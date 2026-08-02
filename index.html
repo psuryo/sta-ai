@@ -3,544 +3,329 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Kecerdasan Buatan — S1 Teknik Informatika · UKWMS</title>
+<title>Kecerdasan Buatan — Universitas Katolik Widya Mandala Surabaya</title>
 <link rel="stylesheet" href="css/style.css">
 <style>
-  /* ── index-specific ── */
-  .cpmk-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: var(--s3);
-  }
-  .cpmk-item {
+  .landing-wrap {
+    min-height: 100vh;
     display: flex;
-    gap: var(--s3);
-    align-items: flex-start;
-    padding: var(--s4) var(--s5);
-    background: var(--bg-2);
-    border: 1px solid var(--border);
-    border-radius: var(--r2);
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: var(--s7);
+    position: relative;
+    overflow: hidden;
   }
-  .cpmk-num {
-    font-family: var(--mono);
-    font-size: 11px;
-    color: var(--teal);
-    flex-shrink: 0;
-    padding-top: 2px;
-  }
-  .cpmk-text { font-size: 13px; color: var(--text-2); line-height: 1.6; }
-  .cpmk-text strong { color: var(--text); display: block; margin-bottom: 2px; font-size: 13px; }
 
-  /* assessment bar */
-  .assess-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: var(--s4);
-  }
-  .assess-card {
-    background: var(--bg-2);
-    border: 1px solid var(--border);
-    border-radius: var(--r3);
-    padding: var(--s5);
-    text-align: center;
-  }
-  .assess-pct {
-    font-family: var(--mono);
-    font-size: 44px;
-    font-weight: 600;
-    line-height: 1;
-    margin-bottom: var(--s2);
-  }
-  .assess-name {
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--text);
-    margin-bottom: var(--s2);
-  }
-  .assess-desc { font-size: 12px; color: var(--text-2); line-height: 1.6; }
-
-  /* hero scan lines (decorative) */
-  .hero-scanlines {
+  /* ambient blobs */
+  .blob {
     position: absolute;
-    inset: 0;
+    border-radius: 50%;
+    filter: blur(80px);
+    pointer-events: none;
+  }
+  .blob-1 { width: 600px; height: 600px; background: rgba(0,201,177,0.07); top: -150px; right: -150px; }
+  .blob-2 { width: 500px; height: 500px; background: rgba(74,142,245,0.06); bottom: -100px; left: -100px; }
+  .blob-3 { width: 300px; height: 300px; background: rgba(155,124,244,0.05); top: 40%; left: 40%; }
+
+  /* scanlines */
+  .scanlines {
+    position: absolute; inset: 0;
     background: repeating-linear-gradient(
-      0deg,
-      transparent,
-      transparent 3px,
-      rgba(0,201,177,0.012) 3px,
-      rgba(0,201,177,0.012) 4px
+      0deg, transparent, transparent 3px,
+      rgba(0,201,177,0.008) 3px, rgba(0,201,177,0.008) 4px
     );
     pointer-events: none;
   }
 
-  /* big bg label */
-  .hero-bg-text {
-    position: absolute;
-    right: -20px; bottom: -30px;
+  .landing-inner {
+    position: relative; z-index: 1;
+    max-width: 860px; width: 100%;
+    text-align: center;
+  }
+
+  .landing-uni {
     font-family: var(--mono);
-    font-size: 180px;
+    font-size: 11px;
+    color: var(--text-3);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: var(--s5);
+  }
+
+  .landing-title {
+    font-family: var(--serif);
+    font-size: clamp(44px, 7vw, 80px);
     font-weight: 600;
-    color: rgba(0,201,177,0.035);
-    line-height: 1;
+    line-height: 1.05;
+    margin-bottom: var(--s3);
+  }
+  .landing-title em { font-style: italic; color: var(--teal); }
+
+  .landing-subtitle {
+    font-size: 16px;
+    color: var(--text-2);
+    max-width: 520px;
+    margin: 0 auto var(--s7);
+    line-height: 1.8;
+  }
+
+  /* Program cards */
+  .program-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--s5);
+    margin-bottom: var(--s7);
+  }
+
+  .program-card {
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: var(--s7) var(--s6);
+    text-align: left;
+    cursor: pointer;
+    transition: all 0.3s var(--ease);
+    position: relative;
+    overflow: hidden;
+    text-decoration: none;
+    display: block;
+  }
+  .program-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transition: opacity 0.3s;
     pointer-events: none;
-    user-select: none;
+  }
+  .program-card.teal::before  { background: radial-gradient(ellipse at 30% 30%, rgba(0,201,177,0.08), transparent 65%); }
+  .program-card.blue::before  { background: radial-gradient(ellipse at 30% 30%, rgba(74,142,245,0.08), transparent 65%); }
+  .program-card:hover { border-color: var(--border-2); transform: translateY(-3px); box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+  .program-card:hover::before { opacity: 1; }
+  .program-card:hover .card-arrow { transform: translateX(4px); }
+
+  .card-icon-wrap {
+    width: 52px; height: 52px;
+    border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 26px;
+    margin-bottom: var(--s5);
+  }
+  .card-icon-teal { background: var(--teal-dim);  border: 1px solid rgba(0,201,177,0.2); }
+  .card-icon-blue { background: var(--blue-dim);  border: 1px solid rgba(74,142,245,0.2); }
+
+  .card-prodi {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text-3);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: var(--s2);
+  }
+  .card-name {
+    font-family: var(--serif);
+    font-size: 26px;
+    font-weight: 600;
+    color: var(--text);
+    line-height: 1.2;
+    margin-bottom: var(--s4);
+  }
+  .card-desc {
+    font-size: 13px;
+    color: var(--text-2);
+    line-height: 1.7;
+    margin-bottom: var(--s5);
+  }
+
+  .card-tags {
+    display: flex; gap: var(--s2); flex-wrap: wrap;
+    margin-bottom: var(--s5);
+  }
+
+  .card-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: var(--s4);
+    border-top: 1px solid var(--border);
+  }
+  .card-enter {
+    font-family: var(--mono);
+    font-size: 12px;
+  }
+  .program-card.teal .card-enter { color: var(--teal); }
+  .program-card.blue .card-enter { color: var(--blue); }
+  .card-arrow {
+    font-size: 18px;
+    transition: transform 0.2s var(--ease);
+  }
+  .program-card.teal .card-arrow { color: var(--teal); }
+  .program-card.blue .card-arrow { color: var(--blue); }
+
+  /* Shared strip */
+  .shared-strip {
+    display: flex;
+    align-items: center;
+    gap: var(--s5);
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: var(--s4) var(--s6);
+    margin-bottom: var(--s6);
+    flex-wrap: wrap;
+  }
+  .shared-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text-3);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+  .shared-items {
+    display: flex; gap: var(--s3); flex-wrap: wrap; flex: 1;
+  }
+  .shared-item {
+    font-size: 12px;
+    color: var(--text-2);
+    display: flex; align-items: center; gap: 6px;
+  }
+  .shared-item::before { content: '✓'; color: var(--teal); font-size: 11px; }
+
+  /* Dosen info */
+  .dosen-row {
+    display: flex;
+    align-items: center;
+    gap: var(--s4);
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .dosen-avatar {
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+  .dosen-name { font-size: 14px; font-weight: 500; color: var(--text); }
+  .dosen-role { font-size: 12px; color: var(--text-3); font-family: var(--mono); }
+  .dosen-divider {
+    width: 1px; height: 32px;
+    background: var(--border);
+  }
+  .dosen-meta { font-size: 12px; color: var(--text-3); }
+
+  /* grid lines bg */
+  .grid-bg {
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(rgba(0,201,177,0.025) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,201,177,0.025) 1px, transparent 1px);
+    background-size: 64px 64px;
+    pointer-events: none;
+  }
+
+  @media (max-width: 700px) {
+    .program-grid { grid-template-columns: 1fr; }
+    .dosen-divider { display: none; }
+    .landing-title { font-size: 40px; }
   }
 </style>
 </head>
 <body>
 
-<!-- ══ NAV ══ -->
-<nav class="nav">
-  <div class="nav-logo">AI<span>·</span>UKWMS</div>
-  <ul class="nav-links">
-    <li><a href="#silabus" class="active">Silabus</a></li>
-    <li><a href="#pertemuan">Pertemuan</a></li>
-    <li><a href="#penilaian">Penilaian</a></li>
-    <li><a href="#referensi">Referensi</a></li>
-  </ul>
-</nav>
+<div class="landing-wrap">
+  <div class="grid-bg"></div>
+  <div class="scanlines"></div>
+  <div class="blob blob-1"></div>
+  <div class="blob blob-2"></div>
+  <div class="blob blob-3"></div>
 
-<!-- ══ HERO ══ -->
-<header class="hero" style="min-height:420px; display:flex; align-items:center; position:relative;">
-  <div class="hero-scanlines"></div>
-  <div class="hero-bg-text">AI</div>
-  <div style="position:relative; z-index:1; max-width:1100px; width:100%; margin:0 auto;">
-    <div class="hero-eyebrow">Panduan Perkuliahan Online</div>
-    <h1 class="hero-title">Kecerdasan<br><em>Buatan</em></h1>
-    <p class="hero-desc">Mata kuliah ini membekali mahasiswa dengan kemampuan memahami, menggunakan, dan mengevaluasi solusi berbasis AI untuk memecahkan masalah nyata di dunia bisnis dan industri.</p>
-    <div class="hero-meta">
-      <span class="badge badge-teal">S1 Teknik Informatika</span>
-      <span class="badge badge-amber">UKWMS · 2024/2025</span>
-      <span class="badge badge-blue">14 Pertemuan · 3 SKS</span>
-    </div>
-  </div>
-</header>
+  <div class="landing-inner">
 
-<!-- ══ INFO STRIP ══ -->
-<div style="border-top:1px solid var(--border); border-bottom:1px solid var(--border); background:var(--bg-2);">
-  <div style="max-width:1100px; margin:0 auto; padding:var(--s5) var(--s7); display:grid; grid-template-columns:repeat(4,1fr); gap:var(--s5);">
-    <div>
-      <div style="font-family:var(--mono);font-size:9px;color:var(--text-3);letter-spacing:2px;text-transform:uppercase;margin-bottom:4px;">Dosen</div>
-      <div style="font-size:14px;color:var(--text);font-weight:500;">Philipus Suryo Subandoro</div>
-    </div>
-    <div>
-      <div style="font-family:var(--mono);font-size:9px;color:var(--text-3);letter-spacing:2px;text-transform:uppercase;margin-bottom:4px;">Program Studi</div>
-      <div style="font-size:14px;color:var(--text);font-weight:500;">S1 Teknik Informatika</div>
-    </div>
-    <div>
-      <div style="font-family:var(--mono);font-size:9px;color:var(--text-3);letter-spacing:2px;text-transform:uppercase;margin-bottom:4px;">Evaluasi</div>
-      <div style="font-size:14px;color:var(--text);font-weight:500;">UTS Teori + UAS Proyek</div>
-    </div>
-    <div>
-      <div style="font-family:var(--mono);font-size:9px;color:var(--text-3);letter-spacing:2px;text-transform:uppercase;margin-bottom:4px;">Tools Utama</div>
-      <div style="font-size:14px;color:var(--text);font-weight:500;">Python · Scikit-learn · LangChain</div>
-    </div>
-  </div>
-</div>
+    <div class="landing-uni">Universitas Katolik Widya Mandala Surabaya · Fak. Teknologi Informasi</div>
 
-<!-- ══ SILABUS ══ -->
-<section class="section" id="silabus">
-  <div style="max-width:1100px; margin:0 auto;">
-    <div class="section-label">01 — Silabus</div>
-    <h2 class="section-title">Deskripsi & Capaian Mata Kuliah</h2>
+    <h1 class="landing-title">Kecerdasan<br><em>Buatan</em></h1>
 
-    <div style="display:grid; grid-template-columns:1fr 1fr; gap:var(--s7); margin-bottom:var(--s7);">
-      <div>
-        <h3 style="font-family:var(--serif);font-size:18px;color:var(--text);margin-bottom:var(--s4);">Deskripsi</h3>
-        <p style="font-size:14px;color:var(--text-2);line-height:1.8;">Mata kuliah Kecerdasan Buatan membahas konsep, teknik, dan aplikasi AI mulai dari Machine Learning klasik hingga Large Language Model modern. Fokus ditempatkan pada <strong style="color:var(--text)">aplikasi AI untuk bisnis dan industri</strong>, bukan derivasi matematis mendalam — karena hal tersebut dicakup di mata kuliah Machine Learning di semester atas.</p>
-        <p style="font-size:14px;color:var(--text-2);line-height:1.8;margin-top:var(--s4);">Mahasiswa akan belajar menggunakan tools AI siap pakai, membangun pipeline data sederhana, mengintegrasikan LLM via API, dan menyelesaikan proyek akhir berupa solusi AI untuk masalah bisnis nyata.</p>
-      </div>
-      <div>
-        <h3 style="font-family:var(--serif);font-size:18px;color:var(--text);margin-bottom:var(--s4);">Prasyarat</h3>
-        <div style="display:flex;flex-direction:column;gap:var(--s2);margin-bottom:var(--s5);">
-          <div style="display:flex;align-items:center;gap:var(--s3);padding:var(--s3) var(--s4);background:var(--teal-glow);border:1px solid rgba(0,201,177,0.15);border-radius:var(--r2);">
-            <span style="color:var(--teal);font-size:14px;">✓</span>
-            <span style="font-size:13px;color:var(--text-2);">Pemrograman Python dasar (variabel, fungsi, OOP)</span>
-          </div>
-          <div style="display:flex;align-items:center;gap:var(--s3);padding:var(--s3) var(--s4);background:var(--teal-glow);border:1px solid rgba(0,201,177,0.15);border-radius:var(--r2);">
-            <span style="color:var(--teal);font-size:14px;">✓</span>
-            <span style="font-size:13px;color:var(--text-2);">Statistika dasar (rata-rata, distribusi, probabilitas)</span>
-          </div>
-          <div style="display:flex;align-items:center;gap:var(--s3);padding:var(--s3) var(--s4);background:var(--teal-glow);border:1px solid rgba(0,201,177,0.15);border-radius:var(--r2);">
-            <span style="color:var(--teal);font-size:14px;">✓</span>
-            <span style="font-size:13px;color:var(--text-2);">Struktur Data & Algoritma</span>
-          </div>
+    <p class="landing-subtitle">Panduan perkuliahan online mata kuliah AI. Pilih program studimu untuk mengakses silabus, materi pertemuan, dan referensi.</p>
+
+    <!-- PROGRAM CARDS -->
+    <div class="program-grid">
+
+      <!-- INFORMATIKA -->
+      <a href="informatika/index.html" class="program-card teal">
+        <div class="card-icon-wrap card-icon-teal">💻</div>
+        <div class="card-prodi">S1 · Program Studi</div>
+        <div class="card-name">Teknik<br>Informatika</div>
+        <div class="card-desc">Fokus pada implementasi teknis AI menggunakan Python. Membangun model ML, mengintegrasikan LLM via API, dan merancang solusi AI end-to-end.</div>
+        <div class="card-tags">
+          <span class="badge badge-teal">Python & Scikit-learn</span>
+          <span class="badge badge-teal">Keras / TensorFlow</span>
+          <span class="badge badge-teal">LangChain & API</span>
         </div>
-        <h3 style="font-family:var(--serif);font-size:18px;color:var(--text);margin-bottom:var(--s4);">Tools yang Digunakan</h3>
-        <div style="display:flex;gap:var(--s2);flex-wrap:wrap;">
-          <span class="badge badge-teal">Python 3.10+</span>
-          <span class="badge badge-teal">Scikit-learn</span>
-          <span class="badge badge-teal">TensorFlow/Keras</span>
-          <span class="badge badge-blue">LangChain</span>
-          <span class="badge badge-blue">OpenAI / Claude API</span>
-          <span class="badge badge-amber">Google Colab</span>
-          <span class="badge badge-amber">Streamlit</span>
+        <div class="card-footer">
+          <div>
+            <div style="font-size:11px;color:var(--text-3);margin-bottom:2px;">UAS</div>
+            <div style="font-size:13px;color:var(--text);">Demo Aplikasi AI Fungsional</div>
+          </div>
+          <span class="card-arrow">→</span>
         </div>
-      </div>
-    </div>
-
-    <h3 style="font-family:var(--serif);font-size:18px;color:var(--text);margin-bottom:var(--s5);">Capaian Pembelajaran Mata Kuliah (CPMK)</h3>
-    <div class="cpmk-grid">
-      <div class="cpmk-item">
-        <span class="cpmk-num">C1</span>
-        <div class="cpmk-text"><strong>Memahami konsep & taksonomi AI</strong>Menjelaskan definisi, cabang, dan sejarah perkembangan AI serta perbedaannya dengan ML dan Deep Learning.</div>
-      </div>
-      <div class="cpmk-item">
-        <span class="cpmk-num">C2</span>
-        <div class="cpmk-text"><strong>Menerapkan Machine Learning</strong>Membangun dan mengevaluasi model ML untuk klasifikasi, regresi, dan klasterisasi menggunakan Scikit-learn.</div>
-      </div>
-      <div class="cpmk-item">
-        <span class="cpmk-num">C3</span>
-        <div class="cpmk-text"><strong>Menggunakan Deep Learning & LLM</strong>Mengimplementasikan CNN sederhana dan mengintegrasikan LLM via API untuk solusi bisnis.</div>
-      </div>
-      <div class="cpmk-item">
-        <span class="cpmk-num">C4</span>
-        <div class="cpmk-text"><strong>Menerapkan AI untuk bisnis</strong>Merancang solusi AI end-to-end untuk masalah nyata: prediksi, rekomendasi, chatbot, atau computer vision.</div>
-      </div>
-      <div class="cpmk-item">
-        <span class="cpmk-num">C5</span>
-        <div class="cpmk-text"><strong>Mengevaluasi dampak & etika AI</strong>Menganalisis bias model, fairness, dan implikasi regulasi AI di konteks industri dan hukum Indonesia.</div>
-      </div>
-      <div class="cpmk-item">
-        <span class="cpmk-num">C6</span>
-        <div class="cpmk-text"><strong>Mengomunikasikan solusi AI</strong>Mempresentasikan proyek AI secara teknis dan non-teknis kepada pemangku kepentingan bisnis.</div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ══ PERTEMUAN ══ -->
-<section class="section" id="pertemuan">
-  <div style="max-width:1100px; margin:0 auto;">
-    <div class="section-label">02 — Jadwal Pertemuan</div>
-    <h2 class="section-title">14 Sesi + UTS + UAS</h2>
-
-    <div class="session-grid">
-
-      <!-- BLOK 1 -->
-      <div class="phase-divider">
-        <span class="phase-divider-label">Blok 1 · P1–P7 → UTS Teori</span>
-        <div class="phase-divider-line"></div>
-      </div>
-
-      <a href="sesi/sesi-01.html" style="text-decoration:none;">
-      <div class="session-item has-link" style="background:var(--teal-glow); border-color:rgba(0,201,177,0.2);">
-        <div class="session-num">P-01</div>
-        <div>
-          <div class="session-title">Pengantar AI & Lanskap Industri</div>
-          <div class="session-sub">Definisi, sejarah, cabang AI, dampak di dunia bisnis dan industri global</div>
-        </div>
-        <span class="session-tag tag-teori">Teori</span>
-      </div>
+        <div class="card-enter" style="margin-top:var(--s4);">Masuk ke materi →</div>
       </a>
 
-      <div class="session-item">
-        <div class="session-num">P-02</div>
-        <div>
-          <div class="session-title">Machine Learning — Konsep & Algoritma</div>
-          <div class="session-sub">Supervised, unsupervised, reinforcement learning; overfitting; evaluasi model</div>
+      <!-- TEKNIK INDUSTRI -->
+      <a href="teknik-industri/index.html" class="program-card blue">
+        <div class="card-icon-wrap card-icon-blue">🏭</div>
+        <div class="card-prodi">S1 · Program Studi</div>
+        <div class="card-name">Teknik<br>Industri</div>
+        <div class="card-desc">Fokus pada penerapan AI untuk efisiensi operasional dan pengambilan keputusan bisnis. Menggunakan tools no-code dan AutoML tanpa coding mendalam.</div>
+        <div class="card-tags">
+          <span class="badge badge-blue">AutoML & Orange</span>
+          <span class="badge badge-blue">Power BI / Tableau</span>
+          <span class="badge badge-blue">Prompt Engineering</span>
         </div>
-        <span class="session-tag tag-teori">Teori</span>
-      </div>
-
-      <div class="session-item">
-        <div class="session-num">P-03</div>
-        <div>
-          <div class="session-title">Praktik ML dengan Python & Scikit-learn</div>
-          <div class="session-sub">Klasifikasi & regresi pada dataset bisnis: prediksi churn pelanggan, harga rumah</div>
+        <div class="card-footer">
+          <div>
+            <div style="font-size:11px;color:var(--text-3);margin-bottom:2px;">UAS</div>
+            <div style="font-size:13px;color:var(--text);">Studi Kasus Perbaikan Proses</div>
+          </div>
+          <span class="card-arrow">→</span>
         </div>
-        <span class="session-tag tag-praktik">Praktik</span>
-      </div>
+        <div class="card-enter" style="margin-top:var(--s4);">Masuk ke materi →</div>
+      </a>
 
-      <div class="session-item">
-        <div class="session-num">P-04</div>
-        <div>
-          <div class="session-title">Data Preparation & Feature Engineering</div>
-          <div class="session-sub">EDA, handling missing values, encoding, scaling, feature selection dengan Pandas</div>
-        </div>
-        <span class="session-tag tag-praktik">Praktik</span>
-      </div>
+    </div>
 
-      <div class="session-item">
-        <div class="session-num">P-05</div>
-        <div>
-          <div class="session-title">Deep Learning & Neural Network</div>
-          <div class="session-sub">Arsitektur ANN, CNN dasar; tools TensorFlow/Keras; use case bisnis</div>
-        </div>
-        <span class="session-tag tag-teori">Teori</span>
+    <!-- SHARED CONTENT -->
+    <div class="shared-strip">
+      <span class="shared-label">Materi Bersama</span>
+      <div class="shared-items">
+        <span class="shared-item">Pengantar AI & Lanskap Industri</span>
+        <span class="shared-item">LLM & Generative AI</span>
+        <span class="shared-item">AI untuk Prediksi Bisnis</span>
+        <span class="shared-item">AI Ethics & Regulasi</span>
+        <span class="shared-item">Workshop Proyek UAS</span>
       </div>
+    </div>
 
-      <div class="session-item">
-        <div class="session-num">P-06</div>
-        <div>
-          <div class="session-title">Praktik Deep Learning: CNN & Analisis Sentimen</div>
-          <div class="session-sub">Implementasi CNN sederhana + analisis sentimen ulasan produk dengan Keras</div>
-        </div>
-        <span class="session-tag tag-praktik">Praktik</span>
+    <!-- DOSEN INFO -->
+    <div class="dosen-row">
+      <div class="dosen-avatar">👨‍🏫</div>
+      <div>
+        <div class="dosen-name">Philipus Suryo Subandoro</div>
+        <div class="dosen-role">Dosen Pengampu</div>
       </div>
+      <div class="dosen-divider"></div>
+      <div class="dosen-meta">Fakultas Teknologi Informasi · UKWMS</div>
+      <div class="dosen-divider"></div>
+      <div class="dosen-meta">Tahun Ajaran 2024/2025</div>
+    </div>
 
-      <div class="session-item" style="background:var(--amber-dim); border-color:rgba(245,166,35,0.15);">
-        <div class="session-num">P-07</div>
-        <div>
-          <div class="session-title">Review & Persiapan UTS</div>
-          <div class="session-sub">Rekap konsep P1–P6, latihan soal, tanya jawab, kisi-kisi UTS</div>
-        </div>
-        <span class="session-tag tag-review">Review</span>
-      </div>
-
-      <!-- UTS -->
-      <div class="exam-block exam-uts" style="margin: var(--s3) 0;">
-        <span class="exam-icon">📝</span>
-        <div>
-          <div class="exam-label">UTS — Ujian Teori (setelah Pertemuan 7)</div>
-          <div class="exam-desc">Pilihan ganda + esai: konsep AI, studi kasus industri, interpretasi output model, pemilihan algoritma</div>
-        </div>
-      </div>
-
-      <!-- BLOK 2 -->
-      <div class="phase-divider">
-        <span class="phase-divider-label">Blok 2 · P8–P14 → UAS Proyek</span>
-        <div class="phase-divider-line"></div>
-      </div>
-
-      <div class="session-item">
-        <div class="session-num">P-08</div>
-        <div>
-          <div class="session-title">LLM & Generative AI</div>
-          <div class="session-sub">Cara kerja transformer, GPT, Claude; aplikasi chatbot & summarizer untuk bisnis</div>
-        </div>
-        <span class="session-tag tag-teori">Teori</span>
-      </div>
-
-      <div class="session-item">
-        <div class="session-num">P-09</div>
-        <div>
-          <div class="session-title">Prompt Engineering & API Integration</div>
-          <div class="session-sub">Zero/few-shot, chain-of-thought; integrasi LLM via API ke aplikasi Python</div>
-        </div>
-        <span class="session-tag tag-praktik">Praktik</span>
-      </div>
-
-      <div class="session-item">
-        <div class="session-num">P-10</div>
-        <div>
-          <div class="session-title">RAG — Chatbot Berbasis Dokumen</div>
-          <div class="session-sub">Vector database, embedding, LangChain dasar; membangun chatbot dokumen perusahaan</div>
-        </div>
-        <span class="session-tag tag-praktik">Praktik</span>
-      </div>
-
-      <div class="session-item">
-        <div class="session-num">P-11</div>
-        <div>
-          <div class="session-title">AI untuk Prediksi & Rekomendasi Bisnis</div>
-          <div class="session-sub">Demand forecasting, recommendation system (collaborative filtering), customer segmentation</div>
-        </div>
-        <span class="session-tag tag-praktik">Praktik</span>
-      </div>
-
-      <div class="session-item">
-        <div class="session-num">P-12</div>
-        <div>
-          <div class="session-title">Computer Vision untuk Industri & AI Ethics</div>
-          <div class="session-sub">Object detection, OCR, quality control; bias model, responsible AI, regulasi</div>
-        </div>
-        <span class="session-tag tag-teori">Teori</span>
-      </div>
-
-      <div class="session-item" style="background:rgba(155,124,244,0.05); border-color:rgba(155,124,244,0.15);">
-        <div class="session-num">P-13</div>
-        <div>
-          <div class="session-title">Workshop Proyek UAS — Sesi 1</div>
-          <div class="session-sub">Pembentukan kelompok, penetapan topik, bimbingan arsitektur solusi AI</div>
-        </div>
-        <span class="session-tag tag-proyek">Proyek</span>
-      </div>
-
-      <div class="session-item" style="background:rgba(155,124,244,0.05); border-color:rgba(155,124,244,0.15);">
-        <div class="session-num">P-14</div>
-        <div>
-          <div class="session-title">Workshop Proyek UAS — Sesi 2</div>
-          <div class="session-sub">Finalisasi implementasi, persiapan demo & laporan, dry-run presentasi</div>
-        </div>
-        <span class="session-tag tag-proyek">Proyek</span>
-      </div>
-
-      <!-- UAS -->
-      <div class="exam-block exam-uas" style="margin: var(--s3) 0;">
-        <span class="exam-icon">🚀</span>
-        <div>
-          <div class="exam-label">UAS — Proyek Kelompok (setelah Pertemuan 14)</div>
-          <div class="exam-desc">Demo live solusi AI untuk bisnis nyata + laporan teknis + presentasi 30 menit + tanya jawab individual</div>
-        </div>
-      </div>
-
-    </div><!-- end session-grid -->
   </div>
-</section>
-
-<!-- ══ PENILAIAN ══ -->
-<section class="section" id="penilaian">
-  <div style="max-width:1100px; margin:0 auto;">
-    <div class="section-label">03 — Penilaian</div>
-    <h2 class="section-title">Komponen & Bobot Nilai</h2>
-    <div class="assess-grid">
-      <div class="assess-card">
-        <div class="assess-pct" style="color:var(--teal);">40%</div>
-        <div class="assess-name">Tugas & Praktik Harian</div>
-        <div class="assess-desc">Tugas individu setiap sesi praktik, laporan praktikum, keaktifan diskusi, dan kuis singkat. Dikumpulkan via Google Classroom atau LMS UKWMS.</div>
-      </div>
-      <div class="assess-card">
-        <div class="assess-pct" style="color:var(--amber);">25%</div>
-        <div class="assess-name">UTS — Ujian Teori</div>
-        <div class="assess-desc">Ujian tulis setelah pertemuan ke-7. Mencakup konsep AI/ML, studi kasus industri, interpretasi output model, dan pemilihan algoritma yang tepat.</div>
-      </div>
-      <div class="assess-card">
-        <div class="assess-pct" style="color:var(--blue);">35%</div>
-        <div class="assess-name">UAS — Proyek Kelompok</div>
-        <div class="assess-desc">Solusi AI end-to-end untuk masalah bisnis nyata. Dinilai dari: relevansi masalah (20%), kualitas solusi (40%), presentasi & demo (30%), dokumentasi (10%).</div>
-      </div>
-    </div>
-
-    <div style="margin-top:var(--s6); padding:var(--s5); background:var(--bg-2); border:1px solid var(--border); border-radius:var(--r3);">
-      <div style="font-family:var(--mono);font-size:10px;color:var(--text-3);letter-spacing:2px;text-transform:uppercase;margin-bottom:var(--s4);">Konversi Nilai</div>
-      <div style="display:flex; gap:var(--s4); flex-wrap:wrap;">
-        <div style="font-size:13px;color:var(--text-2);">A = 85–100</div>
-        <div style="font-size:13px;color:var(--text-2);">B+ = 75–84</div>
-        <div style="font-size:13px;color:var(--text-2);">B = 65–74</div>
-        <div style="font-size:13px;color:var(--text-2);">C+ = 55–64</div>
-        <div style="font-size:13px;color:var(--text-2);">C = 45–54</div>
-        <div style="font-size:13px;color:var(--text-2);">D = 35–44</div>
-        <div style="font-size:13px;color:var(--text-2);">E = 0–34</div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ══ REFERENSI ══ -->
-<section class="section" id="referensi">
-  <div style="max-width:1100px; margin:0 auto;">
-    <div class="section-label">04 — Referensi</div>
-    <h2 class="section-title">Buku & Sumber Utama</h2>
-
-    <h3 style="font-size:14px;font-family:var(--mono);color:var(--text-3);letter-spacing:2px;text-transform:uppercase;margin-bottom:var(--s4);">Buku Wajib</h3>
-    <div class="book-grid" style="margin-bottom:var(--s7);">
-
-      <div class="card book-card">
-        <div class="book-spine" style="background:var(--teal);"></div>
-        <div>
-          <div class="book-title">Artificial Intelligence: A Modern Approach, 4th Ed.</div>
-          <div class="book-author">Stuart Russell & Peter Norvig · Pearson, 2020</div>
-          <span class="book-tag badge badge-teal">Referensi Utama</span>
-          <p style="font-size:12px;color:var(--text-2);margin-top:var(--s3);line-height:1.6;">Standar industri AI di 1.500+ kampus dunia. Digunakan dari P1 hingga P7 untuk fondasi konseptual. Chapter yang relevan: 1, 3, 5, 12, 18, 19, 21.</p>
-        </div>
-      </div>
-
-      <div class="card book-card">
-        <div class="book-spine" style="background:var(--blue);"></div>
-        <div>
-          <div class="book-title">Hands-On Machine Learning with Scikit-Learn, Keras & TensorFlow, 3rd Ed.</div>
-          <div class="book-author">Aurélien Géron · O'Reilly Media, 2022</div>
-          <span class="book-tag badge badge-blue">Praktik ML/DL</span>
-          <p style="font-size:12px;color:var(--text-2);margin-top:var(--s3);line-height:1.6;">Buku praktik terbaik untuk implementasi ML dan DL. Digunakan di sesi P3, P4, P5, P6. Tersedia notebook di GitHub secara gratis.</p>
-        </div>
-      </div>
-
-      <div class="card book-card">
-        <div class="book-spine" style="background:var(--amber);"></div>
-        <div>
-          <div class="book-title">Designing Machine Learning Systems</div>
-          <div class="book-author">Chip Huyen · O'Reilly Media, 2022</div>
-          <span class="book-tag badge badge-amber">ML Produksi</span>
-          <p style="font-size:12px;color:var(--text-2);margin-top:var(--s3);line-height:1.6;">Perspektif industri: bagaimana membangun sistem ML yang scalable dan maintainable. Relevan untuk P9–P12 dan proyek UAS.</p>
-        </div>
-      </div>
-
-    </div>
-
-    <h3 style="font-size:14px;font-family:var(--mono);color:var(--text-3);letter-spacing:2px;text-transform:uppercase;margin-bottom:var(--s4);">Sumber Online Gratis</h3>
-    <div class="book-grid" style="margin-bottom:var(--s7);">
-
-      <div class="card book-card">
-        <div class="book-spine" style="background:var(--purple);"></div>
-        <div>
-          <div class="book-title">Stanford CS221: Artificial Intelligence</div>
-          <div class="book-author">Stanford Online · cs221.stanford.edu</div>
-          <span class="book-tag" style="background:rgba(155,124,244,0.1);color:var(--purple);border:1px solid rgba(155,124,244,0.2);font-family:var(--mono);font-size:10px;padding:2px 8px;border-radius:20px;">Slide & Video</span>
-          <p style="font-size:12px;color:var(--text-2);margin-top:var(--s3);line-height:1.6;">Slide kuliah dari Stanford tersedia untuk diunduh. Sangat berguna untuk P1–P5 sebagai pelengkap AIMA.</p>
-        </div>
-      </div>
-
-      <div class="card book-card">
-        <div class="book-spine" style="background:var(--teal);"></div>
-        <div>
-          <div class="book-title">AI For Everyone</div>
-          <div class="book-author">Andrew Ng · DeepLearning.ai · Coursera (audit gratis)</div>
-          <span class="book-tag badge badge-teal">Non-teknis</span>
-          <p style="font-size:12px;color:var(--text-2);margin-top:var(--s3);line-height:1.6;">Pengantar AI untuk non-engineer. Direkomendasikan sebagai bacaan tambahan untuk membangun intuisi bisnis AI di P1 dan P8.</p>
-        </div>
-      </div>
-
-      <div class="card book-card">
-        <div class="book-spine" style="background:var(--blue);"></div>
-        <div>
-          <div class="book-title">MIT 6.S191: Introduction to Deep Learning</div>
-          <div class="book-author">MIT OpenCourseWare · introtodeeplearning.com</div>
-          <span class="book-tag badge badge-blue">Video + Slide</span>
-          <p style="font-size:12px;color:var(--text-2);margin-top:var(--s3);line-height:1.6;">Materi DL yang selalu diperbarui setiap tahun. Digunakan sebagai referensi utama untuk P5 dan P6.</p>
-        </div>
-      </div>
-
-    </div>
-
-    <h3 style="font-size:14px;font-family:var(--mono);color:var(--text-3);letter-spacing:2px;text-transform:uppercase;margin-bottom:var(--s4);">Laporan Industri (Data & Statistik)</h3>
-    <div class="book-grid">
-
-      <div class="card book-card">
-        <div class="book-spine" style="background:var(--red);"></div>
-        <div>
-          <div class="book-title">Stanford AI Index Report (Annual)</div>
-          <div class="book-author">Stanford HAI · aiindex.stanford.edu</div>
-          <span class="book-tag" style="background:rgba(240,96,96,0.1);color:var(--red);border:1px solid rgba(240,96,96,0.2);font-family:var(--mono);font-size:10px;padding:2px 8px;border-radius:20px;">Data Tren</span>
-          <p style="font-size:12px;color:var(--text-2);margin-top:var(--s3);line-height:1.6;">Laporan komprehensif tentang perkembangan AI: riset, adopsi industri, regulasi, dan tenaga kerja global.</p>
-        </div>
-      </div>
-
-      <div class="card book-card">
-        <div class="book-spine" style="background:var(--amber);"></div>
-        <div>
-          <div class="book-title">McKinsey Global Institute: The State of AI</div>
-          <div class="book-author">McKinsey & Company · mckinsey.com (tahunan)</div>
-          <span class="book-tag badge badge-amber">Bisnis & Industri</span>
-          <p style="font-size:12px;color:var(--text-2);margin-top:var(--s3);line-height:1.6;">Statistik adopsi AI di perusahaan global beserta dampak ekonomi dan tenaga kerja. Digunakan di P1 dan P8.</p>
-        </div>
-      </div>
-
-    </div>
-  </div>
-</section>
-
-<!-- ══ FOOTER ══ -->
-<footer class="footer">
-  <div>AI·UKWMS <span style="color:var(--text-3);">· Kecerdasan Buatan · S1 Teknik Informatika</span></div>
-  <div>Universitas Katolik Widya Mandala Surabaya · 2024/2025</div>
-</footer>
-
-<script>
-  // Smooth active nav on scroll
-  const sections = document.querySelectorAll('section[id], header');
-  const navLinks = document.querySelectorAll('.nav-links a');
-  window.addEventListener('scroll', () => {
-    let current = '';
-    sections.forEach(s => {
-      if (window.scrollY >= s.offsetTop - 80) current = s.id;
-    });
-    navLinks.forEach(a => {
-      a.classList.remove('active');
-      if (a.getAttribute('href') === '#' + current) a.classList.add('active');
-    });
-  });
-</script>
+</div>
 
 </body>
 </html>
