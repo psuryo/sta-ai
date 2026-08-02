@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>P-01: Pengantar AI & Lanskap Industri — Kecerdasan Buatan UKWMS</title>
+<link rel="stylesheet" href="../css/style.css">
+<style>
+  /* sesi-01 specific */
+  .def-block {
+    border-left: 3px solid var(--teal);
+    padding: var(--s3) var(--s5);
+    background: var(--teal-glow);
+    border-radius: 0 var(--r2) var(--r2) 0;
+    margin: var(--s4) 0;
+  }
+  .def-block .def-label {
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--teal);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  .def-block p { color: var(--text) !important; margin-bottom: 0 !important; font-size: 14px !important; }
+
+  .approach-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--s3);
+    margin: var(--s5) 0;
+  }
+  .approach-card {
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: var(--r2);
+    padding: var(--s4) var(--s5);
+  }
+  .approach-tag {
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .approach-title { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
+  .approach-body  { font-size: 13px; color: var(--text-2); line-height: 1.6; }
+  .approach-ex    { font-size: 12px; color: var(--text-3); margin-top: 6px; font-family: var(--mono); }
+
+  .branch-list {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: var(--s3);
+    margin: var(--s5) 0;
+  }
+  .branch-item {
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: var(--r2);
+    padding: var(--s4) var(--s5);
+    display: flex;
+    gap: var(--s3);
+    align-items: flex-start;
+  }
+  .branch-icon { font-size: 22px; flex-shrink: 0; }
+  .branch-name { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+  .branch-desc { font-size: 12px; color: var(--text-2); line-height: 1.5; }
+
+  .vs-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--s4);
+    margin: var(--s5) 0;
+  }
+  .vs-col-head {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: var(--s3) var(--s4);
+    border-radius: var(--r2) var(--r2) 0 0;
+    font-weight: 600;
+    margin-bottom: 0;
+  }
+  .vs-bisa  { background: var(--teal-dim);  color: var(--teal); }
+  .vs-tidak { background: rgba(240,96,96,0.1); color: var(--red); }
+  .vs-list  { list-style: none; padding: 0; margin: 0; }
+  .vs-list li {
+    display: flex; gap: var(--s3); align-items: flex-start;
+    padding: var(--s3) var(--s4);
+    border-bottom: 1px solid var(--border);
+    font-size: 13px; color: var(--text-2);
+    background: var(--bg-2);
+  }
+  .vs-list li:last-child { border-bottom: none; border-radius: 0 0 var(--r2) var(--r2); }
+  .vs-check { flex-shrink: 0; }
+</style>
+</head>
+<body>
+
+<!-- ══ NAV ══ -->
+<nav class="nav">
+  <div class="nav-logo">AI<span>·</span>UKWMS</div>
+  <ul class="nav-links">
+    <li><a href="../index.html">← Beranda</a></li>
+    <li><a href="#definisi" class="active">Definisi</a></li>
+    <li><a href="#sejarah">Sejarah</a></li>
+    <li><a href="#industri">Industri</a></li>
+    <li><a href="#tugas">Tugas</a></li>
+  </ul>
+</nav>
+
+<!-- ══ SESI HERO ══ -->
+<header class="sesi-hero">
+  <div style="max-width:1100px;margin:0 auto;">
+    <div class="sesi-breadcrumb">
+      <a href="../index.html">Kecerdasan Buatan</a>
+      <span>›</span>
+      <span>Pertemuan 1</span>
+    </div>
+    <div class="sesi-num">PERTEMUAN 01 · TEORI</div>
+    <h1 class="sesi-title">Pengantar AI &<br>Lanskap Industri</h1>
+    <p style="font-size:15px;color:var(--text-2);max-width:600px;line-height:1.8;">Memahami apa itu Artificial Intelligence, sejarah 70 tahun perkembangannya, dan mengapa AI menjadi kekuatan penggerak utama di berbagai sektor bisnis dan industri global.</p>
+    <div class="sesi-meta-row">
+      <span class="badge badge-teal">Teori</span>
+      <span class="badge badge-blue">85 menit</span>
+      <span class="badge badge-amber">CPMK: C1, C5</span>
+    </div>
+  </div>
+</header>
+
+<!-- ══ CONTENT LAYOUT ══ -->
+<div class="content-layout">
+
+  <!-- ── MAIN ── -->
+  <main class="content-main">
+
+    <!-- TUJUAN -->
+    <div class="content-block" id="tujuan">
+      <h2>Tujuan Pembelajaran</h2>
+      <p>Setelah mengikuti pertemuan ini, mahasiswa diharapkan mampu:</p>
+      <ol>
+        <li>Menjelaskan definisi Artificial Intelligence dari berbagai perspektif</li>
+        <li>Menyebutkan dan membedakan cabang-cabang utama AI</li>
+        <li>Menceritakan tonggak sejarah penting dalam perkembangan AI</li>
+        <li>Mengidentifikasi minimal 3 aplikasi AI nyata di sektor industri berbeda</li>
+        <li>Menganalisis apa yang bisa dan tidak bisa dilakukan AI saat ini</li>
+      </ol>
+
+      <div class="callout info" style="margin-top:var(--s5);">
+        <span class="callout-icon">💡</span>
+        <div class="callout-body">
+          <p><strong>Orientasi mata kuliah ini:</strong> Kita tidak akan menghitung turunan atau membangun neural network dari nol — itu ada di mata kuliah Machine Learning semester atas. Di sini, kita belajar <em>menggunakan AI</em> untuk memecahkan masalah bisnis nyata.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- BAGIAN 1: DEFINISI -->
+    <div class="content-block" id="definisi">
+      <h2>1. Apa itu Artificial Intelligence?</h2>
+      <p>Sebelum mendefinisikan AI secara formal, coba renungkan ini: hari ini kamu sudah menggunakan Google Maps (prediksi rute), YouTube (rekomendasi video), autocomplete di WhatsApp, dan mungkin berbicara dengan ChatGPT. Semua itu adalah AI. Tapi apa sebenarnya yang menyatukan semua sistem tersebut?</p>
+
+      <div class="pull-quote">
+        <p>"AI adalah ilmu tentang membuat mesin melakukan hal-hal yang membutuhkan kecerdasan jika dilakukan oleh manusia."</p>
+        <cite>— Marvin Minsky, co-founder MIT AI Lab (1968)</cite>
+      </div>
+
+      <div class="pull-quote" style="border-left-color:var(--blue);">
+        <p>"The study of agents that receive percepts from the environment and perform actions to achieve goals."</p>
+        <cite>— Russell & Norvig, Artificial Intelligence: A Modern Approach, 4th Ed. (2020)</cite>
+      </div>
+
+      <p>Secara sederhana, AI adalah kemampuan mesin untuk <strong>meniru fungsi kognitif manusia</strong> — belajar dari data, mengenali pola, memahami bahasa, membuat keputusan, dan memecahkan masalah — tanpa diprogram secara eksplisit untuk setiap skenario yang mungkin terjadi.</p>
+
+      <h3>Empat Cara Mendefinisikan AI</h3>
+      <p>Russell & Norvig (AIMA 4th Ed.) mengorganisasi definisi AI ke dalam 4 kuadran berdasarkan dua sumbu: <em>berpikir vs bertindak</em> dan <em>seperti manusia vs secara rasional</em>.</p>
+
+      <div class="approach-grid">
+        <div class="approach-card">
+          <div class="approach-tag" style="color:var(--blue);">Think Humanly</div>
+          <div class="approach-title">Berpikir seperti manusia</div>
+          <div class="approach-body">Cognitive modeling — memahami dan mereplikasi proses berpikir manusia di dalam mesin. Membutuhkan pemahaman tentang neurosains dan psikologi kognitif.</div>
+          <div class="approach-ex">Contoh: General Problem Solver (1957), cognitive architectures</div>
+        </div>
+        <div class="approach-card">
+          <div class="approach-tag" style="color:var(--amber);">Act Humanly</div>
+          <div class="approach-title">Bertindak seperti manusia</div>
+          <div class="approach-body">Turing Test (1950) — jika mesin tidak bisa dibedakan dari manusia dalam percakapan teks, ia dianggap "cerdas". Standar operasional, bukan mekanisme internal.</div>
+          <div class="approach-ex">Contoh: chatbot konversasional, virtual assistant</div>
+        </div>
+        <div class="approach-card">
+          <div class="approach-tag" style="color:var(--teal);">Think Rationally</div>
+          <div class="approach-title">Berpikir secara rasional</div>
+          <div class="approach-body">Logika formal & inferensi — mesin menggunakan aturan logika untuk menarik kesimpulan yang valid. Berbasis filsafat logika Aristoteles hingga kalkulus predikat modern.</div>
+          <div class="approach-ex">Contoh: Prolog, expert systems, theorem provers</div>
+        </div>
+        <div class="approach-card" style="border-color:rgba(155,124,244,0.25); background:rgba(155,124,244,0.05);">
+          <div class="approach-tag" style="color:var(--purple);">Act Rationally ★</div>
+          <div class="approach-title">Bertindak secara rasional</div>
+          <div class="approach-body"><strong style="color:var(--text)">Pendekatan dominan modern.</strong> Rational agent — sistem yang memilih tindakan terbaik berdasarkan tujuan dan pengetahuan yang dimiliki, tanpa perlu meniru manusia.</div>
+          <div class="approach-ex">Contoh: AlphaGo, self-driving car, recommendation engine</div>
+        </div>
+      </div>
+
+      <div class="callout tip">
+        <span class="callout-icon">🎯</span>
+        <div class="callout-body">
+          <p><strong>Takeaway:</strong> Kebanyakan AI yang kamu gunakan sehari-hari (rekomendasi, deteksi wajah, chatbot modern) masuk ke kategori <em>Act Rationally</em> — sistem yang dioptimasi untuk mencapai tujuan tertentu, bukan untuk meniru manusia secara persis.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- BAGIAN 2: CABANG AI -->
+    <div class="content-block" id="cabang">
+      <h2>2. Ekosistem & Cabang-cabang AI</h2>
+      <p>AI adalah payung besar yang menaungi berbagai subfield. Penting untuk memahami perbedaan di antara mereka agar kamu tidak salah kaprah ketika membaca berita atau berdiskusi di industri.</p>
+
+      <div class="branch-list">
+        <div class="branch-item">
+          <div class="branch-icon">📊</div>
+          <div>
+            <div class="branch-name">Machine Learning</div>
+            <div class="branch-desc">Sistem yang belajar dari data tanpa diprogram eksplisit. Inti dari kebanyakan AI modern. <em>AI ⊃ ML.</em></div>
+          </div>
+        </div>
+        <div class="branch-item">
+          <div class="branch-icon">🧠</div>
+          <div>
+            <div class="branch-name">Deep Learning</div>
+            <div class="branch-desc">Neural network berlapis banyak. Dasar dari image recognition, speech recognition, dan LLM. <em>ML ⊃ DL.</em></div>
+          </div>
+        </div>
+        <div class="branch-item">
+          <div class="branch-icon">💬</div>
+          <div>
+            <div class="branch-name">NLP</div>
+            <div class="branch-desc">Natural Language Processing — pemrosesan dan pemahaman bahasa manusia oleh mesin. Dasar chatbot, translator, dan LLM.</div>
+          </div>
+        </div>
+        <div class="branch-item">
+          <div class="branch-icon">👁️</div>
+          <div>
+            <div class="branch-name">Computer Vision</div>
+            <div class="branch-desc">Mesin yang "melihat" dan menginterpretasi gambar/video. Deteksi objek, pengenalan wajah, OCR dokumen.</div>
+          </div>
+        </div>
+        <div class="branch-item">
+          <div class="branch-icon">🎮</div>
+          <div>
+            <div class="branch-name">Reinforcement Learning</div>
+            <div class="branch-desc">Belajar melalui reward & punishment. Dipakai di game AI (AlphaGo), robotik, dan optimasi kebijakan.</div>
+          </div>
+        </div>
+        <div class="branch-item">
+          <div class="branch-icon">🎨</div>
+          <div>
+            <div class="branch-name">Generative AI</div>
+            <div class="branch-desc">Menghasilkan konten baru: teks, gambar, audio, kode. Contoh: GPT-4, Claude, Stable Diffusion, Sora.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="callout warn">
+        <span class="callout-icon">⚠️</span>
+        <div class="callout-body">
+          <p><strong>Jangan tertukar:</strong> Tidak semua ML adalah Deep Learning, tidak semua AI adalah ML. AI adalah konsep terluas; ML adalah subset AI; DL adalah subset ML. Generative AI menggunakan DL (transformer) sebagai fondasinya.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- BAGIAN 3: SEJARAH -->
+    <div class="content-block" id="sejarah">
+      <h2>3. Sejarah Singkat AI</h2>
+      <p>Perjalanan 70 tahun AI penuh dengan gelombang optimisme, "musim dingin" (periode matinya pendanaan), dan kebangkitan dramatis. Memahami sejarahnya membantu kita tidak terlalu euphoria — dan tidak terlalu pesimis — terhadap AI saat ini.</p>
+
+      <div class="timeline">
+        <div class="tl-item">
+          <div class="tl-year">1950</div>
+          <div class="tl-event">Turing Test — "Can Machines Think?"</div>
+          <div class="tl-desc">Alan Turing menerbitkan "Computing Machinery and Intelligence", mengusulkan Imitation Game sebagai standar kecerdasan mesin. Hingga kini masih menjadi referensi filosofis penting.</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-year">1956</div>
+          <div class="tl-event">Dartmouth Conference — Kelahiran AI</div>
+          <div class="tl-desc">John McCarthy, Marvin Minsky, Claude Shannon, dan rekan-rekan mengadakan workshop musim panas di Dartmouth. Istilah "Artificial Intelligence" pertama kali digunakan dan disepakati.</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-year">1960–70an</div>
+          <div class="tl-event">Era Optimisme Pertama & AI Winter Pertama</div>
+          <div class="tl-desc">Program ELIZA (chatbot pertama), LISP, dan berbagai system buatan para peneliti menimbulkan harapan besar. Namun keterbatasan komputasi dan data menyebabkan pendanaan berhenti — AI Winter pertama.</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-year">1980an</div>
+          <div class="tl-event">Expert Systems & AI Winter Kedua</div>
+          <div class="tl-desc">Sistem berbasis aturan (expert systems) diadopsi di industri medis dan keuangan — antusias besar. Namun biaya maintenance tinggi dan keterbatasan scalability memicu AI Winter kedua pada akhir 1980an.</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-year">1997</div>
+          <div class="tl-event">Deep Blue Mengalahkan Kasparov</div>
+          <div class="tl-desc">IBM Deep Blue mengalahkan juara catur dunia Garry Kasparov dalam pertandingan 6 game. Momen bersejarah yang menunjukkan mesin bisa mengungguli manusia dalam domain tertentu.</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-year">2012</div>
+          <div class="tl-event">AlexNet & Revolusi Deep Learning</div>
+          <div class="tl-desc">AlexNet memenangkan kompetisi ImageNet dengan margin jauh di atas second place — membuktikan superioritas deep neural network. Era deep learning dan GPU computing dimulai. Google, Facebook, dan semua raksasa teknologi berlomba merekrut peneliti DL.</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-year">2017</div>
+          <div class="tl-event">"Attention Is All You Need" — Arsitektur Transformer</div>
+          <div class="tl-desc">Paper dari Google Brain memperkenalkan arsitektur Transformer yang menjadi fondasi semua LLM modern: GPT, BERT, T5, Claude, Gemini. Revolusi NLP dimulai.</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-year">2022–kini</div>
+          <div class="tl-event">Era Generative AI — Mainstream</div>
+          <div class="tl-desc">ChatGPT dirilis November 2022, mencapai 100 juta pengguna dalam 2 bulan — adopsi tercepat dalam sejarah teknologi. AI masuk ke layanan sehari-hari, dunia bisnis, dan regulasi pemerintah di seluruh dunia.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BAGIAN 4: AI DI INDUSTRI -->
+    <div class="content-block" id="industri">
+      <h2>4. AI di Lanskap Industri Global</h2>
+
+      <div class="stat-row">
+        <div class="stat-item">
+          <div class="stat-num" style="color:var(--teal);">72%</div>
+          <div class="stat-desc">Perusahaan global sudah adopsi AI di setidaknya satu fungsi bisnis (McKinsey, 2024)</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num" style="color:var(--amber);">$15.7T</div>
+          <div class="stat-desc">Proyeksi kontribusi AI terhadap PDB global pada 2030 (McKinsey Global Institute)</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num" style="color:var(--blue);">100M</div>
+          <div class="stat-desc">Pengguna aktif ChatGPT dalam 2 bulan pertama — adopsi tercepat dalam sejarah teknologi</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num" style="color:var(--purple);">800M</div>
+          <div class="stat-desc">Pekerjaan yang akan terdampak otomasi AI secara global pada 2030 (McKinsey)</div>
+        </div>
+      </div>
+
+      <h3 style="margin-top:var(--s6);">Aplikasi AI per Sektor Industri</h3>
+
+      <table class="industry-table">
+        <thead>
+          <tr>
+            <th>Sektor</th>
+            <th>Aplikasi AI</th>
+            <th>Contoh Nyata</th>
+            <th>Dampak</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="sector-name">🏥 Kesehatan</span></td>
+            <td>Diagnosis penyakit, drug discovery, analisis citra medis (X-ray, MRI)</td>
+            <td>Google DeepMind AlphaFold — prediksi struktur protein; FDA-approved AI diagnostic tools</td>
+            <td><span class="impact-good">+40% akurasi</span></td>
+          </tr>
+          <tr>
+            <td><span class="sector-name">🏦 Keuangan</span></td>
+            <td>Deteksi fraud real-time, credit scoring, robo-advisor, algorithmic trading</td>
+            <td>Bank BCA — chatbot Vira; OJK fraud detection; PayPal fraud detection (99.9% akurasi)</td>
+            <td><span class="impact-good">-60% fraud loss</span></td>
+          </tr>
+          <tr>
+            <td><span class="sector-name">🏭 Manufaktur</span></td>
+            <td>Quality control visual, predictive maintenance, optimasi supply chain</td>
+            <td>Toyota — computer vision defect detection di lini produksi; Siemens predictive maintenance</td>
+            <td><span class="impact-good">-30% downtime</span></td>
+          </tr>
+          <tr>
+            <td><span class="sector-name">🛒 Ritel / E-com</span></td>
+            <td>Recommendation system, demand forecasting, chatbot layanan pelanggan</td>
+            <td>Tokopedia & Shopee — "Kamu mungkin suka..." engine; Amazon — 35% revenue dari rekomendasi</td>
+            <td><span class="impact-good">+35% revenue</span></td>
+          </tr>
+          <tr>
+            <td><span class="sector-name">🚗 Transportasi</span></td>
+            <td>Route optimization, ETA prediction, dynamic pricing, driver matching</td>
+            <td>Gojek — surge pricing & matching; Tesla Autopilot; Waymo fully autonomous taxi</td>
+            <td><span class="impact-good">+25% efisiensi</span></td>
+          </tr>
+          <tr>
+            <td><span class="sector-name">📚 Pendidikan</span></td>
+            <td>Adaptive learning, grading otomatis, deteksi plagiarisme, tutor AI</td>
+            <td>Khan Academy + GPT-4 — Khanmigo AI tutor; Duolingo AI conversation practice</td>
+            <td><span class="impact-good">+40% engagement</span></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3 style="margin-top:var(--s6);">AI di Indonesia</h3>
+      <div class="concept-grid">
+        <div class="concept-card">
+          <div class="concept-card-label" style="color:var(--blue);">Regulasi & Kebijakan</div>
+          <div class="concept-card-title">Strategi Nasional AI 2020–2045</div>
+          <div class="concept-card-body">Kominfo merilis Stranas KA dengan target Indonesia menjadi hub AI terbesar di ASEAN pada 2030. Perpres AI sedang dalam proses finalisasi.</div>
+        </div>
+        <div class="concept-card">
+          <div class="concept-card-label" style="color:var(--teal);">Ekosistem Lokal</div>
+          <div class="concept-card-title">200+ Startup AI Aktif</div>
+          <div class="concept-card-body">Gojek, Tokopedia, Traveloka investasi ratusan juta USD ke infrastruktur AI. Ekosistem startup AI terus tumbuh: healthtech, agritech, fintech, edtech.</div>
+        </div>
+        <div class="concept-card">
+          <div class="concept-card-label" style="color:var(--amber);">Peluang Karir</div>
+          <div class="concept-card-title">Rp 15–40 juta/bulan</div>
+          <div class="concept-card-body">AI Engineer, Data Scientist, ML Engineer masuk 5 besar profesi paling dicari di Jobstreet Indonesia 2024. Gap talenta: 9 juta tenaga digital dibutuhkan hingga 2030.</div>
+        </div>
+        <div class="concept-card">
+          <div class="concept-card-label" style="color:var(--purple);">Tantangan</div>
+          <div class="concept-card-title">Data, Talenta & Regulasi</div>
+          <div class="concept-card-body">Keterbatasan dataset bahasa Indonesia berkualitas, kurangnya peneliti AI lokal, dan kerangka regulasi privasi data yang masih berkembang (RUU PDP sudah disahkan 2022).</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BAGIAN 5: BISA VS TIDAK BISA -->
+    <div class="content-block" id="batasan">
+      <h2>5. Apa yang Bisa dan Tidak Bisa AI Lakukan?</h2>
+      <p>Salah satu tugas penting seorang AI practitioner adalah memiliki ekspektasi yang realistis tentang kemampuan AI. Terlalu optimis dapat menyebabkan proyek gagal; terlalu pesimis dapat menyebabkan peluang terlewat.</p>
+
+      <div class="vs-grid">
+        <div>
+          <div class="vs-col-head vs-bisa">✓ AI sangat baik dalam</div>
+          <ul class="vs-list">
+            <li><span class="vs-check" style="color:var(--teal)">→</span> Mengenali pola dalam data besar (gambar, teks, suara, tabular)</li>
+            <li><span class="vs-check" style="color:var(--teal)">→</span> Melakukan tugas berulang dengan kecepatan dan konsistensi sangat tinggi</li>
+            <li><span class="vs-check" style="color:var(--teal)">→</span> Membuat prediksi berdasarkan data historis yang besar</li>
+            <li><span class="vs-check" style="color:var(--teal)">→</span> Menghasilkan teks, gambar, dan kode yang menyerupai produksi manusia</li>
+            <li><span class="vs-check" style="color:var(--teal)">→</span> Mengoptimasi variabel dalam ruang solusi yang terdefinisi dengan baik</li>
+          </ul>
+        </div>
+        <div>
+          <div class="vs-col-head vs-tidak">✗ AI masih terbatas dalam</div>
+          <ul class="vs-list">
+            <li><span class="vs-check" style="color:var(--red)">→</span> Memahami konteks di luar distribusi data latih (common sense)</li>
+            <li><span class="vs-check" style="color:var(--red)">→</span> Kreativitas sejati dan orisinalitas tanpa referensi data</li>
+            <li><span class="vs-check" style="color:var(--red)">→</span> Penalaran kausal mendalam (sebab-akibat kompleks)</li>
+            <li><span class="vs-check" style="color:var(--red)">→</span> Adaptasi cepat ke situasi yang benar-benar baru di dunia fisik</li>
+            <li><span class="vs-check" style="color:var(--red)">→</span> Akuntabilitas moral dan pertimbangan etika secara mandiri</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="callout tip" style="margin-top:var(--s5);">
+        <span class="callout-icon">🏆</span>
+        <div class="callout-body">
+          <p><strong>Prinsip emas:</strong> AI paling kuat ketika digunakan sebagai <em>amplifier</em> kemampuan manusia, bukan sebagai pengganti. Seorang dokter + AI diagnosis jauh lebih baik daripada dokter saja atau AI saja.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- RINGKASAN -->
+    <div class="content-block" id="ringkasan">
+      <h2>Ringkasan Pertemuan Ini</h2>
+      <div style="background:var(--bg-2); border:1px solid var(--border); border-radius:var(--r3); padding:var(--s5);">
+        <ul>
+          <li>AI adalah sistem yang meniru kemampuan kognitif manusia — kamu sudah menggunakannya setiap hari tanpa sadar</li>
+          <li>Ada 4 cara mendefinisikan AI; pendekatan <em>rational agent</em> adalah yang dominan saat ini</li>
+          <li>AI memiliki banyak cabang: ML, Deep Learning, NLP, Computer Vision, RL, dan Generative AI</li>
+          <li>Perjalanan AI selama 70 tahun penuh ups & downs, dan kita kini berada di puncak gelombang ketiga</li>
+          <li>72% perusahaan global sudah adopsi AI — dan Indonesia bergerak ke arah yang sama dengan cepat</li>
+          <li>AI bukan segalanya: ada yang bisa dilakukan sangat baik, ada yang masih sangat terbatas</li>
+        </ul>
+      </div>
+
+      <!-- TASK BOX -->
+      <div class="task-box">
+        <div class="task-box-title">📋 Tugas Pertemuan Ini</div>
+        <p style="font-size:13px;color:var(--text-2);margin-bottom:var(--s4);">Dikumpulkan sebelum pertemuan ke-2 melalui Google Classroom.</p>
+        <ol style="font-size:14px;color:var(--text);line-height:2;">
+          <li>Identifikasi <strong>3 aplikasi AI</strong> yang kamu gunakan hari ini. Untuk masing-masing, jelaskan: (a) apa inputnya, (b) apa outputnya, (c) apa manfaat bisnisnya.</li>
+          <li>Pilih <strong>satu industri di Indonesia</strong> yang menurutmu paling berpotensi terdisrupsi oleh AI dalam 5 tahun ke depan. Jelaskan alasanmu dalam 150–200 kata.</li>
+          <li><em>Opsional (bonus):</em> Cari satu berita terbaru tentang AI di Indonesia (maksimal 1 bulan terakhir). Ringkas isinya dan berikan pendapatmu.</li>
+        </ol>
+      </div>
+
+      <!-- READING BOX -->
+      <div class="reading-box">
+        <div class="reading-box-title">📖 Persiapan Pertemuan Ke-2</div>
+        <div class="reading-item">
+          <span class="reading-icon">📗</span>
+          <div class="reading-label">
+            <strong>Russell & Norvig — AIMA 4th Ed., Chapter 18</strong>
+            "Learning from Examples" — Pengantar supervised learning sebelum praktik Scikit-learn
+          </div>
+        </div>
+        <div class="reading-item">
+          <span class="reading-icon">🎥</span>
+          <div class="reading-label">
+            <strong>Andrew Ng — AI For Everyone, Week 2</strong>
+            "Building AI Projects" — 45 menit, tersedia di Coursera (audit gratis)
+          </div>
+        </div>
+        <div class="reading-item">
+          <span class="reading-icon">🔧</span>
+          <div class="reading-label">
+            <strong>Setup Environment</strong>
+            Install Python 3.10+, Jupyter Notebook / Google Colab, library: numpy, pandas, scikit-learn. Panduan instalasi ada di folder /resources di Google Classroom.
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ── ASIDE ── -->
+  <aside class="content-aside">
+    <!-- TOC -->
+    <div class="toc">
+      <div class="toc-title">Isi Halaman</div>
+      <ul class="toc-list">
+        <li><a href="#tujuan" class="active">Tujuan Pembelajaran</a></li>
+        <li><a href="#definisi">1. Definisi AI</a></li>
+        <li><a href="#cabang">2. Cabang-cabang AI</a></li>
+        <li><a href="#sejarah">3. Sejarah AI</a></li>
+        <li><a href="#industri">4. Lanskap Industri</a></li>
+        <li><a href="#batasan">5. Batas Kemampuan AI</a></li>
+        <li><a href="#ringkasan">Ringkasan & Tugas</a></li>
+      </ul>
+    </div>
+
+    <!-- Sesi nav -->
+    <div class="sesi-nav-aside">
+      <div class="sesi-nav-title">Navigasi Sesi</div>
+      <a href="../index.html" class="sesi-nav-btn">
+        <span>🏠</span>
+        <span>Kembali ke Beranda</span>
+      </a>
+      <div style="font-size:12px;color:var(--text-3);margin-top:var(--s4);padding:var(--s3) 0;border-top:1px solid var(--border);">Sesi berikutnya:</div>
+      <a href="#" class="sesi-nav-btn" style="opacity:0.5;pointer-events:none;">
+        <span>→</span>
+        <span>P-02: Konsep Machine Learning</span>
+      </a>
+    </div>
+
+    <!-- Info box -->
+    <div style="background:var(--bg-2);border:1px solid var(--border);border-radius:var(--r3);padding:var(--s5);margin-top:var(--s4);">
+      <div style="font-family:var(--mono);font-size:10px;color:var(--text-3);letter-spacing:2px;text-transform:uppercase;margin-bottom:var(--s3);">Info Pertemuan</div>
+      <div style="display:flex;flex-direction:column;gap:var(--s3);">
+        <div>
+          <div style="font-size:11px;color:var(--text-3);">Tipe</div>
+          <div style="font-size:13px;color:var(--text);">Kuliah Teori</div>
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--text-3);">Durasi</div>
+          <div style="font-size:13px;color:var(--text);">85 menit</div>
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--text-3);">CPMK</div>
+          <div style="font-size:13px;color:var(--text);">C1 (Memahami konsep AI), C5 (Etika & dampak)</div>
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--text-3);">Referensi Utama</div>
+          <div style="font-size:13px;color:var(--text);">AIMA 4th Ed. — Chapter 1</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+</div><!-- end content-layout -->
+
+<!-- ══ FOOTER ══ -->
+<footer class="footer">
+  <div>AI·UKWMS <span style="color:var(--text-3);">· P-01 Pengantar AI & Lanskap Industri</span></div>
+  <div><a href="../index.html" style="color:var(--text-3);">← Kembali ke Beranda</a></div>
+</footer>
+
+<script>
+  // Active TOC on scroll
+  const headings = document.querySelectorAll('.content-main [id]');
+  const tocLinks = document.querySelectorAll('.toc-list a');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(a => {
+          a.classList.remove('active');
+          if (a.getAttribute('href') === '#' + entry.target.id) a.classList.add('active');
+        });
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px' });
+  headings.forEach(h => observer.observe(h));
+
+  // Active nav links on scroll
+  const navLinks = document.querySelectorAll('.nav-links a[href^="#"]');
+  window.addEventListener('scroll', () => {
+    let current = '';
+    headings.forEach(h => { if (window.scrollY >= h.offsetTop - 100) current = h.id; });
+    navLinks.forEach(a => {
+      a.classList.remove('active');
+      if (a.getAttribute('href') === '#' + current) a.classList.add('active');
+    });
+  });
+</script>
+
+</body>
+</html>
