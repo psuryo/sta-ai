@@ -17,10 +17,7 @@
   .assess-name { font-size:13px; font-weight:600; color:var(--text); margin-bottom:var(--s2); }
   .assess-desc { font-size:12px; color:var(--text-2); line-height:1.6; }
   .hero-bg-text { position:absolute; right:-20px; bottom:-30px; font-family:var(--mono); font-size:180px; font-weight:600; color:rgba(74,142,245,0.035); line-height:1; pointer-events:none; user-select:none; }
-  .diff-pill { display:inline-flex; align-items:center; gap:5px; font-size:11px; padding:2px 9px; border-radius:20px; font-family:var(--mono); }
-  .pill-same   { background:var(--teal-dim);  color:var(--teal);  border:1px solid rgba(0,201,177,0.2); }
-  .pill-adapt  { background:var(--amber-dim); color:var(--amber); border:1px solid rgba(245,166,35,0.2); }
-  .pill-ganti  { background:var(--blue-dim);  color:var(--blue);  border:1px solid rgba(74,142,245,0.2); }
+
 </style>
 </head>
 <body>
@@ -86,12 +83,9 @@
       <div>
         <h3 style="font-family:var(--serif);font-size:18px;color:var(--text);margin-bottom:var(--s4);">Deskripsi</h3>
         <p style="font-size:14px;color:var(--text-2);line-height:1.8;">Mata kuliah ini membekali mahasiswa Teknik Industri dengan kemampuan <strong style="color:var(--text)">menggunakan dan mengevaluasi solusi AI</strong> untuk masalah-masalah operasional industri: prediksi permintaan, optimasi proses, quality control, dan pengambilan keputusan berbasis data.</p>
-        <p style="font-size:14px;color:var(--text-2);line-height:1.8;margin-top:var(--s4);">Berbeda dengan kelas Informatika, di sini kita <strong style="color:var(--text)">tidak membangun model dari nol</strong>. Fokusnya adalah memahami kapan dan bagaimana menerapkan AI yang sudah tersedia, menganalisis hasilnya, dan mengomunikasikan rekomendasinya kepada manajemen.</p>
+        <p style="font-size:14px;color:var(--text-2);line-height:1.8;margin-top:var(--s4);">Fokusnya adalah memahami kapan dan bagaimana menerapkan AI yang sudah tersedia, menganalisis hasilnya, dan mengomunikasikan rekomendasinya kepada manajemen — tanpa perlu membangun model dari nol.</p>
 
-        <div style="margin-top:var(--s5);padding:var(--s4) var(--s5);background:var(--blue-dim);border:1px solid rgba(74,142,245,0.2);border-radius:var(--r2);">
-          <div style="font-size:12px;color:var(--blue);font-family:var(--mono);margin-bottom:4px;">PERBEDAAN DENGAN KELAS INFORMATIKA</div>
-          <div style="font-size:13px;color:var(--text-2);line-height:1.7;">Kelas Informatika: <em>membangun</em> model AI (coding Python, Scikit-learn, Keras).<br>Kelas Teknik Industri: <em>menggunakan</em> model AI (AutoML, no-code tools, analisis hasil, keputusan manajerial).</div>
-        </div>
+
       </div>
       <div>
         <h3 style="font-family:var(--serif);font-size:18px;color:var(--text);margin-bottom:var(--s4);">Prasyarat</h3>
@@ -161,14 +155,6 @@
     <div class="section-label">02 — Jadwal Pertemuan</div>
     <h2 class="section-title">14 Sesi + UTS + UAS</h2>
 
-    <!-- Legend -->
-    <div style="display:flex;gap:var(--s4);flex-wrap:wrap;margin-bottom:var(--s5);padding:var(--s4) var(--s5);background:var(--bg-2);border:1px solid var(--border);border-radius:var(--r2);">
-      <div style="font-family:var(--mono);font-size:10px;color:var(--text-3);letter-spacing:2px;text-transform:uppercase;align-self:center;">Status materi:</div>
-      <span class="diff-pill pill-same">✓ Sama dengan Informatika</span>
-      <span class="diff-pill pill-adapt">~ Disesuaikan konteksnya</span>
-      <span class="diff-pill pill-ganti">↻ Topik berbeda</span>
-    </div>
-
     <div class="session-grid">
 
       <!-- BLOK 1 -->
@@ -183,7 +169,7 @@
           <div class="session-title">Pengantar AI & Lanskap Industri</div>
           <div class="session-sub">Definisi, sejarah, cabang AI, dampak di sektor manufaktur, logistik, dan bisnis Indonesia</div>
         </div>
-        <span class="diff-pill pill-same" style="white-space:nowrap;">✓ Sama</span>
+        <span class="session-tag tag-teori">Teori</span>
       </div>
 
       <div class="session-item">
@@ -192,7 +178,7 @@
           <div class="session-title">Konsep ML untuk Industri — Tanpa Coding</div>
           <div class="session-sub">Apa itu supervised/unsupervised learning; kapan & mengapa pakai ML; membaca output model tanpa harus membuatnya</div>
         </div>
-        <span class="diff-pill pill-ganti" style="white-space:nowrap;">↻ Ganti</span>
+        <span class="session-tag tag-teori">Teori</span>
       </div>
 
       <div class="session-item">
@@ -201,7 +187,7 @@
           <div class="session-title">Praktik AutoML: Klasifikasi & Prediksi dengan Orange</div>
           <div class="session-sub">Membangun model prediksi cacat produk dan churn pelanggan dengan drag-and-drop di Orange Data Mining</div>
         </div>
-        <span class="diff-pill pill-ganti" style="white-space:nowrap;">↻ Ganti</span>
+        <span class="session-tag tag-praktik">Praktik</span>
       </div>
 
       <div class="session-item">
@@ -210,7 +196,7 @@
           <div class="session-title">Data Industri: Pembersihan & Visualisasi</div>
           <div class="session-sub">Mengelola data operasional berkualitas buruk; data cleaning tanpa coding; EDA visual dengan Power BI / Looker Studio</div>
         </div>
-        <span class="diff-pill pill-ganti" style="white-space:nowrap;">↻ Ganti</span>
+        <span class="session-tag tag-praktik">Praktik</span>
       </div>
 
       <div class="session-item">
@@ -219,7 +205,7 @@
           <div class="session-title">AI untuk Optimasi Produksi & Supply Chain</div>
           <div class="session-sub">Aplikasi AI di manajemen inventori, scheduling produksi, dan optimasi rantai pasok; studi kasus Toyota, Unilever</div>
         </div>
-        <span class="diff-pill pill-ganti" style="white-space:nowrap;">↻ Ganti</span>
+        <span class="session-tag tag-teori">Teori</span>
       </div>
 
       <div class="session-item">
@@ -228,7 +214,7 @@
           <div class="session-title">Praktik: Prediksi Demand & Simulasi Rantai Pasok</div>
           <div class="session-sub">Membangun model demand forecasting dengan data historis penjualan; simulasi dampak prediksi terhadap keputusan stok</div>
         </div>
-        <span class="diff-pill pill-ganti" style="white-space:nowrap;">↻ Ganti</span>
+        <span class="session-tag tag-praktik">Praktik</span>
       </div>
 
       <div class="session-item" style="background:var(--amber-dim);border-color:rgba(245,166,35,0.15);">
@@ -237,7 +223,7 @@
           <div class="session-title">Review & Persiapan UTS</div>
           <div class="session-sub">Rekap konsep P1–P6, latihan studi kasus, tanya jawab, kisi-kisi UTS</div>
         </div>
-        <span class="diff-pill pill-same" style="white-space:nowrap;">✓ Sama</span>
+        <span class="session-tag tag-review">Review</span>
       </div>
 
       <!-- UTS -->
@@ -261,7 +247,7 @@
           <div class="session-title">LLM & Generative AI</div>
           <div class="session-sub">Cara kerja LLM, ChatGPT, Claude; aplikasi untuk otomasi laporan, rangkuman SOP, analisis data berbasis teks</div>
         </div>
-        <span class="diff-pill pill-same" style="white-space:nowrap;">✓ Sama</span>
+        <span class="session-tag tag-teori">Teori</span>
       </div>
 
       <div class="session-item">
@@ -270,7 +256,7 @@
           <div class="session-title">Prompt Engineering untuk Konteks Industri</div>
           <div class="session-sub">Teknik prompting untuk: pembuatan laporan operasional, analisis data tabel, penyusunan SOP, dan ringkasan meeting</div>
         </div>
-        <span class="diff-pill pill-adapt" style="white-space:nowrap;">~ Disesuaikan</span>
+        <span class="session-tag tag-praktik">Praktik</span>
       </div>
 
       <div class="session-item">
@@ -279,7 +265,7 @@
           <div class="session-title">AI untuk Quality Control & Predictive Maintenance</div>
           <div class="session-sub">Computer vision untuk inspeksi visual; sensor data untuk prediksi kerusakan mesin; studi kasus implementasi nyata</div>
         </div>
-        <span class="diff-pill pill-ganti" style="white-space:nowrap;">↻ Ganti</span>
+        <span class="session-tag tag-praktik">Praktik</span>
       </div>
 
       <div class="session-item">
@@ -288,7 +274,7 @@
           <div class="session-title">AI untuk Prediksi & Rekomendasi Bisnis</div>
           <div class="session-sub">Demand forecasting, segmentasi pelanggan, rekomendasi produk; praktik dengan dataset industri lokal</div>
         </div>
-        <span class="diff-pill pill-same" style="white-space:nowrap;">✓ Sama</span>
+        <span class="session-tag tag-praktik">Praktik</span>
       </div>
 
       <div class="session-item">
@@ -297,7 +283,7 @@
           <div class="session-title">AI Ethics, Regulasi & Kepatuhan Industri</div>
           <div class="session-sub">Bias algoritma, fairness, GDPR & UU PDP Indonesia, ISO AI standards, implikasi K3 dan compliance audit</div>
         </div>
-        <span class="diff-pill pill-adapt" style="white-space:nowrap;">~ Disesuaikan</span>
+        <span class="session-tag tag-teori">Teori</span>
       </div>
 
       <div class="session-item" style="background:rgba(155,124,244,0.05);border-color:rgba(155,124,244,0.15);">
@@ -306,7 +292,7 @@
           <div class="session-title">Workshop Proyek UAS — Sesi 1</div>
           <div class="session-sub">Pembentukan kelompok, penetapan topik perbaikan proses, bimbingan kerangka proposal solusi AI</div>
         </div>
-        <span class="diff-pill pill-same" style="white-space:nowrap;">✓ Sama</span>
+        <span class="session-tag tag-proyek">Proyek</span>
       </div>
 
       <div class="session-item" style="background:rgba(155,124,244,0.05);border-color:rgba(155,124,244,0.15);">
@@ -315,7 +301,7 @@
           <div class="session-title">Workshop Proyek UAS — Sesi 2</div>
           <div class="session-sub">Finalisasi analisis, persiapan presentasi proposal, simulasi presentasi ke "manajemen"</div>
         </div>
-        <span class="diff-pill pill-same" style="white-space:nowrap;">✓ Sama</span>
+        <span class="session-tag tag-proyek">Proyek</span>
       </div>
 
       <!-- UAS -->
