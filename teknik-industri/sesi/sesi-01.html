@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>P-01: Pengantar AI & Lanskap Industri — Teknik Industri UKWMS</title>
+<link rel="stylesheet" href="../../css/style.css">
+<style>
+  .def-block {
+    border-left: 3px solid var(--blue);
+    padding: var(--s3) var(--s5);
+    background: var(--blue-dim);
+    border-radius: 0 var(--r2) var(--r2) 0;
+    margin: var(--s4) 0;
+  }
+  .def-block .def-label {
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--blue);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  .def-block p { color: var(--text) !important; margin-bottom: 0 !important; font-size: 14px !important; }
+
+  .approach-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--s3);
+    margin: var(--s5) 0;
+  }
+  .approach-card {
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: var(--r2);
+    padding: var(--s4) var(--s5);
+  }
+  .approach-tag {
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .approach-title { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
+  .approach-body  { font-size: 13px; color: var(--text-2); line-height: 1.6; }
+  .approach-ex    { font-size: 12px; color: var(--text-3); margin-top: 6px; font-family: var(--mono); }
+
+  .branch-list {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: var(--s3);
+    margin: var(--s5) 0;
+  }
+  .branch-item {
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: var(--r2);
+    padding: var(--s4) var(--s5);
+    display: flex;
+    gap: var(--s3);
+    align-items: flex-start;
+  }
+  .branch-icon { font-size: 22px; flex-shrink: 0; }
+  .branch-name { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+  .branch-desc { font-size: 12px; color: var(--text-2); line-height: 1.5; }
+
+  .vs-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--s4);
+    margin: var(--s5) 0;
+  }
+  .vs-col-head {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: var(--s3) var(--s4);
+    border-radius: var(--r2) var(--r2) 0 0;
+    font-weight: 600;
+    margin-bottom: 0;
+  }
+  .vs-bisa  { background: var(--teal-dim);  color: var(--teal); }
+  .vs-tidak { background: rgba(240,96,96,0.1); color: var(--red); }
+  .vs-list  { list-style: none; padding: 0; margin: 0; }
+  .vs-list li {
+    display: flex; gap: var(--s3); align-items: flex-start;
+    padding: var(--s3) var(--s4);
+    border-bottom: 1px solid var(--border);
+    font-size: 13px; color: var(--text-2);
+    background: var(--bg-2);
+  }
+  .vs-list li:last-child { border-bottom: none; border-radius: 0 0 var(--r2) var(--r2); }
+  .vs-check { flex-shrink: 0; }
+
+  .ti-app-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--s4);
+    margin: var(--s5) 0;
+  }
+  .ti-app-card {
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: var(--r3);
+    padding: var(--s5);
+  }
+  .ti-app-icon { font-size: 28px; margin-bottom: var(--s3); }
+  .ti-app-sector {
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  .ti-app-title { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: var(--s3); }
+  .ti-app-desc { font-size: 13px; color: var(--text-2); line-height: 1.6; }
+  .ti-app-example {
+    margin-top: var(--s3);
+    padding: var(--s3) var(--s4);
+    background: var(--bg-1);
+    border-radius: var(--r2);
+    font-size: 12px;
+    color: var(--text-3);
+    font-family: var(--mono);
+  }
+</style>
+</head>
+<body>
+
+<!-- ══ NAV ══ -->
+<nav class="nav">
+  <div class="nav-logo">AI<span>·</span>UKWMS</div>
+  <ul class="nav-links">
+    <li><a href="../index.html">← Beranda</a></li>
+    <li><a href="#definisi" class="active">Definisi</a></li>
+    <li><a href="#sejarah">Sejarah</a></li>
+    <li><a href="#industri">Industri</a></li>
+    <li><a href="#tugas">Tugas</a></li>
+  </ul>
+</nav>
+
+<!-- ══ SESI HERO ══ -->
+<header class="sesi-hero">
+  <div style="max-width:1100px;margin:0 auto;">
+    <div class="sesi-breadcrumb">
+      <a href="../index.html">Kecerdasan Buatan — Teknik Industri</a>
+      <span>›</span>
+      <span>Pertemuan 1</span>
+    </div>
+    <div class="sesi-num">PERTEMUAN 01 · TEORI</div>
+    <h1 class="sesi-title">Pengantar AI &<br>Lanskap Industri</h1>
+    <p style="font-size:15px;color:var(--text-2);max-width:640px;line-height:1.8;">Memahami apa itu Artificial Intelligence, sejarah perkembangannya, dan bagaimana AI mengubah cara kerja industri manufaktur, logistik, dan rantai pasok secara global — termasuk di Indonesia.</p>
+    <div class="sesi-meta-row">
+      <span class="badge badge-blue">Teori</span>
+      <span class="badge badge-blue">85 menit</span>
+      <span class="badge badge-amber">CPMK: C1, C5</span>
+    </div>
+  </div>
+</header>
+
+<!-- ══ CONTENT LAYOUT ══ -->
+<div class="content-layout">
+
+  <!-- ── MAIN ── -->
+  <main class="content-main">
+
+    <!-- TUJUAN -->
+    <div class="content-block" id="tujuan">
+      <h2>Tujuan Pembelajaran</h2>
+      <p>Setelah mengikuti pertemuan ini, mahasiswa diharapkan mampu:</p>
+      <ol>
+        <li>Menjelaskan definisi Artificial Intelligence dari berbagai perspektif ilmiah</li>
+        <li>Menyebutkan dan membedakan cabang-cabang utama AI serta kegunaannya</li>
+        <li>Menceritakan tonggak sejarah penting dalam perkembangan AI</li>
+        <li>Mengidentifikasi minimal 3 penerapan AI nyata di sektor industri manufaktur, logistik, dan rantai pasok</li>
+        <li>Mengevaluasi apa yang bisa dan tidak bisa dilakukan AI di lingkungan industri</li>
+      </ol>
+
+      <div class="callout info" style="margin-top:var(--s5);">
+        <span class="callout-icon">💡</span>
+        <div class="callout-body">
+          <p><strong>Orientasi mata kuliah ini:</strong> Kita tidak akan menulis kode pemrograman dari nol. Fokus kita adalah <em>memahami, mengevaluasi, dan menerapkan</em> solusi AI yang sudah ada — menggunakan tools seperti Orange, AutoML, dan Power BI — untuk memecahkan masalah operasional industri nyata.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- BAGIAN 1: DEFINISI -->
+    <div class="content-block" id="definisi">
+      <h2>1. Apa itu Artificial Intelligence?</h2>
+      <p>Sebelum kita mendefinisikan AI secara formal, bayangkan skenario berikut di lantai pabrik: kamera inspeksi secara otomatis mendeteksi cacat produk lebih akurat dari inspektur manusia, sistem otomatis memprediksi kapan mesin akan rusak sebelum terjadi, dan algoritma mengoptimasi jadwal produksi setiap jam berdasarkan data permintaan terkini. Semua itu adalah AI. Tapi apa yang menyatukan semua sistem tersebut?</p>
+
+      <div class="pull-quote">
+        <p>"AI adalah ilmu tentang membuat mesin melakukan hal-hal yang membutuhkan kecerdasan jika dilakukan oleh manusia."</p>
+        <cite>— Marvin Minsky, co-founder MIT AI Lab (1968)</cite>
+      </div>
+
+      <div class="pull-quote" style="border-left-color:var(--blue);">
+        <p>"The study of agents that receive percepts from the environment and perform actions to achieve goals."</p>
+        <cite>— Russell & Norvig, Artificial Intelligence: A Modern Approach, 4th Ed. (2020)</cite>
+      </div>
+
+      <p>Secara sederhana, AI adalah kemampuan mesin untuk <strong>meniru fungsi kognitif manusia</strong> — belajar dari data, mengenali pola, membuat prediksi, dan mengambil keputusan — tanpa diprogram secara eksplisit untuk setiap skenario yang mungkin terjadi.</p>
+
+      <h3>Empat Cara Mendefinisikan AI</h3>
+      <p>Russell & Norvig (AIMA 4th Ed.) mengorganisasi definisi AI ke dalam 4 kuadran berdasarkan dua sumbu: <em>berpikir vs bertindak</em> dan <em>seperti manusia vs secara rasional</em>.</p>
+
+      <div class="approach-grid">
+        <div class="approach-card">
+          <div class="approach-tag" style="color:var(--blue);">Think Humanly</div>
+          <div class="approach-title">Berpikir seperti manusia</div>
+          <div class="approach-body">Cognitive modeling — mereplikasi proses berpikir manusia di dalam mesin. Relevan untuk sistem yang perlu meniru penalaran insinyur atau operator berpengalaman.</div>
+          <div class="approach-ex">Contoh industri: expert system diagnosa mesin berbasis pengetahuan teknisi senior</div>
+        </div>
+        <div class="approach-card">
+          <div class="approach-tag" style="color:var(--amber);">Act Humanly</div>
+          <div class="approach-title">Bertindak seperti manusia</div>
+          <div class="approach-body">Turing Test — jika mesin tidak bisa dibedakan dari manusia dalam percakapan, ia dianggap "cerdas". Standar operasional, bukan mekanisme internal.</div>
+          <div class="approach-ex">Contoh industri: chatbot layanan pelanggan, virtual assistant helpdesk pabrik</div>
+        </div>
+        <div class="approach-card">
+          <div class="approach-tag" style="color:var(--teal);">Think Rationally</div>
+          <div class="approach-title">Berpikir secara rasional</div>
+          <div class="approach-body">Logika formal & inferensi — mesin menggunakan aturan logika untuk menarik kesimpulan yang valid. Dasar dari banyak sistem kontrol otomatis industri awal.</div>
+          <div class="approach-ex">Contoh industri: PLC logic, expert system di SCADA, sistem rules-based quality gate</div>
+        </div>
+        <div class="approach-card" style="border-color:rgba(155,124,244,0.25); background:rgba(155,124,244,0.05);">
+          <div class="approach-tag" style="color:var(--purple);">Act Rationally ★</div>
+          <div class="approach-title">Bertindak secara rasional</div>
+          <div class="approach-body"><strong style="color:var(--text)">Pendekatan dominan modern.</strong> Rational agent — sistem yang memilih tindakan terbaik berdasarkan tujuan dan data yang dimiliki, tanpa perlu meniru manusia secara persis.</div>
+          <div class="approach-ex">Contoh industri: sistem prediksi demand, optimasi rute logistik, predictive maintenance</div>
+        </div>
+      </div>
+
+      <div class="callout tip">
+        <span class="callout-icon">🎯</span>
+        <div class="callout-body">
+          <p><strong>Relevansi untuk TI:</strong> Hampir semua solusi AI yang akan kamu terapkan di industri — prediksi cacat, optimasi rantai pasok, demand forecasting — masuk ke kategori <em>Act Rationally</em>: sistem yang dioptimasi untuk mencapai KPI operasional tertentu.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- BAGIAN 2: CABANG AI -->
+    <div class="content-block" id="cabang">
+      <h2>2. Ekosistem & Cabang-cabang AI</h2>
+      <p>AI adalah payung besar yang menaungi berbagai subfield. Penting untuk memahami perbedaan di antara mereka agar kamu dapat memilih pendekatan yang tepat saat menghadapi masalah operasional industri yang berbeda.</p>
+
+      <div class="branch-list">
+        <div class="branch-item">
+          <div class="branch-icon">📊</div>
+          <div>
+            <div class="branch-name">Machine Learning</div>
+            <div class="branch-desc">Sistem yang belajar dari data historis tanpa diprogram eksplisit. Dasar dari kebanyakan solusi prediksi industri. <em>AI ⊃ ML.</em></div>
+          </div>
+        </div>
+        <div class="branch-item">
+          <div class="branch-icon">🧠</div>
+          <div>
+            <div class="branch-name">Deep Learning</div>
+            <div class="branch-desc">Neural network berlapis banyak. Sangat kuat untuk data gambar (inspeksi visual) dan suara (deteksi anomali mesin). <em>ML ⊃ DL.</em></div>
+          </div>
+        </div>
+        <div class="branch-item">
+          <div class="branch-icon">👁️</div>
+          <div>
+            <div class="branch-name">Computer Vision</div>
+            <div class="branch-desc">Mesin yang "melihat" dan menginterpretasi gambar/video. Kunci untuk quality control visual dan inspeksi otomatis di lini produksi.</div>
+          </div>
+        </div>
+        <div class="branch-item">
+          <div class="branch-icon">💬</div>
+          <div>
+            <div class="branch-name">NLP</div>
+            <div class="branch-desc">Natural Language Processing — pemrosesan bahasa manusia oleh mesin. Digunakan untuk analisis laporan, chatbot, dan rangkuman dokumen SOP.</div>
+          </div>
+        </div>
+        <div class="branch-item">
+          <div class="branch-icon">🎮</div>
+          <div>
+            <div class="branch-name">Reinforcement Learning</div>
+            <div class="branch-desc">Belajar melalui reward & punishment. Digunakan di robotik industri, optimasi jalur AGV, dan penjadwalan produksi adaptif.</div>
+          </div>
+        </div>
+        <div class="branch-item">
+          <div class="branch-icon">🎨</div>
+          <div>
+            <div class="branch-name">Generative AI</div>
+            <div class="branch-desc">Menghasilkan konten baru: teks, gambar, kode, simulasi. Digunakan untuk otomasi laporan, desain produk generatif, dan simulasi proses.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="callout warn">
+        <span class="callout-icon">⚠️</span>
+        <div class="callout-body">
+          <p><strong>Jangan tertukar:</strong> Tidak semua ML adalah Deep Learning, tidak semua AI adalah ML. AI adalah konsep terluas; ML adalah subset AI; DL adalah subset ML. Generative AI (ChatGPT, Claude) menggunakan DL sebagai fondasinya.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- BAGIAN 3: SEJARAH -->
+    <div class="content-block" id="sejarah">
+      <h2>3. Sejarah Singkat AI</h2>
+      <p>Perjalanan 70 tahun AI penuh dengan gelombang optimisme, "musim dingin" (AI Winter), dan kebangkitan dramatis. Memahami sejarahnya membantu kita mengevaluasi kapabilitas dan keterbatasan AI saat ini secara realistis.</p>
+
+      <div class="timeline">
+        <div class="tl-item">
+          <div class="tl-year">1950</div>
+          <div class="tl-event">Turing Test — "Can Machines Think?"</div>
+          <div class="tl-desc">Alan Turing menerbitkan "Computing Machinery and Intelligence", mengusulkan Imitation Game sebagai standar kecerdasan mesin. Memulai diskusi ilmiah tentang kecerdasan buatan yang berlangsung hingga kini.</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-year">1956</div>
+          <div class="tl-event">Dartmouth Conference — Kelahiran AI</div>
+          <div class="tl-desc">John McCarthy, Marvin Minsky, dan rekan-rekan mengadakan workshop di Dartmouth. Istilah "Artificial Intelligence" pertama kali digunakan dan disepakati sebagai disiplin ilmu tersendiri.</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-year">1980an</div>
+          <div class="tl-event">Expert Systems di Industri & AI Winter Kedua</div>
+          <div class="tl-desc">Sistem berbasis aturan (expert systems) diadopsi luas di industri manufaktur dan keuangan — DEC menghemat $40 juta/tahun dengan sistem konfigurasi otomatis. Namun biaya maintenance tinggi memicu AI Winter kedua.</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-year">1997</div>
+          <div class="tl-event">Deep Blue Mengalahkan Kasparov</div>
+          <div class="tl-desc">IBM Deep Blue mengalahkan juara catur dunia Garry Kasparov. Momen bersejarah yang membuktikan mesin bisa mengungguli manusia dalam domain tertentu yang memerlukan kalkulasi kompleks.</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-year">2012</div>
+          <div class="tl-event">AlexNet & Revolusi Deep Learning</div>
+          <div class="tl-desc">AlexNet memenangkan kompetisi ImageNet dengan margin jauh — membuktikan keunggulan deep neural network untuk pengenalan gambar. Era computer vision industri dimulai: inspeksi visual otomatis menjadi feasible secara komersial.</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-year">2017</div>
+          <div class="tl-event">"Attention Is All You Need" — Transformer</div>
+          <div class="tl-desc">Paper Google Brain memperkenalkan arsitektur Transformer — fondasi semua LLM modern (GPT, Claude, Gemini). Revolusi pemrosesan data tak terstruktur (dokumen, SOP, laporan) dimulai.</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-year">2022–kini</div>
+          <div class="tl-event">Era Generative AI & Industri 4.0 / 5.0</div>
+          <div class="tl-desc">ChatGPT mencapai 100 juta pengguna dalam 2 bulan. AI terintegrasi ke dalam ERP, MES, dan sistem SCADA industri. Konsep "AI-augmented worker" — manusia dan AI bekerja berdampingan di lantai pabrik — menjadi realitas.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BAGIAN 4: AI DI INDUSTRI -->
+    <div class="content-block" id="industri">
+      <h2>4. AI di Lanskap Industri Global & Indonesia</h2>
+
+      <div class="stat-row">
+        <div class="stat-item">
+          <div class="stat-num" style="color:var(--blue);">72%</div>
+          <div class="stat-desc">Perusahaan manufaktur global sudah adopsi AI di setidaknya satu fungsi operasional (McKinsey, 2024)</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num" style="color:var(--teal);">$3.8T</div>
+          <div class="stat-desc">Nilai tambah AI untuk sektor manufaktur dan supply chain global pada 2030 (World Economic Forum)</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num" style="color:var(--amber);">30%</div>
+          <div class="stat-desc">Rata-rata pengurangan downtime mesin dengan predictive maintenance berbasis AI (McKinsey Operations)</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num" style="color:var(--purple);">25%</div>
+          <div class="stat-desc">Peningkatan akurasi demand forecast dengan ML dibanding metode statistik tradisional (MIT SCM)</div>
+        </div>
+      </div>
+
+      <h3 style="margin-top:var(--s6);">Aplikasi AI Utama di Teknik Industri</h3>
+
+      <div class="ti-app-grid">
+        <div class="ti-app-card">
+          <div class="ti-app-icon">🔍</div>
+          <div class="ti-app-sector" style="color:var(--blue);">Quality Control</div>
+          <div class="ti-app-title">Inspeksi Visual Otomatis</div>
+          <div class="ti-app-desc">Computer vision mendeteksi cacat produk (goresan, dimensi, warna) di lini produksi dengan kecepatan dan konsistensi yang jauh melampaui inspeksi manual. Kamera resolusi tinggi + model deep learning menggantikan peran QC inspector untuk tugas-tugas repetitif.</div>
+          <div class="ti-app-example">Toyota: 99.5% akurasi deteksi cacat las di lini produksi Camry | Intel: inspeksi chip 100% real-time</div>
+        </div>
+
+        <div class="ti-app-card">
+          <div class="ti-app-icon">🔧</div>
+          <div class="ti-app-sector" style="color:var(--teal);">Predictive Maintenance</div>
+          <div class="ti-app-title">Pemeliharaan Prediktif Mesin</div>
+          <div class="ti-app-desc">Sensor IoT mengumpulkan data getaran, suhu, tekanan, dan konsumsi arus secara real-time. Model ML memprediksi kapan komponen akan gagal sebelum terjadi kerusakan aktual, memungkinkan penggantian terencana yang jauh lebih murah dari breakdown.</div>
+          <div class="ti-app-example">Siemens: -50% downtime tak terencana | Schneider Electric: ROI 10x dalam 18 bulan pertama</div>
+        </div>
+
+        <div class="ti-app-card">
+          <div class="ti-app-icon">📦</div>
+          <div class="ti-app-sector" style="color:var(--amber);">Supply Chain & Logistik</div>
+          <div class="ti-app-title">Optimasi Rantai Pasok</div>
+          <div class="ti-app-desc">AI mengoptimasi level inventori, rute pengiriman, pemilihan supplier, dan jadwal produksi secara dinamis. Sistem belajar dari pola historis dan faktor eksternal (cuaca, event, tren pasar) untuk meminimalkan biaya sambil mempertahankan service level.</div>
+          <div class="ti-app-example">Amazon: penghematan $1B+/tahun dari route optimization | DHL: -25% biaya pengiriman last-mile</div>
+        </div>
+
+        <div class="ti-app-card">
+          <div class="ti-app-icon">📈</div>
+          <div class="ti-app-sector" style="color:var(--purple);">Demand Forecasting</div>
+          <div class="ti-app-title">Prediksi Permintaan</div>
+          <div class="ti-app-desc">Model ML menganalisis data penjualan historis, musim, promosi, tren media sosial, dan faktor makroekonomi untuk menghasilkan prediksi permintaan yang jauh lebih akurat dari metode moving average atau ARIMA tradisional.</div>
+          <div class="ti-app-example">Unilever: forecast error turun 20–30% | Indomaret: optimasi stok 500+ SKU per toko secara otomatis</div>
+        </div>
+
+        <div class="ti-app-card">
+          <div class="ti-app-icon">🏭</div>
+          <div class="ti-app-sector" style="color:var(--blue);">Optimasi Produksi</div>
+          <div class="ti-app-title">Penjadwalan & Process Optimization</div>
+          <div class="ti-app-desc">AI menyesuaikan parameter proses (suhu, kecepatan, tekanan) dan urutan job secara real-time untuk memaksimalkan throughput, meminimalkan scrap, dan mengoptimasi penggunaan energi. Reinforcement learning digunakan untuk masalah penjadwalan kompleks.</div>
+          <div class="ti-app-example">BASF: -15% konsumsi energi di reaktor kimia | GE: +2% output turbin dengan AI-controlled combustion</div>
+        </div>
+
+        <div class="ti-app-card">
+          <div class="ti-app-icon">🤖</div>
+          <div class="ti-app-sector" style="color:var(--teal);">Robotika & Otomasi</div>
+          <div class="ti-app-title">Collaborative Robots (Cobots)</div>
+          <div class="ti-app-desc">Robot yang menggunakan computer vision dan AI untuk bekerja berdampingan dengan manusia secara aman. Cobots belajar tugas baru dari demonstrasi manusia (programing by demonstration) tanpa perlu pemrograman konvensional.</div>
+          <div class="ti-app-example">Universal Robots: 50.000+ cobots terinstal di UMKM global | Honda: AI-guided welding robots adaptif</div>
+        </div>
+      </div>
+
+      <h3 style="margin-top:var(--s6);">AI di Industri Indonesia</h3>
+      <div class="concept-grid">
+        <div class="concept-card">
+          <div class="concept-card-label" style="color:var(--blue);">Manufaktur</div>
+          <div class="concept-card-title">Adopsi Industri 4.0</div>
+          <div class="concept-card-body">Astra International, Sritex, dan Indofood mulai mengintegrasikan computer vision dan predictive maintenance di pabrik mereka. BKPM melaporkan investasi industri 4.0 tumbuh 35% pada 2023.</div>
+        </div>
+        <div class="concept-card">
+          <div class="concept-card-label" style="color:var(--teal);">Logistik & Distribusi</div>
+          <div class="concept-card-title">AI di Ekosistem Digital</div>
+          <div class="concept-card-body">J&T Express, SiCepat, dan Anteraja menggunakan AI untuk optimasi rute pengiriman. Tokopedia dan Shopee menerapkan demand forecasting AI untuk ribuan seller mereka.</div>
+        </div>
+        <div class="concept-card">
+          <div class="concept-card-label" style="color:var(--amber);">Pertanian & Agribisnis</div>
+          <div class="concept-card-title">Smart Agriculture</div>
+          <div class="concept-card-body">Startup seperti Habibi Garden dan TaniHub menggunakan IoT + AI untuk optimasi irigasi, prediksi hasil panen, dan deteksi penyakit tanaman — relevan untuk industri pangan Indonesia.</div>
+        </div>
+        <div class="concept-card">
+          <div class="concept-card-label" style="color:var(--purple);">Peluang Karir TI</div>
+          <div class="concept-card-title">Rp 12–35 juta/bulan</div>
+          <div class="concept-card-body">Industrial AI Analyst, Supply Chain Data Analyst, Process Optimization Engineer masuk daftar profesi paling dicari di sektor manufaktur Indonesia 2024–2025 (Jobstreet, LinkedIn).</div>
+        </div>
+      </div>
+
+      <h3 style="margin-top:var(--s6);">Perbandingan Metode Konvensional vs AI</h3>
+      <table class="industry-table">
+        <thead>
+          <tr>
+            <th>Fungsi Industri</th>
+            <th>Metode Konvensional</th>
+            <th>Pendekatan AI</th>
+            <th>Peningkatan Tipikal</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="sector-name">🔍 QC Inspeksi</span></td>
+            <td>Inspeksi manual oleh operator, sampling statistik (AQL)</td>
+            <td>Computer vision — inspeksi 100% produk secara real-time</td>
+            <td><span class="impact-good">-60–80% defect escape rate</span></td>
+          </tr>
+          <tr>
+            <td><span class="sector-name">🔧 Pemeliharaan</span></td>
+            <td>Corrective maintenance (rusak baru diperbaiki) atau preventive terjadwal</td>
+            <td>Predictive maintenance — sensor + ML memprediksi kegagalan</td>
+            <td><span class="impact-good">-30–50% downtime tak terencana</span></td>
+          </tr>
+          <tr>
+            <td><span class="sector-name">📈 Demand Forecast</span></td>
+            <td>Moving average, ARIMA, judgment manajer</td>
+            <td>Ensemble ML (XGBoost, LSTM) dengan ratusan variabel input</td>
+            <td><span class="impact-good">-20–40% forecast error</span></td>
+          </tr>
+          <tr>
+            <td><span class="sector-name">📦 Inventori</span></td>
+            <td>Safety stock tetap, EOQ, reorder point manual</td>
+            <td>Dynamic safety stock berbasis prediksi demand + lead time AI</td>
+            <td><span class="impact-good">-15–25% inventory cost</span></td>
+          </tr>
+          <tr>
+            <td><span class="sector-name">🚛 Routing</span></td>
+            <td>Rute tetap oleh dispatcher, optimasi manual</td>
+            <td>Vehicle Route Optimization — AI dengan ratusan constraints real-time</td>
+            <td><span class="impact-good">-10–25% biaya transportasi</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- BAGIAN 5: BISA VS TIDAK BISA -->
+    <div class="content-block" id="batasan">
+      <h2>5. Apa yang Bisa dan Tidak Bisa AI Lakukan di Industri?</h2>
+      <p>Sebagai calon insinyur industri, kamu harus memiliki ekspektasi yang realistis tentang kapabilitas AI. Terlalu optimis dapat menyebabkan proyek gagal dengan kerugian besar; terlalu pesimis dapat menyebabkan perusahaanmu kalah bersaing.</p>
+
+      <div class="vs-grid">
+        <div>
+          <div class="vs-col-head vs-bisa">✓ AI sangat kuat untuk</div>
+          <ul class="vs-list">
+            <li><span class="vs-check" style="color:var(--teal)">→</span> Mendeteksi pola dalam data sensor, produksi, dan penjualan berskala besar</li>
+            <li><span class="vs-check" style="color:var(--teal)">→</span> Inspeksi visual 100% dengan konsistensi tinggi, 24/7 tanpa kelelahan</li>
+            <li><span class="vs-check" style="color:var(--teal)">→</span> Membuat prediksi berbasis data historis yang kaya</li>
+            <li><span class="vs-check" style="color:var(--teal)">→</span> Mengoptimasi masalah dengan banyak variabel dan constraint</li>
+            <li><span class="vs-check" style="color:var(--teal)">→</span> Otomasi tugas berulang di volume tinggi dengan biaya rendah</li>
+          </ul>
+        </div>
+        <div>
+          <div class="vs-col-head vs-tidak">✗ AI masih terbatas dalam</div>
+          <ul class="vs-list">
+            <li><span class="vs-check" style="color:var(--red)">→</span> Beradaptasi ke kondisi atau produk baru yang belum pernah dilihat sebelumnya</li>
+            <li><span class="vs-check" style="color:var(--red)">→</span> Penalaran kausal: AI mendeteksi korelasi, bukan selalu mengerti sebab-akibat</li>
+            <li><span class="vs-check" style="color:var(--red)">→</span> Pengambilan keputusan strategis yang melibatkan faktor sosial dan politis</li>
+            <li><span class="vs-check" style="color:var(--red)">→</span> Bekerja baik dengan data yang sangat sedikit atau berkualitas buruk</li>
+            <li><span class="vs-check" style="color:var(--red)">→</span> Menjelaskan keputusannya secara transparan (explainability problem)</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="callout tip" style="margin-top:var(--s5);">
+        <span class="callout-icon">🏆</span>
+        <div class="callout-body">
+          <p><strong>Prinsip emas untuk insinyur industri:</strong> AI paling kuat ketika digunakan sebagai <em>decision support system</em> — menyajikan analisis dan rekomendasi kepada manusia yang tetap memegang keputusan akhir, terutama untuk keputusan bernilai tinggi atau berdampak besar.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- RINGKASAN -->
+    <div class="content-block" id="ringkasan">
+      <h2>Ringkasan Pertemuan Ini</h2>
+      <div style="background:var(--bg-2); border:1px solid var(--border); border-radius:var(--r3); padding:var(--s5);">
+        <ul>
+          <li>AI adalah sistem yang meniru kemampuan kognitif manusia — pendekatan <em>rational agent</em> mendominasi aplikasi industri modern</li>
+          <li>AI memiliki banyak cabang: ML, Deep Learning, Computer Vision, NLP, RL, dan Generative AI — masing-masing dengan aplikasi berbeda di industri</li>
+          <li>Perjalanan 70 tahun AI penuh ups & downs; kita kini di era ketiga yang paling transformatif dan sudah masuk ke lantai pabrik</li>
+          <li>Aplikasi AI terbesar di TI: quality control visual, predictive maintenance, supply chain optimization, dan demand forecasting</li>
+          <li>AI bukan pengganti insinyur — ia adalah alat amplifikasi yang mengubah data menjadi keputusan lebih cepat dan akurat</li>
+          <li>Keterbatasan AI perlu dipahami agar kita tidak melebih-lebihkan atau meremehkan kapabilitasnya saat merancang solusi</li>
+        </ul>
+      </div>
+
+      <!-- TASK BOX -->
+      <div class="task-box" id="tugas">
+        <div class="task-box-title">📋 Tugas Pertemuan Ini</div>
+        <p style="font-size:13px;color:var(--text-2);margin-bottom:var(--s4);">Dikumpulkan sebelum pertemuan ke-2 melalui Google Classroom.</p>
+        <ol style="font-size:14px;color:var(--text);line-height:2;">
+          <li>Pilih <strong>satu perusahaan manufaktur atau logistik di Indonesia</strong> (boleh UMKM atau korporasi besar). Identifikasi minimal <strong>2 proses operasionalnya</strong> yang paling berpotensi dioptimasi dengan AI. Jelaskan alasanmu.</li>
+          <li>Bandingkan metode konvensional vs AI untuk <strong>salah satu fungsi industri</strong> dari tabel di atas. Dalam 150–200 kata, jelaskan: apa data yang dibutuhkan, apa tantangan implementasinya, dan bagaimana mengukur keberhasilannya.</li>
+          <li><em>Opsional (bonus):</em> Temukan satu studi kasus nyata penerapan AI di perusahaan Indonesia (dari berita, laporan tahunan, atau LinkedIn). Apa yang berhasil dan apa yang menjadi tantangannya?</li>
+        </ol>
+      </div>
+
+      <!-- READING BOX -->
+      <div class="reading-box">
+        <div class="reading-box-title">📖 Persiapan Pertemuan Ke-2</div>
+        <div class="reading-item">
+          <span class="reading-icon">📗</span>
+          <div class="reading-label">
+            <strong>Russell & Norvig — AIMA 4th Ed., Chapter 18</strong>
+            "Learning from Examples" — Pengantar supervised learning sebelum sesi konsep ML
+          </div>
+        </div>
+        <div class="reading-item">
+          <span class="reading-icon">🎥</span>
+          <div class="reading-label">
+            <strong>Andrew Ng — AI For Everyone, Week 1–2</strong>
+            "What is AI?" + "Building AI Projects" — ~60 menit, tersedia di Coursera (audit gratis)
+          </div>
+        </div>
+        <div class="reading-item">
+          <span class="reading-icon">🔧</span>
+          <div class="reading-label">
+            <strong>Install Orange Data Mining</strong>
+            Download dan install Orange 3.x dari orange.biolab.si — akan digunakan mulai pertemuan ke-3. Panduan instalasi tersedia di folder /resources di Google Classroom.
+          </div>
+        </div>
+        <div class="reading-item">
+          <span class="reading-icon">📄</span>
+          <div class="reading-label">
+            <strong>McKinsey — "The State of AI in 2024"</strong>
+            Baca bagian Manufacturing & Supply Chain (halaman 12–18). Tersedia gratis di mckinsey.com/capabilities/quantumblack/our-insights/the-state-of-ai
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ── ASIDE ── -->
+  <aside class="content-aside">
+    <!-- TOC -->
+    <div class="toc">
+      <div class="toc-title">Isi Halaman</div>
+      <ul class="toc-list">
+        <li><a href="#tujuan" class="active">Tujuan Pembelajaran</a></li>
+        <li><a href="#definisi">1. Definisi AI</a></li>
+        <li><a href="#cabang">2. Cabang-cabang AI</a></li>
+        <li><a href="#sejarah">3. Sejarah AI</a></li>
+        <li><a href="#industri">4. AI di Industri</a></li>
+        <li><a href="#batasan">5. Batas Kemampuan AI</a></li>
+        <li><a href="#ringkasan">Ringkasan & Tugas</a></li>
+      </ul>
+    </div>
+
+    <!-- Sesi nav -->
+    <div class="sesi-nav-aside">
+      <div class="sesi-nav-title">Navigasi Sesi</div>
+      <a href="../index.html" class="sesi-nav-btn">
+        <span>🏠</span>
+        <span>Kembali ke Beranda TI</span>
+      </a>
+      <div style="font-size:12px;color:var(--text-3);margin-top:var(--s4);padding:var(--s3) 0;border-top:1px solid var(--border);">Sesi berikutnya:</div>
+      <a href="#" class="sesi-nav-btn" style="opacity:0.5;pointer-events:none;">
+        <span>→</span>
+        <span>P-02: Konsep ML untuk Industri</span>
+      </a>
+    </div>
+
+    <!-- Info box -->
+    <div style="background:var(--bg-2);border:1px solid var(--border);border-radius:var(--r3);padding:var(--s5);margin-top:var(--s4);">
+      <div style="font-family:var(--mono);font-size:10px;color:var(--text-3);letter-spacing:2px;text-transform:uppercase;margin-bottom:var(--s3);">Info Pertemuan</div>
+      <div style="display:flex;flex-direction:column;gap:var(--s3);">
+        <div>
+          <div style="font-size:11px;color:var(--text-3);">Tipe</div>
+          <div style="font-size:13px;color:var(--text);">Kuliah Teori</div>
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--text-3);">Durasi</div>
+          <div style="font-size:13px;color:var(--text);">85 menit</div>
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--text-3);">CPMK</div>
+          <div style="font-size:13px;color:var(--text);">C1 (Konsep & ekosistem AI), C5 (Evaluasi solusi AI)</div>
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--text-3);">Referensi Utama</div>
+          <div style="font-size:13px;color:var(--text);">AIMA 4th Ed. — Chapter 1</div>
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--text-3);">Tools Pertemuan Ini</div>
+          <div style="font-size:13px;color:var(--text);">Tidak ada (konsep)</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+</div><!-- end content-layout -->
+
+<!-- ══ FOOTER ══ -->
+<footer class="footer">
+  <div>AI·UKWMS <span style="color:var(--text-3);">· P-01 Pengantar AI & Lanskap Industri — Teknik Industri</span></div>
+  <div><a href="../index.html" style="color:var(--text-3);">← Kembali ke Beranda TI</a></div>
+</footer>
+
+<script>
+  // Active TOC on scroll
+  const headings = document.querySelectorAll('.content-main [id]');
+  const tocLinks = document.querySelectorAll('.toc-list a');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(a => {
+          a.classList.remove('active');
+          if (a.getAttribute('href') === '#' + entry.target.id) a.classList.add('active');
+        });
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px' });
+  headings.forEach(h => observer.observe(h));
+
+  // Active nav links on scroll
+  const navLinks = document.querySelectorAll('.nav-links a[href^="#"]');
+  window.addEventListener('scroll', () => {
+    let current = '';
+    headings.forEach(h => { if (window.scrollY >= h.offsetTop - 100) current = h.id; });
+    navLinks.forEach(a => {
+      a.classList.remove('active');
+      if (a.getAttribute('href') === '#' + current) a.classList.add('active');
+    });
+  });
+</script>
+
+</body>
+</html>
