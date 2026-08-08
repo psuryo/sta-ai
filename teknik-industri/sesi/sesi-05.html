@@ -527,6 +527,13 @@
       <h2>4. Studi Kasus Global</h2>
       <p>Tiga perusahaan berikut mewakili tiga model implementasi AI yang berbeda — dari manufaktur lean, FMCG, hingga e-commerce. Masing-masing menawarkan pelajaran yang dapat diambil untuk konteks industri Indonesia.</p>
 
+      <div class="callout info" style="margin-bottom:var(--s5);">
+        <span class="callout-icon">📌</span>
+        <div class="callout-body">
+          <p><strong>Catatan akademis:</strong> Informasi berikut disusun berdasarkan laporan publik, siaran pers, dan presentasi resmi masing-masing perusahaan. Perusahaan-perusahaan besar umumnya tidak mengungkapkan angka kinerja AI secara spesifik dan terpisah dari inisiatif bisnis lainnya. Fokus analisis di sini adalah pada <em>pendekatan</em> dan <em>pelajaran</em> yang dapat diambil, bukan pada klaim kuantitatif.</p>
+        </div>
+      </div>
+
       <!-- Toyota -->
       <div class="case-block">
         <div class="case-header">
@@ -538,28 +545,22 @@
           <span class="badge badge-blue" style="margin-left:auto;">Produksi & QC</span>
         </div>
         <div class="case-body">
-          <p style="font-size:13px;color:var(--text-2);line-height:1.8;margin-bottom:var(--s4);">Toyota adalah pelopor lean manufacturing (TPS) yang kini mengintegrasikan AI ke sistem Jidoka-nya. Tantangan: menjaga zero-defect di 10 juta+ kendaraan per tahun di ratusan lini produksi global.</p>
+          <p style="font-size:13px;color:var(--text-2);line-height:1.8;margin-bottom:var(--s4);">Toyota adalah pelopor lean manufacturing (Toyota Production System) yang secara terbuka mendokumentasikan upayanya mengintegrasikan teknologi AI ke dalam prinsip Jidoka — otomasi dengan sentuhan manusia. Tantangan utama: menjaga standar kualitas tinggi di ratusan lini produksi yang tersebar di seluruh dunia.</p>
 
-          <div class="case-kpi-row">
-            <div class="case-kpi">
-              <div class="case-kpi-val" style="color:var(--teal);">99.8%</div>
-              <div class="case-kpi-name">Akurasi deteksi cacat las</div>
-            </div>
-            <div class="case-kpi">
-              <div class="case-kpi-val" style="color:var(--blue);">25%</div>
-              <div class="case-kpi-name">Pengurangan unplanned downtime</div>
-            </div>
-            <div class="case-kpi">
-              <div class="case-kpi-val" style="color:var(--amber);">40%</div>
-              <div class="case-kpi-name">Penurunan biaya perawatan</div>
-            </div>
+          <div style="background:var(--bg-1);border:1px solid var(--border);border-radius:var(--r2);padding:var(--s4) var(--s5);margin:var(--s4) 0;">
+            <div style="font-family:var(--mono);font-size:10px;color:var(--text-3);letter-spacing:1px;text-transform:uppercase;margin-bottom:var(--s3);">Fokus implementasi AI (berdasarkan laporan publik Toyota)</div>
+            <ul style="font-size:13px;color:var(--text-2);line-height:2;margin:0;padding-left:var(--s4);">
+              <li><strong style="color:var(--text);">Computer vision untuk inspeksi las</strong> — sistem kamera mendeteksi cacat permukaan yang sulit dilihat mata manusia, melengkapi prinsip Jidoka tanpa menggantikannya</li>
+              <li><strong style="color:var(--text);">Predictive maintenance berbasis sensor</strong> — memantau kondisi mesin secara real-time untuk menjadwalkan perawatan sebelum terjadi kegagalan tak terduga</li>
+              <li><strong style="color:var(--text);">Optimasi jalur produksi</strong> — AI digunakan dalam perencanaan kapasitas dan penjadwalan ulang lini ketika terjadi gangguan</li>
+            </ul>
           </div>
 
-          <p style="font-size:13px;color:var(--text-2);line-height:1.8;"><strong style="color:var(--text);">Penerapan utama:</strong> Kamera AI di setiap stasiun las mendeteksi micro-defect yang tidak terlihat mata manusia. Model prediktif memantau 200+ parameter mesin secara real-time. Sistem ini tidak menggantikan andon cord (prinsip Jidoka) — tetapi mempercepat deteksi dari menit ke milidetik.</p>
+          <p style="font-size:13px;color:var(--text-2);line-height:1.8;"><strong style="color:var(--text);">Penerapan utama:</strong> Toyota tidak mempublikasikan angka kinerja AI secara terpisah, namun dalam berbagai presentasi teknis mereka menekankan bahwa AI berperan sebagai <em>pendukung</em> operator — mempercepat deteksi anomali dan mengurangi ketergantungan pada inspeksi manual yang bersifat subjektif.</p>
 
           <div class="callout tip" style="margin-top:var(--s4);">
             <span class="callout-icon">📝</span>
-            <div class="callout-body"><p><strong>Pelajaran untuk industri Indonesia:</strong> Toyota memulai dengan <em>satu</em> lini produksi, mengukur dampaknya dengan ketat selama 6 bulan, baru scale-up. Bukan big-bang transformation — tapi iterasi terkontrol.</p></div>
+            <div class="callout-body"><p><strong>Pelajaran untuk industri Indonesia:</strong> Toyota secara konsisten memulai pilot di satu lini, mengukur dampak dengan ketat, lalu melakukan scale-up bertahap. Bukan big-bang transformation — melainkan iterasi terkontrol yang selaras dengan budaya kaizen.</p></div>
           </div>
         </div>
       </div>
@@ -575,28 +576,22 @@
           <span class="badge badge-teal" style="margin-left:auto;">Supply Chain & Demand</span>
         </div>
         <div class="case-body">
-          <p style="font-size:13px;color:var(--text-2);line-height:1.8;margin-bottom:var(--s4);">Unilever mengelola 75.000+ SKU di seluruh dunia dengan 400+ pabrik. Tantangan: bullwhip effect yang parah, 20% produk memiliki demand sangat volatile (deterjen musim hujan, produk seasonal), dan lead time pemasok yang tidak pasti.</p>
+          <p style="font-size:13px;color:var(--text-2);line-height:1.8;margin-bottom:var(--s4);">Unilever secara terbuka mendiskusikan transformasi supply chain-nya dalam laporan tahunan dan konferensi industri. Kompleksitas operasionalnya — puluhan ribu SKU di ratusan pabrik — menjadikan demand forecasting yang lebih akurat sebagai prioritas strategis utama.</p>
 
-          <div class="case-kpi-row">
-            <div class="case-kpi">
-              <div class="case-kpi-val" style="color:var(--teal);">35%</div>
-              <div class="case-kpi-name">Pengurangan excess inventory</div>
-            </div>
-            <div class="case-kpi">
-              <div class="case-kpi-val" style="color:var(--blue);">20%</div>
-              <div class="case-kpi-name">Peningkatan forecast accuracy</div>
-            </div>
-            <div class="case-kpi">
-              <div class="case-kpi-val" style="color:var(--amber);">$1B+</div>
-              <div class="case-kpi-name">Penghematan tahunan terdokumentasi</div>
-            </div>
+          <div style="background:var(--bg-1);border:1px solid var(--border);border-radius:var(--r2);padding:var(--s4) var(--s5);margin:var(--s4) 0;">
+            <div style="font-family:var(--mono);font-size:10px;color:var(--text-3);letter-spacing:1px;text-transform:uppercase;margin-bottom:var(--s3);">Fokus implementasi AI (berdasarkan laporan & presentasi publik Unilever)</div>
+            <ul style="font-size:13px;color:var(--text-2);line-height:2;margin:0;padding-left:var(--s4);">
+              <li><strong style="color:var(--text);">Demand sensing</strong> — mengintegrasikan sinyal eksternal (data POS retailer, cuaca, kalender acara) ke dalam model forecasting untuk memperpendek siklus perencanaan</li>
+              <li><strong style="color:var(--text);">Dynamic inventory replenishment</strong> — safety stock dan reorder point disesuaikan secara otomatis berdasarkan kondisi pasar terkini, bukan parameter tetap</li>
+              <li><strong style="color:var(--text);">Supplier collaboration platform</strong> — berbagi sinyal demand secara real-time dengan pemasok untuk meredam bullwhip effect di hulu rantai pasok</li>
+            </ul>
           </div>
 
-          <p style="font-size:13px;color:var(--text-2);line-height:1.8;"><strong style="color:var(--text);">Penerapan utama:</strong> Unilever membangun platform "Connected Commerce" yang mengintegrasikan POS data dari retailer, data cuaca, kalender acara, dan media sosial sebagai sinyal demand real-time. Model ML merespons perubahan demand dalam 24 jam, bukan dalam siklus perencanaan 4 minggu.</p>
+          <p style="font-size:13px;color:var(--text-2);line-height:1.8;"><strong style="color:var(--text);">Konteks:</strong> Unilever menyebut inisiatif ini sebagai bagian dari program transformasi supply chain mereka. Dampak finansial spesifik yang dapat diatribusikan langsung ke AI tidak diungkapkan secara terpisah dalam laporan publik mereka.</p>
 
           <div class="callout tip" style="margin-top:var(--s4);">
             <span class="callout-icon">📝</span>
-            <div class="callout-body"><p><strong>Pelajaran untuk Indonesia:</strong> Faktor lokal sangat penting — lebaran, mudik, musim panen mempengaruhi demand secara signifikan. Model yang berhasil di Eropa tidak langsung cocok tanpa kalibrasi data lokal.</p></div>
+            <div class="callout-body"><p><strong>Pelajaran untuk Indonesia:</strong> Faktor lokal sangat penting — lebaran, mudik, musim panen mempengaruhi demand secara signifikan. Model yang dikembangkan di satu konteks geografis perlu dikalibrasi ulang dengan data lokal sebelum diterapkan di pasar lain.</p></div>
           </div>
         </div>
       </div>
@@ -612,28 +607,22 @@
           <span class="badge badge-amber" style="margin-left:auto;">Warehouse & Routing</span>
         </div>
         <div class="case-body">
-          <p style="font-size:13px;color:var(--text-2);line-height:1.8;margin-bottom:var(--s4);">Amazon mengirim 10 juta+ paket per hari. Tantangan: menjaga janji pengiriman same-day/next-day sekaligus meminimalkan biaya logistik yang merupakan komponen terbesar cost structure mereka.</p>
+          <p style="font-size:13px;color:var(--text-2);line-height:1.8;margin-bottom:var(--s4);">Amazon adalah salah satu perusahaan yang paling terbuka mendokumentasikan penggunaan AI dan robotika dalam operasional logistiknya — sebagian besar melalui patent publik, blog teknis, dan presentasi AWS re:Invent. Skala operasinya menjadikannya rujukan utama untuk studi otomasi logistik.</p>
 
-          <div class="case-kpi-row">
-            <div class="case-kpi">
-              <div class="case-kpi-val" style="color:var(--teal);">75%</div>
-              <div class="case-kpi-name">Gudang dioperasikan robot + AI</div>
-            </div>
-            <div class="case-kpi">
-              <div class="case-kpi-val" style="color:var(--blue);">50%</div>
-              <div class="case-kpi-name">Pengurangan waktu pick-and-pack</div>
-            </div>
-            <div class="case-kpi">
-              <div class="case-kpi-val" style="color:var(--amber);">&lt;30s</div>
-              <div class="case-kpi-name">Waktu lokasi barang di gudang</div>
-            </div>
+          <div style="background:var(--bg-1);border:1px solid var(--border);border-radius:var(--r2);padding:var(--s4) var(--s5);margin:var(--s4) 0;">
+            <div style="font-family:var(--mono);font-size:10px;color:var(--text-3);letter-spacing:1px;text-transform:uppercase;margin-bottom:var(--s3);">Fokus implementasi AI (berdasarkan patent publik & blog teknis Amazon)</div>
+            <ul style="font-size:13px;color:var(--text-2);line-height:2;margin:0;padding-left:var(--s4);">
+              <li><strong style="color:var(--text);">Anticipatory Shipping</strong> (US Patent 8,615,473) — sistem yang mulai memindahkan produk ke gudang distribusi terdekat sebelum order ditempatkan, berdasarkan prediksi demand regional</li>
+              <li><strong style="color:var(--text);">Sistem robotika Kiva/Amazon Robotics</strong> — robot membawa rak produk ke operator (bukan operator yang berjalan ke rak), mengubah model picking secara fundamental</li>
+              <li><strong style="color:var(--text);">Dynamic routing optimization</strong> — rute pengiriman dihitung ulang secara terus-menerus berdasarkan kondisi lalu lintas, kapasitas kendaraan, dan prioritas pengiriman</li>
+            </ul>
           </div>
 
-          <p style="font-size:13px;color:var(--text-2);line-height:1.8;"><strong style="color:var(--text);">Penerapan utama:</strong> Anticipatory Shipping — Amazon mulai mengirim produk ke lokasi distribusi sebelum konsumen memesan, berdasarkan prediksi demand. Model routing AI menghitung ulang rute pengiriman setiap 5 menit berdasarkan kondisi lalu lintas real-time.</p>
+          <p style="font-size:13px;color:var(--text-2);line-height:1.8;"><strong style="color:var(--text);">Konteks:</strong> Amazon mengungkapkan detail teknis sistem mereka melalui saluran teknis (patent, blog AWS), namun tidak mempublikasikan metrik kinerja operasional secara spesifik yang memungkinkan perbandingan langsung.</p>
 
           <div class="callout warn" style="margin-top:var(--s4);">
             <span class="callout-icon">⚠️</span>
-            <div class="callout-body"><p><strong>Konteks penting:</strong> Amazon menginvestasikan miliaran dolar dan memiliki tim AI 10.000+ orang. Model ini tidak bisa langsung dijiplak oleh perusahaan lokal. Pelajarannya adalah <em>prinsip</em>-nya: mulai dari data permintaan aktual, bukan perkiraan intuisi, dan otomatiskan keputusan rutin.</p></div>
+            <div class="callout-body"><p><strong>Konteks penting:</strong> Amazon membangun sistem ini selama lebih dari dua dekade dengan investasi infrastruktur yang sangat besar. Pelajarannya bukan "tiru sistemnya" — melainkan pelajari <em>prinsipnya</em>: mulai dari keputusan yang paling sering diulang, otomatiskan keputusan itu, dan terus ukur hasilnya.</p></div>
           </div>
         </div>
       </div>
@@ -725,7 +714,7 @@
       <div class="callout info" style="margin-top:var(--s5);">
         <span class="callout-icon">🏭</span>
         <div class="callout-body">
-          <p><strong>Contoh lokal — Semen Gresik & Sido Muncul:</strong> Semen Gresik mengimplementasikan predictive maintenance pada kiln semen dan melaporkan penghematan &gt;Rp 50M/tahun per unit. Sido Muncul menggunakan demand forecasting untuk mengelola 250+ SKU jamu tradisional yang demand-nya sangat musiman. Keduanya memulai dengan satu use case sederhana, bukan transformasi menyeluruh.</p>
+          <p><strong>Konteks lokal:</strong> Sejumlah perusahaan manufaktur dan FMCG Indonesia telah mulai mengeksplorasi AI untuk predictive maintenance dan demand forecasting — termasuk di segmen semen, farmasi, dan produk konsumen. Pola yang konsisten: implementasi sukses selalu dimulai dari satu use case dengan masalah bisnis yang jelas dan terukur, bukan dari transformasi menyeluruh sekaligus.</p>
         </div>
       </div>
 
@@ -877,7 +866,7 @@
         </div>
         <div>
           <div style="font-size:11px;color:var(--text-3);">Studi Kasus</div>
-          <div style="font-size:13px;color:var(--text);">Toyota, Unilever, Amazon, Semen Gresik, Sido Muncul</div>
+          <div style="font-size:13px;color:var(--text);">Toyota, Unilever, Amazon</div>
         </div>
       </div>
     </div>
