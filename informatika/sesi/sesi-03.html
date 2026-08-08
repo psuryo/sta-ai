@@ -1,0 +1,1025 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>P-03: Praktik ML dengan Python & Scikit-learn — Kecerdasan Buatan UKWMS</title>
+<link rel="stylesheet" href="../../css/style.css">
+<style>
+  .code-block {
+    background: #0d1117;
+    border: 1px solid var(--border);
+    border-radius: var(--r2);
+    padding: var(--s5);
+    font-family: var(--mono);
+    font-size: 12px;
+    line-height: 1.9;
+    overflow-x: auto;
+    margin: var(--s4) 0;
+    color: #c9d1d9;
+  }
+  .code-block .c-comment { color: #8b949e; }
+  .code-block .c-kw      { color: #ff7b72; }
+  .code-block .c-str     { color: #a5d6ff; }
+  .code-block .c-fn      { color: #d2a8ff; }
+  .code-block .c-num     { color: #79c0ff; }
+  .code-block .c-cls     { color: #ffa657; }
+  .code-block .c-dec     { color: #e6c07b; }
+
+  .code-label {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #161b22;
+    border: 1px solid var(--border);
+    border-bottom: none;
+    border-radius: var(--r2) var(--r2) 0 0;
+    padding: var(--s2) var(--s4);
+    margin-top: var(--s4);
+  }
+  .code-label + .code-block {
+    border-radius: 0 0 var(--r2) var(--r2);
+    margin-top: 0;
+  }
+  .code-label-name {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-3);
+  }
+  .code-label-badge {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--teal);
+    background: var(--teal-glow);
+    border: 1px solid rgba(0,201,177,0.2);
+    padding: 1px 8px;
+    border-radius: 20px;
+  }
+
+  .step-num-block {
+    display: flex;
+    gap: var(--s4);
+    align-items: flex-start;
+    margin-bottom: var(--s5);
+  }
+  .step-num-circle {
+    flex-shrink: 0;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--teal-glow);
+    border: 1px solid rgba(0,201,177,0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--mono);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--teal);
+    margin-top: 2px;
+  }
+  .step-num-body { flex: 1; }
+  .step-num-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: var(--s2);
+  }
+  .step-num-desc {
+    font-size: 13px;
+    color: var(--text-2);
+    line-height: 1.7;
+    margin-bottom: 0;
+  }
+
+  .output-block {
+    background: #111827;
+    border: 1px solid rgba(0,201,177,0.2);
+    border-left: 3px solid var(--teal);
+    border-radius: 0 var(--r2) var(--r2) 0;
+    padding: var(--s4) var(--s5);
+    font-family: var(--mono);
+    font-size: 12px;
+    color: #9fffed;
+    line-height: 1.8;
+    margin: 0 0 var(--s4) 0;
+    overflow-x: auto;
+  }
+  .output-label {
+    font-size: 10px;
+    color: var(--teal);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: var(--s2);
+    font-family: var(--mono);
+    opacity: 0.7;
+  }
+
+  .dataset-card {
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: var(--r3);
+    padding: var(--s5);
+    margin-bottom: var(--s4);
+  }
+  .dataset-header {
+    display: flex;
+    align-items: center;
+    gap: var(--s3);
+    margin-bottom: var(--s4);
+  }
+  .dataset-icon { font-size: 26px; }
+  .dataset-title { font-size: 15px; font-weight: 600; color: var(--text); }
+  .dataset-sub { font-size: 12px; color: var(--text-3); font-family: var(--mono); }
+  .dataset-meta {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--s3);
+    margin-bottom: var(--s4);
+  }
+  .dmeta-item { text-align: center; }
+  .dmeta-num  { font-family: var(--mono); font-size: 18px; font-weight: 600; color: var(--teal); }
+  .dmeta-lbl  { font-size: 11px; color: var(--text-3); text-transform: uppercase; letter-spacing: 1px; }
+
+  .feature-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .feature-table th {
+    background: var(--bg-3);
+    color: var(--text-3);
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: var(--s2) var(--s3);
+    text-align: left;
+  }
+  .feature-table td {
+    padding: var(--s2) var(--s3);
+    border-bottom: 1px solid var(--border);
+    color: var(--text-2);
+    vertical-align: top;
+  }
+  .feature-table tr:last-child td { border-bottom: none; }
+  .fname { font-family: var(--mono); color: var(--blue); font-weight: 600; }
+  .ftype-num  { color: var(--teal); font-family: var(--mono); font-size: 11px; }
+  .ftype-cat  { color: var(--amber); font-family: var(--mono); font-size: 11px; }
+  .ftype-tgt  { color: var(--purple); font-family: var(--mono); font-size: 11px; font-weight: 600; }
+
+  .compare-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--s4);
+    margin: var(--s4) 0;
+  }
+  .compare-col {
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: var(--r2);
+    padding: var(--s4);
+  }
+  .compare-col-head {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: var(--s3);
+    padding-bottom: var(--s3);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .edlink-box {
+    display: flex;
+    align-items: center;
+    gap: var(--s4);
+    padding: var(--s4) var(--s5);
+    background: rgba(155,124,244,0.07);
+    border: 1px solid rgba(155,124,244,0.25);
+    border-radius: var(--r2);
+    margin: var(--s4) 0;
+  }
+  .edlink-icon { font-size: 24px; flex-shrink: 0; }
+  .edlink-text { font-size: 13px; color: var(--text-2); line-height: 1.7; }
+  .edlink-text strong { color: var(--text); }
+  .edlink-path {
+    display: inline-block;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--purple);
+    background: rgba(155,124,244,0.1);
+    border: 1px solid rgba(155,124,244,0.2);
+    padding: 2px 8px;
+    border-radius: var(--r1);
+    margin-top: 4px;
+  }
+</style>
+</head>
+<body>
+
+<!-- ══ NAV ══ -->
+<nav class="nav">
+  <div class="nav-logo">AI<span>·</span>UKWMS</div>
+  <ul class="nav-links">
+    <li><a href="../index.html">← Beranda</a></li>
+    <li><a href="#setup" class="active">Setup</a></li>
+    <li><a href="#klasifikasi">Klasifikasi</a></li>
+    <li><a href="#regresi">Regresi</a></li>
+    <li><a href="#perbandingan">Perbandingan</a></li>
+    <li><a href="#tugas">Tugas</a></li>
+  </ul>
+</nav>
+
+<!-- ══ SESI HERO ══ -->
+<header class="sesi-hero">
+  <div style="max-width:1100px;margin:0 auto;">
+    <div class="sesi-breadcrumb">
+      <a href="../index.html">Kecerdasan Buatan</a>
+      <span>›</span>
+      <span>Pertemuan 3</span>
+    </div>
+    <div class="sesi-num">PERTEMUAN 03 · PRAKTIK</div>
+    <h1 class="sesi-title">Praktik ML<br><em style="color:var(--teal);">Python & Scikit-learn</em></h1>
+    <p style="font-size:15px;color:var(--text-2);max-width:640px;line-height:1.8;">Membangun pipeline machine learning end-to-end dari dataset nyata: prediksi churn pelanggan (klasifikasi) dan prediksi harga rumah (regresi) menggunakan Python dan Scikit-learn.</p>
+    <div class="sesi-meta-row">
+      <span class="badge badge-teal">Praktik</span>
+      <span class="badge badge-blue">100 menit</span>
+      <span class="badge badge-amber">CPMK: C2, C3</span>
+    </div>
+  </div>
+</header>
+
+<!-- ══ CONTENT LAYOUT ══ -->
+<div class="content-layout">
+
+  <!-- ── MAIN ── -->
+  <main class="content-main">
+
+    <!-- TUJUAN -->
+    <div class="content-block" id="tujuan">
+      <h2>Tujuan Pembelajaran</h2>
+      <p>Setelah mengikuti pertemuan ini, mahasiswa diharapkan mampu:</p>
+      <ol>
+        <li>Memuat dan mengeksplorasi dataset tabular nyata menggunakan Pandas</li>
+        <li>Melakukan preprocessing data: encoding variabel kategorikal, scaling fitur numerik, dan train-test split</li>
+        <li>Membangun pipeline klasifikasi untuk prediksi churn dengan Logistic Regression dan Random Forest</li>
+        <li>Membangun pipeline regresi untuk prediksi harga rumah dengan Linear Regression dan Ridge</li>
+        <li>Mengevaluasi dan membandingkan model menggunakan metrik yang sesuai (F1, AUC, RMSE, R²)</li>
+        <li>Membaca feature importance dan menginterpretasikan hasil model untuk pengambilan keputusan</li>
+      </ol>
+
+      <div class="callout info" style="margin-top:var(--s5);">
+        <span class="callout-icon">💡</span>
+        <div class="callout-body">
+          <p><strong>Konsep dari P-02 yang akan dipakai hari ini:</strong> Pipeline ML (tahap 1–7), supervised learning, perbedaan klasifikasi vs regresi, confusion matrix, dan metrik evaluasi. Pastikan kamu sudah membaca ringkasan P-02 sebelum sesi ini dimulai.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- SETUP -->
+    <div class="content-block" id="setup">
+      <h2>1. Setup Environment</h2>
+      <p>Kita akan bekerja di <strong>Google Colab</strong> — tidak perlu instalasi apapun di laptop. Semua library yang dibutuhkan sudah tersedia secara default di Colab.</p>
+
+      <div class="step-num-block">
+        <div class="step-num-circle">1</div>
+        <div class="step-num-body">
+          <div class="step-num-title">Buka Google Colab</div>
+          <div class="step-num-desc">Pergi ke <strong>colab.research.google.com</strong> → klik "New Notebook". Pastikan runtime tersambung (pojok kanan atas menunjukkan tanda centang atau ikon RAM/Disk).</div>
+        </div>
+      </div>
+
+      <div class="step-num-block">
+        <div class="step-num-circle">2</div>
+        <div class="step-num-body">
+          <div class="step-num-title">Download Dataset dari Edlink</div>
+          <div class="step-num-desc">Dataset untuk sesi ini tersedia di Edlink. Download kedua file dan upload ke Google Colab melalui panel kiri (ikon folder → upload).</div>
+          <div class="edlink-box" style="margin-top:var(--s3);">
+            <span class="edlink-icon">📦</span>
+            <div class="edlink-text">
+              <strong>Edlink — Materi Pertemuan 3</strong><br>
+              Masuk ke Edlink → pilih mata kuliah Kecerdasan Buatan → Pertemuan 3 → unduh dua file dataset:
+              <br><span class="edlink-path">telco_churn.csv</span>
+              <span class="edlink-path" style="margin-left:var(--s2);">house_price.csv</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="step-num-block">
+        <div class="step-num-circle">3</div>
+        <div class="step-num-body">
+          <div class="step-num-title">Verifikasi Library</div>
+          <div class="step-num-desc">Jalankan cell berikut untuk memastikan semua library tersedia dan versi Python sesuai.</div>
+        </div>
+      </div>
+
+      <div class="code-label">
+        <span class="code-label-name">cell_00_verify.py</span>
+        <span class="code-label-badge">Run first</span>
+      </div>
+      <div class="code-block"><span class="c-kw">import</span> sys, sklearn, pandas, numpy, matplotlib, seaborn
+
+<span class="c-fn">print</span>(<span class="c-str">f"Python : {sys.version.split()[0]}"</span>)
+<span class="c-fn">print</span>(<span class="c-str">f"sklearn: {sklearn.__version__}"</span>)
+<span class="c-fn">print</span>(<span class="c-str">f"pandas : {pandas.__version__}"</span>)
+<span class="c-fn">print</span>(<span class="c-str">f"numpy  : {numpy.__version__}"</span>)
+<span class="c-fn">print</span>(<span class="c-str">"\n✓ Semua library siap!"</span>)</div>
+
+      <div class="output-block">
+        <div class="output-label">Expected Output</div>
+Python : 3.10.x
+sklearn: 1.3.x
+pandas : 2.x.x
+numpy  : 1.x.x
+
+✓ Semua library siap!
+      </div>
+    </div>
+
+    <!-- PRAKTIK A: KLASIFIKASI -->
+    <div class="content-block" id="klasifikasi">
+      <h2>2. Praktik A — Klasifikasi: Prediksi Churn Pelanggan</h2>
+
+      <div class="dataset-card">
+        <div class="dataset-header">
+          <span class="dataset-icon">📱</span>
+          <div>
+            <div class="dataset-title">Telco Customer Churn</div>
+            <div class="dataset-sub">DATASET · IBM Telco · Klasifikasi Biner</div>
+          </div>
+        </div>
+        <div class="dataset-meta">
+          <div class="dmeta-item">
+            <div class="dmeta-num">7.043</div>
+            <div class="dmeta-lbl">Baris</div>
+          </div>
+          <div class="dmeta-item">
+            <div class="dmeta-num">20</div>
+            <div class="dmeta-lbl">Fitur Input</div>
+          </div>
+          <div class="dmeta-item">
+            <div class="dmeta-num">26,5%</div>
+            <div class="dmeta-lbl">Tingkat Churn</div>
+          </div>
+          <div class="dmeta-item">
+            <div class="dmeta-num">telco_churn.csv</div>
+            <div class="dmeta-lbl" style="font-size:9px;">File di Edlink</div>
+          </div>
+        </div>
+        <table class="feature-table">
+          <thead>
+            <tr><th>Fitur</th><th>Tipe</th><th>Keterangan</th></tr>
+          </thead>
+          <tbody>
+            <tr><td class="fname">tenure</td><td class="ftype-num">int</td><td>Bulan sejak pelanggan bergabung</td></tr>
+            <tr><td class="fname">MonthlyCharges</td><td class="ftype-num">float</td><td>Tagihan bulanan dalam USD</td></tr>
+            <tr><td class="fname">TotalCharges</td><td class="ftype-num">float</td><td>Total tagihan kumulatif</td></tr>
+            <tr><td class="fname">Contract</td><td class="ftype-cat">category</td><td>Tipe kontrak: Month-to-month / One year / Two year</td></tr>
+            <tr><td class="fname">InternetService</td><td class="ftype-cat">category</td><td>Jenis layanan internet: DSL / Fiber optic / No</td></tr>
+            <tr><td class="fname">PaymentMethod</td><td class="ftype-cat">category</td><td>Metode pembayaran</td></tr>
+            <tr><td class="fname">... (14 fitur lainnya)</td><td class="ftype-cat">mix</td><td>Layanan tambahan, demografi</td></tr>
+            <tr><td class="fname">Churn</td><td class="ftype-tgt">TARGET</td><td>"Yes" / "No" — apakah pelanggan berhenti berlangganan</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Langkah 1 — Load & Eksplorasi Data</h3>
+
+      <div class="code-label">
+        <span class="code-label-name">cell_01_load.py</span>
+        <span class="code-label-badge">Klasifikasi</span>
+      </div>
+      <div class="code-block"><span class="c-kw">import</span> pandas <span class="c-kw">as</span> pd
+<span class="c-kw">import</span> numpy <span class="c-kw">as</span> np
+<span class="c-kw">import</span> matplotlib.pyplot <span class="c-kw">as</span> plt
+<span class="c-kw">import</span> seaborn <span class="c-kw">as</span> sns
+
+<span class="c-comment"># Load dataset</span>
+df = pd.<span class="c-fn">read_csv</span>(<span class="c-str">"telco_churn.csv"</span>)
+
+<span class="c-comment"># Gambaran umum dataset</span>
+<span class="c-fn">print</span>(<span class="c-str">"Shape:"</span>, df.<span class="c-fn">shape</span>)
+<span class="c-fn">print</span>(<span class="c-str">"\nTipe data:"</span>)
+<span class="c-fn">print</span>(df.<span class="c-fn">dtypes</span>)
+<span class="c-fn">print</span>(<span class="c-str">"\nMissing values:"</span>)
+<span class="c-fn">print</span>(df.<span class="c-fn">isnull</span>().<span class="c-fn">sum</span>()[df.<span class="c-fn">isnull</span>().<span class="c-fn">sum</span>() > <span class="c-num">0</span>])
+<span class="c-fn">print</span>(<span class="c-str">"\nDistribusi target:"</span>)
+<span class="c-fn">print</span>(df[<span class="c-str">"Churn"</span>].<span class="c-fn">value_counts</span>(normalize=<span class="c-kw">True</span>).<span class="c-fn">round</span>(<span class="c-num">3</span>))</div>
+
+      <div class="code-label">
+        <span class="code-label-name">cell_02_eda.py</span>
+        <span class="code-label-badge">EDA</span>
+      </div>
+      <div class="code-block"><span class="c-comment"># Visualisasi distribusi churn berdasarkan fitur kunci</span>
+fig, axes = plt.<span class="c-fn">subplots</span>(<span class="c-num">1</span>, <span class="c-num">3</span>, figsize=(<span class="c-num">15</span>, <span class="c-num">4</span>))
+
+<span class="c-comment"># 1. Distribusi tenure per kelas churn</span>
+df.<span class="c-fn">groupby</span>(<span class="c-str">"Churn"</span>)[<span class="c-str">"tenure"</span>].<span class="c-fn">hist</span>(alpha=<span class="c-num">0.7</span>, bins=<span class="c-num">20</span>, ax=axes[<span class="c-num">0</span>])
+axes[<span class="c-num">0</span>].<span class="c-fn">set_title</span>(<span class="c-str">"Distribusi Tenure per Churn Status"</span>)
+axes[<span class="c-num">0</span>].<span class="c-fn">set_xlabel</span>(<span class="c-str">"Tenure (bulan)"</span>)
+axes[<span class="c-num">0</span>].<span class="c-fn">legend</span>([<span class="c-str">"No Churn"</span>, <span class="c-str">"Churn"</span>])
+
+<span class="c-comment"># 2. Churn rate per tipe kontrak</span>
+contract_churn = df.<span class="c-fn">groupby</span>(<span class="c-str">"Contract"</span>)[<span class="c-str">"Churn"</span>].<span class="c-fn">apply</span>(
+    <span class="c-kw">lambda</span> x: (x == <span class="c-str">"Yes"</span>).<span class="c-fn">mean</span>() * <span class="c-num">100</span>
+)
+contract_churn.<span class="c-fn">plot</span>(kind=<span class="c-str">"bar"</span>, ax=axes[<span class="c-num">1</span>], color=<span class="c-str">"#ff7b72"</span>)
+axes[<span class="c-num">1</span>].<span class="c-fn">set_title</span>(<span class="c-str">"Churn Rate per Tipe Kontrak (%)"</span>)
+axes[<span class="c-num">1</span>].<span class="c-fn">set_xticklabels</span>(axes[<span class="c-num">1</span>].<span class="c-fn">get_xticklabels</span>(), rotation=<span class="c-num">15</span>)
+
+<span class="c-comment"># 3. MonthlyCharges vs tenure (scatterplot warna per kelas)</span>
+colors = [<span class="c-str">"#79c0ff"</span> <span class="c-kw">if</span> c == <span class="c-str">"No"</span> <span class="c-kw">else</span> <span class="c-str">"#ff7b72"</span> <span class="c-kw">for</span> c <span class="c-kw">in</span> df[<span class="c-str">"Churn"</span>]]
+axes[<span class="c-num">2</span>].<span class="c-fn">scatter</span>(df[<span class="c-str">"tenure"</span>], df[<span class="c-str">"MonthlyCharges"</span>], c=colors, alpha=<span class="c-num">0.4</span>, s=<span class="c-num">8</span>)
+axes[<span class="c-num">2</span>].<span class="c-fn">set_title</span>(<span class="c-str">"Tenure vs MonthlyCharges"</span>)
+axes[<span class="c-num">2</span>].<span class="c-fn">set_xlabel</span>(<span class="c-str">"Tenure"</span>)
+axes[<span class="c-num">2</span>].<span class="c-fn">set_ylabel</span>(<span class="c-str">"Monthly Charges"</span>)
+
+plt.<span class="c-fn">tight_layout</span>()
+plt.<span class="c-fn">show</span>()</div>
+
+      <h3>Langkah 2 — Preprocessing</h3>
+
+      <div class="code-label">
+        <span class="code-label-name">cell_03_preprocess.py</span>
+        <span class="code-label-badge">Preprocessing</span>
+      </div>
+      <div class="code-block"><span class="c-kw">from</span> sklearn.model_selection <span class="c-kw">import</span> <span class="c-fn">train_test_split</span>
+<span class="c-kw">from</span> sklearn.preprocessing <span class="c-kw">import</span> <span class="c-fn">StandardScaler</span>, <span class="c-fn">LabelEncoder</span>
+
+<span class="c-comment"># 1. Hapus kolom ID (tidak informatif)</span>
+df = df.<span class="c-fn">drop</span>(columns=[<span class="c-str">"customerID"</span>])
+
+<span class="c-comment"># 2. Perbaiki TotalCharges yang disimpan sebagai string</span>
+df[<span class="c-str">"TotalCharges"</span>] = pd.<span class="c-fn">to_numeric</span>(df[<span class="c-str">"TotalCharges"</span>], errors=<span class="c-str">"coerce"</span>)
+df[<span class="c-str">"TotalCharges"</span>] = df[<span class="c-str">"TotalCharges"</span>].<span class="c-fn">fillna</span>(df[<span class="c-str">"TotalCharges"</span>].<span class="c-fn">median</span>())
+
+<span class="c-comment"># 3. Encode target: Yes=1, No=0</span>
+df[<span class="c-str">"Churn"</span>] = (df[<span class="c-str">"Churn"</span>] == <span class="c-str">"Yes"</span>).<span class="c-fn">astype</span>(<span class="c-fn">int</span>)
+
+<span class="c-comment"># 4. One-Hot Encoding untuk kolom kategorikal</span>
+df_encoded = pd.<span class="c-fn">get_dummies</span>(df, drop_first=<span class="c-kw">True</span>)
+<span class="c-fn">print</span>(<span class="c-str">f"Jumlah fitur setelah encoding: {df_encoded.shape[1] - 1}"</span>)
+
+<span class="c-comment"># 5. Pisahkan fitur (X) dan target (y)</span>
+X = df_encoded.<span class="c-fn">drop</span>(columns=[<span class="c-str">"Churn"</span>])
+y = df_encoded[<span class="c-str">"Churn"</span>]
+
+<span class="c-comment"># 6. Train-test split — stratified untuk menjaga proporsi kelas</span>
+X_train, X_test, y_train, y_test = <span class="c-fn">train_test_split</span>(
+    X, y, test_size=<span class="c-num">0.2</span>, random_state=<span class="c-num">42</span>, stratify=y
+)
+<span class="c-fn">print</span>(<span class="c-str">f"Train: {X_train.shape[0]} | Test: {X_test.shape[0]}"</span>)
+<span class="c-fn">print</span>(<span class="c-str">f"Churn rate train: {y_train.mean():.3f} | test: {y_test.mean():.3f}"</span>)</div>
+
+      <h3>Langkah 3 — Training & Evaluasi Model</h3>
+
+      <div class="code-label">
+        <span class="code-label-name">cell_04_train_classify.py</span>
+        <span class="code-label-badge">Model Training</span>
+      </div>
+      <div class="code-block"><span class="c-kw">from</span> sklearn.pipeline <span class="c-kw">import</span> <span class="c-fn">Pipeline</span>
+<span class="c-kw">from</span> sklearn.linear_model <span class="c-kw">import</span> <span class="c-fn">LogisticRegression</span>
+<span class="c-kw">from</span> sklearn.ensemble <span class="c-kw">import</span> <span class="c-fn">RandomForestClassifier</span>
+<span class="c-kw">from</span> sklearn.metrics <span class="c-kw">import</span> (
+    <span class="c-fn">classification_report</span>, <span class="c-fn">confusion_matrix</span>,
+    <span class="c-fn">roc_auc_score</span>, <span class="c-fn">ConfusionMatrixDisplay</span>
+)
+
+<span class="c-comment"># Model 1: Logistic Regression (baseline)</span>
+pipe_lr = <span class="c-cls">Pipeline</span>([
+    (<span class="c-str">"scaler"</span>, <span class="c-cls">StandardScaler</span>()),
+    (<span class="c-str">"clf"</span>,    <span class="c-cls">LogisticRegression</span>(max_iter=<span class="c-num">300</span>, random_state=<span class="c-num">42</span>))
+])
+pipe_lr.<span class="c-fn">fit</span>(X_train, y_train)
+y_pred_lr   = pipe_lr.<span class="c-fn">predict</span>(X_test)
+y_proba_lr  = pipe_lr.<span class="c-fn">predict_proba</span>(X_test)[:, <span class="c-num">1</span>]
+
+<span class="c-comment"># Model 2: Random Forest</span>
+pipe_rf = <span class="c-cls">Pipeline</span>([
+    (<span class="c-str">"scaler"</span>, <span class="c-cls">StandardScaler</span>()),
+    (<span class="c-str">"clf"</span>,    <span class="c-cls">RandomForestClassifier</span>(n_estimators=<span class="c-num">100</span>, random_state=<span class="c-num">42</span>))
+])
+pipe_rf.<span class="c-fn">fit</span>(X_train, y_train)
+y_pred_rf   = pipe_rf.<span class="c-fn">predict</span>(X_test)
+y_proba_rf  = pipe_rf.<span class="c-fn">predict_proba</span>(X_test)[:, <span class="c-num">1</span>]
+
+<span class="c-comment"># ── Laporan evaluasi ──────────────────────────────────────────</span>
+<span class="c-fn">print</span>(<span class="c-str">"═══ Logistic Regression ═══"</span>)
+<span class="c-fn">print</span>(<span class="c-fn">classification_report</span>(y_test, y_pred_lr, target_names=[<span class="c-str">"No Churn"</span>, <span class="c-str">"Churn"</span>]))
+<span class="c-fn">print</span>(<span class="c-str">f"AUC-ROC: {roc_auc_score(y_test, y_proba_lr):.4f}"</span>)
+
+<span class="c-fn">print</span>(<span class="c-str">"\n═══ Random Forest ═══"</span>)
+<span class="c-fn">print</span>(<span class="c-fn">classification_report</span>(y_test, y_pred_rf, target_names=[<span class="c-str">"No Churn"</span>, <span class="c-str">"Churn"</span>]))
+<span class="c-fn">print</span>(<span class="c-str">f"AUC-ROC: {roc_auc_score(y_test, y_proba_rf):.4f}"</span>)</div>
+
+      <div class="output-block">
+        <div class="output-label">Expected Output (approx.)</div>
+═══ Logistic Regression ═══
+              precision  recall  f1-score  support
+    No Churn       0.85    0.90      0.87     1033
+       Churn       0.66    0.55      0.60      376
+    accuracy                         0.81     1409
+AUC-ROC: 0.8412
+
+═══ Random Forest ═══
+              precision  recall  f1-score  support
+    No Churn       0.84    0.93      0.88     1033
+       Churn       0.70    0.48      0.57      376
+    accuracy                         0.81     1409
+AUC-ROC: 0.8621
+      </div>
+
+      <h3>Langkah 4 — Visualisasi Confusion Matrix & Feature Importance</h3>
+
+      <div class="code-label">
+        <span class="code-label-name">cell_05_visualize.py</span>
+        <span class="code-label-badge">Visualize</span>
+      </div>
+      <div class="code-block"><span class="c-comment"># ── Confusion Matrix ─────────────────────────────────────────</span>
+fig, axes = plt.<span class="c-fn">subplots</span>(<span class="c-num">1</span>, <span class="c-num">2</span>, figsize=(<span class="c-num">10</span>, <span class="c-num">4</span>))
+<span class="c-kw">for</span> ax, model, name <span class="c-kw">in</span> <span class="c-fn">zip</span>(
+    axes,
+    [pipe_lr, pipe_rf],
+    [<span class="c-str">"Logistic Regression"</span>, <span class="c-str">"Random Forest"</span>]
+):
+    <span class="c-cls">ConfusionMatrixDisplay</span>.<span class="c-fn">from_estimator</span>(
+        model, X_test, y_test,
+        display_labels=[<span class="c-str">"No Churn"</span>, <span class="c-str">"Churn"</span>],
+        ax=ax, colorbar=<span class="c-kw">False</span>, cmap=<span class="c-str">"Blues"</span>
+    )
+    ax.<span class="c-fn">set_title</span>(name)
+plt.<span class="c-fn">tight_layout</span>()
+plt.<span class="c-fn">show</span>()
+
+<span class="c-comment"># ── Feature Importance (Random Forest) ───────────────────────</span>
+rf_model = pipe_rf.named_steps[<span class="c-str">"clf"</span>]
+importances = pd.<span class="c-cls">Series</span>(
+    rf_model.feature_importances_,
+    index=X_train.columns
+).<span class="c-fn">sort_values</span>(ascending=<span class="c-kw">False</span>)
+
+plt.<span class="c-fn">figure</span>(figsize=(<span class="c-num">10</span>, <span class="c-num">5</span>))
+importances.head(<span class="c-num">10</span>).<span class="c-fn">plot</span>(kind=<span class="c-str">"barh"</span>, color=<span class="c-str">"#00c9b1"</span>)
+plt.<span class="c-fn">title</span>(<span class="c-str">"Top 10 Fitur Paling Penting (Random Forest)"</span>)
+plt.<span class="c-fn">gca</span>().<span class="c-fn">invert_yaxis</span>()
+plt.<span class="c-fn">tight_layout</span>()
+plt.<span class="c-fn">show</span>()
+
+<span class="c-fn">print</span>(<span class="c-str">"\n📊 Top 5 prediktor churn:"</span>)
+<span class="c-fn">print</span>(importances.head(<span class="c-num">5</span>).<span class="c-fn">to_string</span>())</div>
+
+      <div class="callout tip">
+        <span class="callout-icon">💼</span>
+        <div class="callout-body">
+          <p><strong>Interpretasi bisnis:</strong> Jika <code>tenure</code> muncul sebagai fitur terpenting, artinya pelanggan baru (<em>tenure</em> rendah) adalah yang paling berisiko churn. Rekomendasi: program onboarding intensif di 3 bulan pertama. Fitur <code>Contract_Month-to-month</code> penting → dorong pelanggan ke kontrak tahunan dengan insentif harga.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- PRAKTIK B: REGRESI -->
+    <div class="content-block" id="regresi">
+      <h2>3. Praktik B — Regresi: Prediksi Harga Rumah</h2>
+
+      <div class="dataset-card">
+        <div class="dataset-header">
+          <span class="dataset-icon">🏠</span>
+          <div>
+            <div class="dataset-title">House Price Dataset</div>
+            <div class="dataset-sub">DATASET · Regresi Multivariat · Kaggle-derived</div>
+          </div>
+        </div>
+        <div class="dataset-meta">
+          <div class="dmeta-item">
+            <div class="dmeta-num">1.460</div>
+            <div class="dmeta-lbl">Baris</div>
+          </div>
+          <div class="dmeta-item">
+            <div class="dmeta-num">15</div>
+            <div class="dmeta-lbl">Fitur Input</div>
+          </div>
+          <div class="dmeta-item">
+            <div class="dmeta-num">SalePrice</div>
+            <div class="dmeta-lbl">Target (USD)</div>
+          </div>
+          <div class="dmeta-item">
+            <div class="dmeta-num">house_price.csv</div>
+            <div class="dmeta-lbl" style="font-size:9px;">File di Edlink</div>
+          </div>
+        </div>
+        <table class="feature-table">
+          <thead>
+            <tr><th>Fitur</th><th>Tipe</th><th>Keterangan</th></tr>
+          </thead>
+          <tbody>
+            <tr><td class="fname">GrLivArea</td><td class="ftype-num">int</td><td>Luas area hidup di atas tanah (sq ft)</td></tr>
+            <tr><td class="fname">TotalBsmtSF</td><td class="ftype-num">int</td><td>Luas basement total</td></tr>
+            <tr><td class="fname">OverallQual</td><td class="ftype-num">int</td><td>Rating kualitas keseluruhan material (1–10)</td></tr>
+            <tr><td class="fname">YearBuilt</td><td class="ftype-num">int</td><td>Tahun rumah dibangun</td></tr>
+            <tr><td class="fname">GarageCars</td><td class="ftype-num">int</td><td>Kapasitas garasi (jumlah mobil)</td></tr>
+            <tr><td class="fname">Neighborhood</td><td class="ftype-cat">category</td><td>Nama kawasan perumahan</td></tr>
+            <tr><td class="fname">... (9 fitur lainnya)</td><td class="ftype-cat">mix</td><td>Kondisi rumah, fasilitas</td></tr>
+            <tr><td class="fname">SalePrice</td><td class="ftype-tgt">TARGET</td><td>Harga jual rumah dalam USD</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Langkah 1 — Load & EDA Regresi</h3>
+
+      <div class="code-label">
+        <span class="code-label-name">cell_06_load_house.py</span>
+        <span class="code-label-badge">Regresi</span>
+      </div>
+      <div class="code-block"><span class="c-comment"># Load dataset harga rumah</span>
+house = pd.<span class="c-fn">read_csv</span>(<span class="c-str">"house_price.csv"</span>)
+
+<span class="c-fn">print</span>(<span class="c-str">"Shape:"</span>, house.<span class="c-fn">shape</span>)
+<span class="c-fn">print</span>(<span class="c-str">\nStatistik target SalePrice:"</span>)
+<span class="c-fn">print</span>(house[<span class="c-str">"SalePrice"</span>].<span class="c-fn">describe</span>())
+
+<span class="c-comment"># Distribusi target — sering skewed kanan</span>
+fig, axes = plt.<span class="c-fn">subplots</span>(<span class="c-num">1</span>, <span class="c-num">2</span>, figsize=(<span class="c-num">12</span>, <span class="c-num">4</span>))
+house[<span class="c-str">"SalePrice"</span>].<span class="c-fn">hist</span>(bins=<span class="c-num">50</span>, ax=axes[<span class="c-num">0</span>], color=<span class="c-str">"#ffa657"</span>)
+axes[<span class="c-num">0</span>].<span class="c-fn">set_title</span>(<span class="c-str">"Distribusi SalePrice (Original)"</span>)
+
+<span class="c-comment"># Log-transform untuk distribusi lebih normal</span>
+np.<span class="c-fn">log1p</span>(house[<span class="c-str">"SalePrice"</span>]).<span class="c-fn">hist</span>(bins=<span class="c-num">50</span>, ax=axes[<span class="c-num">1</span>], color=<span class="c-str">"#79c0ff"</span>)
+axes[<span class="c-num">1</span>].<span class="c-fn">set_title</span>(<span class="c-str">"Distribusi log(SalePrice+1)"</span>)
+
+plt.<span class="c-fn">tight_layout</span>()
+plt.<span class="c-fn">show</span>()
+
+<span class="c-comment"># Heatmap korelasi fitur numerik</span>
+plt.<span class="c-fn">figure</span>(figsize=(<span class="c-num">10</span>, <span class="c-num">8</span>))
+num_cols = house.<span class="c-fn">select_dtypes</span>(include=<span class="c-str">"number"</span>).<span class="c-fn">columns</span>
+sns.<span class="c-fn">heatmap</span>(house[num_cols].<span class="c-fn">corr</span>(), annot=<span class="c-kw">True</span>, fmt=<span class="c-str">".1f"</span>,
+            cmap=<span class="c-str">"coolwarm"</span>, center=<span class="c-num">0</span>, square=<span class="c-kw">True</span>, linewidths=<span class="c-num">0.5</span>)
+plt.<span class="c-fn">title</span>(<span class="c-str">"Korelasi Fitur Numerik"</span>)
+plt.<span class="c-fn">tight_layout</span>()
+plt.<span class="c-fn">show</span>()</div>
+
+      <h3>Langkah 2 — Preprocessing & Feature Engineering</h3>
+
+      <div class="code-label">
+        <span class="code-label-name">cell_07_prep_house.py</span>
+        <span class="code-label-badge">Feature Engineering</span>
+      </div>
+      <div class="code-block"><span class="c-kw">from</span> sklearn.impute <span class="c-kw">import</span> <span class="c-fn">SimpleImputer</span>
+<span class="c-kw">from</span> sklearn.compose <span class="c-kw">import</span> <span class="c-fn">ColumnTransformer</span>
+<span class="c-kw">from</span> sklearn.preprocessing <span class="c-kw">import</span> <span class="c-fn">OneHotEncoder</span>, <span class="c-fn">StandardScaler</span>
+<span class="c-kw">from</span> sklearn.pipeline <span class="c-kw">import</span> <span class="c-fn">Pipeline</span>
+
+<span class="c-comment"># Feature engineering: usia rumah saat dijual</span>
+house[<span class="c-str">"HouseAge"</span>] = house[<span class="c-str">"YrSold"</span>] - house[<span class="c-str">"YearBuilt"</span>]
+
+<span class="c-comment"># Pisahkan fitur dan target</span>
+features = [<span class="c-str">"GrLivArea"</span>, <span class="c-str">"TotalBsmtSF"</span>, <span class="c-str">"OverallQual"</span>, <span class="c-str">"GarageCars"</span>,
+            <span class="c-str">"HouseAge"</span>, <span class="c-str">"Neighborhood"</span>, <span class="c-str">"MSZoning"</span>]
+
+X_h = house[features]
+y_h = np.<span class="c-fn">log1p</span>(house[<span class="c-str">"SalePrice"</span>])  <span class="c-comment"># log-transform target</span>
+
+<span class="c-comment"># Definisi kolom per tipe</span>
+num_features = [<span class="c-str">"GrLivArea"</span>, <span class="c-str">"TotalBsmtSF"</span>, <span class="c-str">"OverallQual"</span>, <span class="c-str">"GarageCars"</span>, <span class="c-str">"HouseAge"</span>]
+cat_features = [<span class="c-str">"Neighborhood"</span>, <span class="c-str">"MSZoning"</span>]
+
+<span class="c-comment"># Preprocessor untuk numerik dan kategorikal</span>
+preprocessor = <span class="c-cls">ColumnTransformer</span>([
+    (<span class="c-str">"num"</span>, <span class="c-cls">Pipeline</span>([
+        (<span class="c-str">"imputer"</span>, <span class="c-cls">SimpleImputer</span>(strategy=<span class="c-str">"median"</span>)),
+        (<span class="c-str">"scaler"</span>,  <span class="c-cls">StandardScaler</span>())
+    ]), num_features),
+    (<span class="c-str">"cat"</span>, <span class="c-cls">Pipeline</span>([
+        (<span class="c-str">"imputer"</span>, <span class="c-cls">SimpleImputer</span>(strategy=<span class="c-str">"most_frequent"</span>)),
+        (<span class="c-str">"enc"</span>,     <span class="c-cls">OneHotEncoder</span>(handle_unknown=<span class="c-str">"ignore"</span>))
+    ]), cat_features)
+])
+
+<span class="c-comment"># Train-test split</span>
+X_h_train, X_h_test, y_h_train, y_h_test = <span class="c-fn">train_test_split</span>(
+    X_h, y_h, test_size=<span class="c-num">0.2</span>, random_state=<span class="c-num">42</span>
+)
+<span class="c-fn">print</span>(<span class="c-str">f"Train: {X_h_train.shape[0]} | Test: {X_h_test.shape[0]}"</span>)</div>
+
+      <h3>Langkah 3 — Training & Evaluasi Regresi</h3>
+
+      <div class="code-label">
+        <span class="code-label-name">cell_08_train_regress.py</span>
+        <span class="code-label-badge">Model Training</span>
+      </div>
+      <div class="code-block"><span class="c-kw">from</span> sklearn.linear_model <span class="c-kw">import</span> <span class="c-fn">LinearRegression</span>, <span class="c-fn">Ridge</span>
+<span class="c-kw">from</span> sklearn.metrics <span class="c-kw">import</span> <span class="c-fn">mean_absolute_error</span>, <span class="c-fn">mean_squared_error</span>, <span class="c-fn">r2_score</span>
+
+<span class="c-kw">def</span> <span class="c-fn">eval_regression</span>(name, model, X_train, y_train, X_test, y_test):
+    model.<span class="c-fn">fit</span>(X_train, y_train)
+    y_pred = model.<span class="c-fn">predict</span>(X_test)
+
+    <span class="c-comment"># Balik log-transform untuk metrik dalam USD asli</span>
+    y_pred_orig = np.<span class="c-fn">expm1</span>(y_pred)
+    y_test_orig = np.<span class="c-fn">expm1</span>(y_test)
+
+    mae  = <span class="c-fn">mean_absolute_error</span>(y_test_orig, y_pred_orig)
+    rmse = <span class="c-fn">mean_squared_error</span>(y_test_orig, y_pred_orig, squared=<span class="c-kw">False</span>)
+    r2   = <span class="c-fn">r2_score</span>(y_test, y_pred)  <span class="c-comment"># R² di ruang log</span>
+
+    <span class="c-fn">print</span>(<span class="c-str">f"\n═══ {name} ═══"</span>)
+    <span class="c-fn">print</span>(<span class="c-str">f"MAE  : ${mae:,.0f}"</span>)
+    <span class="c-fn">print</span>(<span class="c-str">f"RMSE : ${rmse:,.0f}"</span>)
+    <span class="c-fn">print</span>(<span class="c-str">f"R²   : {r2:.4f}"</span>)
+    <span class="c-kw">return</span> model
+
+<span class="c-comment"># Model 1: Linear Regression (baseline)</span>
+pipe_linear = <span class="c-cls">Pipeline</span>([(<span class="c-str">"prep"</span>, preprocessor), (<span class="c-str">"reg"</span>, <span class="c-cls">LinearRegression</span>())])
+<span class="c-fn">eval_regression</span>(<span class="c-str">"Linear Regression"</span>, pipe_linear,
+                X_h_train, y_h_train, X_h_test, y_h_test)
+
+<span class="c-comment"># Model 2: Ridge Regression (regularisasi L2)</span>
+pipe_ridge = <span class="c-cls">Pipeline</span>([(<span class="c-str">"prep"</span>, preprocessor), (<span class="c-str">"reg"</span>, <span class="c-cls">Ridge</span>(alpha=<span class="c-num">10.0</span>))])
+<span class="c-fn">eval_regression</span>(<span class="c-str">"Ridge Regression (α=10)"</span>, pipe_ridge,
+                X_h_train, y_h_train, X_h_test, y_h_test)</div>
+
+      <div class="output-block">
+        <div class="output-label">Expected Output (approx.)</div>
+═══ Linear Regression ═══
+MAE  : $22,841
+RMSE : $32,504
+R²   : 0.8213
+
+═══ Ridge Regression (α=10) ═══
+MAE  : $21,953
+RMSE : $31,088
+R²   : 0.8301
+      </div>
+
+      <div class="code-label">
+        <span class="code-label-name">cell_09_residual.py</span>
+        <span class="code-label-badge">Residual Plot</span>
+      </div>
+      <div class="code-block"><span class="c-comment"># Plot Predicted vs Actual — model Ridge</span>
+pipe_ridge.<span class="c-fn">fit</span>(X_h_train, y_h_train)
+y_pred_ridge = np.<span class="c-fn">expm1</span>(pipe_ridge.<span class="c-fn">predict</span>(X_h_test))
+y_actual     = np.<span class="c-fn">expm1</span>(y_h_test.values)
+
+plt.<span class="c-fn">figure</span>(figsize=(<span class="c-num">7</span>, <span class="c-num">6</span>))
+plt.<span class="c-fn">scatter</span>(y_actual, y_pred_ridge, alpha=<span class="c-num">0.5</span>, s=<span class="c-num">18</span>, color=<span class="c-str">"#79c0ff"</span>)
+max_val = <span class="c-fn">max</span>(y_actual.<span class="c-fn">max</span>(), y_pred_ridge.<span class="c-fn">max</span>())
+plt.<span class="c-fn">plot</span>([<span class="c-num">0</span>, max_val], [<span class="c-num">0</span>, max_val], <span class="c-str">"--"</span>, color=<span class="c-str">"#ff7b72"</span>, linewidth=<span class="c-num">1.5</span>)
+plt.<span class="c-fn">xlabel</span>(<span class="c-str">"Harga Aktual (USD)"</span>)
+plt.<span class="c-fn">ylabel</span>(<span class="c-str">"Harga Diprediksi (USD)"</span>)
+plt.<span class="c-fn">title</span>(<span class="c-str">"Predicted vs Actual — Ridge Regression"</span>)
+plt.<span class="c-fn">tight_layout</span>()
+plt.<span class="c-fn">show</span>()</div>
+
+      <div class="callout tip">
+        <span class="callout-icon">📐</span>
+        <div class="callout-body">
+          <p><strong>Interpretasi R²:</strong> R² = 0.83 berarti model menjelaskan 83% variasi harga yang diamati — cukup baik untuk model linier dengan hanya 7 fitur. Titik yang jauh dari garis merah diagonal menunjukkan rumah-rumah yang prediksinya meleset — biasanya rumah mewah atau kondisi sangat unik.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- PERBANDINGAN -->
+    <div class="content-block" id="perbandingan">
+      <h2>4. Perbandingan & Sintesis</h2>
+
+      <div class="compare-grid">
+        <div class="compare-col">
+          <div class="compare-col-head" style="color:var(--teal);">Klasifikasi — Churn Prediction</div>
+          <table style="width:100%;font-size:12px;border-collapse:collapse;">
+            <thead>
+              <tr>
+                <th style="text-align:left;padding:4px 6px;color:var(--text-3);font-family:var(--mono);font-size:10px;border-bottom:1px solid var(--border);">Model</th>
+                <th style="text-align:right;padding:4px 6px;color:var(--text-3);font-family:var(--mono);font-size:10px;border-bottom:1px solid var(--border);">F1 (Churn)</th>
+                <th style="text-align:right;padding:4px 6px;color:var(--text-3);font-family:var(--mono);font-size:10px;border-bottom:1px solid var(--border);">AUC</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td style="padding:4px 6px;color:var(--text-2);border-bottom:1px solid var(--border);">Logistic Regression</td>
+                <td style="padding:4px 6px;color:var(--text);text-align:right;border-bottom:1px solid var(--border);">0.60</td>
+                <td style="padding:4px 6px;color:var(--text);text-align:right;border-bottom:1px solid var(--border);">0.841</td>
+              </tr>
+              <tr>
+                <td style="padding:4px 6px;color:var(--text-2);">Random Forest</td>
+                <td style="padding:4px 6px;color:var(--teal);text-align:right;font-weight:600;">0.57</td>
+                <td style="padding:4px 6px;color:var(--teal);text-align:right;font-weight:600;">0.862 ★</td>
+              </tr>
+            </tbody>
+          </table>
+          <p style="font-size:12px;color:var(--text-2);margin-top:var(--s3);line-height:1.6;">LR unggul di F1 churn (recall lebih tinggi), RF unggul di AUC. Pilihan tergantung prioritas: tangkap churn (LR) atau ranking risiko (RF).</p>
+        </div>
+
+        <div class="compare-col">
+          <div class="compare-col-head" style="color:var(--amber);">Regresi — House Price</div>
+          <table style="width:100%;font-size:12px;border-collapse:collapse;">
+            <thead>
+              <tr>
+                <th style="text-align:left;padding:4px 6px;color:var(--text-3);font-family:var(--mono);font-size:10px;border-bottom:1px solid var(--border);">Model</th>
+                <th style="text-align:right;padding:4px 6px;color:var(--text-3);font-family:var(--mono);font-size:10px;border-bottom:1px solid var(--border);">RMSE</th>
+                <th style="text-align:right;padding:4px 6px;color:var(--text-3);font-family:var(--mono);font-size:10px;border-bottom:1px solid var(--border);">R²</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td style="padding:4px 6px;color:var(--text-2);border-bottom:1px solid var(--border);">Linear Regression</td>
+                <td style="padding:4px 6px;color:var(--text);text-align:right;border-bottom:1px solid var(--border);">$32,504</td>
+                <td style="padding:4px 6px;color:var(--text);text-align:right;border-bottom:1px solid var(--border);">0.821</td>
+              </tr>
+              <tr>
+                <td style="padding:4px 6px;color:var(--text-2);">Ridge (α=10)</td>
+                <td style="padding:4px 6px;color:var(--teal);text-align:right;font-weight:600;">$31,088 ★</td>
+                <td style="padding:4px 6px;color:var(--teal);text-align:right;font-weight:600;">0.830 ★</td>
+              </tr>
+            </tbody>
+          </table>
+          <p style="font-size:12px;color:var(--text-2);margin-top:var(--s3);line-height:1.6;">Ridge lebih baik karena regularisasi mencegah overfitting pada fitur-fitur yang berkorelasi tinggi (multikolinearitas).</p>
+        </div>
+      </div>
+
+      <div class="callout warn">
+        <span class="callout-icon">⚠️</span>
+        <div class="callout-body">
+          <p><strong>Ini baru permulaan:</strong> Hasil di atas menggunakan model sederhana dengan fitur terbatas. Di dunia nyata, peningkatan signifikan bisa diperoleh dengan: lebih banyak fitur relevan, hyperparameter tuning (<code>GridSearchCV</code>), dan algoritma lebih kuat seperti Gradient Boosting (XGBoost). Kita akan bahas di P-04.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- RINGKASAN & TUGAS -->
+    <div class="content-block" id="ringkasan">
+      <h2>Ringkasan Pertemuan Ini</h2>
+      <div style="background:var(--bg-2);border:1px solid var(--border);border-radius:var(--r3);padding:var(--s5);">
+        <ul>
+          <li>Pipeline ML end-to-end mencakup: load → EDA → preprocessing → training → evaluasi — setiap tahap sama pentingnya</li>
+          <li>One-Hot Encoding mengubah variabel kategorikal ke format numerik yang bisa diproses model; <code>ColumnTransformer</code> mempermudah penanganan campuran tipe fitur</li>
+          <li>Selalu gunakan <code>Pipeline</code> Scikit-learn untuk mencegah data leakage — scaler hanya boleh di-fit pada data training</li>
+          <li>Untuk klasifikasi churn yang imbalanced: perhatikan F1-Score dan AUC, bukan hanya accuracy</li>
+          <li>Log-transform pada target regresi yang skewed kanan menghasilkan model yang lebih stabil dan residual yang lebih berdistribusi normal</li>
+          <li>Ridge Regression menambahkan regularisasi L2 untuk menangani multikolinearitas dan mencegah overfitting pada regresi linier</li>
+        </ul>
+      </div>
+
+      <!-- TASK BOX -->
+      <div class="task-box" id="tugas">
+        <div class="task-box-title">📋 Tugas Pertemuan Ini</div>
+        <p style="font-size:13px;color:var(--text-2);margin-bottom:var(--s4);">Kumpulkan sebagai Jupyter Notebook (.ipynb) melalui Edlink sebelum pertemuan ke-4.</p>
+        <ol style="font-size:14px;color:var(--text);line-height:2.1;">
+          <li>Jalankan semua kode dari praktik A (churn) dan B (harga rumah) di Google Colab. <strong>Tambahkan komentar</strong> di setiap cell menjelaskan apa yang dilakukan kode tersebut dan mengapa.</li>
+          <li>Untuk praktik A, tambahkan model <strong>Decision Tree</strong> ke perbandingan (gunakan pola Pipeline yang sama). Bandingkan F1-Score dan AUC ketiga model (LR, RF, DT) dalam satu tabel Markdown. Model mana yang kamu rekomendasikan untuk deployment? Jelaskan dalam 100 kata.</li>
+          <li>Untuk praktik B, coba nilai alpha Ridge yang berbeda: <code>0.1, 1, 10, 100</code>. Buat plot yang menunjukkan hubungan antara nilai alpha dan RMSE. Apa yang kamu amati saat alpha sangat besar atau sangat kecil?</li>
+          <li><em>Bonus:</em> Pada dataset churn, ubah threshold prediksi dari default 0.5 ke 0.3 (<code>model.predict_proba()[:,1] >= 0.3</code>). Bagaimana pengaruhnya terhadap Precision, Recall, dan F1? Kapan kita perlu menurunkan threshold seperti ini dalam konteks bisnis?</li>
+        </ol>
+      </div>
+
+      <!-- READING BOX -->
+      <div class="reading-box">
+        <div class="reading-box-title">📖 Persiapan Pertemuan Ke-4</div>
+        <div class="reading-item">
+          <span class="reading-icon">📗</span>
+          <div class="reading-label">
+            <strong>Géron — Hands-On ML, Chapter 2</strong>
+            "End-to-End ML Project" — Fokus pada bagian Feature Engineering dan Feature Selection. Sangat relevan untuk P-04: Data Preparation.
+          </div>
+        </div>
+        <div class="reading-item">
+          <span class="reading-icon">🎥</span>
+          <div class="reading-label">
+            <strong>3Blue1Brown — "Neural Networks" Series, Episode 1</strong>
+            "But what is a neural network?" — Visualisasi intuitif sebelum masuk ke P-05 Deep Learning. Tersedia di YouTube (~19 menit).
+          </div>
+        </div>
+        <div class="reading-item">
+          <span class="reading-icon">📄</span>
+          <div class="reading-label">
+            <strong>Scikit-learn Docs — ColumnTransformer & Pipeline</strong>
+            Baca dokumentasi resmi <code>sklearn.compose.ColumnTransformer</code> dan <code>sklearn.pipeline.Pipeline</code> — tools yang akan sering digunakan sampai UAS.
+          </div>
+        </div>
+        <div class="reading-item">
+          <span class="reading-icon">📦</span>
+          <div class="reading-label">
+            <strong>Dataset P-04 di Edlink</strong>
+            Unduh <code>ecommerce_raw.csv</code> dari Edlink → Pertemuan 4. Buka di Pandas dan catat: ada berapa missing values? Kolom apa yang perlu di-encode? Bawa temuanmu ke kelas.
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ── ASIDE ── -->
+  <aside class="content-aside">
+    <!-- TOC -->
+    <div class="toc">
+      <div class="toc-title">Isi Halaman</div>
+      <ul class="toc-list">
+        <li><a href="#tujuan" class="active">Tujuan Pembelajaran</a></li>
+        <li><a href="#setup">1. Setup Environment</a></li>
+        <li><a href="#klasifikasi">2. Klasifikasi Churn</a></li>
+        <li><a href="#regresi">3. Regresi Harga Rumah</a></li>
+        <li><a href="#perbandingan">4. Perbandingan Model</a></li>
+        <li><a href="#ringkasan">Ringkasan & Tugas</a></li>
+      </ul>
+    </div>
+
+    <!-- Sesi nav -->
+    <div class="sesi-nav-aside">
+      <div class="sesi-nav-title">Navigasi Sesi</div>
+      <a href="sesi-02.html" class="sesi-nav-btn">
+        <span>←</span>
+        <span>P-02: Konsep Machine Learning</span>
+      </a>
+      <a href="../index.html" class="sesi-nav-btn" style="margin-top:var(--s2);">
+        <span>🏠</span>
+        <span>Kembali ke Beranda</span>
+      </a>
+      <div style="font-size:12px;color:var(--text-3);margin-top:var(--s4);padding:var(--s3) 0;border-top:1px solid var(--border);">Sesi berikutnya:</div>
+      <a href="#" class="sesi-nav-btn" style="opacity:0.5;pointer-events:none;">
+        <span>→</span>
+        <span>P-04: Data Preparation & Feature Engineering</span>
+      </a>
+    </div>
+
+    <!-- Info box -->
+    <div style="background:var(--bg-2);border:1px solid var(--border);border-radius:var(--r3);padding:var(--s5);margin-top:var(--s4);">
+      <div style="font-family:var(--mono);font-size:10px;color:var(--text-3);letter-spacing:2px;text-transform:uppercase;margin-bottom:var(--s3);">Info Pertemuan</div>
+      <div style="display:flex;flex-direction:column;gap:var(--s3);">
+        <div>
+          <div style="font-size:11px;color:var(--text-3);">Tipe</div>
+          <div style="font-size:13px;color:var(--text);">Praktik Hands-on</div>
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--text-3);">Durasi</div>
+          <div style="font-size:13px;color:var(--text);">100 menit</div>
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--text-3);">CPMK</div>
+          <div style="font-size:13px;color:var(--text);">C2 (Menerapkan ML), C3 (Evaluasi & pipeline)</div>
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--text-3);">Tools</div>
+          <div style="font-size:13px;color:var(--text);">Python · Scikit-learn · Pandas · Google Colab</div>
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--text-3);">Dataset</div>
+          <div style="font-size:13px;color:var(--text);">telco_churn.csv · house_price.csv</div>
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--text-3);">Sumber Dataset</div>
+          <div style="font-size:13px;color:var(--text);">Edlink — Pertemuan 3</div>
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--text-3);">Referensi Utama</div>
+          <div style="font-size:13px;color:var(--text);">Géron — Hands-On ML, Ch. 1–3</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Cheat sheet -->
+    <div style="background:var(--bg-2);border:1px solid var(--border);border-radius:var(--r3);padding:var(--s5);margin-top:var(--s4);">
+      <div style="font-family:var(--mono);font-size:10px;color:var(--text-3);letter-spacing:2px;text-transform:uppercase;margin-bottom:var(--s4);">Metrik Quick Ref</div>
+      <div style="display:flex;flex-direction:column;gap:var(--s3);">
+        <div style="border-bottom:1px solid var(--border);padding-bottom:var(--s3);">
+          <div style="font-family:var(--mono);font-size:11px;color:var(--teal);margin-bottom:2px;">KLASIFIKASI</div>
+          <div style="font-size:11px;color:var(--text-2);line-height:1.7;">F1-Score — imbalanced data<br>AUC-ROC — ranking risiko<br>Recall — FN mahal<br>Precision — FP mahal</div>
+        </div>
+        <div>
+          <div style="font-family:var(--mono);font-size:11px;color:var(--amber);margin-bottom:2px;">REGRESI</div>
+          <div style="font-size:11px;color:var(--text-2);line-height:1.7;">MAE — interpretasi mudah<br>RMSE — penalti outlier<br>R² — variansi dijelaskan</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+</div><!-- end content-layout -->
+
+<!-- ══ FOOTER ══ -->
+<footer class="footer">
+  <div>AI·UKWMS <span style="color:var(--text-3);">· P-03 Praktik ML dengan Python & Scikit-learn</span></div>
+  <div><a href="../index.html" style="color:var(--text-3);">← Kembali ke Beranda</a></div>
+</footer>
+
+<script>
+  const headings = document.querySelectorAll('.content-main [id]');
+  const tocLinks = document.querySelectorAll('.toc-list a');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(a => {
+          a.classList.remove('active');
+          if (a.getAttribute('href') === '#' + entry.target.id) a.classList.add('active');
+        });
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px' });
+  headings.forEach(h => observer.observe(h));
+
+  const navLinks = document.querySelectorAll('.nav-links a[href^="#"]');
+  window.addEventListener('scroll', () => {
+    let current = '';
+    headings.forEach(h => { if (window.scrollY >= h.offsetTop - 100) current = h.id; });
+    navLinks.forEach(a => {
+      a.classList.remove('active');
+      if (a.getAttribute('href') === '#' + current) a.classList.add('active');
+    });
+  });
+</script>
+
+</body>
+</html>
