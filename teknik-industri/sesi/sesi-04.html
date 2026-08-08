@@ -1,0 +1,938 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>P-04: Data Industri — Pembersihan & Visualisasi · Teknik Industri UKWMS</title>
+<link rel="stylesheet" href="../../css/style.css">
+<style>
+  /* ── page-specific ── */
+  .problem-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--s4);
+    margin: var(--s4) 0;
+  }
+  .problem-card {
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: var(--r2);
+    padding: var(--s4) var(--s5);
+  }
+  .problem-icon { font-size: 24px; margin-bottom: var(--s2); }
+  .problem-title { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
+  .problem-body  { font-size: 12px; color: var(--text-2); line-height: 1.6; }
+  .problem-fix   { font-size: 11px; color: var(--teal); margin-top: 8px; font-family: var(--mono); }
+
+  .dirty-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+    margin: var(--s4) 0;
+  }
+  .dirty-table th {
+    background: var(--bg-2);
+    color: var(--text-3);
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding: var(--s3) var(--s4);
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+  .dirty-table td {
+    padding: var(--s3) var(--s4);
+    border-bottom: 1px solid var(--border);
+    color: var(--text-2);
+    font-family: var(--mono);
+  }
+  .dirty-table tr:last-child td { border-bottom: none; }
+  .cell-bad    { background: rgba(240,96,96,0.12); color: var(--red) !important; border-radius: 3px; }
+  .cell-warn   { background: rgba(245,166,35,0.1); color: var(--amber) !important; border-radius: 3px; }
+  .cell-good   { background: rgba(0,201,177,0.08); color: var(--teal) !important; border-radius: 3px; }
+
+  .step-action {
+    display: flex;
+    gap: var(--s4);
+    align-items: flex-start;
+    padding: var(--s4) 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .step-action:last-child { border-bottom: none; }
+  .step-badge {
+    flex-shrink: 0;
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 20px;
+    min-width: 60px;
+    text-align: center;
+    margin-top: 2px;
+  }
+  .badge-remove { background: rgba(240,96,96,0.12); color: var(--red); border: 1px solid rgba(240,96,96,0.2); }
+  .badge-fill   { background: rgba(74,142,245,0.1); color: var(--blue); border: 1px solid rgba(74,142,245,0.2); }
+  .badge-fix    { background: rgba(0,201,177,0.1); color: var(--teal); border: 1px solid rgba(0,201,177,0.2); }
+  .badge-flag   { background: rgba(245,166,35,0.1); color: var(--amber); border: 1px solid rgba(245,166,35,0.2); }
+  .step-action-body { flex: 1; }
+  .step-action-title { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+  .step-action-desc  { font-size: 13px; color: var(--text-2); line-height: 1.7; }
+  .step-action-how   { font-size: 12px; color: var(--text-3); font-family: var(--mono); margin-top: 6px; }
+
+  .chart-gallery {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--s4);
+    margin: var(--s4) 0;
+  }
+  .chart-card {
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: var(--r3);
+    padding: var(--s5);
+  }
+  .chart-thumb {
+    height: 80px;
+    border-radius: var(--r2);
+    margin-bottom: var(--s3);
+    display: flex;
+    align-items: flex-end;
+    gap: 6px;
+    padding: var(--s2) var(--s3);
+    background: var(--bg-1);
+    border: 1px solid var(--border);
+    overflow: hidden;
+  }
+  .chart-title { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+  .chart-when  { font-size: 12px; color: var(--text-2); line-height: 1.5; }
+  .chart-tag   {
+    display: inline-block;
+    font-family: var(--mono);
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 20px;
+    margin-bottom: var(--s2);
+  }
+
+  .powerbi-step {
+    display: grid;
+    grid-template-columns: 36px 1fr;
+    gap: var(--s4);
+    align-items: start;
+    padding: var(--s3) 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .powerbi-step:last-child { border-bottom: none; }
+  .powerbi-num {
+    width: 28px;
+    height: 28px;
+    border-radius: var(--r2);
+    background: rgba(74,142,245,0.1);
+    border: 1px solid rgba(74,142,245,0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--mono);
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--blue);
+    flex-shrink: 0;
+  }
+  .powerbi-body { padding-top: 3px; }
+  .powerbi-title { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+  .powerbi-desc  { font-size: 13px; color: var(--text-2); line-height: 1.7; }
+  .powerbi-tip   { font-size: 11px; color: var(--text-3); font-family: var(--mono); margin-top: 4px; }
+
+  .kpi-strip {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--s3);
+    margin: var(--s4) 0;
+  }
+  .kpi-card {
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: var(--r2);
+    padding: var(--s4);
+    text-align: center;
+  }
+  .kpi-val { font-family: var(--mono); font-size: 22px; font-weight: 600; line-height: 1; margin-bottom: var(--s2); }
+  .kpi-lbl { font-size: 11px; color: var(--text-3); text-transform: uppercase; letter-spacing: 1px; }
+
+  .bad-row { background: rgba(240,96,96,0.05); }
+</style>
+</head>
+<body>
+
+<!-- ══ NAV ══ -->
+<nav class="nav">
+  <div class="nav-logo">AI<span>·</span>UKWMS</div>
+  <ul class="nav-links">
+    <li><a href="../index.html">← Beranda</a></li>
+    <li><a href="#tujuan" class="active">Tujuan</a></li>
+    <li><a href="#masalah">Masalah Data</a></li>
+    <li><a href="#cleaning">Pembersihan</a></li>
+    <li><a href="#visualisasi">Visualisasi</a></li>
+    <li><a href="#tugas">Tugas</a></li>
+  </ul>
+</nav>
+
+<!-- ══ SESI HERO ══ -->
+<header class="sesi-hero">
+  <div style="max-width:1100px;margin:0 auto;">
+    <div class="sesi-breadcrumb">
+      <a href="../index.html">Kecerdasan Buatan — Teknik Industri</a>
+      <span>›</span>
+      <span>Pertemuan 4</span>
+    </div>
+    <div class="sesi-num">PERTEMUAN 04 · PRAKTIK</div>
+    <h1 class="sesi-title">Data Industri:<br><em style="color:var(--blue);">Pembersihan &<br>Visualisasi</em></h1>
+    <p style="font-size:15px;color:var(--text-2);max-width:640px;line-height:1.8;">Mengelola data operasional berkualitas buruk — pembersihan tanpa coding — dan membangun dashboard visual dengan Power BI / Looker Studio untuk mendukung pengambilan keputusan berbasis data.</p>
+    <div class="sesi-meta-row">
+      <span class="badge badge-teal">Praktik</span>
+      <span class="badge badge-blue">100 menit</span>
+      <span class="badge badge-amber">CPMK: C3, C4</span>
+    </div>
+  </div>
+</header>
+
+<!-- ══ CONTENT LAYOUT ══ -->
+<div class="content-layout">
+
+  <!-- ── MAIN ── -->
+  <main class="content-main">
+
+    <!-- TUJUAN -->
+    <div class="content-block" id="tujuan">
+      <h2>Tujuan Pembelajaran</h2>
+      <p>Setelah mengikuti pertemuan ini, mahasiswa diharapkan mampu:</p>
+      <ol>
+        <li>Mengidentifikasi berbagai jenis masalah kualitas data dalam dataset operasional industri nyata</li>
+        <li>Menerapkan teknik data cleaning tanpa coding: hapus duplikasi, imputasi nilai kosong, perbaiki format, tangani outlier</li>
+        <li>Melakukan Exploratory Data Analysis (EDA) visual menggunakan Power BI atau Looker Studio</li>
+        <li>Membangun dashboard sederhana yang menjawab pertanyaan operasional bisnis tertentu</li>
+        <li>Membedakan kapan suatu pola dalam data layak dilaporkan kepada manajemen vs memerlukan investigasi lebih lanjut</li>
+      </ol>
+
+      <div class="callout warn" style="margin-top:var(--s5);">
+        <span class="callout-icon">⚠️</span>
+        <div class="callout-body">
+          <p><strong>Prinsip "Garbage In, Garbage Out":</strong> Model AI yang dibangun di P-03 hanya akan sebaik data yang dimasukkandi dalamnya. Tidak ada algoritma canggih yang bisa mengompensasi data yang kotor, tidak konsisten, atau tidak representatif. Pertemuan ini adalah fondasi yang menentukan kualitas semua analisis selanjutnya.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- MASALAH DATA INDUSTRI -->
+    <div class="content-block" id="masalah">
+      <h2>1. Masalah Kualitas Data di Industri</h2>
+      <p>Data operasional industri — yang berasal dari MES, ERP, sensor IoT, form manual, atau ekspor spreadsheet — hampir selalu datang dalam kondisi tidak sempurna. Memahami jenis-jenis masalahnya adalah langkah pertama sebelum bisa membersihkannya.</p>
+
+      <div class="problem-grid">
+        <div class="problem-card">
+          <div class="problem-icon">🕳️</div>
+          <div class="problem-title">Missing Values (Nilai Kosong)</div>
+          <div class="problem-body">Sensor gagal mencatat, operator melewatkan pengisian form, kolom opsional tidak diisi, data hilang saat migrasi sistem. Bisa muncul sebagai sel kosong, "N/A", "-", "0" yang sebenarnya berarti tidak ada data, atau spasi.</div>
+          <div class="problem-fix">→ Strategi: isi dengan rata-rata / median / modus, atau hapus baris</div>
+        </div>
+        <div class="problem-card">
+          <div class="problem-icon">👯</div>
+          <div class="problem-title">Duplikasi Data</div>
+          <div class="problem-body">Data yang sama tercatat dua kali akibat double-entry manual, sinkronisasi sistem yang gagal di tengah jalan, atau merge dataset yang tidak bersih. Menggelembungkan jumlah sampel dan distorsi statistik.</div>
+          <div class="problem-fix">→ Strategi: identifikasi berdasarkan kombinasi kolom kunci, hapus duplikat</div>
+        </div>
+        <div class="problem-card">
+          <div class="problem-icon">📏</div>
+          <div class="problem-title">Inkonsistensi Format</div>
+          <div class="problem-body">Tanggal ditulis "01/07/2024" di satu baris dan "1 Juli 2024" di baris lain. Kota ditulis "Surabaya", "surabaya", "SBY", "sby". Satuan berbeda: "kg" vs "KG" vs "kilogram". Semua ini dianggap nilai berbeda oleh software.</div>
+          <div class="problem-fix">→ Strategi: standardisasi case, format tanggal, dan satuan secara konsisten</div>
+        </div>
+        <div class="problem-card">
+          <div class="problem-icon">🚀</div>
+          <div class="problem-title">Outlier & Nilai Tidak Masuk Akal</div>
+          <div class="problem-body">Suhu mesin tercatat 9999°C (error sensor), umur karyawan 150 tahun (kesalahan input), penjualan negatif (return tidak tercatat dengan benar), berat produk 0 kg. Bisa distorsi rata-rata dan model AI secara drastis.</div>
+          <div class="problem-fix">→ Strategi: tetapkan batas logis, periksa dengan boxplot, koordinasi dengan pemilik data</div>
+        </div>
+        <div class="problem-card">
+          <div class="problem-icon">🔤</div>
+          <div class="problem-title">Tipe Data Salah</div>
+          <div class="problem-body">Kolom angka disimpan sebagai teks karena ada satu sel berisi "N/A". Kolom tanggal diekspor sebagai angka serial Excel. Kolom kategori berisi angka 1/0 tapi seharusnya "Ya/Tidak". Software tidak bisa melakukan kalkulasi pada tipe yang salah.</div>
+          <div class="problem-fix">→ Strategi: konversi eksplisit tipe data setelah membersihkan nilai bermasalah</div>
+        </div>
+        <div class="problem-card">
+          <div class="problem-icon">🏗️</div>
+          <div class="problem-title">Struktur Data Tidak Rapi (Untidy Data)</div>
+          <div class="problem-body">Satu kolom berisi beberapa informasi ("Suhu: 85°C, Tekanan: 2bar"), nilai yang seharusnya jadi baris malah jadi kolom (Jan, Feb, Mar sebagai header), atau beberapa tabel yang harus digabung tidak memiliki kunci yang cocok.</div>
+          <div class="problem-fix">→ Strategi: pisahkan kolom, reshape tabel (melt/pivot), standardisasi kunci join</div>
+        </div>
+      </div>
+
+      <h3>Contoh Dataset Kotor — Lihat Masalahnya</h3>
+      <p style="font-size:13px;color:var(--text-2);">Dataset di bawah adalah contoh ekspor nyata dari sistem pencatatan produksi manual. Identifikasi semua masalah yang Anda temukan sebelum melihat penjelasannya:</p>
+
+      <div style="overflow-x:auto;">
+        <table class="dirty-table">
+          <thead>
+            <tr>
+              <th>ID_Produksi</th>
+              <th>Tanggal</th>
+              <th>Mesin</th>
+              <th>Suhu_Mesin</th>
+              <th>Jumlah_Unit</th>
+              <th>Jumlah_Reject</th>
+              <th>Operator</th>
+              <th>Shift</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>PRD-001</td>
+              <td>01/07/2024</td>
+              <td>M-01</td>
+              <td>82.5</td>
+              <td>1500</td>
+              <td>12</td>
+              <td>Budi</td>
+              <td>Pagi</td>
+            </tr>
+            <tr class="bad-row">
+              <td>PRD-002</td>
+              <td class="cell-warn">1 Juli 2024</td>
+              <td>M-01</td>
+              <td>83.1</td>
+              <td>1480</td>
+              <td class="cell-warn">—</td>
+              <td>Budi</td>
+              <td>Pagi</td>
+            </tr>
+            <tr class="bad-row">
+              <td>PRD-003</td>
+              <td>02/07/2024</td>
+              <td class="cell-warn">m-02</td>
+              <td class="cell-bad">9999</td>
+              <td>1520</td>
+              <td>8</td>
+              <td>Sari</td>
+              <td>Siang</td>
+            </tr>
+            <tr class="bad-row">
+              <td class="cell-bad">PRD-001</td>
+              <td>01/07/2024</td>
+              <td>M-01</td>
+              <td>82.5</td>
+              <td>1500</td>
+              <td>12</td>
+              <td>Budi</td>
+              <td>Pagi</td>
+            </tr>
+            <tr class="bad-row">
+              <td>PRD-004</td>
+              <td>02/07/2024</td>
+              <td>M-03</td>
+              <td>79.0</td>
+              <td class="cell-warn">0</td>
+              <td class="cell-warn">0</td>
+              <td class="cell-warn"></td>
+              <td>Malam</td>
+            </tr>
+            <tr>
+              <td>PRD-005</td>
+              <td>03/07/2024</td>
+              <td>M-02</td>
+              <td>81.3</td>
+              <td>1510</td>
+              <td>15</td>
+              <td>Anton</td>
+              <td>Pagi</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--s4);margin-top:var(--s4);">
+        <div style="background:rgba(240,96,96,0.06);border:1px solid rgba(240,96,96,0.2);border-radius:var(--r2);padding:var(--s4);">
+          <div style="font-family:var(--mono);font-size:10px;color:var(--red);letter-spacing:2px;text-transform:uppercase;margin-bottom:var(--s3);">Masalah ditemukan</div>
+          <ul style="font-size:13px;color:var(--text-2);line-height:2;padding-left:var(--s4);">
+            <li><strong style="color:var(--red)">Duplikasi:</strong> PRD-001 muncul dua kali (baris 1 & 4)</li>
+            <li><strong style="color:var(--amber)">Format tanggal:</strong> "01/07/2024" vs "1 Juli 2024"</li>
+            <li><strong style="color:var(--amber)">Case inkonsisten:</strong> "M-02" vs "m-02" di kolom Mesin</li>
+            <li><strong style="color:var(--red)">Outlier sensor:</strong> Suhu 9999°C jelas error pembacaan</li>
+            <li><strong style="color:var(--amber)">Missing value:</strong> Jumlah_Reject baris 2 berisi "—"</li>
+            <li><strong style="color:var(--amber)">Nilai mencurigakan:</strong> Jumlah_Unit = 0 (mesin berhenti? tidak dicatat?)</li>
+            <li><strong style="color:var(--amber)">Missing value:</strong> Kolom Operator kosong di baris 5</li>
+          </ul>
+        </div>
+        <div style="background:rgba(0,201,177,0.05);border:1px solid rgba(0,201,177,0.2);border-radius:var(--r2);padding:var(--s4);">
+          <div style="font-family:var(--mono);font-size:10px;color:var(--teal);letter-spacing:2px;text-transform:uppercase;margin-bottom:var(--s3);">Data yang bersih terlihat</div>
+          <ul style="font-size:13px;color:var(--text-2);line-height:2;padding-left:var(--s4);">
+            <li>Satu format tanggal konsisten: <code>YYYY-MM-DD</code></li>
+            <li>Kode mesin uppercase konsisten: <code>M-01, M-02</code></li>
+            <li>Tidak ada duplikasi ID_Produksi</li>
+            <li>Nilai suhu dalam rentang logis: 60–110°C</li>
+            <li>Tidak ada sel kosong tanpa penjelasan</li>
+            <li>Jumlah_Unit selalu > 0 kecuali ada catatan alasan</li>
+            <li>Setiap baris punya nama operator yang valid</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- DATA CLEANING -->
+    <div class="content-block" id="cleaning">
+      <h2>2. Data Cleaning Tanpa Coding</h2>
+      <p>Untuk pertemuan ini kita menggunakan <strong>Microsoft Excel</strong> (atau Google Sheets) yang sudah familiar — bukan Python. Di dunia kerja nyata, banyak analisis awal tetap dilakukan di spreadsheet sebelum data masuk ke sistem AI. Memahami prosesnya secara manual membuat kamu lebih sadar saat mengotomasi proses yang sama dengan kode nanti.</p>
+
+      <div class="callout info" style="margin-bottom:var(--s5);">
+        <span class="callout-icon">📦</span>
+        <div class="callout-body">
+          <p><strong>Dataset praktik hari ini:</strong> File <code>data_produksi_mentah.xlsx</code> tersedia di Google Classroom → Pertemuan 4. File berisi 3 sheet: <em>Produksi</em> (800 baris), <em>Mesin</em> (referensi), dan <em>Operator</em> (referensi). Buka file ini sekarang sambil mengikuti langkah di bawah.</p>
+        </div>
+      </div>
+
+      <h3>Langkah Sistematis Data Cleaning</h3>
+
+      <div style="margin-top:var(--s4);">
+        <div class="step-action">
+          <span class="step-badge badge-remove">AUDIT</span>
+          <div class="step-action-body">
+            <div class="step-action-title">Langkah 0 — Audit Data Sebelum Menyentuh Apapun</div>
+            <div class="step-action-desc">Sebelum mengubah data, buat <strong>salinan sheet</strong> bernama "backup_original". Catat temuan awal: berapa baris total, berapa kolom, berapa sel kosong per kolom, tipe data tiap kolom. Ini dokumen jejak audit yang penting — kamu harus bisa menjelaskan setiap perubahan yang dilakukan.</div>
+            <div class="step-action-how">Excel: Ctrl+End → lihat sel terakhir untuk cek ukuran dataset | Ctrl+A → COUNTA untuk cek isi</div>
+          </div>
+        </div>
+
+        <div class="step-action">
+          <span class="step-badge badge-remove">HAPUS</span>
+          <div class="step-action-body">
+            <div class="step-action-title">Langkah 1 — Hapus Duplikasi</div>
+            <div class="step-action-desc">Identifikasi baris yang benar-benar identik (semua kolom sama) dan baris yang memiliki ID sama tapi isi berbeda — keduanya perlu penanganan berbeda. Yang pertama bisa langsung dihapus; yang kedua perlu diperiksa mana yang benar.</div>
+            <div class="step-action-how">Excel: Data → Remove Duplicates → pilih kolom kunci (ID_Produksi). Catat berapa duplikat ditemukan.</div>
+          </div>
+        </div>
+
+        <div class="step-action">
+          <span class="step-badge badge-fill">ISI</span>
+          <div class="step-action-body">
+            <div class="step-action-title">Langkah 2 — Tangani Missing Values</div>
+            <div class="step-action-desc">Tidak semua nilai kosong ditangani sama. Tiga strategi utama: <strong>(a) Hapus baris</strong> jika kolom kritis kosong dan tidak bisa diisi; <strong>(b) Isi dengan nilai statistik</strong> (rata-rata untuk numerik kontinu, modus untuk kategorikal); <strong>(c) Isi dengan nilai tetap</strong> seperti "Tidak Diketahui" untuk teks deskriptif. Pilih strategi berdasarkan kepentingan kolom dan proporsi data yang hilang.</div>
+            <div class="step-action-how">Excel: Ctrl+H → Find: (kosong) → Replace: sesuai strategi | Gunakan AVERAGE/MEDIAN untuk menghitung nilai isian</div>
+          </div>
+        </div>
+
+        <div class="step-action">
+          <span class="step-badge badge-fix">FORMAT</span>
+          <div class="step-action-body">
+            <div class="step-action-title">Langkah 3 — Standardisasi Format & Konsistensi</div>
+            <div class="step-action-desc">Konversi semua tanggal ke format <code>YYYY-MM-DD</code> menggunakan kolom bantu dengan fungsi TEXT(). Standardisasi teks: ubah semua ke UPPER() atau PROPER() sesuai konteks. Trim spasi tidak terlihat dengan TRIM(). Pastikan kode mesin, nama kota, dan kategori mengikuti satu daftar referensi yang disepakati.</div>
+            <div class="step-action-how">Excel: =TRIM(UPPER(A2)) untuk standarisasi teks | =TEXT(A2,"YYYY-MM-DD") untuk tanggal | Paste Special→Values setelah formula</div>
+          </div>
+        </div>
+
+        <div class="step-action">
+          <span class="step-badge badge-flag">OUTLIER</span>
+          <div class="step-action-body">
+            <div class="step-action-title">Langkah 4 — Identifikasi & Tangani Outlier</div>
+            <div class="step-action-desc">Gunakan conditional formatting untuk menyorot nilai di luar batas logis yang disepakati. Untuk kolom suhu mesin, batas logis mungkin 50–120°C — nilai di luar ini perlu di-flag. Penting: jangan langsung hapus outlier tanpa berkonsultasi dengan operator atau teknisi yang tahu konteks fisiknya. Tandai dulu dengan kolom "flag_outlier" = "Ya/Tidak".</div>
+            <div class="step-action-how">Excel: Home → Conditional Formatting → Highlight Rules → Less Than / Greater Than dengan batas yang ditentukan domain expert</div>
+          </div>
+        </div>
+
+        <div class="step-action">
+          <span class="step-badge badge-fix">TIPE</span>
+          <div class="step-action-body">
+            <div class="step-action-title">Langkah 5 — Verifikasi Tipe Data</div>
+            <div class="step-action-desc">Pastikan kolom numerik tidak ada yang tersimpan sebagai teks (ditandai dengan alignment kiri di Excel). Pastikan kolom tanggal dikenali sebagai Date, bukan string. Kolom kategorikal yang akan digunakan sebagai filter di Power BI harus konsisten — tidak boleh ada variasi penulisan untuk nilai yang sama.</div>
+            <div class="step-action-how">Excel: pilih kolom → lihat apakah nilai rata-rata/jumlah tampil di status bar — jika tidak muncul berarti tipenya bukan numerik</div>
+          </div>
+        </div>
+
+        <div class="step-action">
+          <span class="step-badge badge-fix">CATAT</span>
+          <div class="step-action-body">
+            <div class="step-action-title">Langkah 6 — Dokumentasikan Semua Perubahan</div>
+            <div class="step-action-desc">Buat sheet terpisah bernama "cleaning_log" yang mencatat: tanggal cleaning, kolom yang diubah, masalah yang ditemukan, metode yang digunakan, dan jumlah baris yang terpengaruh. Dokumentasi ini krusial agar analisis bisa direplikasi, diaudit, atau dijelaskan kepada manajemen jika ada pertanyaan tentang validitas data.</div>
+            <div class="step-action-how">Format log: Kolom | Masalah | Jumlah terpengaruh | Tindakan | Tanggal | Nama</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="callout tip" style="margin-top:var(--s5);">
+        <span class="callout-icon">🎯</span>
+        <div class="callout-body">
+          <p><strong>Aturan 80/20 data cleaning:</strong> Dalam proyek AI nyata, 80% waktu dihabiskan untuk memahami dan membersihkan data. Investasi waktu di tahap ini langsung menentukan apakah model yang dibangun di P-03 bisa dipercaya atau tidak. Tidak ada jalan pintas.</p>
+        </div>
+      </div>
+
+      <h3 style="margin-top:var(--s6);">Hasil Setelah Cleaning — Ringkasan Audit</h3>
+      <div class="kpi-strip">
+        <div class="kpi-card">
+          <div class="kpi-val" style="color:var(--red);">47</div>
+          <div class="kpi-lbl">Baris Duplikat Dihapus</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-val" style="color:var(--amber);">123</div>
+          <div class="kpi-lbl">Missing Values Diisi</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-val" style="color:var(--amber);">15</div>
+          <div class="kpi-lbl">Outlier Di-flag</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-val" style="color:var(--teal);">753</div>
+          <div class="kpi-lbl">Baris Siap Analisis</div>
+        </div>
+      </div>
+      <p style="font-size:12px;color:var(--text-3);margin-top:-var(--s3);">* Angka di atas adalah estimasi untuk dataset <code>data_produksi_mentah.xlsx</code> — hasilmu bisa berbeda tergantung temuan masing-masing.</p>
+    </div>
+
+    <!-- EDA & VISUALISASI -->
+    <div class="content-block" id="visualisasi">
+      <h2>3. Visualisasi Data dengan Power BI / Looker Studio</h2>
+      <p>Setelah data bersih, langkah berikutnya adalah memvisualisasikannya untuk menemukan pola yang tidak terlihat dari angka mentah. Visualisasi yang baik adalah jembatan antara data dan keputusan — ia menjawab pertanyaan bisnis spesifik, bukan sekadar menampilkan grafik cantik.</p>
+
+      <h3>Prinsip: Mulai dari Pertanyaan Bisnis</h3>
+      <div class="callout info" style="margin-bottom:var(--s5);">
+        <span class="callout-icon">❓</span>
+        <div class="callout-body">
+          <p><strong>Pertanyaan yang harus dijawab dashboard ini:</strong></p>
+          <ol style="margin:var(--s3) 0 0;padding-left:var(--s5);font-size:14px;line-height:2.2;">
+            <li>Mesin mana yang memiliki tingkat reject tertinggi dalam 30 hari terakhir?</li>
+            <li>Apakah ada pola reject berdasarkan shift (pagi / siang / malam)?</li>
+            <li>Bagaimana tren produksi harian — apakah ada penurunan yang perlu diinvestigasi?</li>
+            <li>Apakah ada korelasi antara suhu mesin dan jumlah reject?</li>
+          </ol>
+        </div>
+      </div>
+
+      <h3>Jenis Visualisasi & Kapan Menggunakannya</h3>
+      <div class="chart-gallery">
+
+        <div class="chart-card">
+          <div class="chart-thumb">
+            <!-- bar chart mini -->
+            <div style="width:16px;background:#ffa657;border-radius:2px 2px 0 0;height:40px;"></div>
+            <div style="width:16px;background:#ffa657;border-radius:2px 2px 0 0;height:65px;"></div>
+            <div style="width:16px;background:#ffa657;border-radius:2px 2px 0 0;height:30px;"></div>
+            <div style="width:16px;background:#ffa657;border-radius:2px 2px 0 0;height:55px;"></div>
+            <div style="width:16px;background:#ffa657;border-radius:2px 2px 0 0;height:20px;"></div>
+          </div>
+          <span class="chart-tag" style="background:rgba(245,166,35,0.1);color:var(--amber);border:1px solid rgba(245,166,35,0.2);">Bar Chart</span>
+          <div class="chart-title">Perbandingan Antar Kategori</div>
+          <div class="chart-when">Bandingkan nilai antar kelompok diskrit — reject per mesin, output per shift, biaya per departemen. Urutkan dari tinggi ke rendah untuk memudahkan pembacaan.</div>
+        </div>
+
+        <div class="chart-card">
+          <div class="chart-thumb">
+            <!-- line chart mini -->
+            <svg width="100%" height="60" style="overflow:visible">
+              <polyline points="10,55 30,40 50,45 70,20 90,30 110,15 130,25" fill="none" stroke="#79c0ff" stroke-width="2"/>
+              <polyline points="10,55 30,40 50,45 70,20 90,30 110,15 130,25 130,60 10,60" fill="rgba(121,192,255,0.1)" stroke="none"/>
+            </svg>
+          </div>
+          <span class="chart-tag" style="background:rgba(74,142,245,0.1);color:var(--blue);border:1px solid rgba(74,142,245,0.2);">Line Chart</span>
+          <div class="chart-title">Tren dari Waktu ke Waktu</div>
+          <div class="chart-when">Tampilkan perubahan nilai sepanjang periode — tren produksi harian, reject mingguan, konsumsi energi bulanan. Terbaik untuk mendeteksi kenaikan/penurunan gradual dan anomali.</div>
+        </div>
+
+        <div class="chart-card">
+          <div class="chart-thumb">
+            <!-- scatter mini -->
+            <svg width="100%" height="60">
+              <circle cx="20" cy="45" r="4" fill="#d2a8ff" opacity="0.8"/>
+              <circle cx="40" cy="35" r="4" fill="#d2a8ff" opacity="0.8"/>
+              <circle cx="55" cy="40" r="4" fill="#d2a8ff" opacity="0.8"/>
+              <circle cx="70" cy="25" r="4" fill="#d2a8ff" opacity="0.8"/>
+              <circle cx="85" cy="20" r="4" fill="#d2a8ff" opacity="0.8"/>
+              <circle cx="100" cy="15" r="4" fill="#ff7b72" opacity="0.8"/>
+              <circle cx="115" cy="10" r="4" fill="#d2a8ff" opacity="0.8"/>
+            </svg>
+          </div>
+          <span class="chart-tag" style="background:rgba(155,124,244,0.1);color:var(--purple);border:1px solid rgba(155,124,244,0.2);">Scatter Plot</span>
+          <div class="chart-title">Korelasi Dua Variabel</div>
+          <div class="chart-when">Apakah suhu mesin mempengaruhi jumlah reject? Apakah kecepatan produksi berkaitan dengan cacat? Scatter plot mengungkap hubungan linear, non-linear, atau tidak ada hubungan sama sekali.</div>
+        </div>
+
+        <div class="chart-card">
+          <div class="chart-thumb">
+            <!-- pie mini -->
+            <svg width="100%" height="65" viewBox="0 0 60 60">
+              <circle cx="30" cy="30" r="25" fill="none" stroke="#00c9b1" stroke-width="50" stroke-dasharray="47 100" transform="rotate(-90 30 30)"/>
+              <circle cx="30" cy="30" r="25" fill="none" stroke="#ffa657" stroke-width="50" stroke-dasharray="30 100" stroke-dashoffset="-47" transform="rotate(-90 30 30)"/>
+              <circle cx="30" cy="30" r="25" fill="none" stroke="#79c0ff" stroke-width="50" stroke-dasharray="23 100" stroke-dashoffset="-77" transform="rotate(-90 30 30)"/>
+              <circle cx="30" cy="30" r="18" fill="#161b22"/>
+            </svg>
+          </div>
+          <span class="chart-tag" style="background:rgba(0,201,177,0.1);color:var(--teal);border:1px solid rgba(0,201,177,0.2);">Pie / Donut</span>
+          <div class="chart-title">Proporsi dari Keseluruhan</div>
+          <div class="chart-when">Komposisi reject berdasarkan jenis cacat, distribusi produksi antar lini. Hanya gunakan untuk maksimal 5 kategori — lebih dari itu sulit dibaca. Donut lebih modern dan mudah di-label.</div>
+        </div>
+
+        <div class="chart-card">
+          <div class="chart-thumb">
+            <!-- heatmap mini -->
+            <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:2px;width:100%;align-self:center;">
+              <div style="height:14px;background:rgba(0,201,177,0.2);border-radius:1px;"></div>
+              <div style="height:14px;background:rgba(0,201,177,0.5);border-radius:1px;"></div>
+              <div style="height:14px;background:rgba(240,96,96,0.7);border-radius:1px;"></div>
+              <div style="height:14px;background:rgba(0,201,177,0.3);border-radius:1px;"></div>
+              <div style="height:14px;background:rgba(0,201,177,0.1);border-radius:1px;"></div>
+              <div style="height:14px;background:rgba(240,96,96,0.4);border-radius:1px;"></div>
+              <div style="height:14px;background:rgba(0,201,177,0.6);border-radius:1px;"></div>
+              <div style="height:14px;background:rgba(0,201,177,0.2);border-radius:1px;"></div>
+              <div style="height:14px;background:rgba(240,96,96,0.9);border-radius:1px;"></div>
+              <div style="height:14px;background:rgba(245,166,35,0.5);border-radius:1px;"></div>
+            </div>
+          </div>
+          <span class="chart-tag" style="background:rgba(240,96,96,0.08);color:var(--red);border:1px solid rgba(240,96,96,0.15);">Heatmap</span>
+          <div class="chart-title">Pola di Dua Dimensi</div>
+          <div class="chart-when">Reject rate per mesin per shift (matriks Mesin × Shift), korelasi antar semua variabel numerik. Warna secara intuitif menunjukkan intensitas — merah = masalah, hijau = baik.</div>
+        </div>
+
+        <div class="chart-card">
+          <div class="chart-thumb">
+            <!-- box plot mini -->
+            <svg width="100%" height="60">
+              <line x1="30" y1="10" x2="30" y2="55" stroke="#8b949e" stroke-width="1"/>
+              <rect x="15" y="22" width="30" height="20" fill="none" stroke="#79c0ff" stroke-width="1.5"/>
+              <line x1="15" y1="32" x2="45" y2="32" stroke="#79c0ff" stroke-width="2"/>
+              <line x1="30" y1="10" x2="24" y2="10" stroke="#8b949e" stroke-width="1"/>
+              <line x1="30" y1="55" x2="24" y2="55" stroke="#8b949e" stroke-width="1"/>
+              <circle cx="65" cy="15" r="3" fill="#ff7b72" opacity="0.8"/>
+              <line x1="80" y1="10" x2="80" y2="55" stroke="#8b949e" stroke-width="1"/>
+              <rect x="65" y="25" width="30" height="18" fill="none" stroke="#ffa657" stroke-width="1.5"/>
+              <line x1="65" y1="34" x2="95" y2="34" stroke="#ffa657" stroke-width="2"/>
+            </svg>
+          </div>
+          <span class="chart-tag" style="background:rgba(245,166,35,0.1);color:var(--amber);border:1px solid rgba(245,166,35,0.2);">Box Plot</span>
+          <div class="chart-title">Distribusi & Outlier</div>
+          <div class="chart-when">Tampilkan median, IQR, dan outlier sekaligus. Sangat berguna untuk membandingkan distribusi suhu, waktu siklus, atau jumlah defect antar mesin atau operator dalam satu tampilan.</div>
+        </div>
+
+      </div>
+
+      <h3 style="margin-top:var(--s6);">Panduan Membangun Dashboard di Power BI</h3>
+      <p style="font-size:14px;color:var(--text-2);margin-bottom:var(--s4);">Pastikan Power BI Desktop sudah terinstal (link di Google Classroom). Buka Power BI → pilih "Get Data" → Excel → arahkan ke file <code>data_produksi_bersih.xlsx</code> yang sudah kamu bersihkan tadi.</p>
+
+      <div>
+        <div class="powerbi-step">
+          <div class="powerbi-num">1</div>
+          <div class="powerbi-body">
+            <div class="powerbi-title">Load & Periksa Data di Power Query</div>
+            <div class="powerbi-desc">Saat data dimuat, Power BI otomatis membuka Power Query Editor. Periksa tipe data setiap kolom — pastikan kolom tanggal bertipe Date, numerik bertipe Decimal/Integer, dan kategori bertipe Text.</div>
+            <div class="powerbi-tip">Home → Transform Data → lihat panel "Data Type" di ribbon</div>
+          </div>
+        </div>
+
+        <div class="powerbi-step">
+          <div class="powerbi-num">2</div>
+          <div class="powerbi-body">
+            <div class="powerbi-title">Buat Kolom Kalkulasi Baru (DAX Sederhana)</div>
+            <div class="powerbi-desc">Tambahkan kolom <strong>Reject Rate</strong> = Jumlah_Reject / Jumlah_Unit × 100. Ini adalah KPI utama yang akan ditampilkan di semua visualisasi. Di Power BI, klik kanan tabel → Add Column → masukkan formula DAX.</div>
+            <div class="powerbi-tip">DAX: Reject_Rate = [Jumlah_Reject] / [Jumlah_Unit] * 100</div>
+          </div>
+        </div>
+
+        <div class="powerbi-step">
+          <div class="powerbi-num">3</div>
+          <div class="powerbi-body">
+            <div class="powerbi-title">Bangun 4 Visual Utama</div>
+            <div class="powerbi-desc">
+              Seret visual dari panel kanan ke kanvas:
+              <ul style="margin:var(--s3) 0;padding-left:var(--s5);font-size:13px;line-height:2;">
+                <li><strong>Bar Chart</strong> → Axis: Mesin, Values: Reject_Rate (rata-rata) → jawab: mesin mana paling bermasalah?</li>
+                <li><strong>Line Chart</strong> → Axis: Tanggal, Values: Jumlah_Unit → jawab: bagaimana tren produksi?</li>
+                <li><strong>Stacked Bar / Matrix</strong> → Rows: Mesin, Columns: Shift, Values: Reject_Rate → jawab: pola reject per shift?</li>
+                <li><strong>Scatter Plot</strong> → X: Suhu_Mesin, Y: Reject_Rate → jawab: apakah suhu berpengaruh?</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="powerbi-step">
+          <div class="powerbi-num">4</div>
+          <div class="powerbi-body">
+            <div class="powerbi-title">Tambahkan Slicer (Filter Interaktif)</div>
+            <div class="powerbi-desc">Tambahkan Slicer untuk kolom Mesin, Shift, dan Tanggal. Dengan slicer, pengguna dashboard bisa memfilter semua visual sekaligus hanya dengan satu klik — tanpa perlu membuat halaman terpisah untuk setiap mesin.</div>
+            <div class="powerbi-tip">Visualizations → Slicer → drag field ke Field box → format Style: Dropdown atau List</div>
+          </div>
+        </div>
+
+        <div class="powerbi-step">
+          <div class="powerbi-num">5</div>
+          <div class="powerbi-body">
+            <div class="powerbi-title">Tambahkan Card KPI di Bagian Atas</div>
+            <div class="powerbi-desc">Card visual menampilkan satu angka besar — cocok untuk KPI eksekutif. Tambahkan 4 card: Total Produksi, Total Reject, Reject Rate Keseluruhan, dan Jumlah Hari Data. Letakkan di baris paling atas dashboard.</div>
+            <div class="powerbi-tip">Visualizations → Card → drag measure ke Fields. Format angka di Format pane</div>
+          </div>
+        </div>
+
+        <div class="powerbi-step">
+          <div class="powerbi-num">6</div>
+          <div class="powerbi-body">
+            <div class="powerbi-title">Format & Beri Judul yang Deskriptif</div>
+            <div class="powerbi-desc">Setiap visual harus punya judul yang menjawab pertanyaan, bukan sekadar nama kolom. Bukan "Jumlah_Reject by Mesin" — tapi <strong>"Mesin Mana yang Paling Banyak Menghasilkan Reject?"</strong>. Tambahkan catatan sumber data dan tanggal pembaruan di sudut dashboard.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- EDA TIPS -->
+    <div class="content-block" id="eda">
+      <h2>4. Pola yang Dicari Saat EDA</h2>
+      <p>Exploratory Data Analysis bukan sekadar membuat grafik — ini adalah proses investigasi yang dipandu pertanyaan. Berikut adalah pola-pola yang paling sering ditemukan di data industri dan harus diperhatikan:</p>
+
+      <table class="industry-table">
+        <thead>
+          <tr>
+            <th>Pola yang Ditemukan</th>
+            <th>Cara Mendeteksi</th>
+            <th>Implikasi Operasional</th>
+            <th>Tindak Lanjut</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Reject spike</strong> pada shift malam</td>
+            <td>Bar chart Reject Rate per Shift</td>
+            <td>Kemungkinan kelelahan operator, pencahayaan kurang, atau pengawasan lebih sedikit</td>
+            <td>Audit SOP shift malam, evaluasi rotasi pekerja, tambah inspeksi</td>
+          </tr>
+          <tr>
+            <td><strong>Penurunan output</strong> gradual satu mesin</td>
+            <td>Line chart per mesin selama 30 hari</td>
+            <td>Kemungkinan komponen aus, perlu maintenance preventif</td>
+            <td>Jadwalkan inspeksi sebelum breakdown total (predictive maintenance)</td>
+          </tr>
+          <tr>
+            <td><strong>Korelasi positif</strong> suhu–reject</td>
+            <td>Scatter plot Suhu vs Reject Rate</td>
+            <td>Mesin overheat mempengaruhi kualitas produk — ada batas suhu kritis</td>
+            <td>Tetapkan alarm suhu otomatis, periksa sistem pendinginan</td>
+          </tr>
+          <tr>
+            <td><strong>Outlier</strong> reject rate satu hari</td>
+            <td>Box plot atau line chart harian</td>
+            <td>Kejadian luar biasa: bahan baku bermasalah, kerusakan mendadak, atau error pencatatan</td>
+            <td>Investigasi log produksi hari tersebut sebelum menyimpulkan</td>
+          </tr>
+          <tr>
+            <td><strong>Pola siklus</strong> mingguan/bulanan</td>
+            <td>Line chart dengan granularitas hari-dalam-minggu</td>
+            <td>Senin pagi sering bermasalah (mesin baru pemanasan), Jumat output turun</td>
+            <td>Sesuaikan jadwal warm-up, pertimbangkan buffer produksi di awal minggu</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="callout tip" style="margin-top:var(--s5);">
+        <span class="callout-icon">🔍</span>
+        <div class="callout-body">
+          <p><strong>Bedakan korelasi dan kausalitas:</strong> EDA menemukan korelasi — "suhu tinggi berbarengan dengan reject tinggi". Ini belum berarti suhu <em>menyebabkan</em> reject. Mungkin ada faktor ketiga (misalnya: bahan baku yang sama yang masuk saat itu memang berkualitas buruk). Gunakan temuan EDA sebagai hipotesis untuk diinvestigasi, bukan kesimpulan final.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- RINGKASAN & TUGAS -->
+    <div class="content-block" id="ringkasan">
+      <h2>Ringkasan Pertemuan Ini</h2>
+      <div style="background:var(--bg-2);border:1px solid var(--border);border-radius:var(--r3);padding:var(--s5);">
+        <ul>
+          <li>Data industri dari MES, ERP, dan form manual hampir selalu kotor — jenis masalah umum: missing values, duplikasi, inkonsistensi format, outlier, dan tipe data salah</li>
+          <li>Data cleaning tanpa coding bisa dilakukan di Excel secara sistematis: audit → hapus duplikat → tangani missing → standardisasi format → flag outlier → dokumentasikan</li>
+          <li>Prinsip "Garbage In, Garbage Out" berlaku mutlak — model AI sebaik data yang menjadi inputnya</li>
+          <li>Setiap visualisasi harus menjawab pertanyaan bisnis spesifik, bukan sekadar menampilkan data</li>
+          <li>Pilihan chart bergantung pada jenis pertanyaan: perbandingan → bar, tren → line, korelasi → scatter, proporsi → pie/donut, distribusi → box plot</li>
+          <li>EDA menghasilkan hipotesis, bukan kesimpulan — korelasi yang ditemukan perlu diverifikasi dengan investigasi domain</li>
+        </ul>
+      </div>
+
+      <!-- TASK BOX -->
+      <div class="task-box" id="tugas">
+        <div class="task-box-title">📋 Tugas Pertemuan Ini</div>
+        <p style="font-size:13px;color:var(--text-2);margin-bottom:var(--s4);">Dikumpulkan sebelum pertemuan ke-5 melalui Google Classroom. Format: file Excel yang sudah dibersihkan + file Power BI (.pbix) + laporan singkat PDF 1–2 halaman.</p>
+        <ol style="font-size:14px;color:var(--text);line-height:2.1;">
+          <li>Buka <code>data_produksi_mentah.xlsx</code> dari Google Classroom. Lakukan seluruh 6 langkah data cleaning yang dijelaskan di atas. <strong>Isi sheet cleaning_log</strong> dengan semua perubahan yang kamu lakukan. Submit file Excel yang sudah bersih.</li>
+          <li>Gunakan data yang sudah bersih untuk membangun dashboard Power BI dengan minimal <strong>4 visual</strong> yang menjawab 4 pertanyaan bisnis dari bagian 3. Tambahkan slicer untuk Mesin dan Shift. Submit file .pbix.</li>
+          <li>Dari dashboard yang kamu buat, tulis <strong>3 temuan penting</strong> (pola atau anomali yang kamu temukan) dan <strong>1 rekomendasi operasional</strong> untuk setiap temuan. Format: satu paragraf per temuan (100–150 kata total per temuan). Gunakan screenshot visualisasi sebagai bukti.</li>
+          <li><em>Opsional (bonus):</em> Coba Looker Studio (Google Data Studio) sebagai alternatif Power BI. Hubungkan data dari Google Sheets dan buat visualisasi yang sama. Bandingkan kemudahan penggunaannya dalam 150 kata.</li>
+        </ol>
+      </div>
+
+      <!-- READING BOX -->
+      <div class="reading-box">
+        <div class="reading-box-title">📖 Persiapan Pertemuan Ke-5</div>
+        <div class="reading-item">
+          <span class="reading-icon">📗</span>
+          <div class="reading-label">
+            <strong>Gentsch — "AI for Business", Chapter 5</strong>
+            "AI in Operations & Supply Chain" — Fondasi teori untuk P-05: AI untuk Optimasi Produksi & Supply Chain
+          </div>
+        </div>
+        <div class="reading-item">
+          <span class="reading-icon">🎥</span>
+          <div class="reading-label">
+            <strong>McKinsey — "How AI is Transforming Supply Chains" (YouTube)</strong>
+            Video ~15 menit yang menampilkan implementasi nyata AI di operasional Toyota, Maersk, dan Unilever — konteks langsung untuk P-05
+          </div>
+        </div>
+        <div class="reading-item">
+          <span class="reading-icon">📄</span>
+          <div class="reading-label">
+            <strong>WEF — "The Future of Jobs Report 2023" (bagian Manufacturing)</strong>
+            Baca halaman terkait manufaktur dan teknologi — tersedia gratis di weforum.org. Gunakan sebagai latar belakang untuk memahami mengapa optimasi AI di supply chain menjadi prioritas industri global
+          </div>
+        </div>
+        <div class="reading-item">
+          <span class="reading-icon">🔧</span>
+          <div class="reading-label">
+            <strong>Eksplorasi Dashboard Power BI Publik</strong>
+            Buka app.powerbi.com → pilih "Learn" → "Samples" → coba dashboard "Retail Analysis Sample". Amati struktur, layout, dan cara mereka mengorganisasi informasi untuk eksekutif non-teknis.
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ── ASIDE ── -->
+  <aside class="content-aside">
+    <!-- TOC -->
+    <div class="toc">
+      <div class="toc-title">Isi Halaman</div>
+      <ul class="toc-list">
+        <li><a href="#tujuan" class="active">Tujuan Pembelajaran</a></li>
+        <li><a href="#masalah">1. Masalah Kualitas Data</a></li>
+        <li><a href="#cleaning">2. Data Cleaning</a></li>
+        <li><a href="#visualisasi">3. Visualisasi Power BI</a></li>
+        <li><a href="#eda">4. Pola dalam EDA</a></li>
+        <li><a href="#ringkasan">Ringkasan & Tugas</a></li>
+      </ul>
+    </div>
+
+    <!-- Sesi nav -->
+    <div class="sesi-nav-aside">
+      <div class="sesi-nav-title">Navigasi Sesi</div>
+      <a href="sesi-03.html" class="sesi-nav-btn">
+        <span>←</span>
+        <span>P-03: Praktik AutoML dengan Orange</span>
+      </a>
+      <a href="../index.html" class="sesi-nav-btn" style="margin-top:var(--s2);">
+        <span>🏠</span>
+        <span>Kembali ke Beranda TI</span>
+      </a>
+      <div style="font-size:12px;color:var(--text-3);margin-top:var(--s4);padding:var(--s3) 0;border-top:1px solid var(--border);">Sesi berikutnya:</div>
+      <a href="#" class="sesi-nav-btn" style="opacity:0.5;pointer-events:none;">
+        <span>→</span>
+        <span>P-05: AI untuk Optimasi Produksi & Supply Chain</span>
+      </a>
+    </div>
+
+    <!-- Info box -->
+    <div style="background:var(--bg-2);border:1px solid var(--border);border-radius:var(--r3);padding:var(--s5);margin-top:var(--s4);">
+      <div style="font-family:var(--mono);font-size:10px;color:var(--text-3);letter-spacing:2px;text-transform:uppercase;margin-bottom:var(--s3);">Info Pertemuan</div>
+      <div style="display:flex;flex-direction:column;gap:var(--s3);">
+        <div>
+          <div style="font-size:11px;color:var(--text-3);">Tipe</div>
+          <div style="font-size:13px;color:var(--text);">Praktik Hands-on</div>
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--text-3);">Durasi</div>
+          <div style="font-size:13px;color:var(--text);">100 menit</div>
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--text-3);">CPMK</div>
+          <div style="font-size:13px;color:var(--text);">C3 (Analisis data industri), C4 (Menerapkan AI untuk proses industri)</div>
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--text-3);">Tools</div>
+          <div style="font-size:13px;color:var(--text);">Microsoft Excel · Power BI Desktop · (opsional: Looker Studio)</div>
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--text-3);">Dataset</div>
+          <div style="font-size:13px;color:var(--text);">data_produksi_mentah.xlsx (Google Classroom)</div>
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--text-3);">Referensi Utama</div>
+          <div style="font-size:13px;color:var(--text);">Gentsch — AI for Business, Ch. 4</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Cleaning quick ref -->
+    <div style="background:var(--bg-2);border:1px solid var(--border);border-radius:var(--r3);padding:var(--s5);margin-top:var(--s4);">
+      <div style="font-family:var(--mono);font-size:10px;color:var(--text-3);letter-spacing:2px;text-transform:uppercase;margin-bottom:var(--s4);">Urutan Cleaning</div>
+      <div style="display:flex;flex-direction:column;gap:var(--s2);">
+        <div style="display:flex;gap:var(--s3);align-items:center;font-size:12px;color:var(--text-2);">
+          <span style="flex-shrink:0;font-family:var(--mono);font-size:10px;color:var(--text-3);">0.</span> Backup original
+        </div>
+        <div style="display:flex;gap:var(--s3);align-items:center;font-size:12px;color:var(--text-2);">
+          <span style="flex-shrink:0;font-family:var(--mono);font-size:10px;color:var(--text-3);">1.</span> Hapus duplikat
+        </div>
+        <div style="display:flex;gap:var(--s3);align-items:center;font-size:12px;color:var(--text-2);">
+          <span style="flex-shrink:0;font-family:var(--mono);font-size:10px;color:var(--text-3);">2.</span> Tangani missing
+        </div>
+        <div style="display:flex;gap:var(--s3);align-items:center;font-size:12px;color:var(--text-2);">
+          <span style="flex-shrink:0;font-family:var(--mono);font-size:10px;color:var(--text-3);">3.</span> Standardisasi format
+        </div>
+        <div style="display:flex;gap:var(--s3);align-items:center;font-size:12px;color:var(--text-2);">
+          <span style="flex-shrink:0;font-family:var(--mono);font-size:10px;color:var(--text-3);">4.</span> Flag outlier
+        </div>
+        <div style="display:flex;gap:var(--s3);align-items:center;font-size:12px;color:var(--text-2);">
+          <span style="flex-shrink:0;font-family:var(--mono);font-size:10px;color:var(--text-3);">5.</span> Verifikasi tipe data
+        </div>
+        <div style="display:flex;gap:var(--s3);align-items:center;font-size:12px;color:var(--text-2);">
+          <span style="flex-shrink:0;font-family:var(--mono);font-size:10px;color:var(--text-3);">6.</span> Dokumentasikan
+        </div>
+      </div>
+    </div>
+
+    <!-- Chart decision -->
+    <div style="background:var(--bg-2);border:1px solid var(--border);border-radius:var(--r3);padding:var(--s5);margin-top:var(--s4);">
+      <div style="font-family:var(--mono);font-size:10px;color:var(--text-3);letter-spacing:2px;text-transform:uppercase;margin-bottom:var(--s4);">Pilih Chart yang Tepat</div>
+      <div style="display:flex;flex-direction:column;gap:var(--s3);font-size:12px;color:var(--text-2);">
+        <div><span style="color:var(--amber);">Bar</span> → Bandingkan kategori</div>
+        <div><span style="color:var(--blue);">Line</span> → Tren waktu</div>
+        <div><span style="color:var(--purple);">Scatter</span> → Korelasi 2 var</div>
+        <div><span style="color:var(--teal);">Donut</span> → Proporsi (≤5 kat.)</div>
+        <div><span style="color:var(--red);">Heatmap</span> → Pola 2 dimensi</div>
+        <div><span style="color:var(--amber);">Box Plot</span> → Distribusi & outlier</div>
+      </div>
+    </div>
+  </aside>
+
+</div><!-- end content-layout -->
+
+<!-- ══ FOOTER ══ -->
+<footer class="footer">
+  <div>AI·UKWMS <span style="color:var(--text-3);">· P-04 Data Industri: Pembersihan & Visualisasi — Teknik Industri</span></div>
+  <div><a href="../index.html" style="color:var(--text-3);">← Kembali ke Beranda TI</a></div>
+</footer>
+
+<script>
+  const headings = document.querySelectorAll('.content-main [id]');
+  const tocLinks = document.querySelectorAll('.toc-list a');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(a => {
+          a.classList.remove('active');
+          if (a.getAttribute('href') === '#' + entry.target.id) a.classList.add('active');
+        });
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px' });
+  headings.forEach(h => observer.observe(h));
+
+  const navLinks = document.querySelectorAll('.nav-links a[href^="#"]');
+  window.addEventListener('scroll', () => {
+    let current = '';
+    headings.forEach(h => { if (window.scrollY >= h.offsetTop - 100) current = h.id; });
+    navLinks.forEach(a => {
+      a.classList.remove('active');
+      if (a.getAttribute('href') === '#' + current) a.classList.add('active');
+    });
+  });
+</script>
+
+</body>
+</html>

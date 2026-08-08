@@ -1,0 +1,982 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>P-04: Data Preparation & Feature Engineering — Kecerdasan Buatan UKWMS</title>
+<link rel="stylesheet" href="../../css/style.css">
+<style>
+  .code-block {
+    background: #0d1117;
+    border: 1px solid var(--border);
+    border-radius: var(--r2);
+    padding: var(--s5);
+    font-family: var(--mono);
+    font-size: 12px;
+    line-height: 1.9;
+    overflow-x: auto;
+    margin: var(--s4) 0;
+    color: #c9d1d9;
+  }
+  .code-block .c-comment { color: #8b949e; }
+  .code-block .c-kw      { color: #ff7b72; }
+  .code-block .c-str     { color: #a5d6ff; }
+  .code-block .c-fn      { color: #d2a8ff; }
+  .code-block .c-num     { color: #79c0ff; }
+  .code-block .c-cls     { color: #ffa657; }
+
+  .code-label {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #161b22;
+    border: 1px solid var(--border);
+    border-bottom: none;
+    border-radius: var(--r2) var(--r2) 0 0;
+    padding: var(--s2) var(--s4);
+    margin-top: var(--s4);
+  }
+  .code-label + .code-block {
+    border-radius: 0 0 var(--r2) var(--r2);
+    margin-top: 0;
+  }
+  .code-label-name { font-family: var(--mono); font-size: 11px; color: var(--text-3); }
+  .code-label-badge {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--teal);
+    background: var(--teal-glow);
+    border: 1px solid rgba(0,201,177,0.2);
+    padding: 1px 8px;
+    border-radius: 20px;
+  }
+
+  .output-block {
+    background: #111827;
+    border: 1px solid rgba(0,201,177,0.2);
+    border-left: 3px solid var(--teal);
+    border-radius: 0 var(--r2) var(--r2) 0;
+    padding: var(--s4) var(--s5);
+    font-family: var(--mono);
+    font-size: 12px;
+    color: #9fffed;
+    line-height: 1.8;
+    margin: 0 0 var(--s4) 0;
+    overflow-x: auto;
+    white-space: pre;
+  }
+  .output-label {
+    font-size: 10px;
+    color: var(--teal);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: var(--s2);
+    font-family: var(--mono);
+    opacity: 0.7;
+  }
+
+  .concept-compare {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--s4);
+    margin: var(--s4) 0;
+  }
+  .cc-col {
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: var(--r2);
+    padding: var(--s4);
+  }
+  .cc-head {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: var(--s3);
+    padding-bottom: var(--s2);
+    border-bottom: 1px solid var(--border);
+  }
+  .cc-item {
+    display: flex;
+    gap: var(--s3);
+    align-items: flex-start;
+    padding: var(--s2) 0;
+    font-size: 13px;
+    color: var(--text-2);
+    line-height: 1.6;
+  }
+  .cc-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    margin-top: 6px;
+  }
+
+  .method-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--s3);
+    margin: var(--s4) 0;
+  }
+  .method-card {
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: var(--r2);
+    padding: var(--s4);
+  }
+  .method-name {
+    font-family: var(--mono);
+    font-size: 12px;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+  .method-formula {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--blue);
+    margin-bottom: var(--s2);
+  }
+  .method-when { font-size: 12px; color: var(--text-2); line-height: 1.5; }
+
+  .pipeline-vis {
+    display: flex;
+    align-items: stretch;
+    gap: 0;
+    margin: var(--s5) 0;
+    border: 1px solid var(--border);
+    border-radius: var(--r3);
+    overflow: hidden;
+  }
+  .pv-step {
+    flex: 1;
+    padding: var(--s4) var(--s3);
+    text-align: center;
+    border-right: 1px solid var(--border);
+    position: relative;
+  }
+  .pv-step:last-child { border-right: none; }
+  .pv-step-num {
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--text-3);
+    letter-spacing: 1px;
+    margin-bottom: var(--s2);
+  }
+  .pv-step-name {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 4px;
+  }
+  .pv-step-tool {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text-3);
+  }
+
+  .fe-card {
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: var(--r3);
+    padding: var(--s5);
+    margin-bottom: var(--s4);
+  }
+  .fe-header {
+    display: flex;
+    align-items: center;
+    gap: var(--s3);
+    margin-bottom: var(--s4);
+  }
+  .fe-icon { font-size: 26px; }
+  .fe-title { font-size: 15px; font-weight: 600; color: var(--text); }
+  .fe-sub   { font-size: 12px; color: var(--text-3); font-family: var(--mono); }
+
+  .fi-bar {
+    display: flex;
+    align-items: center;
+    gap: var(--s3);
+    margin-bottom: var(--s2);
+  }
+  .fi-label { font-size: 12px; color: var(--text-2); width: 180px; flex-shrink: 0; font-family: var(--mono); }
+  .fi-track { flex: 1; height: 8px; background: var(--bg-1); border-radius: 4px; overflow: hidden; border: 1px solid var(--border); }
+  .fi-fill  { height: 100%; border-radius: 4px; }
+  .fi-val   { font-size: 11px; color: var(--text-3); font-family: var(--mono); width: 40px; text-align: right; }
+</style>
+</head>
+<body>
+
+<!-- ══ NAV ══ -->
+<nav class="nav">
+  <div class="nav-logo">AI<span>·</span>UKWMS</div>
+  <ul class="nav-links">
+    <li><a href="../index.html">← Beranda</a></li>
+    <li><a href="#tujuan" class="active">Tujuan</a></li>
+    <li><a href="#eda">EDA</a></li>
+    <li><a href="#missing">Missing Values</a></li>
+    <li><a href="#encoding">Encoding</a></li>
+    <li><a href="#scaling">Scaling</a></li>
+    <li><a href="#feature-eng">Feature Eng</a></li>
+    <li><a href="#tugas">Tugas</a></li>
+  </ul>
+</nav>
+
+<!-- ══ SESI HERO ══ -->
+<header class="sesi-hero">
+  <div style="max-width:1100px;margin:0 auto;">
+    <div class="sesi-breadcrumb">
+      <a href="../index.html">Kecerdasan Buatan</a>
+      <span>›</span>
+      <span>Pertemuan 4</span>
+    </div>
+    <div class="sesi-num">PERTEMUAN 04 · PRAKTIK</div>
+    <h1 class="sesi-title">Data Preparation &<br><em style="color:var(--teal);">Feature Engineering</em></h1>
+    <p style="font-size:15px;color:var(--text-2);max-width:640px;line-height:1.8;">EDA mendalam, menangani missing values, encoding variabel kategorikal, scaling fitur numerik, dan membangun fitur baru yang meningkatkan performa model — semuanya dengan Pandas dan Scikit-learn.</p>
+    <div class="sesi-meta-row">
+      <span class="badge badge-teal">Praktik</span>
+      <span class="badge badge-blue">100 menit</span>
+      <span class="badge badge-amber">CPMK: C2, C4</span>
+    </div>
+  </div>
+</header>
+
+<!-- ══ CONTENT LAYOUT ══ -->
+<div class="content-layout">
+  <main class="content-main">
+
+    <!-- TUJUAN -->
+    <div class="content-block" id="tujuan">
+      <h2>Tujuan Pembelajaran</h2>
+      <p>Setelah mengikuti pertemuan ini, mahasiswa diharapkan mampu:</p>
+      <ol>
+        <li>Melakukan EDA sistematis: distribusi, korelasi, deteksi outlier, dan visualisasi pola tersembunyi</li>
+        <li>Memilih dan menerapkan strategi penanganan missing values yang tepat sesuai konteks</li>
+        <li>Mengimplementasikan berbagai teknik encoding (One-Hot, Ordinal, Target Encoding) untuk variabel kategorikal</li>
+        <li>Membedakan dan menerapkan StandardScaler, MinMaxScaler, dan RobustScaler dengan benar</li>
+        <li>Membangun fitur baru (feature engineering) dari domain knowledge dan interaksi antar fitur</li>
+        <li>Menggunakan feature selection untuk memilih fitur paling relevan dan mengurangi dimensi</li>
+      </ol>
+
+      <div class="callout info" style="margin-top:var(--s5);">
+        <span class="callout-icon">📦</span>
+        <div class="callout-body">
+          <p><strong>Dataset hari ini:</strong> File <code>ecommerce_raw.csv</code> tersedia di <strong>Edlink → Pertemuan 4</strong>. Dataset ini berisi data transaksi e-commerce selama 12 bulan — sengaja dibuat "kotor" dengan missing values, encoding yang tidak konsisten, dan fitur mentah yang perlu di-engineer. Upload ke Google Colab sebelum memulai.</p>
+        </div>
+      </div>
+
+      <div class="pipeline-vis" style="margin-top:var(--s5);">
+        <div class="pv-step" style="background:var(--teal-glow);">
+          <div class="pv-step-num">01</div>
+          <div class="pv-step-name">EDA</div>
+          <div class="pv-step-tool">pandas, seaborn</div>
+        </div>
+        <div class="pv-step">
+          <div class="pv-step-num">02</div>
+          <div class="pv-step-name">Missing Values</div>
+          <div class="pv-step-tool">SimpleImputer</div>
+        </div>
+        <div class="pv-step">
+          <div class="pv-step-num">03</div>
+          <div class="pv-step-name">Encoding</div>
+          <div class="pv-step-tool">OneHotEncoder</div>
+        </div>
+        <div class="pv-step">
+          <div class="pv-step-num">04</div>
+          <div class="pv-step-name">Scaling</div>
+          <div class="pv-step-tool">StandardScaler</div>
+        </div>
+        <div class="pv-step">
+          <div class="pv-step-num">05</div>
+          <div class="pv-step-name">Feature Eng</div>
+          <div class="pv-step-tool">domain logic</div>
+        </div>
+        <div class="pv-step" style="background:rgba(74,142,245,0.07);">
+          <div class="pv-step-num">06</div>
+          <div class="pv-step-name">Selection</div>
+          <div class="pv-step-tool">SelectKBest</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- EDA -->
+    <div class="content-block" id="eda">
+      <h2>1. Exploratory Data Analysis (EDA) Sistematis</h2>
+      <p>EDA adalah investigasi awal sebelum menyentuh model. Tujuannya bukan membuat grafik cantik — tapi <strong>menjawab pertanyaan spesifik</strong> tentang data: apakah distribusinya wajar? ada pola tersembunyi? ada anomali yang perlu ditangani?</p>
+
+      <h3>Dataset: <code>ecommerce_raw.csv</code></h3>
+      <p style="font-size:13px;color:var(--text-2);margin-bottom:var(--s4);">Dataset berisi 12.000 transaksi e-commerce dengan 15 kolom: demografi pelanggan, perilaku belanja, dan status churn.</p>
+
+      <div class="code-label">
+        <span class="code-label-name">cell_01_overview.py</span>
+        <span class="code-label-badge">EDA — Overview</span>
+      </div>
+      <div class="code-block"><span class="c-kw">import</span> pandas <span class="c-kw">as</span> pd
+<span class="c-kw">import</span> numpy <span class="c-kw">as</span> np
+<span class="c-kw">import</span> matplotlib.pyplot <span class="c-kw">as</span> plt
+<span class="c-kw">import</span> seaborn <span class="c-kw">as</span> sns
+
+plt.<span class="c-fn">style.use</span>(<span class="c-str">"dark_background"</span>)
+sns.<span class="c-fn">set_palette</span>(<span class="c-str">"husl"</span>)
+
+df = pd.<span class="c-fn">read_csv</span>(<span class="c-str">"ecommerce_raw.csv"</span>)
+
+<span class="c-comment"># ── Gambaran umum ─────────────────────────────────────────────</span>
+<span class="c-fn">print</span>(<span class="c-str">f"Shape       : {df.shape}"</span>)
+<span class="c-fn">print</span>(<span class="c-str">f"Duplikat    : {df.duplicated().sum()}"</span>)
+<span class="c-fn">print</span>(<span class="c-str">f"Missing (%) :\n{(df.isnull().mean()*100).round(2).to_string()}"</span>)
+<span class="c-fn">print</span>(<span class="c-str">f"\nTipe data:\n{df.dtypes.to_string()}"</span>)</div>
+
+      <div class="code-label">
+        <span class="code-label-name">cell_02_distributions.py</span>
+        <span class="code-label-badge">EDA — Distribusi</span>
+      </div>
+      <div class="code-block"><span class="c-comment"># ── Distribusi semua fitur numerik ────────────────────────────</span>
+num_cols = df.<span class="c-fn">select_dtypes</span>(include=<span class="c-str">"number"</span>).<span class="c-fn">columns</span>.<span class="c-fn">tolist</span>()
+
+n = <span class="c-fn">len</span>(num_cols)
+fig, axes = plt.<span class="c-fn">subplots</span>((<span class="c-fn">n</span>+<span class="c-num">2</span>)//<span class="c-num">3</span>, <span class="c-num">3</span>, figsize=(<span class="c-num">15</span>, (<span class="c-fn">n</span>+<span class="c-num">2</span>)//<span class="c-num">3</span> * <span class="c-num">3</span>))
+axes = axes.<span class="c-fn">flatten</span>()
+
+<span class="c-kw">for</span> i, col <span class="c-kw">in</span> <span class="c-fn">enumerate</span>(num_cols):
+    axes[i].<span class="c-fn">hist</span>(df[col].<span class="c-fn">dropna</span>(), bins=<span class="c-num">40</span>, color=<span class="c-str">"#79c0ff"</span>, edgecolor=<span class="c-str">"none"</span>, alpha=<span class="c-num">0.85</span>)
+    axes[i].<span class="c-fn">set_title</span>(col, fontsize=<span class="c-num">11</span>)
+    axes[i].<span class="c-fn">set_xlabel</span>(<span class="c-str">""</span>)
+
+<span class="c-kw">for</span> j <span class="c-kw">in</span> <span class="c-fn">range</span>(i+<span class="c-num">1</span>, <span class="c-fn">len</span>(axes)):
+    axes[j].<span class="c-fn">set_visible</span>(<span class="c-kw">False</span>)
+
+plt.<span class="c-fn">suptitle</span>(<span class="c-str">"Distribusi Fitur Numerik"</span>, fontsize=<span class="c-num">14</span>, y=<span class="c-num">1.01</span>)
+plt.<span class="c-fn">tight_layout</span>()
+plt.<span class="c-fn">show</span>()</div>
+
+      <div class="code-label">
+        <span class="code-label-name">cell_03_correlation.py</span>
+        <span class="code-label-badge">EDA — Korelasi</span>
+      </div>
+      <div class="code-block"><span class="c-comment"># ── Heatmap korelasi ─────────────────────────────────────────</span>
+plt.<span class="c-fn">figure</span>(figsize=(<span class="c-num">11</span>, <span class="c-num">9</span>))
+corr = df[num_cols].<span class="c-fn">corr</span>()
+mask = np.<span class="c-fn">triu</span>(np.<span class="c-fn">ones_like</span>(corr, dtype=<span class="c-fn">bool</span>))  <span class="c-comment"># sembunyikan segitiga atas</span>
+sns.<span class="c-fn">heatmap</span>(
+    corr, mask=mask, annot=<span class="c-kw">True</span>, fmt=<span class="c-str">".2f"</span>, cmap=<span class="c-str">"coolwarm"</span>,
+    center=<span class="c-num">0</span>, linewidths=<span class="c-num">0.3</span>, square=<span class="c-kw">True</span>,
+    vmin=-<span class="c-num">1</span>, vmax=<span class="c-num">1</span>, cbar_kws={<span class="c-str">"shrink"</span>: <span class="c-num">0.8</span>}
+)
+plt.<span class="c-fn">title</span>(<span class="c-str">"Korelasi Antar Fitur Numerik"</span>)
+plt.<span class="c-fn">tight_layout</span>()
+plt.<span class="c-fn">show</span>()
+
+<span class="c-comment"># Korelasi fitur dengan target (churn)</span>
+target_corr = corr[<span class="c-str">"churn"</span>].<span class="c-fn">drop</span>(<span class="c-str">"churn"</span>).<span class="c-fn">abs</span>().<span class="c-fn">sort_values</span>(ascending=<span class="c-kw">False</span>)
+<span class="c-fn">print</span>(<span class="c-str">"\nKorelasi dengan target (churn):"</span>)
+<span class="c-fn">print</span>(target_corr.<span class="c-fn">to_string</span>())</div>
+
+      <div class="code-label">
+        <span class="code-label-name">cell_04_outlier.py</span>
+        <span class="code-label-badge">EDA — Outlier</span>
+      </div>
+      <div class="code-block"><span class="c-comment"># ── Deteksi outlier dengan IQR ────────────────────────────────</span>
+<span class="c-kw">def</span> <span class="c-fn">count_outliers_iqr</span>(series):
+    Q1, Q3 = series.<span class="c-fn">quantile</span>([<span class="c-num">0.25</span>, <span class="c-num">0.75</span>])
+    IQR = Q3 - Q1
+    lower, upper = Q1 - <span class="c-num">1.5</span> * IQR, Q3 + <span class="c-num">1.5</span> * IQR
+    <span class="c-kw">return</span> ((series < lower) | (series > upper)).<span class="c-fn">sum</span>()
+
+outlier_counts = {col: <span class="c-fn">count_outliers_iqr</span>(df[col].<span class="c-fn">dropna</span>()) <span class="c-kw">for</span> col <span class="c-kw">in</span> num_cols}
+outlier_df = pd.<span class="c-cls">DataFrame</span>.<span class="c-fn">from_dict</span>(
+    outlier_counts, orient=<span class="c-str">"index"</span>, columns=[<span class="c-str">"outlier_count"</span>]
+).<span class="c-fn">sort_values</span>(<span class="c-str">"outlier_count"</span>, ascending=<span class="c-kw">False</span>)
+<span class="c-fn">print</span>(outlier_df[outlier_df[<span class="c-str">"outlier_count"</span>] > <span class="c-num">0</span>])
+
+<span class="c-comment"># Box plot fitur dengan outlier terbanyak</span>
+top_outlier_cols = outlier_df.head(<span class="c-num">4</span>).<span class="c-fn">index</span>.<span class="c-fn">tolist</span>()
+fig, axes = plt.<span class="c-fn">subplots</span>(<span class="c-num">1</span>, <span class="c-num">4</span>, figsize=(<span class="c-num">16</span>, <span class="c-num">4</span>))
+<span class="c-kw">for</span> ax, col <span class="c-kw">in</span> <span class="c-fn">zip</span>(axes, top_outlier_cols):
+    ax.<span class="c-fn">boxplot</span>(df[col].<span class="c-fn">dropna</span>(), patch_artist=<span class="c-kw">True</span>,
+               boxprops=<span class="c-fn">dict</span>(facecolor=<span class="c-str">"#79c0ff"</span>, alpha=<span class="c-num">0.6</span>),
+               medianprops=<span class="c-fn">dict</span>(color=<span class="c-str">"#ff7b72"</span>, linewidth=<span class="c-num">2</span>))
+    ax.<span class="c-fn">set_title</span>(col)
+plt.<span class="c-fn">tight_layout</span>()
+plt.<span class="c-fn">show</span>()</div>
+
+      <div class="callout tip">
+        <span class="callout-icon">🔍</span>
+        <div class="callout-body">
+          <p><strong>EDA = dialog dengan data:</strong> Setiap grafik memunculkan pertanyaan baru. Distribusi bimodal → ada dua kelompok berbeda? Korelasi tinggi antar dua fitur → multikolinearitas, pertimbangkan drop salah satu. Outlier ekstrem → error input atau kejadian nyata? Bawa catatan temuanmu — ini jadi bahan diskusi kelas.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- MISSING VALUES -->
+    <div class="content-block" id="missing">
+      <h2>2. Strategi Penanganan Missing Values</h2>
+      <p>Tidak ada satu strategi yang selalu benar. Pilihan bergantung pada <strong>proporsi data yang hilang</strong>, <strong>mekanisme hilangnya data</strong> (acak atau pola tertentu), dan <strong>pentingnya kolom</strong> tersebut untuk model.</p>
+
+      <div class="concept-compare" style="margin-bottom:var(--s5);">
+        <div class="cc-col">
+          <div class="cc-head" style="color:var(--red);">Jangan lakukan ini</div>
+          <div class="cc-item"><div class="cc-dot" style="background:var(--red);"></div>Drop semua baris dengan missing values tanpa analisis — bisa kehilangan 40% data</div>
+          <div class="cc-item"><div class="cc-dot" style="background:var(--red);"></div>Isi semua missing dengan 0 tanpa berpikir — 0 bisa punya makna sendiri</div>
+          <div class="cc-item"><div class="cc-dot" style="background:var(--red);"></div>Isi missing SEBELUM split train-test — menyebabkan data leakage</div>
+          <div class="cc-item"><div class="cc-dot" style="background:var(--red);"></div>Abaikan pola di mana data hilang — hilangnya data mungkin punya makna</div>
+        </div>
+        <div class="cc-col">
+          <div class="cc-head" style="color:var(--teal);">Lakukan ini</div>
+          <div class="cc-item"><div class="cc-dot" style="background:var(--teal);"></div>Analisis dulu proporsi missing per kolom — &gt;50% pertimbangkan drop kolom</div>
+          <div class="cc-item"><div class="cc-dot" style="background:var(--teal);"></div>Buat kolom indikator <code>was_missing</code> sebelum imputasi untuk fitur penting</div>
+          <div class="cc-item"><div class="cc-dot" style="background:var(--teal);"></div>Imputasi hanya menggunakan statistik dari data training</div>
+          <div class="cc-item"><div class="cc-dot" style="background:var(--teal);"></div>Dokumentasikan setiap keputusan imputasi dan alasannya</div>
+        </div>
+      </div>
+
+      <div class="method-grid">
+        <div class="method-card">
+          <div class="method-name" style="color:var(--teal);">Mean Imputation</div>
+          <div class="method-formula">fillna(col.mean())</div>
+          <div class="method-when">Untuk fitur numerik dengan distribusi simetris dan proporsi missing kecil (&lt;5%). Tidak cocok jika ada outlier ekstrem — gunakan median.</div>
+        </div>
+        <div class="method-card">
+          <div class="method-name" style="color:var(--blue);">Median Imputation</div>
+          <div class="method-formula">fillna(col.median())</div>
+          <div class="method-when">Untuk fitur numerik skewed atau ada outlier. Lebih robust dari mean. Default yang aman untuk sebagian besar kolom numerik industri.</div>
+        </div>
+        <div class="method-card">
+          <div class="method-name" style="color:var(--amber);">Mode Imputation</div>
+          <div class="method-formula">fillna(col.mode()[0])</div>
+          <div class="method-when">Untuk fitur kategorikal — isi dengan nilai yang paling sering muncul. Hati-hati pada kolom dengan distribusi hampir merata.</div>
+        </div>
+        <div class="method-card">
+          <div class="method-name" style="color:var(--purple);">Constant Imputation</div>
+          <div class="method-formula">fillna("Unknown")</div>
+          <div class="method-when">Untuk kategorikal saat "tidak ada data" sendiri merupakan informasi — misalnya kolom promo: tidak ada nilai → pelanggan tidak menerima promo.</div>
+        </div>
+        <div class="method-card">
+          <div class="method-name" style="color:var(--red);">Drop Column</div>
+          <div class="method-formula">df.drop(columns=[col])</div>
+          <div class="method-when">Saat missing &gt;50–70% dan kolom tidak kritis. Juga saat imputasi apa pun tidak masuk akal secara domain.</div>
+        </div>
+        <div class="method-card">
+          <div class="method-name" style="color:var(--teal);">KNN / Iterative</div>
+          <div class="method-formula">KNNImputer(k=5)</div>
+          <div class="method-when">Imputasi canggih yang mempertimbangkan hubungan antar fitur. Lebih akurat tapi lebih lambat — gunakan saat kolom penting dan ada korelasi kuat.</div>
+        </div>
+      </div>
+
+      <div class="code-label">
+        <span class="code-label-name">cell_05_missing.py</span>
+        <span class="code-label-badge">Missing Values</span>
+      </div>
+      <div class="code-block"><span class="c-kw">from</span> sklearn.impute <span class="c-kw">import</span> <span class="c-fn">SimpleImputer</span>
+
+<span class="c-comment"># ── Analisis pola missing ─────────────────────────────────────</span>
+missing_pct = df.<span class="c-fn">isnull</span>().<span class="c-fn">mean</span>() * <span class="c-num">100</span>
+missing_pct = missing_pct[missing_pct > <span class="c-num">0</span>].<span class="c-fn">sort_values</span>(ascending=<span class="c-kw">False</span>)
+
+plt.<span class="c-fn">figure</span>(figsize=(<span class="c-num">8</span>, <span class="c-num">4</span>))
+missing_pct.<span class="c-fn">plot</span>(kind=<span class="c-str">"barh"</span>, color=<span class="c-str">"#ff7b72"</span>)
+plt.<span class="c-fn">title</span>(<span class="c-str">"Persentase Missing Values per Kolom"</span>)
+plt.<span class="c-fn">xlabel</span>(<span class="c-str">"% Missing"</span>)
+plt.<span class="c-fn">tight_layout</span>()
+plt.<span class="c-fn">show</span>()
+
+<span class="c-comment"># ── Strategi: buat indikator dulu untuk kolom penting ─────────</span>
+important_cols_with_missing = [<span class="c-str">"tenure"</span>, <span class="c-str">"monthly_spend"</span>]
+<span class="c-kw">for</span> col <span class="c-kw">in</span> important_cols_with_missing:
+    <span class="c-kw">if</span> df[col].<span class="c-fn">isnull</span>().<span class="c-fn">any</span>():
+        df[<span class="c-str">f"{col}_was_missing"</span>] = df[col].<span class="c-fn">isnull</span>().<span class="c-fn">astype</span>(<span class="c-fn">int</span>)
+
+<span class="c-comment"># ── Imputasi numerik: median ───────────────────────────────────</span>
+num_cols_missing = df.<span class="c-fn">select_dtypes</span>(include=<span class="c-str">"number"</span>).<span class="c-fn">columns</span>[
+    df.<span class="c-fn">select_dtypes</span>(include=<span class="c-str">"number"</span>).<span class="c-fn">isnull</span>().<span class="c-fn">any</span>()
+]
+imputer_num = <span class="c-cls">SimpleImputer</span>(strategy=<span class="c-str">"median"</span>)
+df[num_cols_missing] = imputer_num.<span class="c-fn">fit_transform</span>(df[num_cols_missing])
+
+<span class="c-comment"># ── Imputasi kategorikal: modus ───────────────────────────────</span>
+cat_cols_missing = df.<span class="c-fn">select_dtypes</span>(include=<span class="c-str">"object"</span>).<span class="c-fn">columns</span>[
+    df.<span class="c-fn">select_dtypes</span>(include=<span class="c-str">"object"</span>).<span class="c-fn">isnull</span>().<span class="c-fn">any</span>()
+]
+imputer_cat = <span class="c-cls">SimpleImputer</span>(strategy=<span class="c-str">"most_frequent"</span>)
+df[cat_cols_missing] = imputer_cat.<span class="c-fn">fit_transform</span>(df[cat_cols_missing])
+
+<span class="c-fn">print</span>(<span class="c-str">f"Missing setelah imputasi: {df.isnull().sum().sum()}"</span>)</div>
+
+      <div class="output-block"><div class="output-label">Expected Output</div>Missing setelah imputasi: 0</div>
+    </div>
+
+    <!-- ENCODING -->
+    <div class="content-block" id="encoding">
+      <h2>3. Encoding Variabel Kategorikal</h2>
+      <p>Model ML tidak bisa memproses teks secara langsung — semua fitur harus dikonversi ke angka. Pilihan teknik encoding mempengaruhi ukuran dataset, performa model, dan interpretabilitas.</p>
+
+      <table class="industry-table">
+        <thead>
+          <tr>
+            <th>Teknik</th>
+            <th>Cara Kerja</th>
+            <th>Gunakan Saat</th>
+            <th>Hati-hati</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>One-Hot Encoding</strong></td>
+            <td>Buat kolom biner baru per nilai unik — 1 jika nilai tersebut, 0 lainnya</td>
+            <td>Variabel nominal tanpa urutan (kota, produk, warna). Default terbaik untuk sebagian besar kasus.</td>
+            <td>Kolom meledak jika kardinality tinggi (&gt;20 nilai unik) → high dimensional</td>
+          </tr>
+          <tr>
+            <td><strong>Ordinal Encoding</strong></td>
+            <td>Tetapkan angka berurutan sesuai urutan logis nilai</td>
+            <td>Variabel ordinal yang punya urutan jelas: rendah/sedang/tinggi, junior/senior, bintang 1–5</td>
+            <td>Jangan pakai untuk nominal — model akan mengasumsikan urutan yang tidak ada</td>
+          </tr>
+          <tr>
+            <td><strong>Label Encoding</strong></td>
+            <td>Tetapkan angka acak per nilai unik (0, 1, 2, ...)</td>
+            <td>Target biner (0/1). Juga untuk tree-based models yang tidak terpengaruh urutan angka.</td>
+            <td>Menciptakan urutan palsu — hindari untuk fitur input model linier/neural</td>
+          </tr>
+          <tr>
+            <td><strong>Target Encoding</strong></td>
+            <td>Ganti nilai kategori dengan rata-rata target pada kelompok tersebut</td>
+            <td>Kardinality tinggi (ratusan kategori) — kota, kode pos, ID produk. Sering dipakai di kompetisi.</td>
+            <td>Mudah overfitting — selalu terapkan dengan cross-validation atau regularisasi</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="code-label">
+        <span class="code-label-name">cell_06_encoding.py</span>
+        <span class="code-label-badge">Encoding</span>
+      </div>
+      <div class="code-block"><span class="c-kw">from</span> sklearn.preprocessing <span class="c-kw">import</span> <span class="c-fn">OneHotEncoder</span>, <span class="c-fn">OrdinalEncoder</span>
+<span class="c-kw">from</span> sklearn.compose <span class="c-kw">import</span> <span class="c-fn">ColumnTransformer</span>
+
+<span class="c-comment"># Pisahkan kolom berdasarkan tipe dan strategi encoding</span>
+nominal_cols = [<span class="c-str">"city"</span>, <span class="c-str">"payment_method"</span>, <span class="c-str">"device_type"</span>]
+ordinal_cols = [<span class="c-str">"satisfaction_level"</span>]    <span class="c-comment"># low < medium < high</span>
+numeric_cols = [c <span class="c-kw">for</span> c <span class="c-kw">in</span> df.<span class="c-fn">select_dtypes</span>(<span class="c-str">"number"</span>).<span class="c-fn">columns</span>
+                <span class="c-kw">if</span> c != <span class="c-str">"churn"</span>]
+
+<span class="c-comment"># ── One-Hot Encoding untuk nominal ───────────────────────────</span>
+<span class="c-fn">print</span>(<span class="c-str">"Sebelum OHE — shape:"</span>, df[nominal_cols].<span class="c-fn">shape</span>)
+
+ohe = <span class="c-cls">OneHotEncoder</span>(sparse_output=<span class="c-kw">False</span>, handle_unknown=<span class="c-str">"ignore"</span>, drop=<span class="c-str">"first"</span>)
+ohe_result = ohe.<span class="c-fn">fit_transform</span>(df[nominal_cols])
+ohe_cols   = ohe.<span class="c-fn">get_feature_names_out</span>(nominal_cols)
+df_ohe     = pd.<span class="c-cls">DataFrame</span>(ohe_result, columns=ohe_cols, index=df.<span class="c-fn">index</span>)
+
+<span class="c-fn">print</span>(<span class="c-str">"Setelah OHE  — kolom baru:"</span>, ohe_cols.<span class="c-fn">tolist</span>())
+
+<span class="c-comment"># ── Ordinal Encoding untuk satisfaction_level ────────────────</span>
+satisfaction_order = [[<span class="c-str">"low"</span>, <span class="c-str">"medium"</span>, <span class="c-str">"high"</span>]]
+oe = <span class="c-cls">OrdinalEncoder</span>(categories=satisfaction_order)
+df[<span class="c-str">"satisfaction_encoded"</span>] = oe.<span class="c-fn">fit_transform</span>(df[[<span class="c-str">"satisfaction_level"</span>]])
+
+<span class="c-fn">print</span>(<span class="c-str">"\nContoh ordinal encoding:"</span>)
+<span class="c-fn">print</span>(df[[<span class="c-str">"satisfaction_level"</span>, <span class="c-str">"satisfaction_encoded"</span>]].<span class="c-fn">drop_duplicates</span>().<span class="c-fn">sort_values</span>(<span class="c-str">"satisfaction_encoded"</span>))
+
+<span class="c-comment"># ── Gabungkan semua menjadi satu dataframe ────────────────────</span>
+df_final = pd.<span class="c-fn">concat</span>([
+    df[numeric_cols],
+    df[[<span class="c-str">"satisfaction_encoded"</span>]],
+    df_ohe,
+    df[[<span class="c-str">"churn"</span>]]
+], axis=<span class="c-num">1</span>)
+
+<span class="c-fn">print</span>(<span class="c-str">f"\nShape akhir: {df_final.shape}"</span>)</div>
+
+      <div class="output-block"><div class="output-label">Expected Output</div>Sebelum OHE — shape: (12000, 3)
+Setelah OHE  — kolom baru: ['city_Jakarta', 'city_Medan', 'city_Surabaya', ...]
+
+Contoh ordinal encoding:
+  satisfaction_level  satisfaction_encoded
+0                low                   0.0
+1             medium                   1.0
+2               high                   2.0
+
+Shape akhir: (12000, 28)</div>
+
+      <div class="callout warn">
+        <span class="callout-icon">⚠️</span>
+        <div class="callout-body">
+          <p><strong>drop="first" pada One-Hot Encoding:</strong> Parameter ini menghapus satu kolom per kategori untuk menghindari multikolinearitas sempurna (dummy variable trap). Jika ada 3 kota: Jakarta, Surabaya, Medan — kita hanya butuh 2 kolom karena jika keduanya 0, berarti otomatis Medan.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- SCALING -->
+    <div class="content-block" id="scaling">
+      <h2>4. Feature Scaling</h2>
+      <p>Algoritma berbasis jarak (k-NN, SVM, Neural Network) dan berbasis gradien (Logistic/Linear Regression) sangat sensitif terhadap skala fitur. Fitur dengan rentang besar (0–100.000) akan mendominasi fitur dengan rentang kecil (0–1) jika tidak di-scale.</p>
+
+      <div class="method-grid">
+        <div class="method-card">
+          <div class="method-name" style="color:var(--teal);">StandardScaler</div>
+          <div class="method-formula">z = (x − μ) / σ</div>
+          <div class="method-when">Default terbaik. Hasil: mean=0, std=1. Cocok untuk distribusi normal. Dipengaruhi outlier (karena menggunakan mean & std).</div>
+        </div>
+        <div class="method-card">
+          <div class="method-name" style="color:var(--blue);">MinMaxScaler</div>
+          <div class="method-formula">x' = (x − min) / (max − min)</div>
+          <div class="method-when">Hasil: semua nilai antara 0–1. Cocok untuk neural network dan data tanpa outlier. Sensitif terhadap outlier ekstrem.</div>
+        </div>
+        <div class="method-card">
+          <div class="method-name" style="color:var(--amber);">RobustScaler</div>
+          <div class="method-formula">x' = (x − Q2) / IQR</div>
+          <div class="method-when">Menggunakan median dan IQR, bukan mean dan std. Sangat robust terhadap outlier. Pilih ini saat outlier tidak bisa dihapus.</div>
+        </div>
+      </div>
+
+      <div class="code-label">
+        <span class="code-label-name">cell_07_scaling.py</span>
+        <span class="code-label-badge">Scaling</span>
+      </div>
+      <div class="code-block"><span class="c-kw">from</span> sklearn.preprocessing <span class="c-kw">import</span> <span class="c-fn">StandardScaler</span>, <span class="c-fn">MinMaxScaler</span>, <span class="c-fn">RobustScaler</span>
+<span class="c-kw">from</span> sklearn.model_selection <span class="c-kw">import</span> <span class="c-fn">train_test_split</span>
+
+<span class="c-comment"># Split DAHULU, baru scale — mencegah data leakage</span>
+X = df_final.<span class="c-fn">drop</span>(columns=[<span class="c-str">"churn"</span>])
+y = df_final[<span class="c-str">"churn"</span>]
+
+X_train, X_test, y_train, y_test = <span class="c-fn">train_test_split</span>(
+    X, y, test_size=<span class="c-num">0.2</span>, random_state=<span class="c-num">42</span>, stratify=y
+)
+
+<span class="c-comment"># Fit scaler HANYA pada training set, transform keduanya</span>
+scaler = <span class="c-cls">StandardScaler</span>()
+X_train_scaled = scaler.<span class="c-fn">fit_transform</span>(X_train)   <span class="c-comment"># fit + transform</span>
+X_test_scaled  = scaler.<span class="c-fn">transform</span>(X_test)          <span class="c-comment"># transform saja!</span>
+
+<span class="c-comment"># Visualisasi perbandingan sebelum vs sesudah scaling</span>
+col_demo = <span class="c-str">"monthly_spend"</span>
+col_idx  = X_train.<span class="c-fn">columns</span>.<span class="c-fn">get_loc</span>(col_demo)
+
+fig, axes = plt.<span class="c-fn">subplots</span>(<span class="c-num">1</span>, <span class="c-num">2</span>, figsize=(<span class="c-num">11</span>, <span class="c-num">4</span>))
+axes[<span class="c-num">0</span>].<span class="c-fn">hist</span>(X_train[col_demo], bins=<span class="c-num">40</span>, color=<span class="c-str">"#ffa657"</span>)
+axes[<span class="c-num">0</span>].<span class="c-fn">set_title</span>(<span class="c-str">f"{col_demo} — Sebelum Scaling"</span>)
+
+axes[<span class="c-num">1</span>].<span class="c-fn">hist</span>(X_train_scaled[:, col_idx], bins=<span class="c-num">40</span>, color=<span class="c-str">"#79c0ff"</span>)
+axes[<span class="c-num">1</span>].<span class="c-fn">set_title</span>(<span class="c-str">f"{col_demo} — Sesudah StandardScaler"</span>)
+
+plt.<span class="c-fn">tight_layout</span>()
+plt.<span class="c-fn">show</span>()
+
+<span class="c-fn">print</span>(<span class="c-str">f"mean setelah scaling: {X_train_scaled[:, col_idx].mean():.6f}"</span>)
+<span class="c-fn">print</span>(<span class="c-str">f"std  setelah scaling: {X_train_scaled[:, col_idx].std():.6f}"</span>)</div>
+
+      <div class="output-block"><div class="output-label">Expected Output</div>mean setelah scaling: 0.000000
+std  setelah scaling: 1.000000</div>
+
+      <div class="callout warn">
+        <span class="callout-icon">⚠️</span>
+        <div class="callout-body">
+          <p><strong>Urutan wajib: split dulu, scale kemudian.</strong> Jika kamu scale seluruh dataset sebelum split, informasi distribusi test set "bocor" ke training set melalui parameter scaler (mean dan std). Ini membuat model tampak lebih baik dari kenyataannya — evaluasi menjadi tidak valid. Selalu <code>fit_transform</code> pada training, <code>transform</code> saja pada test.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- FEATURE ENGINEERING -->
+    <div class="content-block" id="feature-eng">
+      <h2>5. Feature Engineering & Feature Selection</h2>
+      <p>Feature engineering adalah seni membuat fitur baru dari fitur yang sudah ada menggunakan domain knowledge. Ini sering kali memberikan peningkatan performa model yang jauh lebih besar dibandingkan mengganti algoritma.</p>
+
+      <h3>Feature Engineering — Membuat Fitur Baru</h3>
+
+      <div class="code-label">
+        <span class="code-label-name">cell_08_feature_eng.py</span>
+        <span class="code-label-badge">Feature Engineering</span>
+      </div>
+      <div class="code-block"><span class="c-comment"># Dataset asli punya kolom: tenure, monthly_spend, num_orders,
+# last_purchase_days, num_complaints, total_spend</span>
+
+<span class="c-comment"># ── 1. Fitur rasio ─────────────────────────────────────────────</span>
+<span class="c-comment"># Rata-rata spending per bulan berdasarkan tenure</span>
+df[<span class="c-str">"avg_monthly_spend"</span>] = df[<span class="c-str">"total_spend"</span>] / (df[<span class="c-str">"tenure"</span>] + <span class="c-num">1</span>)
+
+<span class="c-comment"># Komplain per order — indikator kepuasan yang lebih fair</span>
+df[<span class="c-str">"complaint_rate"</span>] = df[<span class="c-str">"num_complaints"</span>] / (df[<span class="c-str">"num_orders"</span>] + <span class="c-num">1</span>)
+
+<span class="c-comment"># ── 2. Fitur biner dari threshold domain ──────────────────────</span>
+<span class="c-comment"># Pelanggan "tidak aktif" jika tidak order dalam 30+ hari</span>
+df[<span class="c-str">"is_inactive"</span>] = (df[<span class="c-str">"last_purchase_days"</span>] > <span class="c-num">30</span>).<span class="c-fn">astype</span>(<span class="c-fn">int</span>)
+
+<span class="c-comment"># Pelanggan "loyal" jika tenure > 12 bulan dan spending tinggi</span>
+spend_median = df[<span class="c-str">"monthly_spend"</span>].<span class="c-fn">median</span>()
+df[<span class="c-str">"is_loyal"</span>] = (
+    (df[<span class="c-str">"tenure"</span>] > <span class="c-num">12</span>) &
+    (df[<span class="c-str">"monthly_spend"</span>] >= spend_median)
+).<span class="c-fn">astype</span>(<span class="c-fn">int</span>)
+
+<span class="c-comment"># ── 3. Fitur interaksi ────────────────────────────────────────</span>
+<span class="c-comment"># Skor risiko churn: skor tinggi = lebih berisiko</span>
+df[<span class="c-str">"churn_risk_score"</span>] = (
+    df[<span class="c-str">"last_purchase_days"</span>] * <span class="c-num">0.4</span> +
+    df[<span class="c-str">"num_complaints"</span>]   * <span class="c-num">0.35</span> -
+    df[<span class="c-str">"tenure"</span>]           * <span class="c-num">0.25</span>
+)
+
+<span class="c-comment"># ── 4. Fitur log-transform untuk distribusi skewed ─────────────</span>
+df[<span class="c-str">"log_total_spend"</span>] = np.<span class="c-fn">log1p</span>(df[<span class="c-str">"total_spend"</span>])
+
+<span class="c-fn">print</span>(<span class="c-str">"Fitur baru yang ditambahkan:"</span>)
+new_features = [<span class="c-str">"avg_monthly_spend"</span>, <span class="c-str">"complaint_rate"</span>,
+                <span class="c-str">"is_inactive"</span>, <span class="c-str">"is_loyal"</span>,
+                <span class="c-str">"churn_risk_score"</span>, <span class="c-str">"log_total_spend"</span>]
+<span class="c-fn">print</span>(df[new_features].<span class="c-fn">describe</span>().<span class="c-fn">round</span>(<span class="c-num">3</span>))</div>
+
+      <h3 style="margin-top:var(--s6);">Feature Selection — Pilih yang Paling Relevan</h3>
+      <p style="font-size:14px;color:var(--text-2);">Lebih banyak fitur tidak selalu lebih baik — fitur yang tidak relevan menambahkan noise dan memperlambat training. Feature selection memilih subset fitur terbaik.</p>
+
+      <div class="code-label">
+        <span class="code-label-name">cell_09_selection.py</span>
+        <span class="code-label-badge">Feature Selection</span>
+      </div>
+      <div class="code-block"><span class="c-kw">from</span> sklearn.feature_selection <span class="c-kw">import</span> <span class="c-fn">SelectKBest</span>, <span class="c-fn">f_classif</span>, <span class="c-fn">mutual_info_classif</span>
+<span class="c-kw">from</span> sklearn.ensemble <span class="c-kw">import</span> <span class="c-fn">RandomForestClassifier</span>
+
+X_all = df_final.<span class="c-fn">drop</span>(columns=[<span class="c-str">"churn"</span>])
+y_all = df_final[<span class="c-str">"churn"</span>]
+
+<span class="c-comment"># ── Metode 1: SelectKBest dengan F-score (ANOVA) ──────────────</span>
+selector_f = <span class="c-cls">SelectKBest</span>(score_func=<span class="c-fn">f_classif</span>, k=<span class="c-num">10</span>)
+selector_f.<span class="c-fn">fit</span>(X_all, y_all)
+
+f_scores = pd.<span class="c-cls">Series</span>(
+    selector_f.scores_, index=X_all.<span class="c-fn">columns</span>
+).<span class="c-fn">sort_values</span>(ascending=<span class="c-kw">False</span>)
+
+<span class="c-comment"># ── Metode 2: Feature Importance dari Random Forest ───────────</span>
+rf = <span class="c-cls">RandomForestClassifier</span>(n_estimators=<span class="c-num">100</span>, random_state=<span class="c-num">42</span>)
+rf.<span class="c-fn">fit</span>(X_all, y_all)
+
+rf_importance = pd.<span class="c-cls">Series</span>(
+    rf.feature_importances_, index=X_all.<span class="c-fn">columns</span>
+).<span class="c-fn">sort_values</span>(ascending=<span class="c-kw">False</span>)
+
+<span class="c-comment"># ── Visualisasi perbandingan dua metode ───────────────────────</span>
+fig, axes = plt.<span class="c-fn">subplots</span>(<span class="c-num">1</span>, <span class="c-num">2</span>, figsize=(<span class="c-num">14</span>, <span class="c-num">5</span>))
+
+f_scores.head(<span class="c-num">12</span>).<span class="c-fn">plot</span>(kind=<span class="c-str">"barh"</span>, ax=axes[<span class="c-num">0</span>], color=<span class="c-str">"#79c0ff"</span>)
+axes[<span class="c-num">0</span>].<span class="c-fn">set_title</span>(<span class="c-str">"Top 12 Fitur — F-Score (ANOVA)"</span>)
+axes[<span class="c-num">0</span>].<span class="c-fn">invert_yaxis</span>()
+
+rf_importance.head(<span class="c-num">12</span>).<span class="c-fn">plot</span>(kind=<span class="c-str">"barh"</span>, ax=axes[<span class="c-num">1</span>], color=<span class="c-str">"#00c9b1"</span>)
+axes[<span class="c-num">1</span>].<span class="c-fn">set_title</span>(<span class="c-str">"Top 12 Fitur — Random Forest Importance"</span>)
+axes[<span class="c-num">1</span>].<span class="c-fn">invert_yaxis</span>()
+
+plt.<span class="c-fn">tight_layout</span>()
+plt.<span class="c-fn">show</span>()</div>
+
+      <h3 style="margin-top:var(--s5);">Feature Importance — Visualisasi Interaktif</h3>
+      <p style="font-size:13px;color:var(--text-2);margin-bottom:var(--s4);">Ilustrasi hasil feature importance yang diharapkan dari Random Forest pada dataset <code>ecommerce_raw.csv</code>:</p>
+
+      <div style="background:var(--bg-2);border:1px solid var(--border);border-radius:var(--r3);padding:var(--s5);">
+        <div style="font-family:var(--mono);font-size:10px;color:var(--text-3);letter-spacing:2px;text-transform:uppercase;margin-bottom:var(--s4);">Feature Importance (Random Forest)</div>
+
+        <div class="fi-bar"><span class="fi-label">churn_risk_score</span><div class="fi-track"><div class="fi-fill" style="width:88%;background:var(--teal);"></div></div><span class="fi-val">0.088</span></div>
+        <div class="fi-bar"><span class="fi-label">last_purchase_days</span><div class="fi-track"><div class="fi-fill" style="width:82%;background:var(--teal);"></div></div><span class="fi-val">0.082</span></div>
+        <div class="fi-bar"><span class="fi-label">tenure</span><div class="fi-track"><div class="fi-fill" style="width:76%;background:var(--blue);"></div></div><span class="fi-val">0.076</span></div>
+        <div class="fi-bar"><span class="fi-label">monthly_spend</span><div class="fi-track"><div class="fi-fill" style="width:71%;background:var(--blue);"></div></div><span class="fi-val">0.071</span></div>
+        <div class="fi-bar"><span class="fi-label">complaint_rate</span><div class="fi-track"><div class="fi-fill" style="width:65%;background:var(--blue);"></div></div><span class="fi-val">0.065</span></div>
+        <div class="fi-bar"><span class="fi-label">avg_monthly_spend</span><div class="fi-track"><div class="fi-fill" style="width:58%;background:var(--blue);"></div></div><span class="fi-val">0.058</span></div>
+        <div class="fi-bar"><span class="fi-label">num_orders</span><div class="fi-track"><div class="fi-fill" style="width:52%;background:var(--amber);"></div></div><span class="fi-val">0.052</span></div>
+        <div class="fi-bar"><span class="fi-label">log_total_spend</span><div class="fi-track"><div class="fi-fill" style="width:48%;background:var(--amber);"></div></div><span class="fi-val">0.048</span></div>
+        <div class="fi-bar"><span class="fi-label">satisfaction_encoded</span><div class="fi-track"><div class="fi-fill" style="width:44%;background:var(--amber);"></div></div><span class="fi-val">0.044</span></div>
+        <div class="fi-bar"><span class="fi-label">is_inactive</span><div class="fi-track"><div class="fi-fill" style="width:38%;background:var(--amber);"></div></div><span class="fi-val">0.038</span></div>
+        <div class="fi-bar" style="margin-top:var(--s2);"><span class="fi-label" style="color:var(--text-3);">... (fitur lainnya)</span><div class="fi-track"><div class="fi-fill" style="width:20%;background:var(--bg-3);"></div></div><span class="fi-val" style="color:var(--text-3);">kecil</span></div>
+
+        <p style="font-size:12px;color:var(--text-3);margin-top:var(--s3);">★ Perhatikan: <code>churn_risk_score</code> (fitur rekayasa) masuk top 2 — fitur baru yang kita buat terbukti lebih prediktif dari fitur aslinya.</p>
+      </div>
+
+      <div class="callout tip" style="margin-top:var(--s5);">
+        <span class="callout-icon">💡</span>
+        <div class="callout-body">
+          <p><strong>Eksperimen feature engineering:</strong> Latih model dengan fitur asli saja vs fitur asli + fitur baru. Bandingkan AUC-ROC keduanya. Jika fitur baru meningkatkan AUC lebih dari 0.01, fitur tersebut layak dipertahankan. Ini adalah cara ilmiah untuk memvalidasi intuisi domain kamu.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- RINGKASAN & TUGAS -->
+    <div class="content-block" id="ringkasan">
+      <h2>Ringkasan Pertemuan Ini</h2>
+      <div style="background:var(--bg-2);border:1px solid var(--border);border-radius:var(--r3);padding:var(--s5);">
+        <ul>
+          <li>EDA sistematis mencakup: shape/tipe/missing → distribusi → korelasi → outlier → pola dengan target. Setiap temuan memunculkan hipotesis yang perlu diuji</li>
+          <li>Missing values tidak boleh ditangani semua dengan satu cara — pilih strategi berdasarkan proporsi, tipe kolom, dan konteks bisnis. Buat indikator <code>was_missing</code> untuk fitur penting</li>
+          <li>Urutan kritis yang tidak boleh dilanggar: <strong>split train-test DULU, baru fit scaler/imputer/encoder pada training set</strong></li>
+          <li>One-Hot untuk nominal, Ordinal untuk yang punya urutan, Label hanya untuk target biner atau tree-based models</li>
+          <li>StandardScaler (default), MinMaxScaler (neural net, data bersih), RobustScaler (ada outlier yang tidak bisa dihapus)</li>
+          <li>Feature engineering yang baik — berdasarkan domain knowledge — sering kali memberikan peningkatan performa lebih besar dari pergantian algoritma</li>
+        </ul>
+      </div>
+
+      <!-- TASK BOX -->
+      <div class="task-box" id="tugas">
+        <div class="task-box-title">📋 Tugas Pertemuan Ini</div>
+        <p style="font-size:13px;color:var(--text-2);margin-bottom:var(--s4);">Kumpulkan sebagai Jupyter Notebook (.ipynb) melalui <strong>Edlink → Pertemuan 4</strong> sebelum pertemuan ke-5.</p>
+        <ol style="font-size:14px;color:var(--text);line-height:2.1;">
+          <li>Jalankan semua kode EDA pada <code>ecommerce_raw.csv</code>. Dalam <strong>Markdown cell</strong>, tulis 3 temuan paling menarik dari EDA-mu — distribusi yang tidak biasa, korelasi yang mengejutkan, atau pola outlier yang mencurigakan. Sertakan plot sebagai bukti.</li>
+          <li>Terapkan seluruh pipeline preprocessing (missing → encoding → scaling) menggunakan <strong><code>Pipeline</code> dan <code>ColumnTransformer</code> dari Scikit-learn</strong> — jangan proses kolom satu per satu secara manual. Ini latihan menulis kode yang production-ready.</li>
+          <li>Buat minimal <strong>3 fitur baru</strong> dari feature engineering menggunakan domain knowledge tentang perilaku belanja online. Latih Random Forest dengan fitur asli saja vs fitur asli + fitur baru. Bandingkan AUC-ROC — apakah fitur barumu meningkatkan performa?</li>
+          <li><em>Bonus:</em> Implementasikan <code>KNNImputer</code> untuk menangani missing values pada kolom numerik, bandingkan hasilnya dengan <code>SimpleImputer(median)</code>. Apakah ada perbedaan signifikan pada AUC model akhir? Jelaskan temuanmu dalam 100 kata.</li>
+        </ol>
+      </div>
+
+      <!-- READING BOX -->
+      <div class="reading-box">
+        <div class="reading-box-title">📖 Persiapan Pertemuan Ke-5</div>
+        <div class="reading-item">
+          <span class="reading-icon">🎥</span>
+          <div class="reading-label">
+            <strong>3Blue1Brown — "Neural Networks" Series, Episode 1 & 2 (YouTube)</strong>
+            "But what is a neural network?" + "Gradient descent, how neural networks learn" — ~40 menit total. Fondasi visual sebelum P-05 Deep Learning.
+          </div>
+        </div>
+        <div class="reading-item">
+          <span class="reading-icon">📗</span>
+          <div class="reading-label">
+            <strong>Géron — Hands-On ML, Chapter 10</strong>
+            "Introduction to Artificial Neural Networks with Keras" — Baca sampai bagian "Building a Regression MLP Using the Sequential API" sebelum pertemuan ke-5.
+          </div>
+        </div>
+        <div class="reading-item">
+          <span class="reading-icon">📄</span>
+          <div class="reading-label">
+            <strong>Scikit-learn User Guide — Preprocessing</strong>
+            Baca dokumentasi resmi <code>sklearn.preprocessing</code> — khususnya bagian Encoding categorical features dan Standardization. Pahami parameter <code>handle_unknown</code> dan <code>sparse_output</code>.
+          </div>
+        </div>
+        <div class="reading-item">
+          <span class="reading-icon">📦</span>
+          <div class="reading-label">
+            <strong>Dataset P-05 di Edlink</strong>
+            Tidak ada dataset baru untuk P-05 — kita akan menggunakan dataset MNIST (built-in di Keras) dan dataset sentimen ulasan produk yang ada di Edlink. Tidak perlu download sebelumnya.
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ── ASIDE ── -->
+  <aside class="content-aside">
+    <!-- TOC -->
+    <div class="toc">
+      <div class="toc-title">Isi Halaman</div>
+      <ul class="toc-list">
+        <li><a href="#tujuan" class="active">Tujuan Pembelajaran</a></li>
+        <li><a href="#eda">1. EDA Sistematis</a></li>
+        <li><a href="#missing">2. Missing Values</a></li>
+        <li><a href="#encoding">3. Encoding</a></li>
+        <li><a href="#scaling">4. Feature Scaling</a></li>
+        <li><a href="#feature-eng">5. Feature Engineering</a></li>
+        <li><a href="#ringkasan">Ringkasan & Tugas</a></li>
+      </ul>
+    </div>
+
+    <!-- Sesi nav -->
+    <div class="sesi-nav-aside">
+      <div class="sesi-nav-title">Navigasi Sesi</div>
+      <a href="sesi-03.html" class="sesi-nav-btn">
+        <span>←</span>
+        <span>P-03: Praktik ML Python & Scikit-learn</span>
+      </a>
+      <a href="../index.html" class="sesi-nav-btn" style="margin-top:var(--s2);">
+        <span>🏠</span>
+        <span>Kembali ke Beranda</span>
+      </a>
+      <div style="font-size:12px;color:var(--text-3);margin-top:var(--s4);padding:var(--s3) 0;border-top:1px solid var(--border);">Sesi berikutnya:</div>
+      <a href="#" class="sesi-nav-btn" style="opacity:0.5;pointer-events:none;">
+        <span>→</span>
+        <span>P-05: Deep Learning & Neural Network</span>
+      </a>
+    </div>
+
+    <!-- Info box -->
+    <div style="background:var(--bg-2);border:1px solid var(--border);border-radius:var(--r3);padding:var(--s5);margin-top:var(--s4);">
+      <div style="font-family:var(--mono);font-size:10px;color:var(--text-3);letter-spacing:2px;text-transform:uppercase;margin-bottom:var(--s3);">Info Pertemuan</div>
+      <div style="display:flex;flex-direction:column;gap:var(--s3);">
+        <div>
+          <div style="font-size:11px;color:var(--text-3);">Tipe</div>
+          <div style="font-size:13px;color:var(--text);">Praktik Hands-on</div>
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--text-3);">Durasi</div>
+          <div style="font-size:13px;color:var(--text);">100 menit</div>
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--text-3);">CPMK</div>
+          <div style="font-size:13px;color:var(--text);">C2 (Menerapkan ML), C4 (AI untuk bisnis)</div>
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--text-3);">Tools</div>
+          <div style="font-size:13px;color:var(--text);">Python · Pandas · Scikit-learn · Seaborn · Google Colab</div>
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--text-3);">Dataset</div>
+          <div style="font-size:13px;color:var(--text);">ecommerce_raw.csv (Edlink)</div>
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--text-3);">Referensi Utama</div>
+          <div style="font-size:13px;color:var(--text);">Géron — Hands-On ML, Ch. 2</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick ref -->
+    <div style="background:var(--bg-2);border:1px solid var(--border);border-radius:var(--r3);padding:var(--s5);margin-top:var(--s4);">
+      <div style="font-family:var(--mono);font-size:10px;color:var(--text-3);letter-spacing:2px;text-transform:uppercase;margin-bottom:var(--s4);">Encoding Quick Ref</div>
+      <div style="display:flex;flex-direction:column;gap:var(--s3);font-size:12px;color:var(--text-2);">
+        <div><span style="color:var(--teal);">One-Hot</span> → nominal, tidak ada urutan</div>
+        <div><span style="color:var(--blue);">Ordinal</span> → ada urutan logis</div>
+        <div><span style="color:var(--amber);">Label</span> → target biner / tree models</div>
+        <div><span style="color:var(--purple);">Target</span> → kardinality tinggi</div>
+      </div>
+      <div style="margin-top:var(--s4);padding-top:var(--s4);border-top:1px solid var(--border);">
+        <div style="font-family:var(--mono);font-size:10px;color:var(--text-3);letter-spacing:2px;text-transform:uppercase;margin-bottom:var(--s3);">Scaler Quick Ref</div>
+        <div style="display:flex;flex-direction:column;gap:var(--s3);font-size:12px;color:var(--text-2);">
+          <div><span style="color:var(--teal);">Standard</span> → default, distribusi normal</div>
+          <div><span style="color:var(--blue);">MinMax</span> → neural net, [0,1]</div>
+          <div><span style="color:var(--amber);">Robust</span> → ada outlier parah</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+</div>
+
+<!-- ══ FOOTER ══ -->
+<footer class="footer">
+  <div>AI·UKWMS <span style="color:var(--text-3);">· P-04 Data Preparation & Feature Engineering</span></div>
+  <div><a href="../index.html" style="color:var(--text-3);">← Kembali ke Beranda</a></div>
+</footer>
+
+<script>
+  const headings = document.querySelectorAll('.content-main [id]');
+  const tocLinks = document.querySelectorAll('.toc-list a');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(a => {
+          a.classList.remove('active');
+          if (a.getAttribute('href') === '#' + entry.target.id) a.classList.add('active');
+        });
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px' });
+  headings.forEach(h => observer.observe(h));
+
+  const navLinks = document.querySelectorAll('.nav-links a[href^="#"]');
+  window.addEventListener('scroll', () => {
+    let current = '';
+    headings.forEach(h => { if (window.scrollY >= h.offsetTop - 100) current = h.id; });
+    navLinks.forEach(a => {
+      a.classList.remove('active');
+      if (a.getAttribute('href') === '#' + current) a.classList.add('active');
+    });
+  });
+</script>
+</body>
+</html>
