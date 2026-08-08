@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>P-02: Konsep ML untuk Industri — Teknik Industri UKWMS</title>
+  <link rel="stylesheet" href="../../css/style.css" />
+  <style>
+    .content-layout {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: var(--s6) var(--s4);
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      gap: var(--s5);
+    }
+    .content-block {
+      background: var(--bg-1);
+      border: 1px solid var(--border);
+      border-radius: var(--r3);
+      padding: var(--s5);
+    }
+    .content-block h2 {
+      font-size: 24px;
+      color: var(--text);
+      margin-bottom: var(--s4);
+    }
+    .content-block h3 {
+      font-size: 16px;
+      margin-top: var(--s4);
+      color: var(--text);
+    }
+    .content-block p, .content-block li {
+      font-size: 14px;
+      line-height: 1.75;
+      color: var(--text-2);
+    }
+    .content-block ol {
+      padding-left: var(--s5);
+    }
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: var(--s4);
+      margin-top: var(--s4);
+    }
+    .mini-card {
+      background: var(--bg-2);
+      border-radius: var(--r2);
+      border: 1px solid var(--border);
+      padding: var(--s4);
+    }
+    .mini-card h4 {
+      font-size: 13px;
+      color: var(--text);
+      margin-bottom: var(--s2);
+    }
+    .mini-card p {
+      font-size: 12px;
+      color: var(--text-2);
+      line-height: 1.55;
+    }
+    .callout {
+      display: flex;
+      gap: var(--s3);
+      align-items: start;
+      padding: var(--s4);
+      border-radius: var(--r2);
+      border: 1px solid var(--border);
+      background: var(--bg-2);
+      margin-top: var(--s4);
+    }
+    .callout .icon {
+      font-size: 24px;
+      line-height: 1;
+    }
+    .callout strong {
+      color: var(--text);
+    }
+    .table-plain {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: var(--s4);
+    }
+    .table-plain th {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--text-2);
+      background: var(--bg-2);
+      padding: var(--s3) var(--s4);
+      text-align: left;
+    }
+    .table-plain td {
+      border-top: 1px solid var(--border);
+      padding: var(--s3) var(--s4);
+      font-size: 13px;
+      color: var(--text-2);
+    }
+    .badge-row {
+      display: flex;
+      gap: var(--s2);
+      flex-wrap: wrap;
+      margin-top: var(--s4);
+    }
+    .assignments {
+      margin-top: var(--s4);
+      padding: var(--s4);
+      border-left: 3px solid var(--blue);
+      background: var(--blue-dim);
+      border-radius: 0 var(--r2) var(--r2) 0;
+    }
+  </style>
+</head>
+<body>
+  <nav class="nav">
+    <div class="nav-logo">AI<span>·</span>UKWMS</div>
+    <ul class="nav-links">
+      <li><a href="../index.html">← Beranda</a></li>
+      <li><a href="#tujuan" class="active">Tujuan</a></li>
+      <li><a href="#paradigma">Paradigma</a></li>
+      <li><a href="#proses">Proses</a></li>
+      <li><a href="#praktik">Praktik</a></li>
+    </ul>
+  </nav>
+
+  <header class="sesi-hero">
+    <div style="max-width:1100px;margin:0 auto;">
+      <div class="sesi-breadcrumb">
+        <a href="../index.html">Kecerdasan Buatan</a>
+        <span>›</span>
+        <span>Pertemuan 2</span>
+      </div>
+      <div class="sesi-num">PERTEMUAN 02 · TEORI + PRAKTIK</div>
+      <h1 class="sesi-title">Konsep Machine<br>Learning untuk Industri</h1>
+      <p style="font-size:15px;color:var(--text-2);max-width:640px;line-height:1.8;">
+        Mahasiswa memahami cara kerja machine learning secara umum, membedakan jenis masalah industri yang cocok untuk AI, serta menyiapkan logika dasar untuk analisis data dan evaluasi solusi.
+      </p>
+      <div class="sesi-meta-row">
+        <span class="badge badge-blue">Teori + Praktik</span>
+        <span class="badge badge-teal">100 menit</span>
+        <span class="badge badge-amber">CPMK: C2, C3</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="content-layout">
+    <main class="content-main">
+      <section class="content-block" id="tujuan">
+        <h2>Tujuan Pembelajaran</h2>
+        <p>Setelah mengikuti sesi 2, mahasiswa diharapkan mampu:</p>
+        <ol>
+          <li>Membedakan tiga paradigma utama machine learning: supervised, unsupervised, dan reinforcement learning.</li>
+          <li>Menjelaskan alur dasar penyelesaian masalah AI pada data industri: input, pembersihan, model, evaluasi, dan keputusan.</li>
+          <li>Menentukan tipe data dan bentuk masalah yang relevan untuk prediksi, klasifikasi, dan segmentasi.</li>
+          <li>Memahami indikator performa model dan interpretasi hasil tanpa mengandalkan pemahaman coding.</li>
+        </ol>
+        <div class="callout">
+          <span class="icon">💡</span>
+          <div>
+            <p><strong>Prasyarat:</strong> Mahasiswa dapat membaca data umum, mengenal konsep variabel, dan memahami bahwa AI untuk industri adalah alat bantu pengambilan keputusan, bukan pengganti pengalaman operasional.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="content-block" id="paradigma">
+        <h2>1. Tiga Paradigma Machine Learning</h2>
+        <p>Dunia industri sering menemui permasalahan yang tidak dapat diselesaikan hanya dengan aturan if-else. Machine learning menjadi pendekatan yang relevan ketika data historis berlimpah dan hubungan pola dapat dipelajari.</p>
+        <div class="grid-3">
+          <article class="mini-card">
+            <h4 style="color:var(--teal);">Supervised Learning</h4>
+            <p>Model belajar dari data yang memiliki label atau target. Contohnya: prediksi kualitas produk, forecasting demand, klasifikasi cacat barang.</p>
+          </article>
+          <article class="mini-card">
+            <h4 style="color:var(--purple);">Unsupervised Learning</h4>
+            <p>Model melakukan pengelompokan atau pengurangan dimensi pada data tanpa label. Contohnya: segmentasi pelanggan, grouping mesin berdasarkan pola konsumsi energi.</p>
+          </article>
+          <article class="mini-card">
+            <h4 style="color:var(--amber);">Reinforcement Learning</h4>
+            <p>Agent belajar melalui trial and error untuk memaksimalkan reward. Contohnya: kontrol sistem otomatis, jadwal produksi adaptif, routing kendaraan.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="content-block" id="proses">
+        <h2>2. Proses Menyelesaikan Masalah Industri dengan AI</h2>
+        <table class="table-plain">
+          <thead>
+            <tr>
+              <th>Langkah</th>
+              <th>Aktivitas</th>
+              <th>Hasil</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>1. Identifikasi masalah</td>
+              <td>Menentukan target keputusan: kualitas, stok, risiko outage, demand, atau inspeksi.</td>
+              <td>Definisi KPI dan target bisnis.</td>
+            </tr>
+            <tr>
+              <td>2. Pengumpulan data</td>
+              <td>Data dari MES, ERP, sensor, insan/QA, penjualan, atau sistem logistik.</td>
+              <td>Dataset awal yang siap dianalisis.</td>
+            </tr>
+            <tr>
+              <td>3. Pembersihan data</td>
+              <td>Memeriksa data kosong, duplikasi, outlier, format tanggal, dan konsistensi.</td>
+              <td>Data yang siap diproses.</td>
+            </tr>
+            <tr>
+              <td>4. Pemodelan</td>
+              <td>Memilih teknik sesuai jenis masalah dan data.</td>
+              <td>Model awal dan output prediksi.</td>
+            </tr>
+            <tr>
+              <td>5. Evaluasi</td>
+              <td>Mengukur akurasi, eror, interpretasi hasil, serta trade-off manfaat dan biaya.</td>
+              <td>Keputusan apakah model siap dipakai.</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section class="content-block" id="praktik">
+        <h2>3. Praktik Sesi</h2>
+        <p>Praktik pada sesi ini dilakukan secara observasional dan berorientasi pada kasus. Mahasiswa tidak dituntut menulis kode, tetapi diminta membaca data, membahas karakteristik masalah, dan menyusun hipotesis solusi.</p>
+        <div class="assignments">
+          <p><strong>Aktivitas:</strong></p>
+          <ul>
+            <li>Identifikasi satu masalah industri di lingkungan kampus atau pabrik demonstrasi.</li>
+            <li>Tentukan apakah masalah termasuk klasifikasi, prediksi, optimasi, atau segmentasi.</li>
+            <li>Buat daftar data yang perlu dikumpulkan untuk mendukung solusi.</li>
+            <li>Diskusikan KPI yang akan dijadikan indikator keberhasilan.</li>
+          </ul>
+        </div>
+        <div class="badge-row">
+          <span class="badge badge-blue">Dataset Industri</span>
+          <span class="badge badge-teal">KPI</span>
+          <span class="badge badge-amber">Diskusi Kelompok</span>
+        </div>
+      </section>
+
+      <section class="content-block">
+        <h2>4. Evaluasi Sesi</h2>
+        <p>Penilaian sesi 2 akan berfokus pada kemampuan mahasiswa menunjukkan pemahaman terhadap:</p>
+        <ul>
+          <li>Perbedaan tipe masalah berlabel dan tidak berlabel.</li>
+          <li>Hubungan antara data, model, dan keputusan bisnis.</li>
+          <li>Penentuan target solusi AI yang sesuai dengan kebutuhan industri.</li>
+        </ul>
+      </section>
+    </main>
+  </div>
+</body>
+</html>
