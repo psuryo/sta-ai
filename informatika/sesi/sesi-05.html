@@ -1,0 +1,1129 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>P-05: Deep Learning & Neural Network — Kecerdasan Buatan UKWMS</title>
+<link rel="stylesheet" href="../../css/style.css">
+<style>
+  /* ── Neuron diagram ── */
+  .neuron-row {
+    display: flex;
+    align-items: center;
+    gap: var(--s5);
+    margin: var(--s5) 0;
+    overflow-x: auto;
+    padding: var(--s4) 0;
+  }
+  .nn-layer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--s3);
+    flex-shrink: 0;
+  }
+  .nn-layer-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text-3);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: var(--s2);
+    text-align: center;
+  }
+  .nn-node {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: 2px solid var(--border);
+    background: var(--bg-2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-3);
+    position: relative;
+  }
+  .nn-node.input  { border-color: var(--blue);   background: var(--blue-dim);  color: var(--blue);  }
+  .nn-node.hidden { border-color: var(--teal);   background: var(--teal-glow); color: var(--teal);  }
+  .nn-node.output { border-color: var(--amber);  background: var(--amber-dim); color: var(--amber); }
+  .nn-arrows {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    flex-shrink: 0;
+    opacity: 0.35;
+  }
+  .nn-arrow-line { width: 36px; height: 1px; background: var(--text-3); }
+
+  /* ── Activation cards ── */
+  .act-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--s3);
+    margin: var(--s4) 0;
+  }
+  .act-card {
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: var(--r2);
+    padding: var(--s4);
+    text-align: center;
+  }
+  .act-name    { font-family: var(--mono); font-size: 12px; font-weight: 600; margin-bottom: var(--s2); }
+  .act-formula { font-family: var(--mono); font-size: 10px; color: var(--blue); margin-bottom: var(--s2); }
+  .act-curve   { margin: var(--s2) auto; }
+  .act-when    { font-size: 11px; color: var(--text-3); line-height: 1.5; margin-top: var(--s2); }
+
+  /* ── Architecture compare ── */
+  .arch-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--s4);
+    margin: var(--s5) 0;
+  }
+  .arch-card {
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: var(--r3);
+    overflow: hidden;
+  }
+  .arch-head {
+    padding: var(--s4) var(--s5);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: var(--s3);
+  }
+  .arch-icon  { font-size: 24px; }
+  .arch-title { font-size: 14px; font-weight: 600; color: var(--text); }
+  .arch-tag   { font-family: var(--mono); font-size: 10px; color: var(--text-3); }
+  .arch-body  { padding: var(--s5); }
+  .arch-use   {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--teal);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: var(--s2);
+  }
+  .arch-desc  { font-size: 13px; color: var(--text-2); line-height: 1.7; }
+  .arch-apps  { display: flex; gap: var(--s2); flex-wrap: wrap; margin-top: var(--s3); }
+  .arch-badge {
+    font-size: 10px;
+    font-family: var(--mono);
+    padding: 2px 8px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    color: var(--text-3);
+  }
+
+  /* ── Training vis ── */
+  .training-flow {
+    display: flex;
+    align-items: stretch;
+    gap: 0;
+    border: 1px solid var(--border);
+    border-radius: var(--r3);
+    overflow: hidden;
+    margin: var(--s5) 0;
+  }
+  .tf-step {
+    flex: 1;
+    padding: var(--s4) var(--s3);
+    text-align: center;
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--s2);
+  }
+  .tf-step:last-child { border-right: none; }
+  .tf-icon  { font-size: 22px; }
+  .tf-name  { font-size: 12px; font-weight: 600; color: var(--text); }
+  .tf-desc  { font-size: 11px; color: var(--text-3); line-height: 1.5; }
+  .tf-math  { font-family: var(--mono); font-size: 10px; color: var(--blue); }
+
+  /* ── Loss curve SVG ── */
+  .loss-curve-wrap {
+    background: #0d1117;
+    border: 1px solid var(--border);
+    border-radius: var(--r2);
+    padding: var(--s4) var(--s5);
+    margin: var(--s4) 0;
+  }
+  .loss-curve-legend {
+    display: flex;
+    gap: var(--s4);
+    margin-bottom: var(--s3);
+    font-family: var(--mono);
+    font-size: 11px;
+  }
+  .legend-dot {
+    display: inline-block;
+    width: 12px;
+    height: 3px;
+    border-radius: 2px;
+    vertical-align: middle;
+    margin-right: 4px;
+  }
+
+  /* ── Code block ── */
+  .code-block {
+    background: #0d1117;
+    border: 1px solid var(--border);
+    border-radius: var(--r2);
+    padding: var(--s5);
+    font-family: var(--mono);
+    font-size: 12px;
+    line-height: 1.9;
+    overflow-x: auto;
+    margin: var(--s4) 0;
+    color: #c9d1d9;
+  }
+  .code-block .c-comment { color: #8b949e; }
+  .code-block .c-kw      { color: #ff7b72; }
+  .code-block .c-str     { color: #a5d6ff; }
+  .code-block .c-fn      { color: #d2a8ff; }
+  .code-block .c-num     { color: #79c0ff; }
+  .code-block .c-cls     { color: #ffa657; }
+  .code-label {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #161b22;
+    border: 1px solid var(--border);
+    border-bottom: none;
+    border-radius: var(--r2) var(--r2) 0 0;
+    padding: var(--s2) var(--s4);
+    margin-top: var(--s4);
+  }
+  .code-label + .code-block {
+    border-radius: 0 0 var(--r2) var(--r2);
+    margin-top: 0;
+  }
+  .code-label-name  { font-family: var(--mono); font-size: 11px; color: var(--text-3); }
+  .code-label-badge {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--teal);
+    background: var(--teal-glow);
+    border: 1px solid rgba(0,201,177,0.2);
+    padding: 1px 8px;
+    border-radius: 20px;
+  }
+
+  /* ── When to use table ── */
+  .when-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    margin: var(--s4) 0;
+  }
+  .when-table th {
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    padding: var(--s3) var(--s4);
+    text-align: left;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-3);
+    letter-spacing: 1px;
+  }
+  .when-table td {
+    border: 1px solid var(--border);
+    padding: var(--s3) var(--s4);
+    color: var(--text-2);
+    vertical-align: top;
+    line-height: 1.6;
+  }
+  .when-table tr:hover td { background: var(--bg-2); }
+  .dot-green  { color: var(--teal); font-weight: 700; }
+  .dot-red    { color: var(--red);  font-weight: 700; }
+  .dot-yellow { color: var(--amber); font-weight: 700; }
+
+  /* ── CNN vis ── */
+  .cnn-vis {
+    display: flex;
+    align-items: center;
+    gap: var(--s3);
+    margin: var(--s5) 0;
+    overflow-x: auto;
+    padding: var(--s3) 0;
+  }
+  .cnn-block {
+    flex-shrink: 0;
+    border-radius: var(--r2);
+    padding: var(--s3) var(--s4);
+    text-align: center;
+    min-width: 80px;
+  }
+  .cnn-block-name  { font-size: 11px; font-weight: 600; color: var(--text); margin-bottom: 2px; }
+  .cnn-block-size  { font-family: var(--mono); font-size: 10px; color: var(--text-3); }
+  .cnn-arrow { color: var(--text-3); font-size: 16px; flex-shrink: 0; }
+</style>
+</head>
+<body>
+
+<!-- ══ NAV ══ -->
+<nav class="nav">
+  <div class="nav-logo">AI<span>·</span>UKWMS</div>
+  <ul class="nav-links">
+    <li><a href="../index.html">← Beranda</a></li>
+    <li><a href="#tujuan" class="active">Tujuan</a></li>
+    <li><a href="#mengapa">Mengapa DL</a></li>
+    <li><a href="#neuron">Neuron & Layer</a></li>
+    <li><a href="#training">Training</a></li>
+    <li><a href="#arsitektur">Arsitektur</a></li>
+    <li><a href="#keras">Keras</a></li>
+    <li><a href="#kapan">Kapan DL</a></li>
+    <li><a href="#tugas">Tugas</a></li>
+  </ul>
+</nav>
+
+<!-- ══ HERO ══ -->
+<header class="sesi-hero">
+  <div style="max-width:1100px;margin:0 auto;">
+    <div class="sesi-breadcrumb">
+      <a href="../index.html">Kecerdasan Buatan</a>
+      <span>›</span>
+      <span>Pertemuan 5</span>
+    </div>
+    <div class="sesi-num">PERTEMUAN 05 · TEORI</div>
+    <h1 class="sesi-title">Deep Learning &<br><em style="color:var(--teal);">Neural Network</em></h1>
+    <p style="font-size:15px;color:var(--text-2);max-width:660px;line-height:1.8;">Dari satu neuron buatan hingga jaringan berlapis ratusan — bagaimana neural network belajar dari data, apa yang membuat deep learning berbeda dari ML klasik, dan kapan tepatnya kamu harus menggunakannya.</p>
+    <div class="sesi-meta-row">
+      <span class="badge badge-teal">Teori</span>
+      <span class="badge badge-blue">100 menit</span>
+      <span class="badge badge-amber">CPMK: C1, C3</span>
+    </div>
+  </div>
+</header>
+
+<!-- ══ CONTENT LAYOUT ══ -->
+<div class="content-layout">
+  <main class="content-main">
+
+    <!-- TUJUAN -->
+    <div class="content-block" id="tujuan">
+      <h2>Tujuan Pembelajaran</h2>
+      <p>Setelah mengikuti pertemuan ini, mahasiswa diharapkan mampu:</p>
+      <ol>
+        <li>Menjelaskan cara kerja neuron buatan dan bagaimana lapisan-lapisan membentuk jaringan yang mampu belajar</li>
+        <li>Menerangkan mekanisme training: forward pass, fungsi loss, backpropagation, dan gradient descent</li>
+        <li>Membedakan arsitektur ANN, CNN, dan RNN serta mengidentifikasi use case yang tepat untuk masing-masing</li>
+        <li>Mengenal ekosistem TensorFlow / Keras dan memahami konsep model Sequential dan Functional API</li>
+        <li>Memutuskan kapan deep learning lebih tepat daripada ML klasik berdasarkan karakteristik data dan masalah</li>
+      </ol>
+
+      <div class="callout info" style="margin-top:var(--s5);">
+        <span class="callout-icon">🔗</span>
+        <div class="callout-body">
+          <p><strong>Fondasi dari P-03 & P-04:</strong> Di P-03 kamu membangun Random Forest dan Logistic Regression — keduanya bekerja dengan fitur yang sudah kamu definisikan. Deep learning mengubah paradigma ini: <em>jaringan mempelajari representasi fiturnya sendiri dari data mentah</em>. Ini yang membuatnya powerful untuk gambar, teks, dan audio.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- MENGAPA DL -->
+    <div class="content-block" id="mengapa">
+      <h2>1. Mengapa Deep Learning?</h2>
+      <p>ML klasik seperti yang dipelajari di P-03 bekerja sangat baik untuk data tabular terstruktur. Tapi ada kelas masalah di mana ia bergumul — dan di situlah deep learning unggul.</p>
+
+      <h3>Keterbatasan ML Klasik</h3>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--s4);margin:var(--s4) 0;">
+        <div style="background:var(--bg-2);border:1px solid var(--border);border-radius:var(--r3);padding:var(--s5);">
+          <div style="font-family:var(--mono);font-size:10px;color:var(--text-3);letter-spacing:2px;text-transform:uppercase;margin-bottom:var(--s3);">ML Klasik (Scikit-learn)</div>
+          <ul style="font-size:13px;color:var(--text-2);line-height:2;margin:0;padding-left:var(--s4);">
+            <li>Membutuhkan <strong style="color:var(--text);">feature engineering manual</strong> — kamu harus tahu fitur apa yang relevan</li>
+            <li>Performa <strong style="color:var(--text);">melandai</strong> dengan lebih banyak data (plateau)</li>
+            <li>Kesulitan dengan data <strong style="color:var(--text);">tidak terstruktur</strong>: gambar, teks, audio</li>
+            <li>Tidak bisa menangkap <strong style="color:var(--text);">hierarki fitur</strong> secara otomatis</li>
+          </ul>
+        </div>
+        <div style="background:var(--teal-glow);border:1px solid rgba(0,201,177,0.2);border-radius:var(--r3);padding:var(--s5);">
+          <div style="font-family:var(--mono);font-size:10px;color:var(--teal);letter-spacing:2px;text-transform:uppercase;margin-bottom:var(--s3);">Deep Learning</div>
+          <ul style="font-size:13px;color:var(--text-2);line-height:2;margin:0;padding-left:var(--s4);">
+            <li><strong style="color:var(--text);">Belajar representasi</strong> secara otomatis dari data mentah — tidak perlu feature engineering manual</li>
+            <li>Performa terus <strong style="color:var(--text);">meningkat</strong> seiring lebih banyak data</li>
+            <li>Sangat kuat untuk gambar, teks, audio, dan data sekuensial</li>
+            <li>Mampu menangkap hierarki fitur <strong style="color:var(--text);">berlapis</strong> (tepi → bentuk → objek)</li>
+          </ul>
+        </div>
+      </div>
+
+      <h3>Faktor Pemungkin Deep Learning Modern</h3>
+      <p style="font-size:13px;color:var(--text-2);margin-bottom:var(--s4);">Deep learning bukan konsep baru — idenya sudah ada sejak 1980-an. Yang berubah adalah tiga faktor yang membuatnya praktis:</p>
+
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:var(--s4);margin:var(--s4) 0;">
+        <div style="background:var(--bg-2);border:1px solid var(--border);border-radius:var(--r3);padding:var(--s5);text-align:center;">
+          <div style="font-size:32px;margin-bottom:var(--s3);">📊</div>
+          <div style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:var(--s2);">Data Berlimpah</div>
+          <div style="font-size:13px;color:var(--text-2);line-height:1.7;">ImageNet (14 juta gambar), Common Crawl (web seluruh dunia), dataset terlabeli dalam jumlah masif yang tidak ada sebelumnya</div>
+        </div>
+        <div style="background:var(--bg-2);border:1px solid var(--border);border-radius:var(--r3);padding:var(--s5);text-align:center;">
+          <div style="font-size:32px;margin-bottom:var(--s3);">🖥️</div>
+          <div style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:var(--s2);">GPU & TPU</div>
+          <div style="font-size:13px;color:var(--text-2);line-height:1.7;">GPU modern 100–1000× lebih cepat untuk matrix multiplication. Google TPU mempercepat training menjadi jam, bukan bulan</div>
+        </div>
+        <div style="background:var(--bg-2);border:1px solid var(--border);border-radius:var(--r3);padding:var(--s5);text-align:center;">
+          <div style="font-size:32px;margin-bottom:var(--s3);">🛠️</div>
+          <div style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:var(--s2);">Framework Modern</div>
+          <div style="font-size:13px;color:var(--text-2);line-height:1.7;">TensorFlow, PyTorch, Keras — mengotomatisasi backpropagation, memungkinkan eksperimen dalam hitungan menit, bukan minggu</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- NEURON -->
+    <div class="content-block" id="neuron">
+      <h2>2. Dari Neuron ke Jaringan</h2>
+
+      <h3>Neuron Buatan — Unit Dasar</h3>
+      <p>Satu neuron buatan terinspirasi dari neuron biologis: menerima input, memprosesnya, dan menghasilkan output. Tapi matematikanya sangat sederhana.</p>
+
+      <div style="background:var(--bg-2);border:1px solid var(--border);border-radius:var(--r3);padding:var(--s6);margin:var(--s5) 0;">
+        <div style="display:flex;align-items:center;justify-content:center;gap:var(--s5);flex-wrap:wrap;">
+          <div style="text-align:center;">
+            <div style="font-family:var(--mono);font-size:11px;color:var(--text-3);margin-bottom:var(--s3);">INPUT</div>
+            <div style="display:flex;flex-direction:column;gap:var(--s3);">
+              <div style="display:flex;align-items:center;gap:var(--s3);">
+                <div class="nn-node input">x₁</div>
+                <div style="font-family:var(--mono);font-size:11px;color:var(--text-3);">× w₁</div>
+              </div>
+              <div style="display:flex;align-items:center;gap:var(--s3);">
+                <div class="nn-node input">x₂</div>
+                <div style="font-family:var(--mono);font-size:11px;color:var(--text-3);">× w₂</div>
+              </div>
+              <div style="display:flex;align-items:center;gap:var(--s3);">
+                <div class="nn-node input">x₃</div>
+                <div style="font-family:var(--mono);font-size:11px;color:var(--text-3);">× w₃</div>
+              </div>
+            </div>
+          </div>
+          <div style="font-size:28px;color:var(--text-3);">→</div>
+          <div style="text-align:center;">
+            <div style="font-family:var(--mono);font-size:11px;color:var(--text-3);margin-bottom:var(--s3);">SUM + BIAS</div>
+            <div style="width:70px;height:70px;border-radius:50%;background:var(--teal-glow);border:2px solid var(--teal);display:flex;align-items:center;justify-content:center;">
+              <div style="font-family:var(--mono);font-size:12px;color:var(--teal);text-align:center;line-height:1.4;">Σ<br>+ b</div>
+            </div>
+          </div>
+          <div style="font-size:28px;color:var(--text-3);">→</div>
+          <div style="text-align:center;">
+            <div style="font-family:var(--mono);font-size:11px;color:var(--text-3);margin-bottom:var(--s3);">AKTIVASI</div>
+            <div style="width:70px;height:70px;border-radius:50%;background:var(--amber-dim);border:2px solid var(--amber);display:flex;align-items:center;justify-content:center;">
+              <div style="font-family:var(--mono);font-size:12px;color:var(--amber);text-align:center;line-height:1.4;">f(z)</div>
+            </div>
+          </div>
+          <div style="font-size:28px;color:var(--text-3);">→</div>
+          <div style="text-align:center;">
+            <div style="font-family:var(--mono);font-size:11px;color:var(--text-3);margin-bottom:var(--s3);">OUTPUT</div>
+            <div class="nn-node output" style="width:55px;height:55px;">ŷ</div>
+          </div>
+        </div>
+        <div style="margin-top:var(--s5);text-align:center;font-family:var(--mono);font-size:13px;color:var(--text-2);">
+          <span style="color:var(--teal);">z</span> = w₁x₁ + w₂x₂ + w₃x₃ + b &nbsp;&nbsp;→&nbsp;&nbsp; <span style="color:var(--amber);">output</span> = f(z)
+        </div>
+      </div>
+
+      <p style="font-size:13px;color:var(--text-2);">Satu neuron = satu Logistic Regression. Yang membuatnya powerful adalah ketika ribuan neuron ini tersambung dalam lapisan-lapisan.</p>
+
+      <h3 style="margin-top:var(--s6);">Arsitektur Multi-Layer (Feedforward / ANN)</h3>
+      <p style="font-size:13px;color:var(--text-2);margin-bottom:var(--s3);">Visualisasi jaringan 3-layer sederhana: input layer (4 fitur) → hidden layer (5 neuron) → hidden layer (4 neuron) → output layer (3 kelas).</p>
+
+      <div style="background:var(--bg-2);border:1px solid var(--border);border-radius:var(--r3);padding:var(--s5) var(--s6);overflow-x:auto;">
+        <div class="neuron-row" style="justify-content:center;">
+          <div class="nn-layer">
+            <div class="nn-layer-label">Input<br>4 fitur</div>
+            <div class="nn-node input">x₁</div>
+            <div class="nn-node input">x₂</div>
+            <div class="nn-node input">x₃</div>
+            <div class="nn-node input">x₄</div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:center;opacity:0.25;gap:2px;flex-shrink:0;">
+            <div style="font-size:20px;color:var(--text-3);">⋯</div>
+            <div style="font-size:10px;color:var(--text-3);font-family:var(--mono);">weights</div>
+          </div>
+          <div class="nn-layer">
+            <div class="nn-layer-label">Hidden 1<br>5 neuron</div>
+            <div class="nn-node hidden">h</div>
+            <div class="nn-node hidden">h</div>
+            <div class="nn-node hidden">h</div>
+            <div class="nn-node hidden">h</div>
+            <div class="nn-node hidden">h</div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:center;opacity:0.25;gap:2px;flex-shrink:0;">
+            <div style="font-size:20px;color:var(--text-3);">⋯</div>
+            <div style="font-size:10px;color:var(--text-3);font-family:var(--mono);">weights</div>
+          </div>
+          <div class="nn-layer">
+            <div class="nn-layer-label">Hidden 2<br>4 neuron</div>
+            <div class="nn-node hidden">h</div>
+            <div class="nn-node hidden">h</div>
+            <div class="nn-node hidden">h</div>
+            <div class="nn-node hidden">h</div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:center;opacity:0.25;gap:2px;flex-shrink:0;">
+            <div style="font-size:20px;color:var(--text-3);">⋯</div>
+            <div style="font-size:10px;color:var(--text-3);font-family:var(--mono);">weights</div>
+          </div>
+          <div class="nn-layer">
+            <div class="nn-layer-label">Output<br>3 kelas</div>
+            <div class="nn-node output">ŷ₁</div>
+            <div class="nn-node output">ŷ₂</div>
+            <div class="nn-node output">ŷ₃</div>
+          </div>
+        </div>
+        <div style="text-align:center;margin-top:var(--s3);font-size:12px;color:var(--text-3);">Total parameter: (4×5 + 5) + (5×4 + 4) + (4×3 + 3) = <strong style="color:var(--text);">60 parameter</strong></div>
+      </div>
+
+      <h3 style="margin-top:var(--s6);">Fungsi Aktivasi</h3>
+      <p>Fungsi aktivasi memperkenalkan <strong>non-linearitas</strong> — tanpanya, jaringan berlapis sama saja dengan satu layer linier. Pemilihan aktivasi yang tepat sangat penting untuk performa model.</p>
+
+      <div class="act-grid">
+        <div class="act-card">
+          <div class="act-name" style="color:var(--red);">Sigmoid</div>
+          <div class="act-formula">σ(z) = 1/(1+e⁻ᶻ)</div>
+          <svg class="act-curve" width="80" height="50" viewBox="0 0 80 50">
+            <path d="M5,45 C20,45 25,40 30,30 C35,20 45,10 55,7 C65,5 72,5 75,5" fill="none" stroke="#ff7b72" stroke-width="2"/>
+            <line x1="0" y1="25" x2="80" y2="25" stroke="#444" stroke-width="0.5"/>
+          </svg>
+          <div class="act-when">Output 0–1. Hanya untuk output layer klasifikasi biner. Jangan pakai di hidden layer (vanishing gradient).</div>
+        </div>
+        <div class="act-card">
+          <div class="act-name" style="color:var(--teal);">ReLU</div>
+          <div class="act-formula">max(0, z)</div>
+          <svg class="act-curve" width="80" height="50" viewBox="0 0 80 50">
+            <path d="M5,45 L40,45 L75,5" fill="none" stroke="#00c9b1" stroke-width="2"/>
+            <line x1="0" y1="25" x2="80" y2="25" stroke="#444" stroke-width="0.5"/>
+          </svg>
+          <div class="act-when"><strong>Default terbaik</strong> untuk hidden layer. Cepat, efektif, atasi vanishing gradient. Gunakan kecuali ada alasan khusus.</div>
+        </div>
+        <div class="act-card">
+          <div class="act-name" style="color:var(--blue);">Softmax</div>
+          <div class="act-formula">eᶻⁱ / Σeᶻʲ</div>
+          <svg class="act-curve" width="80" height="50" viewBox="0 0 80 50">
+            <rect x="15" y="30" width="12" height="15" fill="#4a8ef5" opacity="0.8"/>
+            <rect x="35" y="15" width="12" height="30" fill="#4a8ef5" opacity="0.8"/>
+            <rect x="55" y="35" width="12" height="10" fill="#4a8ef5" opacity="0.8"/>
+          </svg>
+          <div class="act-when">Hanya untuk output layer klasifikasi multi-kelas. Menghasilkan distribusi probabilitas yang jumlahnya 1.</div>
+        </div>
+        <div class="act-card">
+          <div class="act-name" style="color:var(--amber);">Tanh</div>
+          <div class="act-formula">(eᶻ − e⁻ᶻ)/(eᶻ + e⁻ᶻ)</div>
+          <svg class="act-curve" width="80" height="50" viewBox="0 0 80 50">
+            <path d="M5,45 C15,45 20,40 25,32 C30,24 35,15 40,12 C45,10 50,10 55,10 C60,10 65,10 75,10" fill="none" stroke="#f5a623" stroke-width="2"/>
+            <line x1="0" y1="25" x2="80" y2="25" stroke="#444" stroke-width="0.5"/>
+          </svg>
+          <div class="act-when">Output −1 sampai 1. Lebih baik dari sigmoid di hidden layer. Dipakai di RNN/LSTM untuk gating mechanism.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TRAINING -->
+    <div class="content-block" id="training">
+      <h2>3. Mekanisme Training</h2>
+      <p>Cara neural network "belajar" adalah dengan terus-menerus mengukur seberapa salah prediksinya, lalu menyesuaikan semua weight untuk mengurangi kesalahan itu. Proses ini berulang ribuan kali.</p>
+
+      <div class="training-flow">
+        <div class="tf-step" style="background:var(--teal-glow);">
+          <div class="tf-icon">➡️</div>
+          <div class="tf-name">Forward Pass</div>
+          <div class="tf-desc">Data masuk, mengalir maju layer per layer, menghasilkan prediksi ŷ</div>
+          <div class="tf-math">x → ŷ</div>
+        </div>
+        <div class="tf-step">
+          <div class="tf-icon">📏</div>
+          <div class="tf-name">Hitung Loss</div>
+          <div class="tf-desc">Ukur seberapa salah prediksi dibandingkan label y yang sebenarnya</div>
+          <div class="tf-math">L(y, ŷ)</div>
+        </div>
+        <div class="tf-step" style="background:rgba(74,142,245,0.07);">
+          <div class="tf-icon">⬅️</div>
+          <div class="tf-name">Backprop</div>
+          <div class="tf-desc">Hitung gradient loss terhadap setiap weight menggunakan chain rule</div>
+          <div class="tf-math">∂L/∂w</div>
+        </div>
+        <div class="tf-step">
+          <div class="tf-icon">🔄</div>
+          <div class="tf-name">Update Weight</div>
+          <div class="tf-desc">Kurangi weight dengan gradient × learning rate agar loss mengecil</div>
+          <div class="tf-math">w ← w − η·∂L/∂w</div>
+        </div>
+        <div class="tf-step" style="background:var(--teal-glow);">
+          <div class="tf-icon">🔁</div>
+          <div class="tf-name">Ulangi</div>
+          <div class="tf-desc">Lakukan untuk semua batch data, berulang selama N epoch hingga konvergen</div>
+          <div class="tf-math">t = 1, 2, ..., N</div>
+        </div>
+      </div>
+
+      <h3>Fungsi Loss</h3>
+      <table class="when-table">
+        <thead>
+          <tr>
+            <th>Problem</th>
+            <th>Loss Function</th>
+            <th>Formula</th>
+            <th>Keras</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Regresi</td>
+            <td><strong>MSE</strong> (Mean Squared Error)</td>
+            <td style="font-family:var(--mono);font-size:11px;">Σ(y − ŷ)² / n</td>
+            <td style="font-family:var(--mono);font-size:11px;color:var(--teal);">'mse'</td>
+          </tr>
+          <tr>
+            <td>Klasifikasi biner</td>
+            <td><strong>Binary Cross-Entropy</strong></td>
+            <td style="font-family:var(--mono);font-size:11px;">−(y·log ŷ + (1−y)·log(1−ŷ))</td>
+            <td style="font-family:var(--mono);font-size:11px;color:var(--teal);">'binary_crossentropy'</td>
+          </tr>
+          <tr>
+            <td>Klasifikasi multi-kelas</td>
+            <td><strong>Categorical Cross-Entropy</strong></td>
+            <td style="font-family:var(--mono);font-size:11px;">−Σ yᵢ·log ŷᵢ</td>
+            <td style="font-family:var(--mono);font-size:11px;color:var(--teal);">'sparse_categorical_crossentropy'</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3 style="margin-top:var(--s5);">Learning Rate & Optimizer</h3>
+      <p>Learning rate (η) adalah hyperparameter paling penting dalam deep learning. Terlalu besar → loss oscillates. Terlalu kecil → training sangat lambat dan terjebak di local minimum.</p>
+
+      <div style="background:var(--bg-2);border:1px solid var(--border);border-radius:var(--r3);padding:var(--s5);margin:var(--s4) 0;">
+        <div class="loss-curve-legend">
+          <span><span class="legend-dot" style="background:#00c9b1;display:inline-block;"></span><span style="color:var(--teal);">Validation loss</span></span>
+          <span><span class="legend-dot" style="background:#4a8ef5;display:inline-block;"></span><span style="color:var(--blue);">Training loss</span></span>
+          <span style="color:var(--text-3);margin-left:auto;font-size:10px;">Learning rate: 0.001 · Optimizer: Adam</span>
+        </div>
+        <svg width="100%" height="160" viewBox="0 0 540 160" style="display:block;">
+          <!-- Grid lines -->
+          <line x1="40" y1="20" x2="40" y2="140" stroke="#333" stroke-width="1"/>
+          <line x1="40" y1="140" x2="520" y2="140" stroke="#333" stroke-width="1"/>
+          <text x="10" y="25" fill="#666" font-size="9" font-family="monospace">high</text>
+          <text x="10" y="145" fill="#666" font-size="9" font-family="monospace">low</text>
+          <text x="35" y="158" fill="#666" font-size="9" font-family="monospace">0</text>
+          <text x="505" y="158" fill="#666" font-size="9" font-family="monospace">50</text>
+          <text x="270" y="158" fill="#666" font-size="9" font-family="monospace">Epoch</text>
+          <!-- Training loss -->
+          <path d="M40,125 C80,100 120,72 160,55 C200,42 240,35 280,30 C320,26 360,24 400,23 C440,22 480,21.5 520,21" fill="none" stroke="#4a8ef5" stroke-width="2" opacity="0.85"/>
+          <!-- Validation loss -->
+          <path d="M40,128 C80,106 120,80 160,64 C200,52 240,44 280,40 C320,37 360,36 400,37 C440,38 480,40 520,42" fill="none" stroke="#00c9b1" stroke-width="2" opacity="0.85"/>
+          <!-- Overfitting zone marker -->
+          <line x1="360" y1="20" x2="360" y2="140" stroke="#ff7b72" stroke-width="1" stroke-dasharray="4,3" opacity="0.5"/>
+          <text x="364" y="35" fill="#ff7b72" font-size="9" font-family="monospace" opacity="0.8">overfitting zone →</text>
+        </svg>
+        <p style="font-size:12px;color:var(--text-3);margin-top:var(--s2);">Setelah epoch ke-~30, validation loss mulai naik sementara training loss terus turun — tanda overfitting. Gunakan Early Stopping untuk menghentikan training di titik optimal.</p>
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:var(--s3);margin:var(--s4) 0;">
+        <div style="background:var(--bg-2);border:1px solid var(--border);border-radius:var(--r2);padding:var(--s4);">
+          <div style="font-family:var(--mono);font-size:12px;font-weight:600;color:var(--teal);margin-bottom:var(--s2);">Adam</div>
+          <div style="font-size:12px;color:var(--text-2);line-height:1.6;"><strong>Default terbaik.</strong> Adaptive learning rate per parameter. Konvergen cepat, robust, jarang butuh tuning learning rate manual.</div>
+        </div>
+        <div style="background:var(--bg-2);border:1px solid var(--border);border-radius:var(--r2);padding:var(--s4);">
+          <div style="font-family:var(--mono);font-size:12px;font-weight:600;color:var(--blue);margin-bottom:var(--s2);">SGD + Momentum</div>
+          <div style="font-size:12px;color:var(--text-2);line-height:1.6;">Stochastic Gradient Descent dengan momentum. Lebih lambat konvergen tapi sering menghasilkan model yang lebih general. Populer untuk training ulang dari scratch.</div>
+        </div>
+        <div style="background:var(--bg-2);border:1px solid var(--border);border-radius:var(--r2);padding:var(--s4);">
+          <div style="font-family:var(--mono);font-size:12px;font-weight:600;color:var(--amber);margin-bottom:var(--s2);">RMSprop</div>
+          <div style="font-size:12px;color:var(--text-2);line-height:1.6;">Direkomendasikan untuk RNN. Mengatasi masalah learning rate yang mengecil terus-menerus (ada di plain SGD).</div>
+        </div>
+      </div>
+
+      <h3 style="margin-top:var(--s5);">Regularisasi: Mencegah Overfitting</h3>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:var(--s3);margin:var(--s3) 0;">
+        <div style="background:var(--bg-2);border:1px solid var(--border);border-radius:var(--r2);padding:var(--s4);">
+          <div style="font-family:var(--mono);font-size:11px;color:var(--teal);margin-bottom:4px;">Dropout</div>
+          <div style="font-size:12px;color:var(--text-2);line-height:1.6;">Secara acak menonaktifkan p% neuron selama training. Memaksa jaringan belajar representasi yang redundant dan lebih robust.</div>
+          <div style="font-family:var(--mono);font-size:10px;color:var(--text-3);margin-top:var(--s2);">Keras: Dropout(0.3)</div>
+        </div>
+        <div style="background:var(--bg-2);border:1px solid var(--border);border-radius:var(--r2);padding:var(--s4);">
+          <div style="font-family:var(--mono);font-size:11px;color:var(--blue);margin-bottom:4px;">Early Stopping</div>
+          <div style="font-size:12px;color:var(--text-2);line-height:1.6;">Hentikan training ketika validation loss tidak membaik selama N epoch berturut-turut. Simpan model terbaik, bukan model akhir.</div>
+          <div style="font-family:var(--mono);font-size:10px;color:var(--text-3);margin-top:var(--s2);">Keras: EarlyStopping(patience=5)</div>
+        </div>
+        <div style="background:var(--bg-2);border:1px solid var(--border);border-radius:var(--r2);padding:var(--s4);">
+          <div style="font-family:var(--mono);font-size:11px;color:var(--amber);margin-bottom:4px;">Batch Normalization</div>
+          <div style="font-size:12px;color:var(--text-2);line-height:1.6;">Normalisasi output tiap layer selama training. Mempercepat konvergensi, memungkinkan learning rate lebih besar, dan memiliki efek regularisasi ringan.</div>
+          <div style="font-family:var(--mono);font-size:10px;color:var(--text-3);margin-top:var(--s2);">Keras: BatchNormalization()</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ARSITEKTUR -->
+    <div class="content-block" id="arsitektur">
+      <h2>4. Arsitektur Utama</h2>
+
+      <div class="arch-grid">
+        <div class="arch-card">
+          <div class="arch-head">
+            <div class="arch-icon">🔢</div>
+            <div>
+              <div class="arch-title">ANN / MLP</div>
+              <div class="arch-tag">Artificial / Multi-Layer Perceptron</div>
+            </div>
+          </div>
+          <div class="arch-body">
+            <div class="arch-use">Terbaik untuk</div>
+            <div class="arch-desc">Data tabular terstruktur, klasifikasi, dan regresi. Ketika ML klasik kurang mencukupi tapi data bukan gambar/teks/urutan.</div>
+            <div class="arch-apps">
+              <span class="arch-badge">Prediksi harga</span>
+              <span class="arch-badge">Klasifikasi churn</span>
+              <span class="arch-badge">Deteksi fraud</span>
+            </div>
+          </div>
+        </div>
+        <div class="arch-card" style="border-color:rgba(0,201,177,0.2);">
+          <div class="arch-head" style="background:var(--teal-glow);">
+            <div class="arch-icon">🖼️</div>
+            <div>
+              <div class="arch-title">CNN</div>
+              <div class="arch-tag">Convolutional Neural Network</div>
+            </div>
+          </div>
+          <div class="arch-body">
+            <div class="arch-use" style="color:var(--teal);">Terbaik untuk</div>
+            <div class="arch-desc">Data spasial — gambar dan video. Lapisan konvolusi secara otomatis mempelajari hierarki fitur: tepi → tekstur → bentuk → objek.</div>
+            <div class="arch-apps">
+              <span class="arch-badge">Computer vision</span>
+              <span class="arch-badge">QC visual</span>
+              <span class="arch-badge">OCR</span>
+              <span class="arch-badge">Medical imaging</span>
+            </div>
+          </div>
+        </div>
+        <div class="arch-card">
+          <div class="arch-head">
+            <div class="arch-icon">📝</div>
+            <div>
+              <div class="arch-title">RNN / LSTM</div>
+              <div class="arch-tag">Recurrent / Long Short-Term Memory</div>
+            </div>
+          </div>
+          <div class="arch-body">
+            <div class="arch-use">Terbaik untuk</div>
+            <div class="arch-desc">Data sekuensial yang memiliki ketergantungan temporal. LSTM mengatasi vanishing gradient yang dialami RNN biasa pada sequence panjang.</div>
+            <div class="arch-apps">
+              <span class="arch-badge">Time series</span>
+              <span class="arch-badge">NLP / teks</span>
+              <span class="arch-badge">Speech</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <h3>Cara Kerja CNN — Visualisasi</h3>
+      <p style="font-size:13px;color:var(--text-2);margin-bottom:var(--s3);">CNN mengolah gambar melalui serangkaian transformasi yang secara progresif mengekstrak fitur dari level rendah ke level tinggi.</p>
+
+      <div class="cnn-vis">
+        <div class="cnn-block" style="background:var(--blue-dim);border:1px solid rgba(74,142,245,0.3);">
+          <div style="font-size:28px;margin-bottom:4px;">🖼️</div>
+          <div class="cnn-block-name">Input</div>
+          <div class="cnn-block-size">28×28×1</div>
+        </div>
+        <div class="cnn-arrow">→</div>
+        <div class="cnn-block" style="background:var(--teal-glow);border:1px solid rgba(0,201,177,0.3);">
+          <div style="font-size:22px;margin-bottom:4px;">⬛</div>
+          <div class="cnn-block-name">Conv2D</div>
+          <div class="cnn-block-size">32 filter 3×3</div>
+          <div style="font-size:10px;color:var(--text-3);margin-top:3px;">ReLU</div>
+        </div>
+        <div class="cnn-arrow">→</div>
+        <div class="cnn-block" style="background:var(--bg-2);border:1px solid var(--border);">
+          <div style="font-size:22px;margin-bottom:4px;">⬜</div>
+          <div class="cnn-block-name">MaxPool</div>
+          <div class="cnn-block-size">2×2</div>
+          <div style="font-size:10px;color:var(--text-3);margin-top:3px;">↓ ukuran</div>
+        </div>
+        <div class="cnn-arrow">→</div>
+        <div class="cnn-block" style="background:var(--teal-glow);border:1px solid rgba(0,201,177,0.3);">
+          <div style="font-size:22px;margin-bottom:4px;">⬛</div>
+          <div class="cnn-block-name">Conv2D</div>
+          <div class="cnn-block-size">64 filter 3×3</div>
+          <div style="font-size:10px;color:var(--text-3);margin-top:3px;">ReLU</div>
+        </div>
+        <div class="cnn-arrow">→</div>
+        <div class="cnn-block" style="background:var(--bg-2);border:1px solid var(--border);">
+          <div style="font-size:22px;margin-bottom:4px;">📐</div>
+          <div class="cnn-block-name">Flatten</div>
+          <div class="cnn-block-size">1D vector</div>
+        </div>
+        <div class="cnn-arrow">→</div>
+        <div class="cnn-block" style="background:var(--blue-dim);border:1px solid rgba(74,142,245,0.3);">
+          <div style="font-size:22px;margin-bottom:4px;">🔢</div>
+          <div class="cnn-block-name">Dense</div>
+          <div class="cnn-block-size">128 neuron</div>
+          <div style="font-size:10px;color:var(--text-3);margin-top:3px;">+ Dropout</div>
+        </div>
+        <div class="cnn-arrow">→</div>
+        <div class="cnn-block" style="background:var(--amber-dim);border:1px solid rgba(245,166,35,0.3);">
+          <div style="font-size:22px;margin-bottom:4px;">🎯</div>
+          <div class="cnn-block-name">Output</div>
+          <div class="cnn-block-size">10 kelas</div>
+          <div style="font-size:10px;color:var(--amber);margin-top:3px;">Softmax</div>
+        </div>
+      </div>
+
+      <div class="callout info">
+        <span class="callout-icon">💡</span>
+        <div class="callout-body">
+          <p><strong>Hierarki fitur CNN:</strong> Layer Conv pertama belajar mendeteksi tepi (edges) dan gradien warna. Layer kedua menggabungkannya menjadi tekstur dan pola. Layer lebih dalam belajar bentuk geometris, dan akhirnya bagian-bagian objek yang bermakna — semua tanpa satu baris instruksi eksplisit.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- KERAS -->
+    <div class="content-block" id="keras">
+      <h2>5. Ekosistem TensorFlow / Keras</h2>
+      <p>Keras adalah high-level API yang berjalan di atas TensorFlow, dirancang agar membangun neural network semudah menyusun blok LEGO. Sejak TF 2.0, Keras adalah interface default TensorFlow.</p>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--s5);margin:var(--s4) 0;">
+        <div>
+          <h3>Sequential API</h3>
+          <p style="font-size:13px;color:var(--text-2);">Untuk model linier — satu input, satu output, layer berurutan. 90% kebutuhan DL dicakup dengan ini.</p>
+          <div class="code-label">
+            <span class="code-label-name">sequential_model.py</span>
+            <span class="code-label-badge">Keras</span>
+          </div>
+          <div class="code-block"><span class="c-kw">import</span> tensorflow <span class="c-kw">as</span> tf
+<span class="c-kw">from</span> tensorflow <span class="c-kw">import</span> keras
+
+model = keras.<span class="c-cls">Sequential</span>([
+    keras.layers.<span class="c-cls">Dense</span>(<span class="c-num">128</span>, activation=<span class="c-str">'relu'</span>,
+                        input_shape=(<span class="c-num">20</span>,)),
+    keras.layers.<span class="c-cls">Dropout</span>(<span class="c-num">0.3</span>),
+    keras.layers.<span class="c-cls">Dense</span>(<span class="c-num">64</span>, activation=<span class="c-str">'relu'</span>),
+    keras.layers.<span class="c-cls">Dense</span>(<span class="c-num">1</span>,  activation=<span class="c-str">'sigmoid'</span>)
+])
+
+model.<span class="c-fn">compile</span>(
+    optimizer=<span class="c-str">'adam'</span>,
+    loss=<span class="c-str">'binary_crossentropy'</span>,
+    metrics=[<span class="c-str">'accuracy'</span>]
+)
+
+model.<span class="c-fn">summary</span>()  <span class="c-comment"># cetak arsitektur</span></div>
+        </div>
+        <div>
+          <h3>Training & Evaluasi</h3>
+          <p style="font-size:13px;color:var(--text-2);">Setelah compile, training hanya membutuhkan satu baris — Keras mengurus semua detail backprop secara otomatis.</p>
+          <div class="code-label">
+            <span class="code-label-name">train_evaluate.py</span>
+            <span class="code-label-badge">Keras</span>
+          </div>
+          <div class="code-block"><span class="c-kw">from</span> tensorflow.keras.callbacks <span class="c-kw">import</span> (
+    <span class="c-cls">EarlyStopping</span>, <span class="c-cls">ModelCheckpoint</span>
+)
+
+callbacks = [
+    <span class="c-cls">EarlyStopping</span>(monitor=<span class="c-str">'val_loss'</span>,
+                  patience=<span class="c-num">5</span>,
+                  restore_best_weights=<span class="c-kw">True</span>),
+    <span class="c-cls">ModelCheckpoint</span>(<span class="c-str">'best_model.h5'</span>,
+                    save_best_only=<span class="c-kw">True</span>)
+]
+
+history = model.<span class="c-fn">fit</span>(
+    X_train, y_train,
+    epochs=<span class="c-num">50</span>,
+    batch_size=<span class="c-num">32</span>,
+    validation_split=<span class="c-num">0.2</span>,
+    callbacks=callbacks,
+    verbose=<span class="c-num">1</span>
+)
+
+<span class="c-comment"># Evaluasi pada test set</span>
+loss, acc = model.<span class="c-fn">evaluate</span>(X_test, y_test)
+<span class="c-fn">print</span>(<span class="c-str">f"Test accuracy: {acc:.4f}"</span>)</div>
+        </div>
+      </div>
+
+      <h3>Visualisasi Training History</h3>
+      <div class="code-label">
+        <span class="code-label-name">plot_history.py</span>
+        <span class="code-label-badge">Keras</span>
+      </div>
+      <div class="code-block"><span class="c-kw">import</span> matplotlib.pyplot <span class="c-kw">as</span> plt
+
+fig, axes = plt.<span class="c-fn">subplots</span>(<span class="c-num">1</span>, <span class="c-num">2</span>, figsize=(<span class="c-num">12</span>, <span class="c-num">4</span>))
+
+<span class="c-comment"># ── Loss curve ────────────────────────────────────────────────</span>
+axes[<span class="c-num">0</span>].<span class="c-fn">plot</span>(history.history[<span class="c-str">'loss'</span>],     label=<span class="c-str">'Train Loss'</span>,  color=<span class="c-str">'#4a8ef5'</span>)
+axes[<span class="c-num">0</span>].<span class="c-fn">plot</span>(history.history[<span class="c-str">'val_loss'</span>], label=<span class="c-str">'Val Loss'</span>,    color=<span class="c-str">'#00c9b1'</span>)
+axes[<span class="c-num">0</span>].<span class="c-fn">set_title</span>(<span class="c-str">'Loss Curve'</span>)
+axes[<span class="c-num">0</span>].<span class="c-fn">set_xlabel</span>(<span class="c-str">'Epoch'</span>)
+axes[<span class="c-num">0</span>].<span class="c-fn">legend</span>()
+
+<span class="c-comment"># ── Accuracy curve ────────────────────────────────────────────</span>
+axes[<span class="c-num">1</span>].<span class="c-fn">plot</span>(history.history[<span class="c-str">'accuracy'</span>],     label=<span class="c-str">'Train Acc'</span>, color=<span class="c-str">'#4a8ef5'</span>)
+axes[<span class="c-num">1</span>].<span class="c-fn">plot</span>(history.history[<span class="c-str">'val_accuracy'</span>], label=<span class="c-str">'Val Acc'</span>,   color=<span class="c-str">'#00c9b1'</span>)
+axes[<span class="c-num">1</span>].<span class="c-fn">set_title</span>(<span class="c-str">'Accuracy Curve'</span>)
+axes[<span class="c-num">1</span>].<span class="c-fn">set_xlabel</span>(<span class="c-str">'Epoch'</span>)
+axes[<span class="c-num">1</span>].<span class="c-fn">legend</span>()
+
+plt.<span class="c-fn">tight_layout</span>()
+plt.<span class="c-fn">show</span>()</div>
+
+      <div class="callout tip">
+        <span class="callout-icon">💡</span>
+        <div class="callout-body">
+          <p><strong>Preview P-06:</strong> Pertemuan berikutnya kita akan langsung praktik — membangun CNN untuk klasifikasi digit tulisan tangan dengan MNIST (dataset built-in Keras, tidak perlu download), lalu mengaplikasikan ANN untuk analisis sentimen ulasan produk. Kode di atas adalah fondasi yang akan dipakai di sana.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- KAPAN DL -->
+    <div class="content-block" id="kapan">
+      <h2>6. Kapan Pakai Deep Learning?</h2>
+      <p>Deep learning bukan perak ajaib untuk semua masalah. Ada kondisi spesifik di mana DL jauh lebih unggul — dan kondisi lain di mana ML klasik lebih tepat, lebih cepat, dan lebih mudah dijelaskan.</p>
+
+      <table class="when-table">
+        <thead>
+          <tr>
+            <th>Kondisi</th>
+            <th>Pilihan</th>
+            <th>Alasan</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Data &lt; 1.000 sampel</td>
+            <td><span class="dot-red">✗ DL</span> &nbsp;<span class="dot-green">✓ ML Klasik</span></td>
+            <td>DL butuh banyak data untuk generalisasi. Dengan data sedikit, Random Forest atau SVM hampir pasti menang.</td>
+          </tr>
+          <tr>
+            <td>Data tabular terstruktur</td>
+            <td><span class="dot-yellow">○ DL</span> &nbsp;<span class="dot-green">✓ ML Klasik</span></td>
+            <td>Gradient Boosting (XGBoost, LightGBM) secara konsisten mengalahkan DL di data tabular. DL tidak memiliki inductive bias yang tepat untuk struktur ini.</td>
+          </tr>
+          <tr>
+            <td>Data gambar / video</td>
+            <td><span class="dot-green">✓ DL (CNN)</span></td>
+            <td>CNN adalah state-of-the-art yang tidak tertandingi untuk data spasial. ML klasik memerlukan feature engineering manual yang sangat sulit untuk gambar.</td>
+          </tr>
+          <tr>
+            <td>Data teks / NLP</td>
+            <td><span class="dot-green">✓ DL (Transformer)</span></td>
+            <td>BERT, GPT, dan Transformer architecture telah merevolusi NLP. Untuk teks panjang dan nuansa bahasa, DL tidak ada tandingannya.</td>
+          </tr>
+          <tr>
+            <td>Time series / Sensor IoT</td>
+            <td><span class="dot-green">✓ DL (LSTM)</span> atau <span class="dot-yellow">○ ML</span></td>
+            <td>Tergantung kompleksitas pola. ARIMA masih kompetitif untuk time series sederhana. LSTM unggul untuk pola jangka panjang kompleks dan multivariate.</td>
+          </tr>
+          <tr>
+            <td>Butuh interpretabilitas tinggi</td>
+            <td><span class="dot-red">✗ DL</span> &nbsp;<span class="dot-green">✓ ML Klasik</span></td>
+            <td>DL adalah black box. Di konteks medis, hukum, atau kredit perbankan — regulatory requirement sering mengharuskan model yang bisa dijelaskan (explainable AI).</td>
+          </tr>
+          <tr>
+            <td>Resource komputasi terbatas</td>
+            <td><span class="dot-red">✗ DL</span> &nbsp;<span class="dot-green">✓ ML Klasik</span></td>
+            <td>DL butuh GPU dan training berjam-jam. Jika model harus berjalan di edge device atau server murah, ML klasik yang teroptimasi lebih praktis.</td>
+          </tr>
+          <tr>
+            <td>Data tidak berlabel berlimpah</td>
+            <td><span class="dot-green">✓ DL (Self-supervised)</span></td>
+            <td>Transfer learning dan self-supervised learning memungkinkan DL memanfaatkan data tidak berlabel dalam jumlah besar — sesuatu yang ML klasik tidak bisa lakukan.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="callout warn" style="margin-top:var(--s5);">
+        <span class="callout-icon">⚠️</span>
+        <div class="callout-body">
+          <p><strong>Anti-pattern paling umum:</strong> Langsung pakai DL untuk data tabular kecil karena terdengar lebih keren atau "modern". Selalu mulai dengan baseline sederhana (Logistic Regression, Random Forest), ukur performanya, dan beralih ke DL hanya jika ada gap performa yang signifikan <em>dan</em> kamu punya cukup data serta resource.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- RINGKASAN & TUGAS -->
+    <div class="content-block" id="ringkasan">
+      <h2>Ringkasan Pertemuan Ini</h2>
+      <div style="background:var(--bg-2);border:1px solid var(--border);border-radius:var(--r3);padding:var(--s5);">
+        <ul>
+          <li>Deep learning unggul karena bisa <strong>belajar representasi fitur secara otomatis</strong> dari data mentah — tidak perlu feature engineering manual seperti ML klasik</li>
+          <li>Neuron buatan: <em>weighted sum + bias → activation function → output</em>. Dirangkai berlapis membentuk jaringan yang bisa belajar fungsi arbitrarily complex</li>
+          <li>Training: <strong>forward pass</strong> (prediksi) → <strong>hitung loss</strong> → <strong>backpropagation</strong> (gradient) → <strong>update weight</strong> → ulangi sampai konvergen</li>
+          <li>ReLU untuk hidden layer, Sigmoid untuk output biner, Softmax untuk output multi-kelas — ini adalah default yang hampir selalu benar</li>
+          <li>Tiga arsitektur utama: <strong>ANN/MLP</strong> (tabular), <strong>CNN</strong> (gambar/spasial), <strong>RNN/LSTM</strong> (sekuensial/teks/time series)</li>
+          <li>Keras Sequential API: define layer → compile dengan optimizer+loss → fit dengan callback (EarlyStopping) → evaluate</li>
+          <li>DL bukan selalu lebih baik — untuk data tabular kecil, Gradient Boosting hampir selalu menang. Pilih alat berdasarkan karakteristik masalah, bukan popularitas</li>
+        </ul>
+      </div>
+
+      <!-- TASK BOX -->
+      <div class="task-box" id="tugas">
+        <div class="task-box-title">📋 Tugas Pertemuan Ini</div>
+        <p style="font-size:13px;color:var(--text-2);margin-bottom:var(--s4);">Kumpulkan sebagai Jupyter Notebook (.ipynb) melalui <strong>Edlink → Pertemuan 5</strong> sebelum pertemuan ke-6.</p>
+        <ol style="font-size:14px;color:var(--text);line-height:2.1;">
+          <li><strong>Eksplorasi Arsitektur:</strong> Bangun tiga variasi model Sequential di Keras untuk dataset MNIST (gunakan <code>keras.datasets.mnist.load_data()</code> — built-in, tidak perlu download). Variasi: (a) 1 hidden layer 64 neuron, (b) 2 hidden layer 128+64, (c) 3 hidden layer 256+128+64. Untuk masing-masing, catat test accuracy, jumlah parameter, dan waktu training per epoch. Tulis analisis singkat: apakah lebih dalam selalu lebih baik?</li>
+          <li><strong>Pengaruh Regularisasi:</strong> Dari model terbaik di nomor 1, tambahkan Dropout(0.3) dan BatchNormalization. Bandingkan loss curve (training vs validation) dengan dan tanpa regularisasi. Apakah regularisasi membantu? Kapan di dalam plot kamu melihat tanda overfitting?</li>
+          <li><strong>Pemilihan Arsitektur:</strong> Untuk setiap skenario berikut, pilih arsitektur (ML klasik / ANN / CNN / LSTM) beserta justifikasi singkat (2–3 kalimat): (a) prediksi stok barang dari 12 bulan historis penjualan, (b) klasifikasi foto produk rusak vs normal di lini produksi, (c) analisis sentimen review Google Play Store, (d) prediksi churn pelanggan dari 15 kolom tabular.</li>
+          <li><em>Bonus:</em> Implementasikan model CNN sederhana untuk MNIST (gunakan Conv2D + MaxPooling2D sebelum Dense layers) dan bandingkan accuracy-nya dengan MLP dari nomor 1. Berapa improvement yang kamu dapatkan? Mengapa CNN lebih efektif untuk data gambar?</li>
+        </ol>
+      </div>
+
+      <!-- READING BOX -->
+      <div class="reading-box">
+        <div class="reading-box-title">📖 Persiapan Pertemuan Ke-6</div>
+        <div class="reading-item">
+          <span class="reading-icon">📗</span>
+          <div class="reading-label">
+            <strong>Géron — Hands-On ML, Chapter 10 (lanjutan)</strong>
+            Baca bagian "Fine-Tuning Neural Network Hyperparameters" dan "Faster Optimizers". Fokus pada bagian tentang batch size, learning rate schedules, dan kapan BatchNorm membantu.
+          </div>
+        </div>
+        <div class="reading-item">
+          <span class="reading-icon">📗</span>
+          <div class="reading-label">
+            <strong>Géron — Hands-On ML, Chapter 14: CNN</strong>
+            Baca "The Architecture of the Visual Cortex" sampai "Pooling Layers". Ini menyiapkan intuisi untuk CNN yang akan diimplementasikan di P-06.
+          </div>
+        </div>
+        <div class="reading-item">
+          <span class="reading-icon">📦</span>
+          <div class="reading-label">
+            <strong>Dataset P-06 di Edlink → Pertemuan 6</strong>
+            Unduh <code>review_produk.csv</code> — dataset ulasan produk e-commerce dalam Bahasa Indonesia (15.000 baris). P-06 akan menggunakan ini untuk analisis sentimen + CNN pada MNIST untuk klasifikasi gambar.
+          </div>
+        </div>
+        <div class="reading-item">
+          <span class="reading-icon">🎥</span>
+          <div class="reading-label">
+            <strong>3Blue1Brown — "Neural Networks" Episode 3 & 4 (YouTube)</strong>
+            "What is backpropagation really doing?" dan "Backpropagation calculus" — ~30 menit. Visualisasi terbaik yang tersedia tentang mekanisme gradient descent dan chain rule di jaringan berlapis.
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ── ASIDE ── -->
+  <aside class="content-aside">
+    <!-- TOC -->
+    <div class="toc">
+      <div class="toc-title">Isi Halaman</div>
+      <ul class="toc-list">
+        <li><a href="#tujuan" class="active">Tujuan Pembelajaran</a></li>
+        <li><a href="#mengapa">1. Mengapa Deep Learning</a></li>
+        <li><a href="#neuron">2. Neuron & Layer</a></li>
+        <li><a href="#training">3. Mekanisme Training</a></li>
+        <li><a href="#arsitektur">4. Arsitektur Utama</a></li>
+        <li><a href="#keras">5. TensorFlow / Keras</a></li>
+        <li><a href="#kapan">6. Kapan Pakai DL</a></li>
+        <li><a href="#ringkasan">Ringkasan & Tugas</a></li>
+      </ul>
+    </div>
+
+    <!-- Sesi nav -->
+    <div class="sesi-nav-aside">
+      <div class="sesi-nav-title">Navigasi Sesi</div>
+      <a href="sesi-04.html" class="sesi-nav-btn">
+        <span>←</span>
+        <span>P-04: Data Preparation & Feature Engineering</span>
+      </a>
+      <a href="../index.html" class="sesi-nav-btn" style="margin-top:var(--s2);">
+        <span>🏠</span>
+        <span>Kembali ke Beranda</span>
+      </a>
+      <div style="font-size:12px;color:var(--text-3);margin-top:var(--s4);padding:var(--s3) 0;border-top:1px solid var(--border);">Sesi berikutnya:</div>
+      <a href="#" class="sesi-nav-btn" style="opacity:0.5;pointer-events:none;">
+        <span>→</span>
+        <span>P-06: Praktik Deep Learning — CNN & Sentimen</span>
+      </a>
+    </div>
+
+    <!-- Info box -->
+    <div style="background:var(--bg-2);border:1px solid var(--border);border-radius:var(--r3);padding:var(--s5);margin-top:var(--s4);">
+      <div style="font-family:var(--mono);font-size:10px;color:var(--text-3);letter-spacing:2px;text-transform:uppercase;margin-bottom:var(--s3);">Info Pertemuan</div>
+      <div style="display:flex;flex-direction:column;gap:var(--s3);">
+        <div>
+          <div style="font-size:11px;color:var(--text-3);">Tipe</div>
+          <div style="font-size:13px;color:var(--text);">Teori + Preview Kode</div>
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--text-3);">Durasi</div>
+          <div style="font-size:13px;color:var(--text);">100 menit</div>
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--text-3);">CPMK</div>
+          <div style="font-size:13px;color:var(--text);">C1 (Konsep AI), C3 (Deep Learning & LLM)</div>
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--text-3);">Tools</div>
+          <div style="font-size:13px;color:var(--text);">TensorFlow 2.x · Keras · Google Colab</div>
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--text-3);">Dataset</div>
+          <div style="font-size:13px;color:var(--text);">MNIST (built-in Keras)</div>
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--text-3);">Referensi</div>
+          <div style="font-size:13px;color:var(--text);">Géron Ch. 10, 3Blue1Brown Ep. 1–4</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick ref -->
+    <div style="background:var(--bg-2);border:1px solid var(--border);border-radius:var(--r3);padding:var(--s5);margin-top:var(--s4);">
+      <div style="font-family:var(--mono);font-size:10px;color:var(--text-3);letter-spacing:2px;text-transform:uppercase;margin-bottom:var(--s4);">Activation Quick Ref</div>
+      <div style="display:flex;flex-direction:column;gap:var(--s3);font-size:12px;color:var(--text-2);">
+        <div><span style="color:var(--teal);font-family:var(--mono);">ReLU</span> → hidden layer (default)</div>
+        <div><span style="color:var(--red);font-family:var(--mono);">Sigmoid</span> → output, biner</div>
+        <div><span style="color:var(--blue);font-family:var(--mono);">Softmax</span> → output, multi-kelas</div>
+        <div><span style="color:var(--amber);font-family:var(--mono);">Tanh</span> → RNN/LSTM gating</div>
+      </div>
+      <div style="margin-top:var(--s4);padding-top:var(--s4);border-top:1px solid var(--border);">
+        <div style="font-family:var(--mono);font-size:10px;color:var(--text-3);letter-spacing:2px;text-transform:uppercase;margin-bottom:var(--s3);">Loss Quick Ref</div>
+        <div style="display:flex;flex-direction:column;gap:var(--s3);font-size:12px;color:var(--text-2);">
+          <div><span style="color:var(--teal);font-family:var(--mono);">'mse'</span> → regresi</div>
+          <div><span style="color:var(--blue);font-family:var(--mono);">'binary_crossentropy'</span> → biner</div>
+          <div><span style="color:var(--amber);font-family:var(--mono);">'sparse_categorical_crossentropy'</span><br>→ multi-kelas (label integer)</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+</div>
+
+<!-- ══ FOOTER ══ -->
+<footer class="footer">
+  <div>AI·UKWMS <span style="color:var(--text-3);">· P-05 Deep Learning & Neural Network</span></div>
+  <div><a href="../index.html" style="color:var(--text-3);">← Kembali ke Beranda</a></div>
+</footer>
+
+<script>
+  const headings = document.querySelectorAll('.content-main [id]');
+  const tocLinks = document.querySelectorAll('.toc-list a');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(a => {
+          a.classList.remove('active');
+          if (a.getAttribute('href') === '#' + entry.target.id) a.classList.add('active');
+        });
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px' });
+  headings.forEach(h => observer.observe(h));
+
+  const navLinks = document.querySelectorAll('.nav-links a[href^="#"]');
+  window.addEventListener('scroll', () => {
+    let current = '';
+    headings.forEach(h => { if (window.scrollY >= h.offsetTop - 100) current = h.id; });
+    navLinks.forEach(a => {
+      a.classList.remove('active');
+      if (a.getAttribute('href') === '#' + current) a.classList.add('active');
+    });
+  });
+</script>
+</body>
+</html>

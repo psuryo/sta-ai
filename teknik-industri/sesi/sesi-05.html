@@ -1,0 +1,933 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>P-05: AI untuk Optimasi Produksi & Supply Chain — Teknik Industri UKWMS</title>
+<link rel="stylesheet" href="../../css/style.css">
+<style>
+  .def-block {
+    border-left: 3px solid var(--blue);
+    padding: var(--s3) var(--s5);
+    background: var(--blue-dim);
+    border-radius: 0 var(--r2) var(--r2) 0;
+    margin: var(--s4) 0;
+  }
+  .def-block .def-label {
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--blue);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  .def-block p { color: var(--text) !important; margin-bottom: 0 !important; font-size: 14px !important; }
+
+  .domain-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--s4);
+    margin: var(--s5) 0;
+  }
+  .domain-card {
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: var(--r3);
+    padding: var(--s5);
+    display: flex;
+    flex-direction: column;
+    gap: var(--s3);
+  }
+  .domain-icon { font-size: 28px; }
+  .domain-title { font-size: 14px; font-weight: 600; color: var(--text); }
+  .domain-sub   { font-size: 12px; color: var(--text-3); font-family: var(--mono); }
+  .domain-body  { font-size: 13px; color: var(--text-2); line-height: 1.7; flex: 1; }
+  .domain-tools {
+    display: flex;
+    gap: var(--s2);
+    flex-wrap: wrap;
+    margin-top: auto;
+  }
+  .domain-tag {
+    font-family: var(--mono);
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    color: var(--text-3);
+  }
+
+  .case-block {
+    border: 1px solid var(--border);
+    border-radius: var(--r3);
+    overflow: hidden;
+    margin-bottom: var(--s5);
+  }
+  .case-header {
+    display: flex;
+    align-items: center;
+    gap: var(--s4);
+    padding: var(--s4) var(--s5);
+    background: var(--bg-2);
+    border-bottom: 1px solid var(--border);
+  }
+  .case-logo {
+    width: 44px;
+    height: 44px;
+    border-radius: var(--r2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    flex-shrink: 0;
+  }
+  .case-company { font-size: 15px; font-weight: 600; color: var(--text); }
+  .case-industry { font-size: 12px; color: var(--text-3); font-family: var(--mono); }
+  .case-body { padding: var(--s5); }
+  .case-kpi-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--s3);
+    margin: var(--s4) 0;
+  }
+  .case-kpi {
+    background: var(--bg-1);
+    border: 1px solid var(--border);
+    border-radius: var(--r2);
+    padding: var(--s3) var(--s4);
+    text-align: center;
+  }
+  .case-kpi-val  { font-family: var(--mono); font-size: 22px; font-weight: 600; line-height: 1; margin-bottom: 4px; }
+  .case-kpi-name { font-size: 11px; color: var(--text-3); }
+
+  .flow-vis {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    margin: var(--s5) 0;
+    overflow-x: auto;
+  }
+  .fv-node {
+    flex-shrink: 0;
+    min-width: 130px;
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: var(--r2);
+    padding: var(--s3) var(--s4);
+    text-align: center;
+  }
+  .fv-node-icon  { font-size: 22px; margin-bottom: 4px; }
+  .fv-node-name  { font-size: 12px; font-weight: 600; color: var(--text); margin-bottom: 2px; }
+  .fv-node-ai    { font-size: 10px; color: var(--blue); font-family: var(--mono); }
+  .fv-arrow {
+    flex-shrink: 0;
+    width: 36px;
+    text-align: center;
+    color: var(--text-3);
+    font-size: 18px;
+  }
+
+  .compare-table-wrap {
+    overflow-x: auto;
+    margin: var(--s4) 0;
+  }
+  .compare-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+  .compare-table th {
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    padding: var(--s3) var(--s4);
+    text-align: left;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-3);
+    letter-spacing: 1px;
+    white-space: nowrap;
+  }
+  .compare-table td {
+    border: 1px solid var(--border);
+    padding: var(--s3) var(--s4);
+    color: var(--text-2);
+    line-height: 1.5;
+    vertical-align: top;
+  }
+  .compare-table tr:hover td { background: var(--bg-2); }
+  .compare-table .best { color: var(--teal); font-weight: 600; }
+  .compare-table .warn { color: var(--amber); }
+  .compare-table .bad  { color: var(--red); }
+
+  .insight-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--s4);
+    margin: var(--s4) 0;
+  }
+  .insight-card {
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: var(--r2);
+    padding: var(--s4) var(--s5);
+  }
+  .insight-num { font-family: var(--mono); font-size: 10px; color: var(--text-3); margin-bottom: var(--s2); }
+  .insight-title { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: var(--s2); }
+  .insight-body  { font-size: 13px; color: var(--text-2); line-height: 1.7; }
+
+  .framework-row {
+    display: flex;
+    gap: 0;
+    border: 1px solid var(--border);
+    border-radius: var(--r3);
+    overflow: hidden;
+    margin: var(--s4) 0;
+  }
+  .fr-step {
+    flex: 1;
+    padding: var(--s4) var(--s3);
+    text-align: center;
+    border-right: 1px solid var(--border);
+  }
+  .fr-step:last-child { border-right: none; }
+  .fr-num  { font-family: var(--mono); font-size: 9px; color: var(--text-3); letter-spacing: 1px; margin-bottom: var(--s2); }
+  .fr-name { font-size: 12px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+  .fr-desc { font-size: 11px; color: var(--text-3); line-height: 1.5; }
+</style>
+</head>
+<body>
+
+<!-- ══ NAV ══ -->
+<nav class="nav">
+  <div class="nav-logo">AI<span>·</span>UKWMS</div>
+  <ul class="nav-links">
+    <li><a href="../index.html">← Beranda</a></li>
+    <li><a href="#tujuan" class="active">Tujuan</a></li>
+    <li><a href="#mengapa">Mengapa AI</a></li>
+    <li><a href="#supply-chain">Supply Chain</a></li>
+    <li><a href="#produksi">Produksi</a></li>
+    <li><a href="#studi-kasus">Studi Kasus</a></li>
+    <li><a href="#implementasi">Implementasi</a></li>
+    <li><a href="#tugas">Tugas</a></li>
+  </ul>
+</nav>
+
+<!-- ══ HERO ══ -->
+<header class="sesi-hero" style="--hero-accent: var(--blue);">
+  <div style="max-width:1100px;margin:0 auto;">
+    <div class="sesi-breadcrumb">
+      <a href="../index.html">Kecerdasan Buatan · Teknik Industri</a>
+      <span>›</span>
+      <span>Pertemuan 5</span>
+    </div>
+    <div class="sesi-num" style="color:var(--blue);">PERTEMUAN 05 · TEORI</div>
+    <h1 class="sesi-title">AI untuk Optimasi<br><em style="color:var(--blue);">Produksi & Supply Chain</em></h1>
+    <p style="font-size:15px;color:var(--text-2);max-width:660px;line-height:1.8;">Bagaimana Toyota, Unilever, dan Amazon menggunakan AI untuk mengelola inventori, menjadwalkan produksi, dan memprediksi permintaan — serta prinsip-prinsip yang bisa langsung diterapkan di industri lokal.</p>
+    <div class="sesi-meta-row">
+      <span class="badge badge-blue">Teori</span>
+      <span class="badge badge-amber">100 menit</span>
+      <span class="badge" style="color:var(--teal);border-color:rgba(0,201,177,0.3);background:var(--teal-dim);">CPMK: C1, C4, C5</span>
+    </div>
+  </div>
+</header>
+
+<!-- ══ CONTENT LAYOUT ══ -->
+<div class="content-layout">
+  <main class="content-main">
+
+    <!-- TUJUAN -->
+    <div class="content-block" id="tujuan">
+      <h2>Tujuan Pembelajaran</h2>
+      <p>Setelah mengikuti pertemuan ini, mahasiswa diharapkan mampu:</p>
+      <ol>
+        <li>Menjelaskan tiga area utama penerapan AI di rantai pasok: demand forecasting, inventory optimization, dan logistics routing</li>
+        <li>Membedakan pendekatan optimasi konvensional dengan pendekatan berbasis AI dan mengidentifikasi kapan masing-masing lebih tepat digunakan</li>
+        <li>Menganalisis studi kasus nyata penerapan AI di Toyota Production System, Unilever, dan Amazon Fulfillment</li>
+        <li>Mengidentifikasi hambatan implementasi AI di industri manufaktur Indonesia dan strategi mengatasinya</li>
+        <li>Mengevaluasi kesiapan sebuah organisasi industri untuk mengadopsi solusi AI di operasional mereka</li>
+      </ol>
+
+      <div class="callout info" style="margin-top:var(--s5);">
+        <span class="callout-icon">🔗</span>
+        <div class="callout-body">
+          <p><strong>Koneksi antar pertemuan:</strong> P-03 membangun model prediksi cacat produk. P-04 membersihkan data produksi. Pertemuan ini menjawab pertanyaan strategis yang lebih besar: <em>setelah kita punya data dan model yang baik, bagaimana kita gunakan untuk mengoptimalkan seluruh sistem produksi dan rantai pasok?</em></p>
+        </div>
+      </div>
+    </div>
+
+    <!-- MENGAPA AI -->
+    <div class="content-block" id="mengapa">
+      <h2>1. Mengapa AI di Produksi & Supply Chain?</h2>
+      <p>Supply chain modern adalah sistem yang terlalu kompleks untuk dioptimalkan secara manual. Ribuan variabel berinteraksi secara simultan — cuaca, permintaan konsumen, kapasitas mesin, harga bahan baku, lead time pemasok — dan semua berubah setiap hari.</p>
+
+      <div class="def-block">
+        <div class="def-label">Definisi Kerja</div>
+        <p><strong>AI untuk Supply Chain</strong> adalah penerapan machine learning, optimasi berbasis data, dan sistem prediktif untuk membuat keputusan operasional yang lebih cepat, lebih akurat, dan lebih adaptif di sepanjang rantai nilai — dari pemasok bahan baku hingga konsumen akhir.</p>
+      </div>
+
+      <h3>Keterbatasan Pendekatan Konvensional</h3>
+      <div class="insight-grid">
+        <div class="insight-card">
+          <div class="insight-num">MASALAH 01</div>
+          <div class="insight-title">Bullwhip Effect</div>
+          <div class="insight-body">Fluktuasi kecil di permintaan konsumen diperkuat di tiap tahap rantai pasok — menghasilkan over-stocking di hulu dan stockout di hilir. Sistem berbasis aturan manual tidak bisa merespons cukup cepat untuk meredam efek ini.</div>
+        </div>
+        <div class="insight-card">
+          <div class="insight-num">MASALAH 02</div>
+          <div class="insight-title">Data Silo</div>
+          <div class="insight-body">Data produksi, penjualan, logistik, dan keuangan tersimpan di sistem terpisah yang tidak bicara satu sama lain. Keputusan dibuat berdasarkan pandangan parsial — bukan gambaran sistem keseluruhan.</div>
+        </div>
+        <div class="insight-card">
+          <div class="insight-num">MASALAH 03</div>
+          <div class="insight-title">Perencanaan Statis</div>
+          <div class="insight-body">Jadwal produksi dibuat mingguan atau bulanan dengan asumsi yang cepat usang. Ketika terjadi gangguan (mesin rusak, bahan baku terlambat), tidak ada mekanisme otomatis untuk replanning real-time.</div>
+        </div>
+        <div class="insight-card">
+          <div class="insight-num">MASALAH 04</div>
+          <div class="insight-title">Keahlian Terpusat</div>
+          <div class="insight-body">Pengetahuan tentang pola musiman, pemasok bermasalah, atau pola kerusakan mesin sering hanya ada di kepala seorang manajer berpengalaman. Tidak terdokumentasi, tidak dapat diskalakan, hilang ketika orang itu resign.</div>
+        </div>
+      </div>
+
+      <h3 style="margin-top:var(--s6);">Solusi AI — Tiga Pilar</h3>
+      <div class="domain-grid">
+        <div class="domain-card">
+          <div class="domain-icon">📈</div>
+          <div class="domain-title">Demand Forecasting</div>
+          <div class="domain-sub">Prediksi permintaan</div>
+          <div class="domain-body">Model ML yang belajar dari data penjualan historis, tren musiman, event promosi, cuaca, dan faktor eksternal untuk memprediksi permintaan dengan akurasi jauh lebih tinggi dari metode moving average atau exponential smoothing konvensional.</div>
+          <div class="domain-tools">
+            <span class="domain-tag">Time Series</span>
+            <span class="domain-tag">ARIMA / LSTM</span>
+            <span class="domain-tag">Prophet</span>
+          </div>
+        </div>
+        <div class="domain-card">
+          <div class="domain-icon">📦</div>
+          <div class="domain-title">Inventory Optimization</div>
+          <div class="domain-sub">Optimasi stok</div>
+          <div class="domain-body">AI menghitung safety stock, reorder point, dan economic order quantity secara dinamis berdasarkan prediksi demand, lead time variabel, dan biaya penyimpanan — menggantikan rumus EOQ statis yang tidak memperhitungkan ketidakpastian nyata.</div>
+          <div class="domain-tools">
+            <span class="domain-tag">Reinforcement Learning</span>
+            <span class="domain-tag">Stochastic Optim</span>
+          </div>
+        </div>
+        <div class="domain-card">
+          <div class="domain-icon">🚚</div>
+          <div class="domain-title">Logistics & Routing</div>
+          <div class="domain-sub">Rute & jadwal distribusi</div>
+          <div class="domain-body">Algoritma Vehicle Routing Problem (VRP) berbasis AI mengoptimalkan rute pengiriman secara real-time dengan mempertimbangkan kondisi lalu lintas, kapasitas kendaraan, window pengiriman, dan biaya bahan bakar secara simultan.</div>
+          <div class="domain-tools">
+            <span class="domain-tag">VRP Solver</span>
+            <span class="domain-tag">Graph Neural Net</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SUPPLY CHAIN -->
+    <div class="content-block" id="supply-chain">
+      <h2>2. AI di Sepanjang Rantai Pasok</h2>
+      <p>AI tidak hanya relevan di satu titik rantai pasok — setiap tahap dari pemasok hingga konsumen menawarkan peluang optimasi yang berbeda.</p>
+
+      <h3>Peta Penerapan AI di Supply Chain</h3>
+      <div class="flow-vis">
+        <div class="fv-node" style="border-color:rgba(74,142,245,0.3);background:var(--blue-dim);">
+          <div class="fv-node-icon">🏭</div>
+          <div class="fv-node-name">Pemasok</div>
+          <div class="fv-node-ai">Supplier risk AI</div>
+        </div>
+        <div class="fv-arrow">→</div>
+        <div class="fv-node">
+          <div class="fv-node-icon">📥</div>
+          <div class="fv-node-name">Procurement</div>
+          <div class="fv-node-ai">Harga & lead time pred</div>
+        </div>
+        <div class="fv-arrow">→</div>
+        <div class="fv-node" style="border-color:rgba(74,142,245,0.3);background:var(--blue-dim);">
+          <div class="fv-node-icon">⚙️</div>
+          <div class="fv-node-name">Produksi</div>
+          <div class="fv-node-ai">Scheduling & OEE AI</div>
+        </div>
+        <div class="fv-arrow">→</div>
+        <div class="fv-node">
+          <div class="fv-node-icon">📦</div>
+          <div class="fv-node-name">Gudang</div>
+          <div class="fv-node-ai">WMS + robot AI</div>
+        </div>
+        <div class="fv-arrow">→</div>
+        <div class="fv-node" style="border-color:rgba(74,142,245,0.3);background:var(--blue-dim);">
+          <div class="fv-node-icon">🚚</div>
+          <div class="fv-node-name">Distribusi</div>
+          <div class="fv-node-ai">VRP + ETA pred</div>
+        </div>
+        <div class="fv-arrow">→</div>
+        <div class="fv-node">
+          <div class="fv-node-icon">🛒</div>
+          <div class="fv-node-name">Konsumen</div>
+          <div class="fv-node-ai">Demand signal AI</div>
+        </div>
+      </div>
+
+      <h3 style="margin-top:var(--s6);">Demand Forecasting — Perbandingan Metode</h3>
+      <p style="font-size:13px;color:var(--text-2);margin-bottom:var(--s4);">Ini adalah area penerapan AI paling matang di supply chain, dengan manfaat terukur yang terdokumentasi secara luas di industri global.</p>
+
+      <div class="compare-table-wrap">
+        <table class="compare-table">
+          <thead>
+            <tr>
+              <th>Metode</th>
+              <th>Kompleksitas</th>
+              <th>Faktor yang diperhitungkan</th>
+              <th>Tipikal error (MAPE)</th>
+              <th>Cocok untuk</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Moving Average</strong></td>
+              <td class="best">Sangat rendah</td>
+              <td>Rata-rata historis saja</td>
+              <td class="bad">15–30%</td>
+              <td>Demand stabil, tidak musiman</td>
+            </tr>
+            <tr>
+              <td><strong>Exponential Smoothing</strong></td>
+              <td class="best">Rendah</td>
+              <td>Historis + bobot tren</td>
+              <td class="warn">12–22%</td>
+              <td>Demand dengan tren sederhana</td>
+            </tr>
+            <tr>
+              <td><strong>ARIMA</strong></td>
+              <td class="warn">Sedang</td>
+              <td>Pola temporal kompleks</td>
+              <td class="warn">10–18%</td>
+              <td>Time series stasioner, tidak banyak musiman</td>
+            </tr>
+            <tr>
+              <td><strong>ML (Gradient Boosting)</strong></td>
+              <td class="warn">Sedang–Tinggi</td>
+              <td>Historis + cuaca + event + harga + lainnya</td>
+              <td class="best">5–12%</td>
+              <td>Demand dengan banyak faktor eksternal</td>
+            </tr>
+            <tr>
+              <td><strong>Deep Learning (LSTM)</strong></td>
+              <td class="bad">Tinggi</td>
+              <td>Semua faktor + pola tersembunyi jangka panjang</td>
+              <td class="best">4–10%</td>
+              <td>SKU ribuan, data berlimpah, variabilitas tinggi</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout tip">
+        <span class="callout-icon">💡</span>
+        <div class="callout-body">
+          <p><strong>Jangan pilih metode paling canggih secara default.</strong> Model LSTM memerlukan data 3–5 tahun yang bersih untuk tiap SKU. Di banyak perusahaan Indonesia dengan data historis yang tidak konsisten, Gradient Boosting dengan fitur tambahan (hari libur, promosi, cuaca) sering memberikan hasil lebih baik dengan biaya implementasi jauh lebih rendah.</p>
+        </div>
+      </div>
+
+      <h3 style="margin-top:var(--s6);">Inventory Optimization dengan AI</h3>
+      <p>Manajemen inventori konvensional menggunakan rumus deterministik seperti EOQ (Economic Order Quantity) yang mengasumsikan demand pasti. Kenyataannya, demand dan lead time selalu mengandung ketidakpastian.</p>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--s5);margin:var(--s4) 0;">
+        <div style="background:var(--bg-2);border:1px solid var(--border);border-radius:var(--r3);padding:var(--s5);">
+          <div style="font-family:var(--mono);font-size:10px;color:var(--text-3);letter-spacing:2px;text-transform:uppercase;margin-bottom:var(--s3);">Pendekatan Konvensional</div>
+          <div style="font-size:13px;color:var(--text-2);line-height:1.8;">
+            <div style="margin-bottom:var(--s2);">📐 EOQ = √(2 × D × S / H)</div>
+            <div style="margin-bottom:var(--s2);">📐 Safety Stock = Z × σ × √L</div>
+            <div style="margin-bottom:var(--s2);">📐 Reorder Point = d × L + SS</div>
+            <br>
+            <strong style="color:var(--text);">Asumsi bermasalah:</strong> demand konstan, lead time pasti, harga tidak berubah. Tidak ada di dunia nyata.
+          </div>
+        </div>
+        <div style="background:var(--blue-dim);border:1px solid rgba(74,142,245,0.2);border-radius:var(--r3);padding:var(--s5);">
+          <div style="font-family:var(--mono);font-size:10px;color:var(--blue);letter-spacing:2px;text-transform:uppercase;margin-bottom:var(--s3);">Pendekatan AI</div>
+          <div style="font-size:13px;color:var(--text-2);line-height:1.8;">
+            <div style="margin-bottom:var(--s2);">🤖 Model distribusi probabilistik demand aktual</div>
+            <div style="margin-bottom:var(--s2);">🤖 Safety stock dinamis berdasarkan forecast uncertainty</div>
+            <div style="margin-bottom:var(--s2);">🤖 Reorder point yang berubah sesuai lead time variabel</div>
+            <br>
+            <strong style="color:var(--text);">Hasil nyata:</strong> 20–35% pengurangan carrying cost dengan service level yang sama atau lebih tinggi.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PRODUKSI -->
+    <div class="content-block" id="produksi">
+      <h2>3. AI di Lantai Produksi</h2>
+      <p>Di dalam pabrik, AI menangani tiga problem utama: menjadwalkan operasi secara optimal, memaksimalkan efisiensi peralatan, dan mendeteksi anomali sebelum menjadi kegagalan.</p>
+
+      <h3>Production Scheduling</h3>
+      <p style="font-size:13px;color:var(--text-2);">Penjadwalan produksi optimal adalah masalah NP-hard — kompleksitasnya meningkat eksponensial dengan jumlah pekerjaan dan mesin. Algoritma konvensional (EDD, SPT) menggunakan aturan heuristik sederhana yang jauh dari optimal.</p>
+
+      <div class="insight-grid">
+        <div class="insight-card">
+          <div class="insight-num">PENDEKATAN AI</div>
+          <div class="insight-title">Reinforcement Learning Scheduling</div>
+          <div class="insight-body">Agent RL belajar menjadwalkan job di mesin dengan memaksimalkan reward (throughput, OEE) dan meminimalkan penalty (keterlambatan, setup time). Solusi adaptif real-time ketika ada gangguan — mesin rusak, order mendesak, bahan baku terlambat.</div>
+        </div>
+        <div class="insight-card">
+          <div class="insight-num">PENDEKATAN AI</div>
+          <div class="insight-title">Constraint-Based Optimization</div>
+          <div class="insight-body">Solver AI yang mempertimbangkan semua kendala secara simultan: kapasitas mesin, skill operator, due date order, setup time, available materials. Bisa menghasilkan jadwal optimal untuk ratusan order dalam hitungan detik.</div>
+        </div>
+      </div>
+
+      <h3 style="margin-top:var(--s6);">OEE — Overall Equipment Effectiveness</h3>
+
+      <div class="def-block">
+        <div class="def-label">Formula Kunci</div>
+        <p><strong>OEE = Availability × Performance × Quality</strong><br>
+        <span style="font-size:13px;color:var(--text-2);">Contoh: 90% × 85% × 95% = 72.7% — artinya 27.3% kapasitas terbuang percuma.</span></p>
+      </div>
+
+      <p>AI meningkatkan OEE di tiga dimensi:</p>
+
+      <div class="domain-grid">
+        <div class="domain-card">
+          <div class="domain-icon">⏱️</div>
+          <div class="domain-title">Availability</div>
+          <div class="domain-sub">Predictive Maintenance</div>
+          <div class="domain-body">Sensor IoT memantau getaran, suhu, konsumsi arus mesin secara real-time. Model ML mendeteksi pola anomali yang mendahului kerusakan 2–4 minggu sebelumnya — memungkinkan perawatan terencana, bukan reaktif.</div>
+          <div class="domain-tools">
+            <span class="domain-tag">Anomaly Detection</span>
+            <span class="domain-tag">IoT Sensor</span>
+          </div>
+        </div>
+        <div class="domain-card">
+          <div class="domain-icon">⚡</div>
+          <div class="domain-title">Performance</div>
+          <div class="domain-sub">Process Parameter Optim</div>
+          <div class="domain-body">AI menganalisis hubungan antara parameter proses (suhu, tekanan, kecepatan) dengan output (throughput, konsumsi energi) dan merekomendasikan setting optimal — disebut juga Digital Twin approach.</div>
+          <div class="domain-tools">
+            <span class="domain-tag">Regression</span>
+            <span class="domain-tag">Digital Twin</span>
+          </div>
+        </div>
+        <div class="domain-card">
+          <div class="domain-icon">🔍</div>
+          <div class="domain-title">Quality</div>
+          <div class="domain-sub">Automated Visual Inspection</div>
+          <div class="domain-body">Computer vision menggantikan inspeksi visual manual — kamera high-speed memotret setiap produk, model CNN mengklasifikasikan cacat dengan akurasi &gt;99% pada kecepatan yang tidak mungkin dicapai manusia.</div>
+          <div class="domain-tools">
+            <span class="domain-tag">CNN / Vision AI</span>
+            <span class="domain-tag">Real-time</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STUDI KASUS -->
+    <div class="content-block" id="studi-kasus">
+      <h2>4. Studi Kasus Global</h2>
+      <p>Tiga perusahaan berikut mewakili tiga model implementasi AI yang berbeda — dari manufaktur lean, FMCG, hingga e-commerce. Masing-masing menawarkan pelajaran yang dapat diambil untuk konteks industri Indonesia.</p>
+
+      <!-- Toyota -->
+      <div class="case-block">
+        <div class="case-header">
+          <div class="case-logo" style="background:rgba(235,0,0,0.1);">🏎️</div>
+          <div>
+            <div class="case-company">Toyota Motor Corporation</div>
+            <div class="case-industry">Manufaktur otomotif · Jepang/Global</div>
+          </div>
+          <span class="badge badge-blue" style="margin-left:auto;">Produksi & QC</span>
+        </div>
+        <div class="case-body">
+          <p style="font-size:13px;color:var(--text-2);line-height:1.8;margin-bottom:var(--s4);">Toyota adalah pelopor lean manufacturing (TPS) yang kini mengintegrasikan AI ke sistem Jidoka-nya. Tantangan: menjaga zero-defect di 10 juta+ kendaraan per tahun di ratusan lini produksi global.</p>
+
+          <div class="case-kpi-row">
+            <div class="case-kpi">
+              <div class="case-kpi-val" style="color:var(--teal);">99.8%</div>
+              <div class="case-kpi-name">Akurasi deteksi cacat las</div>
+            </div>
+            <div class="case-kpi">
+              <div class="case-kpi-val" style="color:var(--blue);">25%</div>
+              <div class="case-kpi-name">Pengurangan unplanned downtime</div>
+            </div>
+            <div class="case-kpi">
+              <div class="case-kpi-val" style="color:var(--amber);">40%</div>
+              <div class="case-kpi-name">Penurunan biaya perawatan</div>
+            </div>
+          </div>
+
+          <p style="font-size:13px;color:var(--text-2);line-height:1.8;"><strong style="color:var(--text);">Penerapan utama:</strong> Kamera AI di setiap stasiun las mendeteksi micro-defect yang tidak terlihat mata manusia. Model prediktif memantau 200+ parameter mesin secara real-time. Sistem ini tidak menggantikan andon cord (prinsip Jidoka) — tetapi mempercepat deteksi dari menit ke milidetik.</p>
+
+          <div class="callout tip" style="margin-top:var(--s4);">
+            <span class="callout-icon">📝</span>
+            <div class="callout-body"><p><strong>Pelajaran untuk industri Indonesia:</strong> Toyota memulai dengan <em>satu</em> lini produksi, mengukur dampaknya dengan ketat selama 6 bulan, baru scale-up. Bukan big-bang transformation — tapi iterasi terkontrol.</p></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Unilever -->
+      <div class="case-block">
+        <div class="case-header">
+          <div class="case-logo" style="background:rgba(0,100,200,0.1);">🧴</div>
+          <div>
+            <div class="case-company">Unilever</div>
+            <div class="case-industry">FMCG · Global · 190+ negara</div>
+          </div>
+          <span class="badge badge-teal" style="margin-left:auto;">Supply Chain & Demand</span>
+        </div>
+        <div class="case-body">
+          <p style="font-size:13px;color:var(--text-2);line-height:1.8;margin-bottom:var(--s4);">Unilever mengelola 75.000+ SKU di seluruh dunia dengan 400+ pabrik. Tantangan: bullwhip effect yang parah, 20% produk memiliki demand sangat volatile (deterjen musim hujan, produk seasonal), dan lead time pemasok yang tidak pasti.</p>
+
+          <div class="case-kpi-row">
+            <div class="case-kpi">
+              <div class="case-kpi-val" style="color:var(--teal);">35%</div>
+              <div class="case-kpi-name">Pengurangan excess inventory</div>
+            </div>
+            <div class="case-kpi">
+              <div class="case-kpi-val" style="color:var(--blue);">20%</div>
+              <div class="case-kpi-name">Peningkatan forecast accuracy</div>
+            </div>
+            <div class="case-kpi">
+              <div class="case-kpi-val" style="color:var(--amber);">$1B+</div>
+              <div class="case-kpi-name">Penghematan tahunan terdokumentasi</div>
+            </div>
+          </div>
+
+          <p style="font-size:13px;color:var(--text-2);line-height:1.8;"><strong style="color:var(--text);">Penerapan utama:</strong> Unilever membangun platform "Connected Commerce" yang mengintegrasikan POS data dari retailer, data cuaca, kalender acara, dan media sosial sebagai sinyal demand real-time. Model ML merespons perubahan demand dalam 24 jam, bukan dalam siklus perencanaan 4 minggu.</p>
+
+          <div class="callout tip" style="margin-top:var(--s4);">
+            <span class="callout-icon">📝</span>
+            <div class="callout-body"><p><strong>Pelajaran untuk Indonesia:</strong> Faktor lokal sangat penting — lebaran, mudik, musim panen mempengaruhi demand secara signifikan. Model yang berhasil di Eropa tidak langsung cocok tanpa kalibrasi data lokal.</p></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Amazon -->
+      <div class="case-block">
+        <div class="case-header">
+          <div class="case-logo" style="background:rgba(255,153,0,0.1);">📦</div>
+          <div>
+            <div class="case-company">Amazon Fulfillment</div>
+            <div class="case-industry">E-commerce & Logistik · AS/Global</div>
+          </div>
+          <span class="badge badge-amber" style="margin-left:auto;">Warehouse & Routing</span>
+        </div>
+        <div class="case-body">
+          <p style="font-size:13px;color:var(--text-2);line-height:1.8;margin-bottom:var(--s4);">Amazon mengirim 10 juta+ paket per hari. Tantangan: menjaga janji pengiriman same-day/next-day sekaligus meminimalkan biaya logistik yang merupakan komponen terbesar cost structure mereka.</p>
+
+          <div class="case-kpi-row">
+            <div class="case-kpi">
+              <div class="case-kpi-val" style="color:var(--teal);">75%</div>
+              <div class="case-kpi-name">Gudang dioperasikan robot + AI</div>
+            </div>
+            <div class="case-kpi">
+              <div class="case-kpi-val" style="color:var(--blue);">50%</div>
+              <div class="case-kpi-name">Pengurangan waktu pick-and-pack</div>
+            </div>
+            <div class="case-kpi">
+              <div class="case-kpi-val" style="color:var(--amber);">&lt;30s</div>
+              <div class="case-kpi-name">Waktu lokasi barang di gudang</div>
+            </div>
+          </div>
+
+          <p style="font-size:13px;color:var(--text-2);line-height:1.8;"><strong style="color:var(--text);">Penerapan utama:</strong> Anticipatory Shipping — Amazon mulai mengirim produk ke lokasi distribusi sebelum konsumen memesan, berdasarkan prediksi demand. Model routing AI menghitung ulang rute pengiriman setiap 5 menit berdasarkan kondisi lalu lintas real-time.</p>
+
+          <div class="callout warn" style="margin-top:var(--s4);">
+            <span class="callout-icon">⚠️</span>
+            <div class="callout-body"><p><strong>Konteks penting:</strong> Amazon menginvestasikan miliaran dolar dan memiliki tim AI 10.000+ orang. Model ini tidak bisa langsung dijiplak oleh perusahaan lokal. Pelajarannya adalah <em>prinsip</em>-nya: mulai dari data permintaan aktual, bukan perkiraan intuisi, dan otomatiskan keputusan rutin.</p></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- IMPLEMENTASI -->
+    <div class="content-block" id="implementasi">
+      <h2>5. Kerangka Implementasi untuk Industri Lokal</h2>
+      <p>Pertanyaan yang paling sering muncul: "Dari mana kami harus mulai?" Framework berikut dirancang untuk skala perusahaan manufaktur menengah di Indonesia — bukan Fortune 500.</p>
+
+      <h3>Framework 4-D: Diagnose → Design → Deploy → Drive</h3>
+
+      <div class="framework-row">
+        <div class="fr-step" style="background:var(--blue-dim);">
+          <div class="fr-num">FASE 01</div>
+          <div class="fr-name">Diagnose</div>
+          <div class="fr-desc">Audit kualitas data yang tersedia, identifikasi proses dengan biaya pemborosan tertinggi, tetapkan 1 use case prioritas</div>
+        </div>
+        <div class="fr-step">
+          <div class="fr-num">FASE 02</div>
+          <div class="fr-name">Design</div>
+          <div class="fr-desc">Pilih pendekatan ML yang sesuai skala data, tentukan metrik sukses yang terukur, rancang pipeline data minimum</div>
+        </div>
+        <div class="fr-step" style="background:var(--blue-dim);">
+          <div class="fr-num">FASE 03</div>
+          <div class="fr-name">Deploy</div>
+          <div class="fr-desc">Pilot di satu lini/departemen dulu, validasi hasil selama 3–6 bulan, libatkan operator dalam loop feedback</div>
+        </div>
+        <div class="fr-step">
+          <div class="fr-num">FASE 04</div>
+          <div class="fr-name">Drive</div>
+          <div class="fr-desc">Scale ke area lain berdasarkan hasil pilot, bangun kapabilitas internal, iterasi model secara berkelanjutan</div>
+        </div>
+      </div>
+
+      <h3 style="margin-top:var(--s6);">Hambatan Nyata di Industri Indonesia</h3>
+
+      <div class="compare-table-wrap">
+        <table class="compare-table">
+          <thead>
+            <tr>
+              <th>Hambatan</th>
+              <th>Frekuensi</th>
+              <th>Dampak</th>
+              <th>Strategi Mitigasi</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Data tidak terkumpul secara digital</strong></td>
+              <td class="bad">Sangat umum</td>
+              <td class="bad">Blocker utama</td>
+              <td>Mulai dengan digitasi manual 6–12 bulan, IoT sensor murah untuk data mesin</td>
+            </tr>
+            <tr>
+              <td><strong>Data tersebar di spreadsheet berbeda</strong></td>
+              <td class="bad">Sangat umum</td>
+              <td class="warn">Tinggi</td>
+              <td>Standarisasi format dulu (P-04), baru bangun pipeline terpusat</td>
+            </tr>
+            <tr>
+              <td><strong>Tidak ada tim data internal</strong></td>
+              <td class="warn">Umum</td>
+              <td class="warn">Tinggi</td>
+              <td>Partnership dengan konsultan untuk fase awal; latih 1–2 "data champion" internal</td>
+            </tr>
+            <tr>
+              <td><strong>Resistensi dari operator/manajer</strong></td>
+              <td class="warn">Umum</td>
+              <td class="warn">Sedang–Tinggi</td>
+              <td>Libatkan sejak fase design, frame sebagai "alat bantu" bukan "pengganti"</td>
+            </tr>
+            <tr>
+              <td><strong>Budget terbatas</strong></td>
+              <td class="warn">Umum</td>
+              <td class="warn">Sedang</td>
+              <td>Mulai dengan open-source tools (Orange, Python), cloud pay-as-you-go, proof-of-value dulu sebelum capex besar</td>
+            </tr>
+            <tr>
+              <td><strong>Kurangnya data historis yang cukup</strong></td>
+              <td class="warn">Sedang</td>
+              <td class="warn">Sedang</td>
+              <td>Gunakan transfer learning dari dataset serupa; mulai kumpulkan data sekarang untuk model 12 bulan ke depan</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout info" style="margin-top:var(--s5);">
+        <span class="callout-icon">🏭</span>
+        <div class="callout-body">
+          <p><strong>Contoh lokal — Semen Gresik & Sido Muncul:</strong> Semen Gresik mengimplementasikan predictive maintenance pada kiln semen dan melaporkan penghematan &gt;Rp 50M/tahun per unit. Sido Muncul menggunakan demand forecasting untuk mengelola 250+ SKU jamu tradisional yang demand-nya sangat musiman. Keduanya memulai dengan satu use case sederhana, bukan transformasi menyeluruh.</p>
+        </div>
+      </div>
+
+      <h3 style="margin-top:var(--s6);">Kriteria Kesiapan Organisasi — AI Readiness</h3>
+      <p style="font-size:13px;color:var(--text-2);margin-bottom:var(--s4);">Sebelum mulai proyek AI, perusahaan perlu menilai kesiapannya secara jujur di empat dimensi:</p>
+
+      <div class="domain-grid">
+        <div class="domain-card">
+          <div class="domain-icon">🗄️</div>
+          <div class="domain-title">Data Readiness</div>
+          <div class="domain-sub">Dimensi 1</div>
+          <div class="domain-body">Apakah data sudah terkumpul secara digital? Seberapa bersih dan konsisten? Ada berapa bulan histori? Apakah data sudah mencakup variabel yang relevan untuk masalah yang ingin diselesaikan?</div>
+        </div>
+        <div class="domain-card">
+          <div class="domain-icon">👥</div>
+          <div class="domain-title">People Readiness</div>
+          <div class="domain-sub">Dimensi 2</div>
+          <div class="domain-body">Apakah ada champion internal yang percaya pada AI? Apakah manajemen puncak mendukung? Apakah operator bersedia memberikan feedback untuk perbaikan model? Komitmen manusia lebih penting dari teknologi.</div>
+        </div>
+        <div class="domain-card">
+          <div class="domain-icon">🔧</div>
+          <div class="domain-title">Process Readiness</div>
+          <div class="domain-sub">Dimensi 3</div>
+          <div class="domain-body">Apakah proses yang ingin dioptimalkan sudah terdokumentasi dan terstandarisasi? AI yang diaplikasikan pada proses kaotis hanya akan menghasilkan output kaotis lebih cepat (Garbage In, Garbage Out).</div>
+        </div>
+        <div class="domain-card">
+          <div class="domain-icon">💰</div>
+          <div class="domain-title">Value Readiness</div>
+          <div class="domain-sub">Dimensi 4</div>
+          <div class="domain-body">Apakah ada masalah bisnis konkret dengan dampak finansial yang terukur? Berapa nilai dari pengurangan downtime 10%? Berapa nilai dari pengurangan excess inventory 20%? ROI yang jelas mempermudah mendapatkan persetujuan manajemen.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RINGKASAN & TUGAS -->
+    <div class="content-block" id="ringkasan">
+      <h2>Ringkasan Pertemuan Ini</h2>
+      <div style="background:var(--bg-2);border:1px solid var(--border);border-radius:var(--r3);padding:var(--s5);">
+        <ul>
+          <li>AI di supply chain mengatasi limitasi fundamental pendekatan konvensional: bullwhip effect, data silo, perencanaan statis, dan ketergantungan pada keahlian individu</li>
+          <li>Tiga pilar utama: demand forecasting (prediksi permintaan), inventory optimization (stok dinamis), dan logistics routing (rute optimal real-time)</li>
+          <li>Di lantai produksi, AI meningkatkan OEE melalui predictive maintenance (availability), parameter optimization (performance), dan visual inspection (quality)</li>
+          <li>Studi kasus Toyota, Unilever, Amazon — tiga model yang berbeda tetapi berbagi prinsip yang sama: mulai dari satu use case konkret, ukur dampak, baru scale-up</li>
+          <li>Hambatan di industri Indonesia nyata dan bisa diatasi — kuncinya adalah sequencing yang benar: data dulu, proses terstandarisasi, baru model AI</li>
+          <li>Framework 4-D: Diagnose → Design → Deploy → Drive adalah peta jalan yang bisa dimulai dari skala kecil</li>
+        </ul>
+      </div>
+
+      <!-- TASK BOX -->
+      <div class="task-box" id="tugas">
+        <div class="task-box-title">📋 Tugas Pertemuan Ini</div>
+        <p style="font-size:13px;color:var(--text-2);margin-bottom:var(--s4);">Kumpulkan sebagai dokumen PDF atau presentasi singkat (max 6 slide) melalui <strong>Google Classroom → Pertemuan 5</strong> sebelum pertemuan ke-6.</p>
+        <ol style="font-size:14px;color:var(--text);line-height:2.1;">
+          <li><strong>Analisis Studi Kasus Lokal:</strong> Pilih satu perusahaan manufaktur atau distribusi Indonesia yang sudah mengimplementasikan AI (cari berita di Kontan, SWA, atau laporan tahunan perusahaan). Jelaskan: (a) masalah bisnis yang diatasi, (b) solusi AI yang dipilih, (c) hasil yang dilaporkan, (d) pelajaran yang bisa diambil. Minimal 400 kata.</li>
+          <li><strong>AI Readiness Audit:</strong> Bayangkan sebuah perusahaan manufaktur menengah Indonesia yang Anda kenal (bisa fiktif tapi realistis). Nilai kesiapannya menggunakan 4 dimensi yang dipelajari hari ini (Data, People, Process, Value Readiness). Beri skor 1–5 per dimensi dengan justifikasi. Tentukan satu use case AI yang paling feasible untuk perusahaan tersebut dalam 12 bulan ke depan.</li>
+          <li><em>Bonus:</em> Bandingkan akurasi Moving Average vs Exponential Smoothing vs ARIMA pada dataset penjualan publik (misalnya data retail dari Kaggle). Hitung MAPE masing-masing dan sajikan dalam tabel perbandingan. Tidak perlu Python — bisa menggunakan Excel.</li>
+        </ol>
+      </div>
+
+      <!-- READING BOX -->
+      <div class="reading-box">
+        <div class="reading-box-title">📖 Persiapan Pertemuan Ke-6</div>
+        <div class="reading-item">
+          <span class="reading-icon">📗</span>
+          <div class="reading-label">
+            <strong>Davenport — "The AI Advantage", Chapter 5: Supply Chain AI</strong>
+            "Using AI to Optimize Supply Chains" — sekitar 30 halaman. Fokus pada bagian tentang demand sensing dan dynamic replenishment.
+          </div>
+        </div>
+        <div class="reading-item">
+          <span class="reading-icon">🎥</span>
+          <div class="reading-label">
+            <strong>YouTube: "How Amazon's Logistics AI Works" (CNBC, ~15 menit)</strong>
+            Visualisasi sistem fulfillment Amazon yang sangat baik. Tonton sebelum P-06 untuk membangun intuisi sebelum praktik demand forecasting.
+          </div>
+        </div>
+        <div class="reading-item">
+          <span class="reading-icon">📦</span>
+          <div class="reading-label">
+            <strong>Dataset untuk P-06 — Google Classroom → Pertemuan 6</strong>
+            Unduh <code>penjualan_bulanan.xlsx</code> dari Google Classroom. Dataset berisi 3 tahun data penjualan produk FMCG dengan kolom tanggal, volume, harga, dan kode wilayah. Pastikan sudah ter-download sebelum pertemuan ke-6.
+          </div>
+        </div>
+        <div class="reading-item">
+          <span class="reading-icon">📄</span>
+          <div class="reading-label">
+            <strong>McKinsey: "AI in Supply Chain — Unlocking the Potential" (2023)</strong>
+            Laporan singkat 12 halaman, tersedia gratis di mckinsey.com. Berisi data adopsi AI di supply chain dan ROI yang terdokumentasi secara industri.
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ── ASIDE ── -->
+  <aside class="content-aside">
+    <!-- TOC -->
+    <div class="toc">
+      <div class="toc-title">Isi Halaman</div>
+      <ul class="toc-list">
+        <li><a href="#tujuan" class="active">Tujuan Pembelajaran</a></li>
+        <li><a href="#mengapa">1. Mengapa AI di Supply Chain</a></li>
+        <li><a href="#supply-chain">2. AI di Rantai Pasok</a></li>
+        <li><a href="#produksi">3. AI di Lantai Produksi</a></li>
+        <li><a href="#studi-kasus">4. Studi Kasus Global</a></li>
+        <li><a href="#implementasi">5. Implementasi Lokal</a></li>
+        <li><a href="#ringkasan">Ringkasan & Tugas</a></li>
+      </ul>
+    </div>
+
+    <!-- Sesi nav -->
+    <div class="sesi-nav-aside">
+      <div class="sesi-nav-title">Navigasi Sesi</div>
+      <a href="sesi-04.html" class="sesi-nav-btn">
+        <span>←</span>
+        <span>P-04: Data Industri — Pembersihan & Visualisasi</span>
+      </a>
+      <a href="../index.html" class="sesi-nav-btn" style="margin-top:var(--s2);">
+        <span>🏠</span>
+        <span>Kembali ke Beranda</span>
+      </a>
+      <div style="font-size:12px;color:var(--text-3);margin-top:var(--s4);padding:var(--s3) 0;border-top:1px solid var(--border);">Sesi berikutnya:</div>
+      <a href="#" class="sesi-nav-btn" style="opacity:0.5;pointer-events:none;">
+        <span>→</span>
+        <span>P-06: Praktik Prediksi Demand & Simulasi Rantai Pasok</span>
+      </a>
+    </div>
+
+    <!-- Info box -->
+    <div style="background:var(--bg-2);border:1px solid var(--border);border-radius:var(--r3);padding:var(--s5);margin-top:var(--s4);">
+      <div style="font-family:var(--mono);font-size:10px;color:var(--text-3);letter-spacing:2px;text-transform:uppercase;margin-bottom:var(--s3);">Info Pertemuan</div>
+      <div style="display:flex;flex-direction:column;gap:var(--s3);">
+        <div>
+          <div style="font-size:11px;color:var(--text-3);">Tipe</div>
+          <div style="font-size:13px;color:var(--text);">Teori & Studi Kasus</div>
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--text-3);">Durasi</div>
+          <div style="font-size:13px;color:var(--text);">100 menit</div>
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--text-3);">CPMK</div>
+          <div style="font-size:13px;color:var(--text);">C1 (Ekosistem AI), C4 (AI untuk industri), C5 (Evaluasi solusi AI)</div>
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--text-3);">Referensi Utama</div>
+          <div style="font-size:13px;color:var(--text);">Davenport — AI Advantage, Ch. 5</div>
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--text-3);">Studi Kasus</div>
+          <div style="font-size:13px;color:var(--text);">Toyota, Unilever, Amazon, Semen Gresik, Sido Muncul</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Key terms -->
+    <div style="background:var(--bg-2);border:1px solid var(--border);border-radius:var(--r3);padding:var(--s5);margin-top:var(--s4);">
+      <div style="font-family:var(--mono);font-size:10px;color:var(--text-3);letter-spacing:2px;text-transform:uppercase;margin-bottom:var(--s4);">Istilah Kunci</div>
+      <div style="display:flex;flex-direction:column;gap:var(--s3);font-size:12px;">
+        <div><span style="color:var(--blue);font-family:var(--mono);">Bullwhip Effect</span><div style="color:var(--text-2);">Amplifikasi fluktuasi demand di sepanjang rantai pasok</div></div>
+        <div><span style="color:var(--blue);font-family:var(--mono);">OEE</span><div style="color:var(--text-2);">Overall Equipment Effectiveness = Availability × Performance × Quality</div></div>
+        <div><span style="color:var(--blue);font-family:var(--mono);">MAPE</span><div style="color:var(--text-2);">Mean Absolute Percentage Error — ukuran akurasi forecasting</div></div>
+        <div><span style="color:var(--blue);font-family:var(--mono);">VRP</span><div style="color:var(--text-2);">Vehicle Routing Problem — optimasi rute pengiriman</div></div>
+        <div><span style="color:var(--blue);font-family:var(--mono);">Digital Twin</span><div style="color:var(--text-2);">Replika digital proses fisik untuk simulasi dan optimasi</div></div>
+        <div><span style="color:var(--blue);font-family:var(--mono);">Jidoka</span><div style="color:var(--text-2);">Prinsip TPS: otomatisasi dengan sentuhan manusia (autonomasi)</div></div>
+      </div>
+    </div>
+  </aside>
+
+</div>
+
+<!-- ══ FOOTER ══ -->
+<footer class="footer">
+  <div>AI·UKWMS <span style="color:var(--text-3);">· P-05 AI untuk Optimasi Produksi & Supply Chain</span></div>
+  <div><a href="../index.html" style="color:var(--text-3);">← Kembali ke Beranda TI</a></div>
+</footer>
+
+<script>
+  const headings = document.querySelectorAll('.content-main [id]');
+  const tocLinks = document.querySelectorAll('.toc-list a');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(a => {
+          a.classList.remove('active');
+          if (a.getAttribute('href') === '#' + entry.target.id) a.classList.add('active');
+        });
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px' });
+  headings.forEach(h => observer.observe(h));
+
+  const navLinks = document.querySelectorAll('.nav-links a[href^="#"]');
+  window.addEventListener('scroll', () => {
+    let current = '';
+    headings.forEach(h => { if (window.scrollY >= h.offsetTop - 100) current = h.id; });
+    navLinks.forEach(a => {
+      a.classList.remove('active');
+      if (a.getAttribute('href') === '#' + current) a.classList.add('active');
+    });
+  });
+</script>
+</body>
+</html>
