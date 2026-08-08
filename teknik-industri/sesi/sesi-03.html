@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>P-03: Praktik AutoML — Klasifikasi & Prediksi dengan Orange · Teknik Industri UKWMS</title>
+<link rel="stylesheet" href="../../css/style.css">
+<style>
+  .orange-flow {
+    display: flex;
+    align-items: center;
+    gap: var(--s3);
+    flex-wrap: wrap;
+    margin: var(--s5) 0;
+  }
+  .flow-step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--s2);
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: var(--r2);
+    padding: var(--s3) var(--s4);
+    min-width: 110px;
+    text-align: center;
+  }
+  .flow-step-icon { font-size: 22px; }
+  .flow-step-name { font-size: 12px; font-weight: 600; color: var(--text); }
+  .flow-step-sub  { font-size: 10px; color: var(--text-3); font-family: var(--mono); }
+  .flow-arrow { color: var(--text-3); font-size: 18px; flex-shrink: 0; }
+
+  .widget-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--s3);
+    margin: var(--s4) 0;
+  }
+  .widget-card {
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: var(--r2);
+    padding: var(--s4);
+  }
+  .widget-name {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--blue);
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+  .widget-cat {
+    font-size: 10px;
+    color: var(--text-3);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: var(--s2);
+  }
+  .widget-desc { font-size: 12px; color: var(--text-2); line-height: 1.5; }
+
+  .step-list {
+    counter-reset: step-counter;
+    list-style: none;
+    padding: 0;
+    margin: var(--s4) 0;
+  }
+  .step-list li {
+    counter-increment: step-counter;
+    display: flex;
+    gap: var(--s4);
+    align-items: flex-start;
+    padding: var(--s3) 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 14px;
+    color: var(--text-2);
+    line-height: 1.7;
+  }
+  .step-list li:last-child { border-bottom: none; }
+  .step-list li::before {
+    content: counter(step-counter);
+    flex-shrink: 0;
+    width: 24px;
+    height: 24px;
+    background: var(--blue-dim);
+    border: 1px solid rgba(74,142,245,0.25);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--blue);
+    font-weight: 600;
+    margin-top: 2px;
+  }
+
+  .metric-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--s3);
+    margin: var(--s4) 0;
+  }
+  .metric-card {
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: var(--r2);
+    padding: var(--s4);
+    text-align: center;
+  }
+  .metric-name {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-3);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: var(--s2);
+  }
+  .metric-formula {
+    font-size: 13px;
+    color: var(--blue);
+    font-family: var(--mono);
+    margin-bottom: var(--s2);
+    word-break: break-word;
+  }
+  .metric-when { font-size: 11px; color: var(--text-2); line-height: 1.5; }
+
+  .scenario-block {
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: var(--r3);
+    padding: var(--s5);
+    margin-bottom: var(--s4);
+  }
+  .scenario-header {
+    display: flex;
+    align-items: center;
+    gap: var(--s3);
+    margin-bottom: var(--s4);
+  }
+  .scenario-icon { font-size: 28px; }
+  .scenario-title { font-size: 16px; font-weight: 600; color: var(--text); }
+  .scenario-sub { font-size: 12px; color: var(--text-3); font-family: var(--mono); }
+
+  .dataset-info {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: var(--s3);
+    margin: var(--s4) 0;
+  }
+  .dataset-col {
+    background: var(--bg-1);
+    border: 1px solid var(--border);
+    border-radius: var(--r2);
+    padding: var(--s3) var(--s4);
+  }
+  .dataset-col-label {
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--text-3);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: var(--s2);
+  }
+  .dataset-col ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .dataset-col ul li {
+    font-size: 12px;
+    color: var(--text-2);
+    padding: 3px 6px;
+    background: var(--bg-2);
+    border-radius: var(--r1);
+    font-family: var(--mono);
+  }
+  .target-badge {
+    display: inline-block;
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: var(--r1);
+    font-family: var(--mono);
+    font-weight: 600;
+    background: rgba(0,201,177,0.12);
+    color: var(--teal);
+    border: 1px solid rgba(0,201,177,0.3);
+  }
+</style>
+</head>
+<body>
+
+<!-- ══ NAV ══ -->
+<nav class="nav">
+  <div class="nav-logo">AI<span>·</span>UKWMS</div>
+  <ul class="nav-links">
+    <li><a href="../index.html">← Beranda</a></li>
+    <li><a href="#tujuan" class="active">Tujuan</a></li>
+    <li><a href="#orange">Orange</a></li>
+    <li><a href="#klasifikasi">Klasifikasi</a></li>
+    <li><a href="#evaluasi">Evaluasi</a></li>
+    <li><a href="#tugas">Tugas</a></li>
+  </ul>
+</nav>
+
+<!-- ══ SESI HERO ══ -->
+<header class="sesi-hero">
+  <div style="max-width:1100px;margin:0 auto;">
+    <div class="sesi-breadcrumb">
+      <a href="../index.html">Kecerdasan Buatan — Teknik Industri</a>
+      <span>›</span>
+      <span>Pertemuan 3</span>
+    </div>
+    <div class="sesi-num">PERTEMUAN 03 · PRAKTIK</div>
+    <h1 class="sesi-title">Praktik AutoML:<br>Klasifikasi & Prediksi<br><em style="color:var(--teal);">dengan Orange</em></h1>
+    <p style="font-size:15px;color:var(--text-2);max-width:640px;line-height:1.8;">Membangun model prediksi cacat produk dan churn pelanggan menggunakan drag-and-drop di Orange Data Mining — tanpa menulis satu baris kode pun.</p>
+    <div class="sesi-meta-row">
+      <span class="badge badge-teal">Praktik</span>
+      <span class="badge badge-blue">100 menit</span>
+      <span class="badge badge-amber">CPMK: C2, C3</span>
+    </div>
+  </div>
+</header>
+
+<!-- ══ CONTENT LAYOUT ══ -->
+<div class="content-layout">
+
+  <!-- ── MAIN ── -->
+  <main class="content-main">
+
+    <!-- TUJUAN -->
+    <div class="content-block" id="tujuan">
+      <h2>Tujuan Pembelajaran</h2>
+      <p>Setelah mengikuti pertemuan ini, mahasiswa diharapkan mampu:</p>
+      <ol>
+        <li>Menginstal dan menjalankan antarmuka Orange Data Mining dengan benar</li>
+        <li>Membangun alur kerja (workflow) klasifikasi dan regresi menggunakan widget drag-and-drop</li>
+        <li>Memuat dataset industri, melakukan inspeksi awal, dan mengidentifikasi variabel target</li>
+        <li>Melatih model Decision Tree dan k-NN untuk prediksi cacat produk</li>
+        <li>Memahami dan menginterpretasi metrik evaluasi model: akurasi, precision, recall, dan AUC</li>
+        <li>Membandingkan performa dua algoritma berbeda untuk kasus yang sama</li>
+      </ol>
+
+      <div class="callout tip" style="margin-top:var(--s5);">
+        <span class="callout-icon">🛠️</span>
+        <div class="callout-body">
+          <p><strong>Persiapan:</strong> Pastikan Orange 3.x sudah terinstal di laptop kamu sebelum sesi dimulai (link instalasi ada di Edlink). Bawa laptop dengan minimal 4GB RAM. Dataset yang digunakan hari ini sudah tersedia di folder <code>resources/P03/</code> di Edlink.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ORANGE INTRO -->
+    <div class="content-block" id="orange">
+      <h2>1. Mengenal Orange Data Mining</h2>
+      <p>Orange adalah platform machine learning visual berbasis Python yang dikembangkan oleh Universitas Ljubljana, Slovenia. Filosofinya sederhana: semua langkah analisis data — dari loading, preprocessing, modeling, hingga evaluasi — dilakukan dengan menyambungkan widget secara visual di kanvas.</p>
+
+      <div class="callout info" style="margin-bottom:var(--s5);">
+        <span class="callout-icon">💡</span>
+        <div class="callout-body">
+          <p><strong>Mengapa Orange untuk TI?</strong> Sebagai insinyur industri, tugas kamu bukan menulis kode ML dari nol — melainkan memahami masalah, memilih metode yang tepat, dan menginterpretasi hasilnya. Orange memungkinkan kamu melakukan semua ini tanpa barrier pemrograman.</p>
+        </div>
+      </div>
+
+      <h3>Alur Kerja Standar di Orange</h3>
+      <div class="orange-flow">
+        <div class="flow-step">
+          <span class="flow-step-icon">📁</span>
+          <span class="flow-step-name">File / CSV</span>
+          <span class="flow-step-sub">Load data</span>
+        </div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-step">
+          <span class="flow-step-icon">🔍</span>
+          <span class="flow-step-name">Data Table</span>
+          <span class="flow-step-sub">Inspeksi awal</span>
+        </div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-step">
+          <span class="flow-step-icon">⚙️</span>
+          <span class="flow-step-name">Preprocess</span>
+          <span class="flow-step-sub">Bersihkan data</span>
+        </div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-step">
+          <span class="flow-step-icon">🧪</span>
+          <span class="flow-step-name">Test & Score</span>
+          <span class="flow-step-sub">Cross-validation</span>
+        </div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-step">
+          <span class="flow-step-icon">📊</span>
+          <span class="flow-step-name">Confusion Matrix</span>
+          <span class="flow-step-sub">Evaluasi hasil</span>
+        </div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-step">
+          <span class="flow-step-icon">📈</span>
+          <span class="flow-step-name">ROC Curve</span>
+          <span class="flow-step-sub">AUC analysis</span>
+        </div>
+      </div>
+
+      <h3>Widget-widget Penting di Orange</h3>
+      <div class="widget-grid">
+        <div class="widget-card">
+          <div class="widget-name">File</div>
+          <div class="widget-cat">Data · Input</div>
+          <div class="widget-desc">Memuat dataset dari CSV, Excel, atau format lainnya ke dalam workflow Orange.</div>
+        </div>
+        <div class="widget-card">
+          <div class="widget-name">Data Table</div>
+          <div class="widget-cat">Data · Visualize</div>
+          <div class="widget-desc">Menampilkan data dalam bentuk tabel, memeriksa tipe variabel dan nilai yang hilang.</div>
+        </div>
+        <div class="widget-card">
+          <div class="widget-name">Distributions</div>
+          <div class="widget-cat">Visualize · EDA</div>
+          <div class="widget-desc">Menampilkan distribusi setiap fitur — histogram dan bar chart otomatis sesuai tipe data.</div>
+        </div>
+        <div class="widget-card">
+          <div class="widget-name">Scatter Plot</div>
+          <div class="widget-cat">Visualize · EDA</div>
+          <div class="widget-desc">Korelasi antar dua variabel numerik, dapat diwarnai berdasarkan kelas target.</div>
+        </div>
+        <div class="widget-card">
+          <div class="widget-name">Preprocess</div>
+          <div class="widget-cat">Data · Transform</div>
+          <div class="widget-desc">Normalisasi, imputasi nilai kosong, encoding kategori — semua dalam satu widget.</div>
+        </div>
+        <div class="widget-card">
+          <div class="widget-name">Decision Tree</div>
+          <div class="widget-cat">Model · Classify</div>
+          <div class="widget-desc">Algoritma berbasis aturan IF-THEN yang mudah diinterpretasi — cocok untuk kasus industri.</div>
+        </div>
+        <div class="widget-card">
+          <div class="widget-name">k-NN</div>
+          <div class="widget-cat">Model · Classify</div>
+          <div class="widget-desc">k-Nearest Neighbors — mengklasifikasi berdasarkan kemiripan dengan data historis terdekat.</div>
+        </div>
+        <div class="widget-card">
+          <div class="widget-name">Test and Score</div>
+          <div class="widget-cat">Evaluate</div>
+          <div class="widget-desc">Menjalankan cross-validation pada satu atau beberapa model sekaligus dan menampilkan metrik.</div>
+        </div>
+        <div class="widget-card">
+          <div class="widget-name">Confusion Matrix</div>
+          <div class="widget-cat">Evaluate · Visual</div>
+          <div class="widget-desc">Matriks TP, TN, FP, FN — menampilkan di mana model salah dan benar dalam klasifikasi.</div>
+        </div>
+      </div>
+
+      <div class="callout warn">
+        <span class="callout-icon">⚠️</span>
+        <div class="callout-body">
+          <p><strong>Koneksi widget:</strong> Di Orange, setiap widget memiliki titik input (kiri) dan output (kanan). Tarik garis dari output satu widget ke input widget berikutnya. Jika garis berwarna merah, berarti ada ketidakcocokan tipe data — periksa urutan widget dan tipe data yang dikirim.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- SKENARIO 1: KLASIFIKASI CACAT PRODUK -->
+    <div class="content-block" id="klasifikasi">
+      <h2>2. Skenario A — Klasifikasi Cacat Produk</h2>
+
+      <div class="scenario-block">
+        <div class="scenario-header">
+          <span class="scenario-icon">🔍</span>
+          <div>
+            <div class="scenario-title">Prediksi Cacat Produk di Lini Produksi</div>
+            <div class="scenario-sub">KASUS NYATA · Quality Control · Manufaktur FMCG</div>
+          </div>
+        </div>
+        <p style="font-size:14px;color:var(--text-2);line-height:1.8;">Sebuah pabrik FMCG (Fast-Moving Consumer Goods) di Surabaya mengalami tingkat reject produk 4,2% — jauh di atas target 1,5%. Inspektur QC sudah kewalahan memeriksa 15.000 unit per hari secara manual. Manajer produksi memintamu membangun model yang bisa <strong>memprediksi apakah sebuah unit akan cacat</strong> berdasarkan parameter proses produksi yang tercatat di sistem MES.</p>
+      </div>
+
+      <h3>Dataset: <code>produk_cacat.csv</code></h3>
+      <p style="font-size:14px;color:var(--text-2);">Dataset berisi 2.400 observasi dari data historis produksi selama 6 bulan terakhir.</p>
+      <div class="dataset-info">
+        <div class="dataset-col">
+          <div class="dataset-col-label">Fitur Input (X)</div>
+          <ul>
+            <li>suhu_mesin</li>
+            <li>tekanan_cetakan</li>
+            <li>kecepatan_ban_berjalan</li>
+            <li>kelembaban_ruangan</li>
+            <li>umur_cetakan_hari</li>
+            <li>shift (pagi/siang/malam)</li>
+            <li>operator_id</li>
+          </ul>
+        </div>
+        <div class="dataset-col">
+          <div class="dataset-col-label">Variabel Target (Y)</div>
+          <ul>
+            <li style="background:rgba(0,201,177,0.12);color:var(--teal);border:1px solid rgba(0,201,177,0.3);">status_produk</li>
+          </ul>
+          <div style="margin-top:var(--s3);font-size:12px;color:var(--text-2);">
+            Nilai: <br>
+            <span class="target-badge">OK</span> — tidak cacat<br>
+            <span style="font-size:11px;padding:2px 8px;border-radius:var(--r1);font-family:var(--mono);font-weight:600;background:rgba(240,96,96,0.1);color:var(--red);border:1px solid rgba(240,96,96,0.3);display:inline-block;margin-top:4px;">CACAT</span> — perlu dibuang/rework
+          </div>
+        </div>
+        <div class="dataset-col">
+          <div class="dataset-col-label">Statistik Dataset</div>
+          <ul>
+            <li style="background:transparent;color:var(--text-2);">2.400 baris observasi</li>
+            <li style="background:transparent;color:var(--text-2);">7 fitur input</li>
+            <li style="background:transparent;color:var(--text-2);">1 target biner</li>
+            <li style="background:transparent;color:var(--text-2);">Kelas OK: 78,4%</li>
+            <li style="background:transparent;color:var(--text-2);">Kelas CACAT: 21,6%</li>
+            <li style="background:transparent;color:var(--text-2);">Nilai kosong: ~3%</li>
+          </ul>
+        </div>
+      </div>
+
+      <h3>Langkah Praktik — Bangun Workflow di Orange</h3>
+      <ol class="step-list">
+        <li><strong>Load data:</strong> Buka Orange → seret widget <code>File</code> ke kanvas → klik dua kali → pilih file <code>produk_cacat.csv</code>. Periksa di pojok kanan bawah widget bahwa Orange berhasil membaca 2.400 baris dan 8 kolom.</li>
+        <li><strong>Inspeksi awal:</strong> Sambungkan <code>File</code> → <code>Data Table</code>. Lihat apakah kolom <code>status_produk</code> bertipe "categorical" (bukan numerik). Jika belum, klik kanan kolom tersebut → Set as Target.</li>
+        <li><strong>Distribusi fitur:</strong> Sambungkan <code>File</code> → <code>Distributions</code>. Pilih fitur <code>suhu_mesin</code> dan <code>shift</code> bergantian. Perhatikan apakah ada perbedaan distribusi antara produk OK dan CACAT.</li>
+        <li><strong>Preprocessing:</strong> Sambungkan <code>File</code> → <code>Preprocess</code>. Aktifkan: <em>Impute Missing Values</em> (pilih "Average/Most frequent"), <em>Normalize Features</em>. Ini penting karena k-NN sensitif terhadap skala fitur.</li>
+        <li><strong>Masukkan dua model:</strong> Dari panel kiri kategori "Model", seret <code>Decision Tree</code> dan <code>kNN</code> ke kanvas. Sambungkan keduanya ke output <code>Preprocess</code>.</li>
+        <li><strong>Test dan evaluasi:</strong> Seret widget <code>Test and Score</code> → sambungkan output <code>Preprocess</code> sebagai Data, dan kedua model sebagai Learner. Atur metode ke <em>Cross Validation, k=10 folds</em>. Klik Run.</li>
+        <li><strong>Lihat Confusion Matrix:</strong> Sambungkan <code>Test and Score</code> → <code>Confusion Matrix</code>. Pilih model yang ditampilkan dan amati di mana model salah mengklasifikasi.</li>
+        <li><strong>ROC Curve:</strong> Sambungkan <code>Test and Score</code> → <code>ROC Analysis</code>. Bandingkan kurva AUC Decision Tree vs k-NN pada kelas CACAT.</li>
+      </ol>
+
+      <div class="callout tip">
+        <span class="callout-icon">🎯</span>
+        <div class="callout-body">
+          <p><strong>Fokus pada kelas CACAT:</strong> Dalam konteks QC, biaya <em>false negative</em> (produk cacat lolos = sampai ke konsumen) jauh lebih mahal dari <em>false positive</em> (produk bagus dibuang = kerugian material). Artinya, kita lebih mementingkan <em>Recall</em> untuk kelas CACAT daripada akurasi keseluruhan.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- SKENARIO 2: CHURN -->
+    <div class="content-block" id="churn">
+      <h2>3. Skenario B — Prediksi Churn Pelanggan</h2>
+
+      <div class="scenario-block">
+        <div class="scenario-header">
+          <span class="scenario-icon">👥</span>
+          <div>
+            <div class="scenario-title">Prediksi Pelanggan yang Akan Berhenti Berlangganan</div>
+            <div class="scenario-sub">KASUS NYATA · Customer Retention · Industri Distribusi</div>
+          </div>
+        </div>
+        <p style="font-size:14px;color:var(--text-2);line-height:1.8;">Perusahaan distributor spare part industri di Jawa Timur kehilangan 12% pelanggan korporat per tahun. Biaya akuisisi pelanggan baru 5× lebih mahal daripada mempertahankan pelanggan lama. Tim sales memintamu membangun model yang bisa <strong>mengidentifikasi pelanggan berisiko tinggi churn</strong> — agar tim bisa melakukan intervensi proaktif sebelum mereka pergi.</p>
+      </div>
+
+      <h3>Dataset: <code>pelanggan_distribusi.csv</code></h3>
+      <div class="dataset-info">
+        <div class="dataset-col">
+          <div class="dataset-col-label">Fitur Input (X)</div>
+          <ul>
+            <li>total_pembelian_6bln</li>
+            <li>frekuensi_order</li>
+            <li>rata_nilai_order</li>
+            <li>hari_sejak_terakhir_order</li>
+            <li>jumlah_keluhan</li>
+            <li>tenure_bulan</li>
+            <li>tipe_kontrak</li>
+          </ul>
+        </div>
+        <div class="dataset-col">
+          <div class="dataset-col-label">Variabel Target (Y)</div>
+          <ul>
+            <li style="background:rgba(0,201,177,0.12);color:var(--teal);border:1px solid rgba(0,201,177,0.3);">churn</li>
+          </ul>
+          <div style="margin-top:var(--s3);font-size:12px;color:var(--text-2);">
+            Nilai: <br>
+            <span class="target-badge">0</span> — masih aktif<br>
+            <span style="font-size:11px;padding:2px 8px;border-radius:var(--r1);font-family:var(--mono);font-weight:600;background:rgba(240,96,96,0.1);color:var(--red);border:1px solid rgba(240,96,96,0.3);display:inline-block;margin-top:4px;">1</span> — sudah churn
+          </div>
+        </div>
+        <div class="dataset-col">
+          <div class="dataset-col-label">Statistik Dataset</div>
+          <ul>
+            <li style="background:transparent;color:var(--text-2);">1.800 pelanggan</li>
+            <li style="background:transparent;color:var(--text-2);">7 fitur input</li>
+            <li style="background:transparent;color:var(--text-2);">1 target biner</li>
+            <li style="background:transparent;color:var(--text-2);">Aktif (0): 88,1%</li>
+            <li style="background:transparent;color:var(--text-2);">Churn (1): 11,9%</li>
+            <li style="background:transparent;color:var(--text-2);">Nilai kosong: &lt;1%</li>
+          </ul>
+        </div>
+      </div>
+
+      <h3>Langkah Tambahan — Interpretasi Decision Tree</h3>
+      <ol class="step-list">
+        <li>Ulangi alur workflow Skenario A dengan dataset <code>pelanggan_distribusi.csv</code> dan target kolom <code>churn</code>.</li>
+        <li>Setelah melatih model, sambungkan <code>Decision Tree</code> → <code>Decision Tree Viewer</code>. Visualisasi pohon keputusan akan muncul.</li>
+        <li>Identifikasi <em>root node</em> — fitur apa yang paling pertama digunakan untuk memisahkan data? Ini adalah prediktor terkuat churn.</li>
+        <li>Telusuri path menuju node "Churn = 1". Aturan apa yang terbentuk? Contoh: <em>"Jika hari_sejak_terakhir_order &gt; 60 AND jumlah_keluhan &gt; 2, maka kemungkinan churn 87%"</em></li>
+        <li>Catat 3 aturan IF-THEN terpenting yang dihasilkan pohon. Aturan-aturan ini langsung bisa dikomunikasikan ke tim sales sebagai <em>early warning indicators</em>.</li>
+      </ol>
+
+      <div class="callout info">
+        <span class="callout-icon">💼</span>
+        <div class="callout-body">
+          <p><strong>Nilai bisnis nyata:</strong> Aturan yang dihasilkan Decision Tree bisa langsung digunakan sebagai trigger otomatis di sistem CRM — misalnya: kirimkan alert ke sales manager ketika pelanggan memenuhi kondisi risiko tinggi, tanpa perlu memahami matematika di balik model.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- EVALUASI MODEL -->
+    <div class="content-block" id="evaluasi">
+      <h2>4. Membaca & Menginterpretasi Hasil Evaluasi</h2>
+      <p>Angka yang dihasilkan widget <em>Test and Score</em> hanya bermakna jika kamu memahami apa yang mereka ukur dan dalam konteks apa mereka penting. Berikut empat metrik utama yang akan kamu temui:</p>
+
+      <div class="metric-grid">
+        <div class="metric-card">
+          <div class="metric-name">Accuracy</div>
+          <div class="metric-formula">(TP + TN) / Total</div>
+          <div class="metric-when">Cocok ketika kelas seimbang. <strong>Menyesatkan</strong> jika kelas sangat tidak seimbang (misal: 95% OK, 5% cacat — model yang selalu prediksi OK sudah 95% akurat).</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-name">Precision</div>
+          <div class="metric-formula">TP / (TP + FP)</div>
+          <div class="metric-when">Dari semua yang diprediksi cacat, berapa yang benar-benar cacat? Penting jika biaya <em>false alarm</em> tinggi (membuang produk bagus).</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-name">Recall</div>
+          <div class="metric-formula">TP / (TP + FN)</div>
+          <div class="metric-when">Dari semua cacat nyata, berapa yang berhasil terdeteksi? Penting jika biaya <em>missed detection</em> tinggi (cacat lolos ke konsumen).</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-name">AUC</div>
+          <div class="metric-formula">Area under ROC Curve</div>
+          <div class="metric-when">Mengukur kemampuan model membedakan dua kelas di semua threshold. AUC = 1,0 sempurna, AUC = 0,5 sama dengan tebak acak. Metrik terbaik untuk kelas tidak seimbang.</div>
+        </div>
+      </div>
+
+      <h3 style="margin-top:var(--s5);">Panduan Interpretasi untuk Konteks Industri</h3>
+      <table class="industry-table">
+        <thead>
+          <tr>
+            <th>Kasus Industri</th>
+            <th>Prioritaskan</th>
+            <th>Alasan</th>
+            <th>Konsekuensi jika salah prioritas</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Deteksi cacat produk QC</td>
+            <td><strong style="color:var(--teal);">Recall</strong></td>
+            <td>Tidak boleh ada produk cacat yang lolos ke konsumen</td>
+            <td>Recall rendah → recall = produk cacat lolos → komplain pelanggan, recall produk mahal</td>
+          </tr>
+          <tr>
+            <td>Prediksi churn pelanggan</td>
+            <td><strong style="color:var(--blue);">Recall + Precision</strong></td>
+            <td>Seimbangkan: tangkap sebanyak mungkin churn, tapi jangan ganggu pelanggan loyal terlalu sering</td>
+            <td>Precision rendah → sales menghubungi terlalu banyak pelanggan yang tidak akan churn = pemborosan</td>
+          </tr>
+          <tr>
+            <td>Predictive maintenance mesin</td>
+            <td><strong style="color:var(--teal);">Recall</strong></td>
+            <td>Kerusakan mesin yang tidak terdeteksi jauh lebih mahal dari penggantian komponen yang belum rusak</td>
+            <td>Recall rendah → breakdown tak terduga → downtime produksi, kerusakan sekunder</td>
+          </tr>
+          <tr>
+            <td>Fraud detection pembayaran</td>
+            <td><strong style="color:var(--amber);">Precision</strong></td>
+            <td>Memblokir transaksi sah (false positive) merusak pengalaman pelanggan dan reputasi</td>
+            <td>Precision rendah → terlalu banyak transaksi sah diblokir → pelanggan marah, churn</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="callout warn" style="margin-top:var(--s5);">
+        <span class="callout-icon">⚠️</span>
+        <div class="callout-body">
+          <p><strong>Jangan tertipu akurasi tinggi:</strong> Dataset cacat produk kita 78% OK dan 22% CACAT. Model yang selalu memprediksi "OK" akan mendapat akurasi 78% — terlihat bagus, tapi sama sekali tidak berguna karena 100% cacat lolos. Selalu periksa confusion matrix untuk memahami di mana model gagal.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- DISKUSI & PERBANDINGAN -->
+    <div class="content-block" id="diskusi">
+      <h2>5. Diskusi Kelas — Decision Tree vs k-NN</h2>
+      <p>Setelah menjalankan kedua model di dua skenario, diskusikan pertanyaan berikut dalam kelompok (5–10 menit):</p>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--s4);margin:var(--s4) 0;">
+        <div style="background:var(--bg-2);border:1px solid var(--border);border-radius:var(--r2);padding:var(--s4);">
+          <div style="font-family:var(--mono);font-size:10px;color:var(--blue);letter-spacing:2px;text-transform:uppercase;margin-bottom:var(--s3);">Decision Tree</div>
+          <ul style="font-size:13px;color:var(--text-2);line-height:1.8;padding-left:var(--s4);">
+            <li>Menghasilkan aturan yang bisa dibaca manusia</li>
+            <li>Mudah dijelaskan ke manajer non-teknis</li>
+            <li>Cepat saat prediksi</li>
+            <li>Rentan overfitting jika pohon terlalu dalam</li>
+            <li>Tidak butuh normalisasi fitur</li>
+          </ul>
+        </div>
+        <div style="background:var(--bg-2);border:1px solid var(--border);border-radius:var(--r2);padding:var(--s4);">
+          <div style="font-family:var(--mono);font-size:10px;color:var(--purple);letter-spacing:2px;text-transform:uppercase;margin-bottom:var(--s3);">k-Nearest Neighbors</div>
+          <ul style="font-size:13px;color:var(--text-2);line-height:1.8;padding-left:var(--s4);">
+            <li>Tidak ada "model" eksplisit — hanya ingat data training</li>
+            <li>Performa baik pada dataset kecil-menengah</li>
+            <li>Lambat untuk dataset sangat besar</li>
+            <li>Sangat sensitif terhadap skala fitur (harus dinormalisasi)</li>
+            <li>Sulit dijelaskan mengapa suatu prediksi dibuat</li>
+          </ul>
+        </div>
+      </div>
+
+      <p style="font-size:14px;color:var(--text-2);line-height:1.8;"><strong style="color:var(--text);">Pertanyaan diskusi:</strong> Dari dua skenario yang kamu coba (cacat produk & churn pelanggan), model mana yang lebih baik? Pertimbangkan tidak hanya metrik AUC, tapi juga: siapa yang akan menggunakan hasil prediksi ini? Apakah mereka perlu memahami <em>mengapa</em> model membuat keputusan tertentu?</p>
+    </div>
+
+    <!-- RINGKASAN & TUGAS -->
+    <div class="content-block" id="ringkasan">
+      <h2>Ringkasan Pertemuan Ini</h2>
+      <div style="background:var(--bg-2);border:1px solid var(--border);border-radius:var(--r3);padding:var(--s5);">
+        <ul>
+          <li>Orange Data Mining memungkinkan membangun model ML lengkap — dari load data hingga evaluasi — tanpa satu baris kode pun</li>
+          <li>Alur standar: File → Preprocess → Model (Decision Tree / kNN) → Test &amp; Score → Confusion Matrix → ROC Analysis</li>
+          <li>Decision Tree menghasilkan aturan IF-THEN yang bisa langsung diterjemahkan menjadi prosedur operasional</li>
+          <li>Pemilihan metrik evaluasi bergantung pada konteks bisnis — Recall lebih penting dari Precision untuk kasus QC dan predictive maintenance</li>
+          <li>Kelas tidak seimbang (imbalanced class) adalah tantangan umum di data industri — akurasi bisa menyesatkan, AUC lebih andal</li>
+          <li>Setiap prediksi model harus diinterpretasi dalam konteks biaya bisnis: biaya false positive vs false negative berbeda tiap kasus</li>
+        </ul>
+      </div>
+
+      <!-- TASK BOX -->
+      <div class="task-box" id="tugas">
+        <div class="task-box-title">📋 Tugas Pertemuan Ini</div>
+        <p style="font-size:13px;color:var(--text-2);margin-bottom:var(--s4);">Dikumpulkan sebelum pertemuan ke-4 melalui Edlink. Format: PDF laporan singkat + screenshot workflow Orange.</p>
+        <ol style="font-size:14px;color:var(--text);line-height:2;">
+          <li>Selesaikan kedua workflow Orange (cacat produk & churn pelanggan) dan <strong>screenshot hasil Test and Score</strong> beserta Confusion Matrix untuk masing-masing model. Sertakan dalam laporan.</li>
+          <li>Untuk kasus cacat produk: Decision Tree atau k-NN yang kamu pilih sebagai model final? <strong>Jelaskan alasanmu dalam 100–150 kata</strong>, sertakan angka AUC dan Recall sebagai dasar argumen.</li>
+          <li>Dari Decision Tree Viewer pada kasus churn, <strong>tulis 3 aturan IF-THEN</strong> yang dihasilkan model. Ubah setiap aturan menjadi rekomendasi tindakan nyata yang bisa dilakukan tim sales (contoh: "Hubungi pelanggan dalam 7 hari jika...").</li>
+          <li><em>Opsional (bonus):</em> Coba parameter <em>Maximum depth</em> di Decision Tree widget — ubah dari 3 ke 5 ke 10. Bagaimana dampaknya terhadap akurasi training vs akurasi cross-validation? Fenomena apa yang kamu amati?</li>
+        </ol>
+      </div>
+
+      <!-- READING BOX -->
+      <div class="reading-box">
+        <div class="reading-box-title">📖 Persiapan Pertemuan Ke-4</div>
+        <div class="reading-item">
+          <span class="reading-icon">📗</span>
+          <div class="reading-label">
+            <strong>Gentsch — "AI for Business", Chapter 4</strong>
+            "Data Quality in AI Projects" — Memahami mengapa kualitas data menentukan kualitas model, sebelum sesi data cleaning di P-04
+          </div>
+        </div>
+        <div class="reading-item">
+          <span class="reading-icon">🎥</span>
+          <div class="reading-label">
+            <strong>Orange Tutorial Resmi — "Classification" (YouTube)</strong>
+            Playlist "Orange Beginners" di channel resmi orangedatamining — tonton video Classification dan Confusion Matrix (~30 menit total)
+          </div>
+        </div>
+        <div class="reading-item">
+          <span class="reading-icon">🔧</span>
+          <div class="reading-label">
+            <strong>Instal Power BI Desktop</strong>
+            Download gratis dari microsoft.com/power-bi — akan digunakan di P-04 untuk visualisasi data operasional. Pastikan terinstal sebelum pertemuan ke-4.
+          </div>
+        </div>
+        <div class="reading-item">
+          <span class="reading-icon">📊</span>
+          <div class="reading-label">
+            <strong>Eksplorasi Dataset P-04 (di Edlink)</strong>
+            Buka file <code>data_produksi_mentah.xlsx</code> di Excel dan identifikasi: ada berapa kolom kosong? ada nilai yang terlihat tidak wajar? Catat temuanmu — akan didiskusikan di awal P-04.
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ── ASIDE ── -->
+  <aside class="content-aside">
+    <!-- TOC -->
+    <div class="toc">
+      <div class="toc-title">Isi Halaman</div>
+      <ul class="toc-list">
+        <li><a href="#tujuan" class="active">Tujuan Pembelajaran</a></li>
+        <li><a href="#orange">1. Mengenal Orange</a></li>
+        <li><a href="#klasifikasi">2. Klasifikasi Cacat Produk</a></li>
+        <li><a href="#churn">3. Prediksi Churn</a></li>
+        <li><a href="#evaluasi">4. Interpretasi Evaluasi</a></li>
+        <li><a href="#diskusi">5. Diskusi Kelas</a></li>
+        <li><a href="#ringkasan">Ringkasan & Tugas</a></li>
+      </ul>
+    </div>
+
+    <!-- Sesi nav -->
+    <div class="sesi-nav-aside">
+      <div class="sesi-nav-title">Navigasi Sesi</div>
+      <a href="sesi-02.html" class="sesi-nav-btn">
+        <span>←</span>
+        <span>P-02: Konsep ML untuk Industri</span>
+      </a>
+      <div style="font-size:12px;color:var(--text-3);margin-top:var(--s4);padding:var(--s3) 0;border-top:1px solid var(--border);">Sesi berikutnya:</div>
+      <a href="#" class="sesi-nav-btn" style="opacity:0.5;pointer-events:none;">
+        <span>→</span>
+        <span>P-04: Data Industri: Pembersihan & Visualisasi</span>
+      </a>
+      <div style="margin-top:var(--s4);padding-top:var(--s4);border-top:1px solid var(--border);">
+        <a href="../index.html" class="sesi-nav-btn">
+          <span>🏠</span>
+          <span>Kembali ke Beranda TI</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- Info box -->
+    <div style="background:var(--bg-2);border:1px solid var(--border);border-radius:var(--r3);padding:var(--s5);margin-top:var(--s4);">
+      <div style="font-family:var(--mono);font-size:10px;color:var(--text-3);letter-spacing:2px;text-transform:uppercase;margin-bottom:var(--s3);">Info Pertemuan</div>
+      <div style="display:flex;flex-direction:column;gap:var(--s3);">
+        <div>
+          <div style="font-size:11px;color:var(--text-3);">Tipe</div>
+          <div style="font-size:13px;color:var(--text);">Praktik Hands-on</div>
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--text-3);">Durasi</div>
+          <div style="font-size:13px;color:var(--text);">100 menit</div>
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--text-3);">CPMK</div>
+          <div style="font-size:13px;color:var(--text);">C2 (ML tanpa coding), C3 (Analisis data industri)</div>
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--text-3);">Tools</div>
+          <div style="font-size:13px;color:var(--text);">Orange Data Mining 3.x</div>
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--text-3);">Dataset</div>
+          <div style="font-size:13px;color:var(--text);">produk_cacat.csv · pelanggan_distribusi.csv</div>
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--text-3);">Referensi Utama</div>
+          <div style="font-size:13px;color:var(--text);">Gentsch — AI for Business, Ch. 3</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Algoritma quick ref -->
+    <div style="background:var(--bg-2);border:1px solid var(--border);border-radius:var(--r3);padding:var(--s5);margin-top:var(--s4);">
+      <div style="font-family:var(--mono);font-size:10px;color:var(--text-3);letter-spacing:2px;text-transform:uppercase;margin-bottom:var(--s4);">Algoritma Hari Ini</div>
+      <div style="display:flex;flex-direction:column;gap:var(--s4);">
+        <div>
+          <div style="font-size:12px;font-weight:600;color:var(--blue);margin-bottom:4px;">Decision Tree</div>
+          <div style="font-size:11px;color:var(--text-2);line-height:1.6;">Membagi data berdasarkan aturan IF-THEN. Mudah diinterpretasi, cocok untuk presentasi ke manajemen.</div>
+        </div>
+        <div>
+          <div style="font-size:12px;font-weight:600;color:var(--purple);margin-bottom:4px;">k-NN (k=5)</div>
+          <div style="font-size:11px;color:var(--text-2);line-height:1.6;">Prediksi berdasarkan 5 tetangga terdekat di data historis. Intuitif, tapi perlu normalisasi fitur.</div>
+        </div>
+        <div style="padding-top:var(--s3);border-top:1px solid var(--border);">
+          <div style="font-size:11px;color:var(--text-3);">Cross-validation:</div>
+          <div style="font-size:12px;color:var(--text-2);margin-top:2px;">10-fold CV — data dibagi 10 bagian, model dilatih dan diuji 10 kali, hasilnya dirata-rata. Lebih andal dari single train-test split.</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+</div><!-- end content-layout -->
+
+<!-- ══ FOOTER ══ -->
+<footer class="footer">
+  <div>AI·UKWMS <span style="color:var(--text-3);">· P-03 Praktik AutoML: Klasifikasi & Prediksi dengan Orange — Teknik Industri</span></div>
+  <div><a href="../index.html" style="color:var(--text-3);">← Kembali ke Beranda TI</a></div>
+</footer>
+
+<script>
+  const headings = document.querySelectorAll('.content-main [id]');
+  const tocLinks = document.querySelectorAll('.toc-list a');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(a => {
+          a.classList.remove('active');
+          if (a.getAttribute('href') === '#' + entry.target.id) a.classList.add('active');
+        });
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px' });
+  headings.forEach(h => observer.observe(h));
+
+  const navLinks = document.querySelectorAll('.nav-links a[href^="#"]');
+  window.addEventListener('scroll', () => {
+    let current = '';
+    headings.forEach(h => { if (window.scrollY >= h.offsetTop - 100) current = h.id; });
+    navLinks.forEach(a => {
+      a.classList.remove('active');
+      if (a.getAttribute('href') === '#' + current) a.classList.add('active');
+    });
+  });
+</script>
+
+</body>
+</html>
