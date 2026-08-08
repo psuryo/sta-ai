@@ -18,6 +18,33 @@
   .assess-desc { font-size:12px; color:var(--text-2); line-height:1.6; }
   .hero-bg-text { position:absolute; right:-20px; bottom:-30px; font-family:var(--mono); font-size:180px; font-weight:600; color:rgba(74,142,245,0.035); line-height:1; pointer-events:none; user-select:none; }
 
+  /* ── Session visibility states ── */
+  .session-item[data-state="open"] {
+    background: var(--teal-glow);
+    border-color: rgba(0,201,177,0.2);
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+  }
+  .session-item[data-state="open"]:hover {
+    border-color: var(--teal);
+  }
+  .session-item[data-state="locked"] {
+    opacity: 0.45;
+    cursor: not-allowed;
+    filter: grayscale(0.4);
+  }
+  .session-item[data-state="locked"] .session-num::after {
+    content: " 🔒";
+    font-size: 10px;
+  }
+  .session-item[data-state="coming"] {
+    opacity: 0.65;
+    cursor: default;
+  }
+  .session-item[data-state="coming"] .session-num::after {
+    content: " ·";
+    color: var(--text-3);
+  }
 </style>
 </head>
 <body>
@@ -153,9 +180,9 @@
 <section class="section" id="pertemuan">
   <div style="max-width:1100px;margin:0 auto;">
     <div class="section-label">02 — Jadwal Pertemuan</div>
-    <h2 class="section-title">14 Sesi + UTS + UAS</h2>
+    <h2 class="session-title">14 Sesi + UTS + UAS</h2>
 
-    <div class="session-grid">
+    <div class="session-grid" id="session-grid">
 
       <!-- BLOK 1 -->
       <div class="phase-divider">
@@ -163,8 +190,7 @@
         <div class="phase-divider-line"></div>
       </div>
 
-      <a href="sesi/sesi-01.html" style="text-decoration:none;color:inherit;">
-      <div class="session-item" style="background:var(--teal-glow);border-color:rgba(0,201,177,0.2);cursor:pointer;">
+      <div class="session-item" data-sesi="1" data-href="sesi/sesi-01.html" data-tag="teori">
         <div class="session-num">P-01</div>
         <div>
           <div class="session-title">Pengantar AI & Lanskap Industri</div>
@@ -172,10 +198,8 @@
         </div>
         <span class="session-tag tag-teori">Teori</span>
       </div>
-      </a>
 
-      <a href="sesi/sesi-02.html" style="text-decoration:none;color:inherit;">
-      <div class="session-item">
+      <div class="session-item" data-sesi="2" data-href="sesi/sesi-02.html" data-tag="teori">
         <div class="session-num">P-02</div>
         <div>
           <div class="session-title">Konsep ML untuk Industri — Tanpa Coding</div>
@@ -183,10 +207,8 @@
         </div>
         <span class="session-tag tag-teori">Teori</span>
       </div>
-      </a>
 
-      <a href="sesi/sesi-03.html" style="text-decoration:none;color:inherit;">
-      <div class="session-item" style="background:var(--teal-glow);border-color:rgba(0,201,177,0.2);cursor:pointer;">
+      <div class="session-item" data-sesi="3" data-href="sesi/sesi-03.html" data-tag="praktik">
         <div class="session-num">P-03</div>
         <div>
           <div class="session-title">Praktik AutoML: Klasifikasi & Prediksi dengan Orange</div>
@@ -194,10 +216,8 @@
         </div>
         <span class="session-tag tag-praktik">Praktik</span>
       </div>
-      </a>
 
-      <a href="sesi/sesi-04.html" style="text-decoration:none;color:inherit;">
-      <div class="session-item" style="background:var(--teal-glow);border-color:rgba(0,201,177,0.2);cursor:pointer;">
+      <div class="session-item" data-sesi="4" data-href="sesi/sesi-04.html" data-tag="praktik">
         <div class="session-num">P-04</div>
         <div>
           <div class="session-title">Data Industri: Pembersihan & Visualisasi</div>
@@ -205,10 +225,8 @@
         </div>
         <span class="session-tag tag-praktik">Praktik</span>
       </div>
-      </a>
 
-      <a href="sesi/sesi-05.html" style="text-decoration:none;color:inherit;">
-      <div class="session-item" style="background:var(--teal-glow);border-color:rgba(0,201,177,0.2);cursor:pointer;">
+      <div class="session-item" data-sesi="5" data-href="sesi/sesi-05.html" data-tag="teori">
         <div class="session-num">P-05</div>
         <div>
           <div class="session-title">AI untuk Optimasi Produksi & Supply Chain</div>
@@ -216,9 +234,8 @@
         </div>
         <span class="session-tag tag-teori">Teori</span>
       </div>
-      </a>
 
-      <div class="session-item">
+      <div class="session-item" data-sesi="6" data-href="sesi/sesi-06.html" data-tag="praktik">
         <div class="session-num">P-06</div>
         <div>
           <div class="session-title">Praktik: Prediksi Demand & Simulasi Rantai Pasok</div>
@@ -227,7 +244,7 @@
         <span class="session-tag tag-praktik">Praktik</span>
       </div>
 
-      <div class="session-item" style="background:var(--amber-dim);border-color:rgba(245,166,35,0.15);">
+      <div class="session-item" data-sesi="7" data-href="" data-tag="review" style="background:var(--amber-dim);border-color:rgba(245,166,35,0.15);">
         <div class="session-num">P-07</div>
         <div>
           <div class="session-title">Review & Persiapan UTS</div>
@@ -251,7 +268,7 @@
         <div class="phase-divider-line"></div>
       </div>
 
-      <div class="session-item">
+      <div class="session-item" data-sesi="8" data-href="sesi/sesi-08.html" data-tag="teori">
         <div class="session-num">P-08</div>
         <div>
           <div class="session-title">LLM & Generative AI</div>
@@ -260,7 +277,7 @@
         <span class="session-tag tag-teori">Teori</span>
       </div>
 
-      <div class="session-item">
+      <div class="session-item" data-sesi="9" data-href="sesi/sesi-09.html" data-tag="praktik">
         <div class="session-num">P-09</div>
         <div>
           <div class="session-title">Prompt Engineering untuk Konteks Industri</div>
@@ -269,7 +286,7 @@
         <span class="session-tag tag-praktik">Praktik</span>
       </div>
 
-      <div class="session-item">
+      <div class="session-item" data-sesi="10" data-href="sesi/sesi-10.html" data-tag="praktik">
         <div class="session-num">P-10</div>
         <div>
           <div class="session-title">AI untuk Quality Control & Predictive Maintenance</div>
@@ -278,7 +295,7 @@
         <span class="session-tag tag-praktik">Praktik</span>
       </div>
 
-      <div class="session-item">
+      <div class="session-item" data-sesi="11" data-href="sesi/sesi-11.html" data-tag="praktik">
         <div class="session-num">P-11</div>
         <div>
           <div class="session-title">AI untuk Prediksi & Rekomendasi Bisnis</div>
@@ -287,7 +304,7 @@
         <span class="session-tag tag-praktik">Praktik</span>
       </div>
 
-      <div class="session-item">
+      <div class="session-item" data-sesi="12" data-href="sesi/sesi-12.html" data-tag="teori">
         <div class="session-num">P-12</div>
         <div>
           <div class="session-title">AI Ethics, Regulasi & Kepatuhan Industri</div>
@@ -296,7 +313,7 @@
         <span class="session-tag tag-teori">Teori</span>
       </div>
 
-      <div class="session-item" style="background:rgba(155,124,244,0.05);border-color:rgba(155,124,244,0.15);">
+      <div class="session-item" data-sesi="13" data-href="" data-tag="proyek" style="background:rgba(155,124,244,0.05);border-color:rgba(155,124,244,0.15);">
         <div class="session-num">P-13</div>
         <div>
           <div class="session-title">Workshop Proyek UAS — Sesi 1</div>
@@ -305,7 +322,7 @@
         <span class="session-tag tag-proyek">Proyek</span>
       </div>
 
-      <div class="session-item" style="background:rgba(155,124,244,0.05);border-color:rgba(155,124,244,0.15);">
+      <div class="session-item" data-sesi="14" data-href="" data-tag="proyek" style="background:rgba(155,124,244,0.05);border-color:rgba(155,124,244,0.15);">
         <div class="session-num">P-14</div>
         <div>
           <div class="session-title">Workshop Proyek UAS — Sesi 2</div>
@@ -446,8 +463,48 @@
 </footer>
 
 <script>
+  // ════════════════════════════════════════════════════════════
+  // KONFIGURASI SESI — ubah di sini untuk mengatur visibilitas
+  // ════════════════════════════════════════════════════════════
+  //
+  //  "open"   → link aktif, mahasiswa bisa klik dan membuka sesi
+  //  "coming" → tampil normal tapi tidak bisa diklik (belum dirilis)
+  //  "locked" → redup + ikon kunci, tidak bisa diklik
+  //
+  const SESI_CONFIG = {
+    1:  "open",     // P-01 Pengantar AI
+    2:  "locked",     // P-02 Konsep ML
+    3:  "locked",     // P-03 Praktik AutoML Orange
+    4:  "locked",     // P-04 Data Cleaning & Visualisasi
+    5:  "locked",     // P-05 Optimasi Produksi & Supply Chain
+    6:  "coming",   // P-06 Prediksi Demand (belum dirilis)
+    7:  "coming",   // P-07 Review UTS
+    8:  "locked",   // P-08 LLM & Generative AI
+    9:  "locked",   // P-09 Prompt Engineering
+    10: "locked",   // P-10 QC & Predictive Maintenance
+    11: "locked",   // P-11 Prediksi & Rekomendasi Bisnis
+    12: "locked",   // P-12 AI Ethics
+    13: "locked",   // P-13 Workshop UAS 1
+    14: "locked",   // P-14 Workshop UAS 2
+  };
+  // ════════════════════════════════════════════════════════════
+
+  document.querySelectorAll('.session-item[data-sesi]').forEach(item => {
+    const sesi  = parseInt(item.dataset.sesi);
+    const href  = item.dataset.href;
+    const state = SESI_CONFIG[sesi] || "locked";
+
+    item.setAttribute('data-state', state);
+
+    if (state === "open" && href) {
+      item.style.cursor = "pointer";
+      item.addEventListener('click', () => { window.location.href = href; });
+    }
+  });
+
+  // Active nav on scroll
   const sections = document.querySelectorAll('section[id]');
-  const navLinks = document.querySelectorAll('.nav-links a');
+  const navLinks  = document.querySelectorAll('.nav-links a');
   window.addEventListener('scroll', () => {
     let current = '';
     sections.forEach(s => { if (window.scrollY >= s.offsetTop - 80) current = s.id; });
