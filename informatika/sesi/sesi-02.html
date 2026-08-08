@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>P-02: Konsep Machine Learning — Kecerdasan Buatan UKWMS</title>
+<link rel="stylesheet" href="../../css/style.css">
+<style>
+  /* sesi-02 specific */
+  .paradigm-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: var(--s3);
+    margin: var(--s5) 0;
+  }
+  .paradigm-card {
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: var(--r2);
+    padding: var(--s4) var(--s5);
+  }
+  .paradigm-card .p-tag {
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+    font-weight: 600;
+  }
+  .paradigm-card .p-title { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
+  .paradigm-card .p-body  { font-size: 13px; color: var(--text-2); line-height: 1.6; }
+  .paradigm-card .p-ex    { font-size: 12px; color: var(--text-3); margin-top: 8px; font-family: var(--mono); }
+
+  .flow-pipeline {
+    display: flex;
+    align-items: center;
+    gap: var(--s2);
+    margin: var(--s5) 0;
+    flex-wrap: wrap;
+  }
+  .flow-step {
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: var(--r2);
+    padding: var(--s3) var(--s4);
+    font-size: 13px;
+    color: var(--text);
+    font-weight: 500;
+    text-align: center;
+    min-width: 110px;
+    flex: 1;
+  }
+  .flow-step .fs-num { font-family: var(--mono); font-size: 10px; color: var(--text-3); margin-bottom: 4px; }
+  .flow-step .fs-label { font-size: 12px; color: var(--text-2); margin-top: 3px; font-weight: 400; }
+  .flow-arrow { font-size: 18px; color: var(--text-3); flex-shrink: 0; }
+
+  .algo-table { width: 100%; border-collapse: collapse; margin: var(--s4) 0; }
+  .algo-table th { background: var(--bg-3); color: var(--text-2); font-family: var(--mono); font-size: 11px; letter-spacing: 1px; text-transform: uppercase; padding: var(--s3) var(--s4); text-align: left; border-bottom: 1px solid var(--border); }
+  .algo-table td { padding: var(--s3) var(--s4); font-size: 13px; color: var(--text-2); border-bottom: 1px solid var(--border); vertical-align: top; }
+  .algo-table tr:last-child td { border-bottom: none; }
+  .algo-table tr:hover td { background: var(--bg-2); }
+  .algo-name { font-weight: 600; color: var(--text); font-family: var(--mono); font-size: 12px; }
+
+  .metric-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--s3);
+    margin: var(--s4) 0;
+  }
+  .metric-card {
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: var(--r2);
+    padding: var(--s4) var(--s5);
+  }
+  .metric-card .mc-name  { font-family: var(--mono); font-size: 11px; color: var(--teal); letter-spacing: 1px; margin-bottom: 4px; }
+  .metric-card .mc-formula { font-family: var(--mono); font-size: 13px; color: var(--text); margin-bottom: 6px; }
+  .metric-card .mc-desc  { font-size: 12px; color: var(--text-2); line-height: 1.5; }
+
+  .code-block {
+    background: #0d1117;
+    border: 1px solid var(--border);
+    border-radius: var(--r2);
+    padding: var(--s5);
+    font-family: var(--mono);
+    font-size: 12px;
+    line-height: 1.8;
+    overflow-x: auto;
+    margin: var(--s4) 0;
+    color: #c9d1d9;
+  }
+  .code-block .c-comment { color: #8b949e; }
+  .code-block .c-kw      { color: #ff7b72; }
+  .code-block .c-str     { color: #a5d6ff; }
+  .code-block .c-fn      { color: #d2a8ff; }
+  .code-block .c-num     { color: #79c0ff; }
+  .code-block .c-cls     { color: #ffa657; }
+
+  .confusion-matrix {
+    display: grid;
+    grid-template-columns: auto 1fr 1fr;
+    gap: 2px;
+    max-width: 380px;
+    margin: var(--s4) auto;
+  }
+  .cm-cell {
+    padding: var(--s3) var(--s4);
+    border-radius: 4px;
+    text-align: center;
+    font-size: 13px;
+    font-weight: 600;
+  }
+  .cm-tp { background: rgba(0,230,171,0.15); color: var(--teal); border: 1px solid rgba(0,230,171,0.3); }
+  .cm-tn { background: rgba(0,230,171,0.15); color: var(--teal); border: 1px solid rgba(0,230,171,0.3); }
+  .cm-fp { background: rgba(240,96,96,0.1); color: var(--red); border: 1px solid rgba(240,96,96,0.2); }
+  .cm-fn { background: rgba(240,96,96,0.1); color: var(--red); border: 1px solid rgba(240,96,96,0.2); }
+  .cm-label { font-size: 11px; color: var(--text-3); font-family: var(--mono); display: flex; align-items: center; justify-content: center; }
+
+  .bias-var-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: var(--s3);
+    margin: var(--s5) 0;
+  }
+  .bias-var-card {
+    border: 1px solid var(--border);
+    border-radius: var(--r2);
+    padding: var(--s4) var(--s5);
+    text-align: center;
+  }
+  .bv-icon   { font-size: 28px; margin-bottom: var(--s3); }
+  .bv-title  { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
+  .bv-body   { font-size: 12px; color: var(--text-2); line-height: 1.5; }
+</style>
+</head>
+<body>
+
+<!-- ══ NAV ══ -->
+<nav class="nav">
+  <div class="nav-logo">AI<span>·</span>UKWMS</div>
+  <ul class="nav-links">
+    <li><a href="../index.html">← Beranda</a></li>
+    <li><a href="#paradigma" class="active">Paradigma ML</a></li>
+    <li><a href="#pipeline">Pipeline</a></li>
+    <li><a href="#algoritma">Algoritma</a></li>
+    <li><a href="#evaluasi">Evaluasi</a></li>
+    <li><a href="#praktik">Praktik</a></li>
+  </ul>
+</nav>
+
+<!-- ══ SESI HERO ══ -->
+<header class="sesi-hero">
+  <div style="max-width:1100px;margin:0 auto;">
+    <div class="sesi-breadcrumb">
+      <a href="../index.html">Kecerdasan Buatan</a>
+      <span>›</span>
+      <span>Pertemuan 2</span>
+    </div>
+    <div class="sesi-num">PERTEMUAN 02 · TEORI + PRAKTIK</div>
+    <h1 class="sesi-title">Konsep<br>Machine Learning</h1>
+    <p style="font-size:15px;color:var(--text-2);max-width:600px;line-height:1.8;">Memahami tiga paradigma utama machine learning, pipeline end-to-end membangun model, algoritma fundamental yang paling sering digunakan di industri, serta cara mengevaluasi performa model secara benar.</p>
+    <div class="sesi-meta-row">
+      <span class="badge badge-blue">Teori + Praktik</span>
+      <span class="badge badge-teal">100 menit</span>
+      <span class="badge badge-amber">CPMK: C2, C3</span>
+    </div>
+  </div>
+</header>
+
+<!-- ══ CONTENT LAYOUT ══ -->
+<div class="content-layout">
+
+  <!-- ── MAIN ── -->
+  <main class="content-main">
+
+    <!-- TUJUAN -->
+    <div class="content-block" id="tujuan">
+      <h2>Tujuan Pembelajaran</h2>
+      <p>Setelah mengikuti pertemuan ini, mahasiswa diharapkan mampu:</p>
+      <ol>
+        <li>Membedakan supervised, unsupervised, dan reinforcement learning beserta contoh aplikasinya</li>
+        <li>Menjelaskan alur pipeline machine learning dari data mentah hingga model yang siap digunakan</li>
+        <li>Memilih algoritma yang tepat berdasarkan karakteristik data dan masalah yang dihadapi</li>
+        <li>Menghitung dan menginterpretasikan metrik evaluasi model (accuracy, precision, recall, F1)</li>
+        <li>Mengimplementasikan klasifikasi sederhana menggunakan Python dan Scikit-learn</li>
+      </ol>
+
+      <div class="callout info" style="margin-top:var(--s5);">
+        <span class="callout-icon">💡</span>
+        <div class="callout-body">
+          <p><strong>Prasyarat pertemuan ini:</strong> Pastikan kamu sudah meng-install Python 3.10+, Jupyter Notebook atau memiliki akses Google Colab, serta library <code>numpy</code>, <code>pandas</code>, dan <code>scikit-learn</code>.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- BAGIAN 1: PARADIGMA ML -->
+    <div class="content-block" id="paradigma">
+      <h2>1. Tiga Paradigma Machine Learning</h2>
+      <p>Machine Learning adalah cabang AI yang memungkinkan mesin <strong>belajar dari data</strong> tanpa diprogram secara eksplisit untuk setiap kasus. Terdapat tiga paradigma utama yang digunakan di industri:</p>
+
+      <div class="pull-quote">
+        <p>"A computer program is said to learn from experience E with respect to some task T and performance measure P, if its performance at tasks in T, as measured by P, improves with experience E."</p>
+        <cite>— Tom Mitchell, Machine Learning (1997)</cite>
+      </div>
+
+      <div class="paradigm-grid">
+        <div class="paradigm-card">
+          <div class="p-tag" style="color:var(--teal);">Supervised Learning</div>
+          <div class="p-title">Pembelajaran Terawasi</div>
+          <div class="p-body">Model dilatih menggunakan data berlabel — setiap input memiliki output (jawaban) yang diketahui. Model belajar memetakan input → output, lalu memprediksi output untuk data baru.</div>
+          <div class="p-ex">Contoh: deteksi spam (email → spam/ham), prediksi harga rumah, diagnosa penyakit dari citra medis.</div>
+        </div>
+        <div class="paradigm-card">
+          <div class="p-tag" style="color:var(--purple);">Unsupervised Learning</div>
+          <div class="p-title">Pembelajaran Tidak Terawasi</div>
+          <div class="p-body">Model menemukan pola tersembunyi dalam data tanpa label. Tidak ada "jawaban benar" — model mengorganisasi data berdasarkan kemiripan atau struktur yang ditemukan sendiri.</div>
+          <div class="p-ex">Contoh: segmentasi pelanggan (clustering), deteksi anomali transaksi, kompresi dimensi data.</div>
+        </div>
+        <div class="paradigm-card">
+          <div class="p-tag" style="color:var(--amber);">Reinforcement Learning</div>
+          <div class="p-title">Pembelajaran Penguatan</div>
+          <div class="p-body">Agent belajar melalui interaksi dengan lingkungan. Agent mengambil aksi, menerima reward atau penalty, dan secara bertahap mengembangkan strategi (policy) untuk memaksimalkan reward kumulatif.</div>
+          <div class="p-ex">Contoh: AlphaGo, robot navigasi, optimasi kampanye iklan, rekomendasi dinamis.</div>
+        </div>
+      </div>
+
+      <h3>Supervised Learning: Klasifikasi vs Regresi</h3>
+      <p>Dua tipe utama supervised learning dibedakan berdasarkan tipe output yang diprediksi:</p>
+
+      <table class="algo-table">
+        <thead>
+          <tr>
+            <th>Aspek</th>
+            <th>Klasifikasi</th>
+            <th>Regresi</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Output</strong></td>
+            <td>Kategori diskrit (label kelas)</td>
+            <td>Nilai kontinu (angka)</td>
+          </tr>
+          <tr>
+            <td><strong>Contoh masalah</strong></td>
+            <td>Spam atau bukan; kucing atau anjing; tumor ganas atau jinak</td>
+            <td>Harga rumah; suhu besok; estimasi penjualan bulan depan</td>
+          </tr>
+          <tr>
+            <td><strong>Metrik evaluasi</strong></td>
+            <td>Accuracy, Precision, Recall, F1-Score, AUC-ROC</td>
+            <td>MAE, MSE, RMSE, R² Score</td>
+          </tr>
+          <tr>
+            <td><strong>Algoritma umum</strong></td>
+            <td>Logistic Regression, Decision Tree, Random Forest, SVM, k-NN</td>
+            <td>Linear Regression, Ridge, Lasso, SVR, Gradient Boosting</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="callout tip">
+        <span class="callout-icon">🎯</span>
+        <div class="callout-body">
+          <p><strong>Aturan praktis:</strong> Tanyakan selalu — "Apakah target prediksi kita adalah sebuah <em>kategori</em> atau sebuah <em>angka</em>?" Jawabannya menentukan apakah kamu butuh algoritma klasifikasi atau regresi.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- BAGIAN 2: PIPELINE ML -->
+    <div class="content-block" id="pipeline">
+      <h2>2. Pipeline Machine Learning End-to-End</h2>
+      <p>Membangun model ML bukan hanya "training model". Di dunia nyata, 80% waktu seorang data scientist dihabiskan untuk <strong>mengolah data</strong>, bukan untuk melatih model. Berikut adalah tahapan lengkap yang harus dilalui:</p>
+
+      <div class="flow-pipeline">
+        <div class="flow-step" style="border-color:var(--teal);background:var(--teal-glow);">
+          <div class="fs-num">01</div>
+          Definisi Masalah
+          <div class="fs-label">Problem framing</div>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step">
+          <div class="fs-num">02</div>
+          Pengumpulan Data
+          <div class="fs-label">Data collection</div>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step">
+          <div class="fs-num">03</div>
+          Eksplorasi Data
+          <div class="fs-label">EDA</div>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step">
+          <div class="fs-num">04</div>
+          Pra-pemrosesan
+          <div class="fs-label">Preprocessing</div>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step">
+          <div class="fs-num">05</div>
+          Feature Engineering
+          <div class="fs-label">Fitur & seleksi</div>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step">
+          <div class="fs-num">06</div>
+          Training Model
+          <div class="fs-label">Fitting</div>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step" style="border-color:var(--blue);background:rgba(79,140,255,0.07);">
+          <div class="fs-num">07</div>
+          Evaluasi
+          <div class="fs-label">Metrics & tuning</div>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step" style="border-color:var(--amber);background:rgba(255,185,56,0.07);">
+          <div class="fs-num">08</div>
+          Deployment
+          <div class="fs-label">Produksi</div>
+        </div>
+      </div>
+
+      <h3>Tahap-tahap Kritis yang Sering Diabaikan</h3>
+
+      <div class="concept-grid">
+        <div class="concept-card">
+          <div class="concept-card-label" style="color:var(--teal);">Tahap 01 — Problem Framing</div>
+          <div class="concept-card-title">Definisikan dulu, kode nanti</div>
+          <div class="concept-card-body">Pertanyaan kritis: Apa yang ingin diprediksi? Apa unit pengukuran suksesnya? Siapa pengguna akhirnya? Data apa yang tersedia? Banyak proyek ML gagal karena melewatkan tahap ini.</div>
+        </div>
+        <div class="concept-card">
+          <div class="concept-card-label" style="color:var(--purple);">Tahap 03 — EDA</div>
+          <div class="concept-card-title">Exploratory Data Analysis</div>
+          <div class="concept-card-body">Pahami distribusi data, missing values, outlier, dan korelasi antar fitur sebelum modelling. Gunakan visualisasi (histogram, scatter plot, heatmap korelasi) sebagai alat investigasi.</div>
+        </div>
+        <div class="concept-card">
+          <div class="concept-card-label" style="color:var(--amber);">Tahap 04 — Preprocessing</div>
+          <div class="concept-card-title">Garbage in, garbage out</div>
+          <div class="concept-card-body">Penanganan missing values (imputasi atau drop), encoding variabel kategorikal (One-Hot, Label Encoding), normalisasi/standarisasi fitur numerik. Kualitas data menentukan kualitas model.</div>
+        </div>
+        <div class="concept-card">
+          <div class="concept-card-label" style="color:var(--blue);">Tahap 05 — Feature Engineering</div>
+          <div class="concept-card-title">Domain knowledge matters</div>
+          <div class="concept-card-body">Membuat fitur baru dari fitur yang ada, memilih fitur paling relevan (feature selection), mengurangi dimensi (PCA). Sering kali ini yang paling menentukan performa akhir model.</div>
+        </div>
+      </div>
+
+      <div class="callout warn">
+        <span class="callout-icon">⚠️</span>
+        <div class="callout-body">
+          <p><strong>Data leakage:</strong> Pastikan data test <em>tidak pernah</em> digunakan dalam proses training, termasuk saat normalisasi. Gunakan <code>Pipeline</code> di Scikit-learn untuk mencegah kebocoran data yang merusak validitas evaluasi model.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- BAGIAN 3: ALGORITMA -->
+    <div class="content-block" id="algoritma">
+      <h2>3. Algoritma Fundamental</h2>
+      <p>Berikut adalah algoritma-algoritma yang paling sering digunakan di industri dan wajib dipahami oleh setiap AI practitioner. Kamu tidak harus menghafal matematikanya, tapi harus paham <strong>kapan dan mengapa</strong> menggunakannya.</p>
+
+      <h3>Algoritma Supervised Learning</h3>
+      <table class="algo-table">
+        <thead>
+          <tr>
+            <th>Algoritma</th>
+            <th>Cara Kerja (Intuitif)</th>
+            <th>Kelebihan</th>
+            <th>Kekurangan</th>
+            <th>Gunakan Saat</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="algo-name">Linear / Logistic Regression</span></td>
+            <td>Menemukan garis (atau kurva) terbaik yang memisahkan atau memprediksi kelas</td>
+            <td>Interpretable, cepat, baseline yang baik</td>
+            <td>Hanya linier, sensitif outlier</td>
+            <td>Baseline pertama, fitur independen, hubungan linier</td>
+          </tr>
+          <tr>
+            <td><span class="algo-name">Decision Tree</span></td>
+            <td>Membuat pohon keputusan seperti flowchart "if-else" berdasarkan fitur</td>
+            <td>Mudah divisualisasi, interpretable</td>
+            <td>Mudah overfit, tidak stabil</td>
+            <td>Perlu penjelasan keputusan kepada stakeholder</td>
+          </tr>
+          <tr>
+            <td><span class="algo-name">Random Forest</span></td>
+            <td>Gabungan banyak decision tree; voting mayoritas untuk prediksi akhir</td>
+            <td>Akurasi tinggi, tahan overfit, feature importance</td>
+            <td>Lambat untuk prediksi, kurang interpretable</td>
+            <td>Tabular data, perlu performa baik dengan usaha minimal</td>
+          </tr>
+          <tr>
+            <td><span class="algo-name">Gradient Boosting (XGBoost)</span></td>
+            <td>Membangun pohon secara berurutan; setiap pohon baru memperbaiki error pohon sebelumnya</td>
+            <td>State-of-the-art untuk tabular data, sangat akurat</td>
+            <td>Butuh tuning hyperparameter, lebih lambat dari RF</td>
+            <td>Kompetisi data science, tabular data terstruktur</td>
+          </tr>
+          <tr>
+            <td><span class="algo-name">k-Nearest Neighbors (k-NN)</span></td>
+            <td>Prediksi berdasarkan k tetangga terdekat di ruang fitur</td>
+            <td>Sederhana, tidak perlu training</td>
+            <td>Lambat saat prediksi, sensitif skala fitur</td>
+            <td>Dataset kecil, tidak ada asumsi distribusi data</td>
+          </tr>
+          <tr>
+            <td><span class="algo-name">Support Vector Machine</span></td>
+            <td>Mencari hyperplane optimal yang memisahkan kelas dengan margin terlebar</td>
+            <td>Efektif di dimensi tinggi, kuat secara teoritis</td>
+            <td>Sulit di-scale, butuh tuning kernel</td>
+            <td>Data berdimensi tinggi (teks, citra setelah ekstraksi fitur)</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3 style="margin-top:var(--s6);">Algoritma Unsupervised Learning</h3>
+      <table class="algo-table">
+        <thead>
+          <tr>
+            <th>Algoritma</th>
+            <th>Cara Kerja</th>
+            <th>Aplikasi Umum</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="algo-name">K-Means Clustering</span></td>
+            <td>Membagi data ke dalam k cluster berdasarkan jarak rata-rata ke centroid masing-masing cluster</td>
+            <td>Segmentasi pelanggan, pengelompokan dokumen, kompresi warna gambar</td>
+          </tr>
+          <tr>
+            <td><span class="algo-name">DBSCAN</span></td>
+            <td>Mengelompokkan titik yang berdekatan dan menandai titik terisolasi sebagai noise/anomali</td>
+            <td>Deteksi anomali transaksi, clustering data geografis, network intrusion detection</td>
+          </tr>
+          <tr>
+            <td><span class="algo-name">PCA (Dimensionality Reduction)</span></td>
+            <td>Memproyeksikan data ke komponen dengan variansi terbesar untuk mengurangi dimensi</td>
+            <td>Visualisasi data berdimensi tinggi, kompresi fitur, noise reduction</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3 style="margin-top:var(--s6);">Panduan Memilih Algoritma</h3>
+      <div class="callout info">
+        <span class="callout-icon">🗺️</span>
+        <div class="callout-body">
+          <p><strong>Alur keputusan sederhana:</strong></p>
+          <ol style="margin:var(--s3) 0 0; padding-left:var(--s5); font-size:14px; line-height:2.2;">
+            <li>Apakah data kamu <strong>berlabel</strong>? → Ya: Supervised Learning | Tidak: Unsupervised Learning</li>
+            <li>Jika supervised — apakah target berupa <strong>kategori atau angka</strong>? → Klasifikasi atau Regresi</li>
+            <li>Mulai dengan model <strong>sederhana dulu</strong> (Logistic/Linear Regression) sebagai baseline</li>
+            <li>Jika performa belum cukup → coba Random Forest atau Gradient Boosting</li>
+            <li>Jika butuh interpretability → pilih Decision Tree atau Logistic Regression</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+
+    <!-- BAGIAN 4: EVALUASI -->
+    <div class="content-block" id="evaluasi">
+      <h2>4. Evaluasi Model: Bagaimana Tahu Model Kita Bagus?</h2>
+      <p>Salah satu kesalahan paling umum pemula: hanya melihat <em>accuracy</em> dan menyimpulkan model sudah bagus. Di dunia nyata, pilihan metrik evaluasi sangat bergantung pada konteks bisnis.</p>
+
+      <h3>Confusion Matrix: Fondasi Evaluasi Klasifikasi</h3>
+      <p>Untuk masalah klasifikasi biner (Positif/Negatif), setiap prediksi jatuh ke salah satu dari empat sel:</p>
+
+      <div style="overflow-x:auto;">
+        <div class="confusion-matrix">
+          <div class="cm-label"></div>
+          <div class="cm-label" style="color:var(--teal);">Prediksi: Positif</div>
+          <div class="cm-label" style="color:var(--red);">Prediksi: Negatif</div>
+
+          <div class="cm-label" style="writing-mode:initial;color:var(--teal);">Aktual: Positif</div>
+          <div class="cm-cell cm-tp">TP<br><span style="font-size:11px;font-weight:400;">True Positive</span></div>
+          <div class="cm-cell cm-fn">FN<br><span style="font-size:11px;font-weight:400;">False Negative</span></div>
+
+          <div class="cm-label" style="color:var(--red);">Aktual: Negatif</div>
+          <div class="cm-cell cm-fp">FP<br><span style="font-size:11px;font-weight:400;">False Positive</span></div>
+          <div class="cm-cell cm-tn">TN<br><span style="font-size:11px;font-weight:400;">True Negative</span></div>
+        </div>
+      </div>
+
+      <h3 style="margin-top:var(--s5);">Metrik Evaluasi Utama</h3>
+      <div class="metric-grid">
+        <div class="metric-card">
+          <div class="mc-name">Accuracy</div>
+          <div class="mc-formula">(TP + TN) / Total</div>
+          <div class="mc-desc">Proporsi prediksi yang benar dari semua prediksi. <strong>Menyesatkan pada data imbalanced.</strong> Jika 95% data adalah negatif, model yang selalu prediksi negatif pun accuracy-nya 95%.</div>
+        </div>
+        <div class="metric-card">
+          <div class="mc-name">Precision</div>
+          <div class="mc-formula">TP / (TP + FP)</div>
+          <div class="mc-desc">Dari semua yang diprediksi positif, berapa yang benar-benar positif? Penting saat <strong>False Positive mahal</strong> — misal, spam filter yang terlalu agresif memblokir email penting.</div>
+        </div>
+        <div class="metric-card">
+          <div class="mc-name">Recall (Sensitivity)</div>
+          <div class="mc-formula">TP / (TP + FN)</div>
+          <div class="mc-desc">Dari semua yang benar-benar positif, berapa yang berhasil dideteksi? Penting saat <strong>False Negative mahal</strong> — misal, deteksi kanker yang melewatkan pasien positif.</div>
+        </div>
+        <div class="metric-card">
+          <div class="mc-name">F1-Score</div>
+          <div class="mc-formula">2 × (P × R) / (P + R)</div>
+          <div class="mc-desc">Rata-rata harmonik precision dan recall. Digunakan saat kamu butuh <strong>keseimbangan</strong> antara keduanya, terutama pada data imbalanced. Pilihan default yang aman untuk banyak kasus.</div>
+        </div>
+      </div>
+
+      <div class="callout tip" style="margin-top:var(--s4);">
+        <span class="callout-icon">⚕️</span>
+        <div class="callout-body">
+          <p><strong>Studi kasus:</strong> Model deteksi kanker — mana yang lebih penting, precision atau recall? Recall lebih penting! False Negative (pasien kanker tidak terdeteksi) jauh lebih berbahaya daripada False Positive (pasien sehat yang perlu tes lanjut). Konteks bisnis selalu menentukan metrik mana yang diprioritaskan.</p>
+        </div>
+      </div>
+
+      <h3>Bias-Variance Tradeoff</h3>
+      <p>Dua sumber utama error model yang harus selalu dikelola:</p>
+
+      <div class="bias-var-grid">
+        <div class="bias-var-card" style="border-color:rgba(240,96,96,0.3);background:rgba(240,96,96,0.05);">
+          <div class="bv-icon">📉</div>
+          <div class="bv-title" style="color:var(--red);">Underfitting (High Bias)</div>
+          <div class="bv-body">Model terlalu sederhana — tidak mampu menangkap pola dalam data training sekalipun. Error tinggi di training maupun test set. Solusi: tambah kompleksitas model, tambah fitur.</div>
+        </div>
+        <div class="bias-var-card" style="border-color:rgba(0,230,171,0.3);background:var(--teal-glow);">
+          <div class="bv-icon">🎯</div>
+          <div class="bv-title" style="color:var(--teal);">Sweet Spot</div>
+          <div class="bv-body">Error training dan test set sama-sama rendah. Model berhasil mempelajari pola sejati dari data tanpa menghafal noise. Tujuan utama yang selalu ingin dicapai.</div>
+        </div>
+        <div class="bias-var-card" style="border-color:rgba(155,124,244,0.3);background:rgba(155,124,244,0.05);">
+          <div class="bv-icon">📈</div>
+          <div class="bv-title" style="color:var(--purple);">Overfitting (High Variance)</div>
+          <div class="bv-body">Model terlalu kompleks — "menghafal" data training termasuk noisenya. Error rendah di training tapi tinggi di test set. Solusi: regularisasi, kurangi kompleksitas, tambah data, dropout.</div>
+        </div>
+      </div>
+
+      <div class="callout info" style="margin-top:var(--s4);">
+        <span class="callout-icon">🔪</span>
+        <div class="callout-body">
+          <p><strong>Cross-validation:</strong> Untuk estimasi performa yang lebih robust, gunakan <strong>k-fold cross-validation</strong> — bagi data training menjadi k bagian, lakukan training-evaluasi sebanyak k kali dengan bagian validasi yang berbeda. Rata-rata scorenya lebih dapat dipercaya daripada satu kali split.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- BAGIAN 5: PRAKTIK -->
+    <div class="content-block" id="praktik">
+      <h2>5. Praktik: Klasifikasi dengan Scikit-learn</h2>
+      <p>Kita akan membangun pipeline klasifikasi lengkap menggunakan dataset Iris — dataset klasik yang berisi 150 sampel bunga dari 3 spesies berbeda berdasarkan 4 fitur ukuran kelopak dan mahkota.</p>
+
+      <h3>Langkah 1: Import & Load Data</h3>
+      <div class="code-block"><span class="c-comment"># Import library yang dibutuhkan</span>
+<span class="c-kw">import</span> numpy <span class="c-kw">as</span> np
+<span class="c-kw">import</span> pandas <span class="c-kw">as</span> pd
+<span class="c-kw">import</span> matplotlib.pyplot <span class="c-kw">as</span> plt
+<span class="c-kw">from</span> sklearn.datasets <span class="c-kw">import</span> <span class="c-fn">load_iris</span>
+<span class="c-kw">from</span> sklearn.model_selection <span class="c-kw">import</span> <span class="c-fn">train_test_split</span>, <span class="c-fn">cross_val_score</span>
+<span class="c-kw">from</span> sklearn.preprocessing <span class="c-kw">import</span> <span class="c-fn">StandardScaler</span>
+<span class="c-kw">from</span> sklearn.pipeline <span class="c-kw">import</span> <span class="c-fn">Pipeline</span>
+<span class="c-kw">from</span> sklearn.ensemble <span class="c-kw">import</span> <span class="c-fn">RandomForestClassifier</span>
+<span class="c-kw">from</span> sklearn.metrics <span class="c-kw">import</span> <span class="c-fn">classification_report</span>, <span class="c-fn">confusion_matrix</span>
+
+<span class="c-comment"># Load dataset Iris</span>
+iris = <span class="c-fn">load_iris</span>()
+X = iris.data       <span class="c-comment"># fitur: panjang & lebar sepal + petal</span>
+y = iris.target     <span class="c-comment"># label: 0=setosa, 1=versicolor, 2=virginica</span>
+
+<span class="c-comment"># Eksplorasi awal</span>
+df = pd.<span class="c-fn">DataFrame</span>(X, columns=iris.feature_names)
+df[<span class="c-str">'species'</span>] = iris.target_names[y]
+<span class="c-fn">print</span>(df.<span class="c-fn">head</span>())
+<span class="c-fn">print</span>(df.<span class="c-fn">describe</span>())</div>
+
+      <h3>Langkah 2: Split Data & Bangun Pipeline</h3>
+      <div class="code-block"><span class="c-comment"># Bagi data: 80% train, 20% test — stratified agar distribusi kelas seimbang</span>
+X_train, X_test, y_train, y_test = <span class="c-fn">train_test_split</span>(
+    X, y, test_size=<span class="c-num">0.2</span>, random_state=<span class="c-num">42</span>, stratify=y
+)
+
+<span class="c-comment"># Bangun pipeline: scaler → model (mencegah data leakage)</span>
+pipeline = <span class="c-cls">Pipeline</span>([
+    (<span class="c-str">'scaler'</span>, <span class="c-cls">StandardScaler</span>()),
+    (<span class="c-str">'clf'</span>, <span class="c-cls">RandomForestClassifier</span>(n_estimators=<span class="c-num">100</span>, random_state=<span class="c-num">42</span>))
+])
+
+<span class="c-comment"># Latih model</span>
+pipeline.<span class="c-fn">fit</span>(X_train, y_train)
+<span class="c-fn">print</span>(<span class="c-str">"Training selesai!"</span>)</div>
+
+      <h3>Langkah 3: Evaluasi Model</h3>
+      <div class="code-block"><span class="c-comment"># Prediksi di test set</span>
+y_pred = pipeline.<span class="c-fn">predict</span>(X_test)
+
+<span class="c-comment"># Laporan lengkap: precision, recall, F1 per kelas</span>
+<span class="c-fn">print</span>(<span class="c-cls">classification_report</span>(y_test, y_pred, target_names=iris.target_names))
+
+<span class="c-comment"># Confusion matrix</span>
+cm = <span class="c-fn">confusion_matrix</span>(y_test, y_pred)
+<span class="c-fn">print</span>(<span class="c-str">"Confusion Matrix:"</span>)
+<span class="c-fn">print</span>(cm)
+
+<span class="c-comment"># Validasi dengan 5-fold cross-validation</span>
+cv_scores = <span class="c-fn">cross_val_score</span>(pipeline, X, y, cv=<span class="c-num">5</span>, scoring=<span class="c-str">'f1_macro'</span>)
+<span class="c-fn">print</span>(<span class="c-str">f"CV F1-Macro: {cv_scores.mean():.3f} ± {cv_scores.std():.3f}"</span>)
+
+<span class="c-comment"># Feature importance</span>
+rf_model = pipeline.named_steps[<span class="c-str">'clf'</span>]
+importances = pd.<span class="c-cls">Series</span>(rf_model.feature_importances_, index=iris.feature_names)
+importances.<span class="c-fn">sort_values</span>().<span class="c-fn">plot</span>(kind=<span class="c-str">'barh'</span>, title=<span class="c-str">'Feature Importance'</span>)
+plt.<span class="c-fn">show</span>()</div>
+
+      <div class="callout tip" style="margin-top:var(--s4);">
+        <span class="callout-icon">🧪</span>
+        <div class="callout-body">
+          <p><strong>Coba sendiri:</strong> Ganti <code>RandomForestClassifier</code> dengan <code>LogisticRegression</code>, <code>DecisionTreeClassifier</code>, atau <code>KNeighborsClassifier</code> dan bandingkan hasilnya. Ini cara terbaik untuk membangun intuisi tentang karakteristik setiap algoritma.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- RINGKASAN -->
+    <div class="content-block" id="ringkasan">
+      <h2>Ringkasan Pertemuan Ini</h2>
+      <div style="background:var(--bg-2); border:1px solid var(--border); border-radius:var(--r3); padding:var(--s5);">
+        <ul>
+          <li>ML memiliki tiga paradigma: <em>supervised</em> (ada label), <em>unsupervised</em> (tanpa label), dan <em>reinforcement learning</em> (reward-based)</li>
+          <li>Pipeline ML end-to-end: definisi masalah → kumpul data → EDA → preprocessing → feature engineering → training → evaluasi → deployment</li>
+          <li>80% waktu kerja data scientist dihabiskan untuk <strong>mengolah data</strong>, bukan melatih model</li>
+          <li>Pilih algoritma berdasarkan tipe masalah (klasifikasi/regresi), ukuran data, dan kebutuhan interpretability</li>
+          <li>Accuracy bukan satu-satunya metrik — gunakan Precision, Recall, dan F1-Score sesuai konteks bisnis</li>
+          <li>Overfitting dan underfitting adalah dua musuh utama yang dikelola lewat regularisasi, data lebih banyak, dan cross-validation</li>
+        </ul>
+      </div>
+
+      <!-- TASK BOX -->
+      <div class="task-box">
+        <div class="task-box-title">📋 Tugas Pertemuan Ini</div>
+        <p style="font-size:13px;color:var(--text-2);margin-bottom:var(--s4);">Dikumpulkan sebelum pertemuan ke-3 melalui Google Classroom dalam format Jupyter Notebook (.ipynb).</p>
+        <ol style="font-size:14px;color:var(--text);line-height:2;">
+          <li>Jalankan seluruh kode praktik di atas di Google Colab atau Jupyter Notebook lokal. Tambahkan komentar penjelasan di setiap bagian kode.</li>
+          <li>Ganti algoritma menjadi <strong>Logistic Regression</strong> dan <strong>Decision Tree</strong>. Bandingkan F1-Score ketiganya (RF, LR, DT) dalam satu tabel di Markdown cell.</li>
+          <li>Cari dataset bebas di <a href="https://www.kaggle.com/datasets" target="_blank" rel="noopener noreferrer">Kaggle</a> atau UCI ML Repository. Terapkan pipeline klasifikasi yang sama dan interpretasikan hasilnya dalam 200–300 kata.</li>
+          <li><em>Opsional (bonus):</em> Implementasikan K-Means Clustering pada dataset Iris (tanpa menggunakan label <code>y</code>) dan visualisasikan cluster yang terbentuk. Bandingkan dengan label aslinya — apakah clustering berhasil memisahkan spesies?</li>
+        </ol>
+      </div>
+
+      <!-- READING BOX -->
+      <div class="reading-box">
+        <div class="reading-box-title">📖 Persiapan Pertemuan Ke-3</div>
+        <div class="reading-item">
+          <span class="reading-icon">📗</span>
+          <div class="reading-label">
+            <strong>Russell & Norvig — AIMA 4th Ed., Chapter 19</strong>
+            "Knowledge in Learning" — Pengantar neural network dan deep learning sebelum sesi berikutnya
+          </div>
+        </div>
+        <div class="reading-item">
+          <span class="reading-icon">🎥</span>
+          <div class="reading-label">
+            <strong>3Blue1Brown — "Neural Networks" Series (YouTube)</strong>
+            Episode 1 & 2 — visualisasi intuitif tentang bagaimana neural network bekerja (sekitar 40 menit total)
+          </div>
+        </div>
+        <div class="reading-item">
+          <span class="reading-icon">📄</span>
+          <div class="reading-label">
+            <strong>Scikit-learn User Guide — Supervised Learning</strong>
+            Baca dokumentasi resmi untuk algoritma yang digunakan di tugas: <code>sklearn.ensemble</code>, <code>sklearn.linear_model</code>, <code>sklearn.tree</code>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ── ASIDE ── -->
+  <aside class="content-aside">
+    <!-- TOC -->
+    <div class="toc">
+      <div class="toc-title">Isi Halaman</div>
+      <ul class="toc-list">
+        <li><a href="#tujuan" class="active">Tujuan Pembelajaran</a></li>
+        <li><a href="#paradigma">1. Paradigma ML</a></li>
+        <li><a href="#pipeline">2. Pipeline ML</a></li>
+        <li><a href="#algoritma">3. Algoritma Fundamental</a></li>
+        <li><a href="#evaluasi">4. Evaluasi Model</a></li>
+        <li><a href="#praktik">5. Praktik Scikit-learn</a></li>
+        <li><a href="#ringkasan">Ringkasan & Tugas</a></li>
+      </ul>
+    </div>
+
+    <!-- Sesi nav -->
+    <div class="sesi-nav-aside">
+      <div class="sesi-nav-title">Navigasi Sesi</div>
+      <a href="sesi-01.html" class="sesi-nav-btn">
+        <span>←</span>
+        <span>P-01: Pengantar AI & Lanskap Industri</span>
+      </a>
+      <a href="../index.html" class="sesi-nav-btn" style="margin-top:var(--s2);">
+        <span>🏠</span>
+        <span>Kembali ke Beranda</span>
+      </a>
+      <div style="font-size:12px;color:var(--text-3);margin-top:var(--s4);padding:var(--s3) 0;border-top:1px solid var(--border);">Sesi berikutnya:</div>
+      <a href="#" class="sesi-nav-btn" style="opacity:0.5;pointer-events:none;">
+        <span>→</span>
+        <span>P-03: Neural Network & Deep Learning</span>
+      </a>
+    </div>
+
+    <!-- Info box -->
+    <div style="background:var(--bg-2);border:1px solid var(--border);border-radius:var(--r3);padding:var(--s5);margin-top:var(--s4);">
+      <div style="font-family:var(--mono);font-size:10px;color:var(--text-3);letter-spacing:2px;text-transform:uppercase;margin-bottom:var(--s3);">Info Pertemuan</div>
+      <div style="display:flex;flex-direction:column;gap:var(--s3);">
+        <div>
+          <div style="font-size:11px;color:var(--text-3);">Tipe</div>
+          <div style="font-size:13px;color:var(--text);">Teori + Praktik</div>
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--text-3);">Durasi</div>
+          <div style="font-size:13px;color:var(--text);">100 menit</div>
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--text-3);">CPMK</div>
+          <div style="font-size:13px;color:var(--text);">C2 (Memahami paradigma ML), C3 (Mengimplementasikan model)</div>
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--text-3);">Referensi Utama</div>
+          <div style="font-size:13px;color:var(--text);">AIMA 4th Ed. — Chapter 18; Scikit-learn Documentation</div>
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--text-3);">Tools</div>
+          <div style="font-size:13px;color:var(--text);">Python, Scikit-learn, Pandas, Jupyter / Google Colab</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+</div><!-- end content-layout -->
+
+<!-- ══ FOOTER ══ -->
+<footer class="footer">
+  <div>AI·UKWMS <span style="color:var(--text-3);">· P-02 Konsep Machine Learning</span></div>
+  <div><a href="../index.html" style="color:var(--text-3);">← Kembali ke Beranda</a></div>
+</footer>
+
+<script>
+  // Active TOC on scroll
+  const headings = document.querySelectorAll('.content-main [id]');
+  const tocLinks = document.querySelectorAll('.toc-list a');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(a => {
+          a.classList.remove('active');
+          if (a.getAttribute('href') === '#' + entry.target.id) a.classList.add('active');
+        });
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px' });
+  headings.forEach(h => observer.observe(h));
+
+  // Active nav links on scroll
+  const navLinks = document.querySelectorAll('.nav-links a[href^="#"]');
+  window.addEventListener('scroll', () => {
+    let current = '';
+    headings.forEach(h => { if (window.scrollY >= h.offsetTop - 100) current = h.id; });
+    navLinks.forEach(a => {
+      a.classList.remove('active');
+      if (a.getAttribute('href') === '#' + current) a.classList.add('active');
+    });
+  });
+</script>
+
+</body>
+</html>
