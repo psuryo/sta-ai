@@ -1,257 +1,1330 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>P-02: Konsep ML untuk Industri — Teknik Industri UKWMS</title>
-  <link rel="stylesheet" href="../../css/style.css" />
-  <style>
-    .content-layout {
-      max-width: 1100px;
-      margin: 0 auto;
-      padding: var(--s6) var(--s4);
-      display: grid;
-      grid-template-columns: minmax(0, 1fr);
-      gap: var(--s5);
-    }
-    .content-block {
-      background: var(--bg-1);
-      border: 1px solid var(--border);
-      border-radius: var(--r3);
-      padding: var(--s5);
-    }
-    .content-block h2 {
-      font-size: 24px;
-      color: var(--text);
-      margin-bottom: var(--s4);
-    }
-    .content-block h3 {
-      font-size: 16px;
-      margin-top: var(--s4);
-      color: var(--text);
-    }
-    .content-block p, .content-block li {
-      font-size: 14px;
-      line-height: 1.75;
-      color: var(--text-2);
-    }
-    .content-block ol {
-      padding-left: var(--s5);
-    }
-    .grid-3 {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: var(--s4);
-      margin-top: var(--s4);
-    }
-    .mini-card {
-      background: var(--bg-2);
-      border-radius: var(--r2);
-      border: 1px solid var(--border);
-      padding: var(--s4);
-    }
-    .mini-card h4 {
-      font-size: 13px;
-      color: var(--text);
-      margin-bottom: var(--s2);
-    }
-    .mini-card p {
-      font-size: 12px;
-      color: var(--text-2);
-      line-height: 1.55;
-    }
-    .callout {
-      display: flex;
-      gap: var(--s3);
-      align-items: start;
-      padding: var(--s4);
-      border-radius: var(--r2);
-      border: 1px solid var(--border);
-      background: var(--bg-2);
-      margin-top: var(--s4);
-    }
-    .callout .icon {
-      font-size: 24px;
-      line-height: 1;
-    }
-    .callout strong {
-      color: var(--text);
-    }
-    .table-plain {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: var(--s4);
-    }
-    .table-plain th {
-      font-family: var(--mono);
-      font-size: 10px;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      color: var(--text-2);
-      background: var(--bg-2);
-      padding: var(--s3) var(--s4);
-      text-align: left;
-    }
-    .table-plain td {
-      border-top: 1px solid var(--border);
-      padding: var(--s3) var(--s4);
-      font-size: 13px;
-      color: var(--text-2);
-    }
-    .badge-row {
-      display: flex;
-      gap: var(--s2);
-      flex-wrap: wrap;
-      margin-top: var(--s4);
-    }
-    .assignments {
-      margin-top: var(--s4);
-      padding: var(--s4);
-      border-left: 3px solid var(--blue);
-      background: var(--blue-dim);
-      border-radius: 0 var(--r2) var(--r2) 0;
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>P-02: Konsep ML untuk Industri — Kecerdasan Buatan Teknik Industri UKWMS</title>
+<link rel="stylesheet" href="../../css/style.css">
+<style>
+  /* ── sesi-02 specific ── */
+
+  /* Paradigm cards */
+  .paradigm-card {
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: var(--r3);
+    padding: var(--s6) var(--s6);
+    margin-bottom: var(--s5);
+    position: relative;
+    overflow: hidden;
+  }
+  .paradigm-card::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 4px;
+    border-radius: var(--r1) 0 0 var(--r1);
+  }
+  .paradigm-card.supervised::before  { background: var(--teal); }
+  .paradigm-card.unsupervised::before { background: var(--blue); }
+  .paradigm-card.reinforcement::before { background: var(--purple); }
+
+  .paradigm-header {
+    display: flex;
+    align-items: center;
+    gap: var(--s4);
+    margin-bottom: var(--s5);
+  }
+  .paradigm-icon {
+    width: 48px; height: 48px;
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 24px;
+    flex-shrink: 0;
+  }
+  .paradigm-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 3px;
+  }
+  .paradigm-title {
+    font-family: var(--serif);
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--text);
+  }
+  .paradigm-tagline {
+    font-size: 14px;
+    color: var(--text-2);
+    font-style: italic;
+    margin-bottom: var(--s5);
+    padding-bottom: var(--s4);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .paradigm-body {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--s5);
+  }
+  .paradigm-section-title {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text-3);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: var(--s3);
+  }
+  .paradigm-body p, .paradigm-body li {
+    font-size: 13.5px;
+    color: var(--text-2);
+    line-height: 1.7;
+  }
+  .paradigm-body ul { padding-left: var(--s4); list-style: none; }
+  .paradigm-body ul li { position: relative; padding-left: var(--s4); margin-bottom: var(--s2); }
+  .paradigm-body ul li::before { content: '→'; position: absolute; left: 0; color: var(--teal); font-size: 12px; font-family: var(--mono); }
+  .supervised  .paradigm-body ul li::before { color: var(--teal); }
+  .unsupervised .paradigm-body ul li::before { color: var(--blue); }
+  .reinforcement .paradigm-body ul li::before { color: var(--purple); }
+
+  .task-chips {
+    display: flex; flex-wrap: wrap; gap: var(--s2);
+    margin-top: var(--s3);
+  }
+  .task-chip {
+    font-size: 11px;
+    font-family: var(--mono);
+    padding: 3px 10px;
+    border-radius: 20px;
+    border: 1px solid;
+  }
+  .chip-teal   { background: var(--teal-dim);  color: var(--teal);   border-color: rgba(0,201,177,0.3); }
+  .chip-blue   { background: var(--blue-dim);  color: var(--blue);   border-color: rgba(74,142,245,0.3); }
+  .chip-purple { background: rgba(155,124,244,0.1); color: var(--purple); border-color: rgba(155,124,244,0.3); }
+
+  /* Comparison table */
+  .compare-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    margin: var(--s5) 0;
+  }
+  .compare-table th {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text-3);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    font-weight: 400;
+    padding: var(--s3) var(--s4);
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg-2);
+  }
+  .compare-table th:first-child { border-radius: var(--r1) 0 0 0; }
+  .compare-table th:last-child  { border-radius: 0 var(--r1) 0 0; }
+  .compare-table td {
+    padding: var(--s3) var(--s4);
+    border-bottom: 1px solid var(--border);
+    color: var(--text-2);
+    vertical-align: top;
+    line-height: 1.6;
+  }
+  .compare-table tr:hover td { background: var(--bg-3); }
+  .compare-table .aspect { color: var(--text); font-weight: 500; font-size: 12px; }
+  .compare-table .c-sup  { color: var(--teal); }
+  .compare-table .c-uns  { color: var(--blue); }
+  .compare-table .c-rl   { color: var(--purple); }
+
+  /* Process steps */
+  .process-steps {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    margin: var(--s5) 0;
+  }
+  .process-step {
+    display: grid;
+    grid-template-columns: 56px 1fr;
+    gap: var(--s5);
+    position: relative;
+  }
+  .process-step:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    left: 27px;
+    top: 56px;
+    bottom: 0;
+    width: 2px;
+    background: var(--border);
+  }
+  .step-num-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: var(--s2);
+  }
+  .step-num {
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    background: var(--surface);
+    border: 2px solid var(--teal);
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--mono);
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--teal);
+    flex-shrink: 0;
+    z-index: 1;
+  }
+  .step-body {
+    padding-bottom: var(--s6);
+  }
+  .step-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: var(--s2);
+  }
+  .step-desc {
+    font-size: 14px;
+    color: var(--text-2);
+    line-height: 1.8;
+    margin-bottom: var(--s3);
+  }
+  .step-key {
+    background: var(--bg-3);
+    border: 1px solid var(--border);
+    border-radius: var(--r2);
+    padding: var(--s3) var(--s4);
+  }
+  .step-key-label {
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--text-3);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: var(--s2);
+  }
+  .step-key ul {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .step-key ul li {
+    font-size: 12.5px;
+    color: var(--text-2);
+    display: flex;
+    gap: var(--s2);
+  }
+  .step-key ul li::before {
+    content: '✓';
+    color: var(--teal);
+    font-size: 11px;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  /* Decision tree */
+  .decision-tree {
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: var(--r3);
+    padding: var(--s5) var(--s6);
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--text-2);
+    line-height: 2.2;
+    overflow-x: auto;
+    margin: var(--s5) 0;
+  }
+  .dt-q  { color: var(--text); font-weight: 600; }
+  .dt-ya { color: var(--teal); }
+  .dt-no { color: var(--text-3); }
+  .dt-ans { color: var(--amber); font-weight: 600; }
+  .dt-sub { color: var(--blue); }
+
+  /* Metric boxes */
+  .metric-group {
+    margin: var(--s4) 0;
+  }
+  .metric-group-title {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text-3);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: var(--s3);
+  }
+  .metric-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: var(--s3);
+  }
+  .metric-item {
+    background: var(--bg-3);
+    border: 1px solid var(--border);
+    border-radius: var(--r2);
+    padding: var(--s3) var(--s4);
+  }
+  .metric-name {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--text);
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+  .metric-def {
+    font-size: 12px;
+    color: var(--text-2);
+    line-height: 1.5;
+  }
+
+  /* Case study cards */
+  .case-grid {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s5);
+    margin: var(--s5) 0;
+  }
+  .case-card {
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: var(--r3);
+    overflow: hidden;
+  }
+  .case-header {
+    display: flex;
+    align-items: center;
+    gap: var(--s4);
+    padding: var(--s4) var(--s5);
+    border-bottom: 1px solid var(--border);
+    background: var(--bg-3);
+  }
+  .case-num {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--mono);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+    flex-shrink: 0;
+  }
+  .case-industry {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text-3);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+  .case-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text);
+  }
+  .case-body {
+    padding: var(--s5);
+  }
+  .case-scenario {
+    font-size: 14px;
+    color: var(--text-2);
+    line-height: 1.8;
+    margin-bottom: var(--s4);
+  }
+  .case-data {
+    background: var(--bg-3);
+    border: 1px solid var(--border);
+    border-radius: var(--r2);
+    padding: var(--s3) var(--s4);
+    margin-bottom: var(--s4);
+  }
+  .case-data-label {
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--text-3);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: var(--s2);
+  }
+  .case-data-items {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s2);
+  }
+  .case-data-item {
+    font-size: 12px;
+    color: var(--text-2);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 2px 10px;
+    font-family: var(--mono);
+  }
+  .case-question {
+    background: var(--teal-glow);
+    border: 1px solid rgba(0,201,177,0.2);
+    border-radius: var(--r2);
+    padding: var(--s4);
+    font-size: 14px;
+    color: var(--text);
+    font-weight: 500;
+    line-height: 1.6;
+  }
+  .case-question::before {
+    content: '❓ ';
+    color: var(--teal);
+  }
+
+  /* Group task box */
+  .group-task {
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-top: 3px solid var(--amber);
+    border-radius: var(--r3);
+    padding: var(--s6);
+    margin-top: var(--s7);
+  }
+  .group-task-header {
+    display: flex;
+    align-items: center;
+    gap: var(--s3);
+    margin-bottom: var(--s5);
+  }
+  .group-task-icon { font-size: 24px; }
+  .group-task-title {
+    font-family: var(--serif);
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--text);
+  }
+  .group-task-sub {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--amber);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+  .instruction-steps {
+    counter-reset: istep;
+    display: flex;
+    flex-direction: column;
+    gap: var(--s3);
+    margin-bottom: var(--s5);
+  }
+  .instruction-step {
+    counter-increment: istep;
+    display: flex;
+    gap: var(--s4);
+    align-items: flex-start;
+  }
+  .instruction-step::before {
+    content: counter(istep);
+    min-width: 26px; height: 26px;
+    background: var(--amber-dim);
+    border: 1px solid rgba(245,166,35,0.3);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--amber);
+    font-weight: 600;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .instruction-step p {
+    font-size: 14px !important;
+    color: var(--text-2) !important;
+    line-height: 1.7 !important;
+    margin: 0 !important;
+  }
+  .instruction-step strong { color: var(--text) !important; }
+
+  .category-ref {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--s3);
+    margin: var(--s4) 0;
+  }
+  .cat-ref-item {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--s3);
+    padding: var(--s3) var(--s4);
+    background: var(--bg-3);
+    border: 1px solid var(--border);
+    border-radius: var(--r2);
+    font-size: 13px;
+  }
+  .cat-ref-dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    margin-top: 4px;
+  }
+  .cat-ref-name { font-weight: 600; color: var(--text); display: block; margin-bottom: 2px; }
+  .cat-ref-desc { color: var(--text-3); font-size: 12px; }
+
+  .deliverable-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--s3);
+    margin-top: var(--s4);
+  }
+  .deliverable-item {
+    background: var(--bg-3);
+    border: 1px solid var(--border);
+    border-radius: var(--r2);
+    padding: var(--s4);
+  }
+  .deliverable-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text-3);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: var(--s2);
+  }
+  .deliverable-desc {
+    font-size: 13px;
+    color: var(--text-2);
+    line-height: 1.6;
+  }
+
+  @media (max-width: 900px) {
+    .paradigm-body { grid-template-columns: 1fr; }
+    .category-ref  { grid-template-columns: 1fr; }
+    .deliverable-grid { grid-template-columns: 1fr; }
+  }
+</style>
 </head>
 <body>
-  <nav class="nav">
-    <div class="nav-logo">AI<span>·</span>UKWMS</div>
-    <ul class="nav-links">
-      <li><a href="../index.html">← Beranda</a></li>
-      <li><a href="#tujuan" class="active">Tujuan</a></li>
-      <li><a href="#paradigma">Paradigma</a></li>
-      <li><a href="#proses">Proses</a></li>
-      <li><a href="#praktik">Praktik</a></li>
-    </ul>
-  </nav>
 
-  <header class="sesi-hero">
-    <div style="max-width:1100px;margin:0 auto;">
-      <div class="sesi-breadcrumb">
-        <a href="../index.html">Kecerdasan Buatan</a>
-        <span>›</span>
-        <span>Pertemuan 2</span>
-      </div>
-      <div class="sesi-num">PERTEMUAN 02 · TEORI + PRAKTIK</div>
-      <h1 class="sesi-title">Konsep Machine<br>Learning untuk Industri</h1>
-      <p style="font-size:15px;color:var(--text-2);max-width:640px;line-height:1.8;">
-        Mahasiswa memahami cara kerja machine learning secara umum, membedakan jenis masalah industri yang cocok untuk AI, serta menyiapkan logika dasar untuk analisis data dan evaluasi solusi.
-      </p>
-      <div class="sesi-meta-row">
-        <span class="badge badge-blue">Teori + Praktik</span>
-        <span class="badge badge-teal">100 menit</span>
-        <span class="badge badge-amber">CPMK: C2, C3</span>
+<!-- ══ NAV ══ -->
+<nav class="nav">
+  <div class="nav-logo">AI<span>·</span>UKWMS</div>
+  <ul class="nav-links">
+    <li><a href="../index.html">← Beranda TI</a></li>
+    <li><a href="#paradigma" class="active">Paradigma ML</a></li>
+    <li><a href="#proses">Proses</a></li>
+    <li><a href="#kasus">Kasus Latihan</a></li>
+  </ul>
+</nav>
+
+<!-- ══ HERO ══ -->
+<header class="sesi-hero">
+  <div style="max-width:1100px;margin:0 auto;">
+    <div class="sesi-breadcrumb">
+      <a href="../../index.html">Beranda</a>
+      <span>›</span>
+      <a href="../index.html">Teknik Industri</a>
+      <span>›</span>
+      <span>Pertemuan 2</span>
+    </div>
+    <div class="sesi-num">PERTEMUAN 02 · TEORI</div>
+    <h1 class="sesi-title">Konsep ML untuk<br>Industri</h1>
+    <p style="font-size:15px;color:var(--text-2);max-width:620px;line-height:1.8;">Memahami tiga paradigma Machine Learning, cara menentukan pendekatan yang tepat untuk masalah industri nyata, dan proses sistematis membangun solusi berbasis data — tanpa harus menulis kode dari nol.</p>
+    <div class="sesi-meta-row">
+      <span class="badge badge-blue">Teori</span>
+      <span class="badge" style="color:var(--teal);border-color:rgba(0,201,177,0.3);background:var(--teal-dim);">85 menit</span>
+      <span class="badge badge-amber">CPMK: C1, C2, C5</span>
+    </div>
+  </div>
+</header>
+
+<!-- ══ CONTENT LAYOUT ══ -->
+<div class="content-layout">
+
+<!-- ── MAIN ── -->
+<main class="content-main">
+
+  <!-- TUJUAN -->
+  <div class="content-block" id="tujuan">
+    <h2>Tujuan Pembelajaran</h2>
+    <p>Setelah mengikuti pertemuan ini, mahasiswa diharapkan mampu:</p>
+    <ol>
+      <li>Menjelaskan perbedaan mendasar tiga paradigma Machine Learning beserta analoginya</li>
+      <li>Mengidentifikasi jenis tugas ML yang sesuai: klasifikasi, prediksi, segmentasi, atau optimasi</li>
+      <li>Menguraikan tujuh tahap proses penyelesaian masalah industri dengan ML</li>
+      <li>Memilih metrik evaluasi yang sesuai berdasarkan konteks masalah bisnis</li>
+      <li>Menggolongkan kasus industri nyata ke dalam kategori ML yang tepat dan mempertahankan argumennya dalam diskusi kelompok</li>
+    </ol>
+
+    <div class="callout info" style="margin-top:var(--s5);">
+      <span class="callout-icon">🎯</span>
+      <div class="callout-body">
+        <p><strong>Catatan orientasi:</strong> Di pertemuan ini kita tidak akan menulis kode. Fokusnya adalah membangun <em>intuisi konseptual</em> yang akan menjadi dasar seluruh pertemuan selanjutnya — termasuk saat kita menggunakan tools seperti Orange dan AutoML. Memahami <em>mengapa</em> suatu pendekatan dipilih jauh lebih penting daripada tahu <em>cara</em> menjalankan toolsnya.</p>
       </div>
     </div>
-  </header>
+  </div>
 
-  <div class="content-layout">
-    <main class="content-main">
-      <section class="content-block" id="tujuan">
-        <h2>Tujuan Pembelajaran</h2>
-        <p>Setelah mengikuti sesi 2, mahasiswa diharapkan mampu:</p>
-        <ol>
-          <li>Membedakan tiga paradigma utama machine learning: supervised, unsupervised, dan reinforcement learning.</li>
-          <li>Menjelaskan alur dasar penyelesaian masalah AI pada data industri: input, pembersihan, model, evaluasi, dan keputusan.</li>
-          <li>Menentukan tipe data dan bentuk masalah yang relevan untuk prediksi, klasifikasi, dan segmentasi.</li>
-          <li>Memahami indikator performa model dan interpretasi hasil tanpa mengandalkan pemahaman coding.</li>
-        </ol>
-        <div class="callout">
-          <span class="icon">💡</span>
-          <div>
-            <p><strong>Prasyarat:</strong> Mahasiswa dapat membaca data umum, mengenal konsep variabel, dan memahami bahwa AI untuk industri adalah alat bantu pengambilan keputusan, bukan pengganti pengalaman operasional.</p>
+  <!-- ══════════════════════════════════════════
+       TOPIK 1: TIGA PARADIGMA ML
+  ══════════════════════════════════════════ -->
+  <div class="content-block" id="paradigma">
+    <h2>1. Tiga Paradigma Machine Learning</h2>
+
+    <div class="callout tip" style="margin-bottom:var(--s6);">
+      <span class="callout-icon">💡</span>
+      <div class="callout-body">
+        <p><strong>Mengapa "paradigma", bukan sekadar "tipe"?</strong> Perbedaan ketiganya bukan hanya teknis. Ketiganya berbeda dalam cara <em>mendefinisikan masalah</em>, cara <em>mesin belajar</em>, dan cara <em>mengevaluasi keberhasilan</em>. Memilih paradigma yang salah adalah kesalahan paling mahal di awal proyek ML.</p>
+      </div>
+    </div>
+
+    <!-- SUPERVISED -->
+    <div class="paradigm-card supervised">
+      <div class="paradigm-header">
+        <div class="paradigm-icon" style="background:var(--teal-dim);">🎓</div>
+        <div>
+          <div class="paradigm-label" style="color:var(--teal);">Paradigma 1</div>
+          <div class="paradigm-title">Supervised Learning</div>
+        </div>
+      </div>
+      <div class="paradigm-tagline">
+        "Belajar dari contoh berlabel — mesin tahu jawaban yang benar selama training."
+      </div>
+      <div class="paradigm-body">
+        <div>
+          <div class="paradigm-section-title">Cara Kerja</div>
+          <p>Manusia menyediakan pasangan <strong style="color:var(--text)">input → output</strong> yang benar (data berlabel). Mesin mempelajari pola yang memetakan input ke output, lalu digunakan untuk memprediksi output pada data baru yang belum pernah dilihat sebelumnya.</p>
+          <br>
+          <p><strong style="color:var(--text)">Analogi:</strong> Seperti belajar mengemudi dengan instruktur. Ada yang selalu mengoreksi setiap kesalahan — mesin tahu kapan jawabannya benar dan kapan salah.</p>
+          <br>
+          <div class="paradigm-section-title">Syarat Utama</div>
+          <p>Harus ada <strong style="color:var(--text)">label</strong> (jawaban yang benar) pada setiap data latih. Di industri, proses pelabelan sering menjadi bottleneck karena memakan waktu dan biaya — misalnya, seorang insinyur harus menandai ribuan foto produk satu per satu sebagai "cacat" atau "normal".</p>
+        </div>
+        <div>
+          <div class="paradigm-section-title">Dua Tugas Utama</div>
+          <div class="task-chips" style="margin-bottom:var(--s4);">
+            <span class="task-chip chip-teal">Klasifikasi</span>
+            <span class="task-chip chip-teal">Regresi / Prediksi</span>
           </div>
-        </div>
-      </section>
-
-      <section class="content-block" id="paradigma">
-        <h2>1. Tiga Paradigma Machine Learning</h2>
-        <p>Dunia industri sering menemui permasalahan yang tidak dapat diselesaikan hanya dengan aturan if-else. Machine learning menjadi pendekatan yang relevan ketika data historis berlimpah dan hubungan pola dapat dipelajari.</p>
-        <div class="grid-3">
-          <article class="mini-card">
-            <h4 style="color:var(--teal);">Supervised Learning</h4>
-            <p>Model belajar dari data yang memiliki label atau target. Contohnya: prediksi kualitas produk, forecasting demand, klasifikasi cacat barang.</p>
-          </article>
-          <article class="mini-card">
-            <h4 style="color:var(--purple);">Unsupervised Learning</h4>
-            <p>Model melakukan pengelompokan atau pengurangan dimensi pada data tanpa label. Contohnya: segmentasi pelanggan, grouping mesin berdasarkan pola konsumsi energi.</p>
-          </article>
-          <article class="mini-card">
-            <h4 style="color:var(--amber);">Reinforcement Learning</h4>
-            <p>Agent belajar melalui trial and error untuk memaksimalkan reward. Contohnya: kontrol sistem otomatis, jadwal produksi adaptif, routing kendaraan.</p>
-          </article>
-        </div>
-      </section>
-
-      <section class="content-block" id="proses">
-        <h2>2. Proses Menyelesaikan Masalah Industri dengan AI</h2>
-        <table class="table-plain">
-          <thead>
-            <tr>
-              <th>Langkah</th>
-              <th>Aktivitas</th>
-              <th>Hasil</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>1. Identifikasi masalah</td>
-              <td>Menentukan target keputusan: kualitas, stok, risiko outage, demand, atau inspeksi.</td>
-              <td>Definisi KPI dan target bisnis.</td>
-            </tr>
-            <tr>
-              <td>2. Pengumpulan data</td>
-              <td>Data dari MES, ERP, sensor, insan/QA, penjualan, atau sistem logistik.</td>
-              <td>Dataset awal yang siap dianalisis.</td>
-            </tr>
-            <tr>
-              <td>3. Pembersihan data</td>
-              <td>Memeriksa data kosong, duplikasi, outlier, format tanggal, dan konsistensi.</td>
-              <td>Data yang siap diproses.</td>
-            </tr>
-            <tr>
-              <td>4. Pemodelan</td>
-              <td>Memilih teknik sesuai jenis masalah dan data.</td>
-              <td>Model awal dan output prediksi.</td>
-            </tr>
-            <tr>
-              <td>5. Evaluasi</td>
-              <td>Mengukur akurasi, eror, interpretasi hasil, serta trade-off manfaat dan biaya.</td>
-              <td>Keputusan apakah model siap dipakai.</td>
-            </tr>
-          </tbody>
-        </table>
-      </section>
-
-      <section class="content-block" id="praktik">
-        <h2>3. Praktik Sesi</h2>
-        <p>Praktik pada sesi ini dilakukan secara observasional dan berorientasi pada kasus. Mahasiswa tidak dituntut menulis kode, tetapi diminta membaca data, membahas karakteristik masalah, dan menyusun hipotesis solusi.</p>
-        <div class="assignments">
-          <p><strong>Aktivitas:</strong></p>
           <ul>
-            <li>Identifikasi satu masalah industri di lingkungan kampus atau pabrik demonstrasi.</li>
-            <li>Tentukan apakah masalah termasuk klasifikasi, prediksi, optimasi, atau segmentasi.</li>
-            <li>Buat daftar data yang perlu dikumpulkan untuk mendukung solusi.</li>
-            <li>Diskusikan KPI yang akan dijadikan indikator keberhasilan.</li>
+            <li><strong style="color:var(--text)">Klasifikasi</strong> — output berupa <em>kategori diskrit</em>. Produk ini cacat atau tidak? Mesin ini akan rusak atau tidak? Pelanggan ini akan churn atau tidak?</li>
+            <li><strong style="color:var(--text)">Prediksi / Regresi</strong> — output berupa <em>angka kontinu</em>. Berapa unit yang terjual bulan depan? Berapa sisa umur pakai mesin ini? Berapa harga bahan baku minggu ini?</li>
+          </ul>
+          <br>
+          <div class="paradigm-section-title">Contoh di Industri</div>
+          <ul>
+            <li>Prediksi permintaan (demand forecasting) untuk manajemen stok</li>
+            <li>Deteksi produk cacat visual di lini produksi</li>
+            <li>Prediksi kerusakan mesin (predictive maintenance)</li>
+            <li>Prediksi no-show pasien di rumah sakit</li>
           </ul>
         </div>
-        <div class="badge-row">
-          <span class="badge badge-blue">Dataset Industri</span>
-          <span class="badge badge-teal">KPI</span>
-          <span class="badge badge-amber">Diskusi Kelompok</span>
-        </div>
-      </section>
+      </div>
+    </div>
 
-      <section class="content-block">
-        <h2>4. Evaluasi Sesi</h2>
-        <p>Penilaian sesi 2 akan berfokus pada kemampuan mahasiswa menunjukkan pemahaman terhadap:</p>
-        <ul>
-          <li>Perbedaan tipe masalah berlabel dan tidak berlabel.</li>
-          <li>Hubungan antara data, model, dan keputusan bisnis.</li>
-          <li>Penentuan target solusi AI yang sesuai dengan kebutuhan industri.</li>
-        </ul>
-      </section>
-    </main>
+    <!-- UNSUPERVISED -->
+    <div class="paradigm-card unsupervised">
+      <div class="paradigm-header">
+        <div class="paradigm-icon" style="background:var(--blue-dim);">🔍</div>
+        <div>
+          <div class="paradigm-label" style="color:var(--blue);">Paradigma 2</div>
+          <div class="paradigm-title">Unsupervised Learning</div>
+        </div>
+      </div>
+      <div class="paradigm-tagline">
+        "Mencari struktur tersembunyi dalam data tanpa jawaban yang benar."
+      </div>
+      <div class="paradigm-body">
+        <div>
+          <div class="paradigm-section-title">Cara Kerja</div>
+          <p>Tidak ada label. Mesin <strong style="color:var(--text)">mencari sendiri</strong> struktur, pola, atau kelompok yang tersembunyi di dalam data. Manusia mendefinisikan apa artinya "mirip", dan mesin menemukan pengelompokan yang terbentuk secara alami.</p>
+          <br>
+          <p><strong style="color:var(--text)">Analogi:</strong> Seorang analis baru yang diberi tumpukan ribuan faktur tanpa penjelasan apapun. Ia mulai mengelompokkan faktur yang mirip-mirip, menemukan pola sendiri — tanpa ada yang memberitahu apa kategorinya.</p>
+          <br>
+          <div class="paradigm-section-title">Tantangan Utama</div>
+          <p>Hasil clustering bisa valid secara matematis tapi <strong style="color:var(--text)">tidak bermakna secara bisnis</strong>. Penting untuk melibatkan domain expert dalam menginterpretasikan kelompok yang ditemukan mesin.</p>
+        </div>
+        <div>
+          <div class="paradigm-section-title">Tiga Tugas Utama</div>
+          <div class="task-chips" style="margin-bottom:var(--s4);">
+            <span class="task-chip chip-blue">Segmentasi / Clustering</span>
+            <span class="task-chip chip-blue">Anomaly Detection</span>
+            <span class="task-chip chip-blue">Dimensionality Reduction</span>
+          </div>
+          <ul>
+            <li><strong style="color:var(--text)">Segmentasi / Clustering</strong> — mengelompokkan data berdasarkan kemiripan. Segmentasi pelanggan, pengelompokan gerai, identifikasi pola kerusakan.</li>
+            <li><strong style="color:var(--text)">Anomaly Detection</strong> — menemukan data yang tidak sesuai pola umum. Deteksi fraud, identifikasi produk cacat tak biasa, outlier sensor.</li>
+            <li><strong style="color:var(--text)">Dimensionality Reduction</strong> — menyederhanakan data berdimensi tinggi tanpa kehilangan informasi penting.</li>
+          </ul>
+          <br>
+          <div class="paradigm-section-title">Contoh di Industri</div>
+          <ul>
+            <li>Segmentasi pelanggan berdasarkan pola pembelian</li>
+            <li>Pengelompokan gerai untuk strategi stok yang tepat sasaran</li>
+            <li>Deteksi anomali pada data sensor mesin produksi</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- REINFORCEMENT -->
+    <div class="paradigm-card reinforcement">
+      <div class="paradigm-header">
+        <div class="paradigm-icon" style="background:rgba(155,124,244,0.12);">🎮</div>
+        <div>
+          <div class="paradigm-label" style="color:var(--purple);">Paradigma 3</div>
+          <div class="paradigm-title">Reinforcement Learning</div>
+        </div>
+      </div>
+      <div class="paradigm-tagline">
+        "Belajar dari interaksi dengan lingkungan melalui reward dan penalty."
+      </div>
+      <div class="paradigm-body">
+        <div>
+          <div class="paradigm-section-title">Cara Kerja</div>
+          <p>Sebuah <strong style="color:var(--text)">agent</strong> mengambil tindakan dalam suatu lingkungan, menerima sinyal reward (positif) atau penalty (negatif), dan secara bertahap belajar strategi yang memaksimalkan reward jangka panjang.</p>
+          <br>
+          <p><strong style="color:var(--text)">Analogi:</strong> Anak kecil yang belajar bermain game. Tidak ada yang mengajari langkah per langkah — ia mencoba berbagai hal, mendapat skor, dan lama-lama menemukan strategi terbaik sendiri.</p>
+          <br>
+          <div class="paradigm-section-title">Komponen Inti</div>
+          <ul>
+            <li><strong style="color:var(--text)">Agent</strong> — sistem yang belajar dan mengambil keputusan</li>
+            <li><strong style="color:var(--text)">Environment</strong> — dunia tempat agent berinteraksi</li>
+            <li><strong style="color:var(--text)">State</strong> — kondisi lingkungan saat ini</li>
+            <li><strong style="color:var(--text)">Action</strong> — pilihan yang bisa diambil agent</li>
+            <li><strong style="color:var(--text)">Reward</strong> — sinyal umpan balik (positif/negatif)</li>
+            <li><strong style="color:var(--text)">Policy</strong> — strategi yang dipelajari</li>
+          </ul>
+        </div>
+        <div>
+          <div class="paradigm-section-title">Kekuatan Utama</div>
+          <p>Sangat kuat untuk masalah <strong style="color:var(--text)">pengambilan keputusan sekuensial</strong> — di mana setiap keputusan mempengaruhi situasi berikutnya dan tujuannya adalah memaksimalkan hasil jangka panjang, bukan hanya satu prediksi tunggal.</p>
+          <br>
+          <div class="paradigm-section-title">Contoh di Industri</div>
+          <div class="task-chips" style="margin-bottom:var(--s4);">
+            <span class="task-chip chip-purple">Optimasi</span>
+          </div>
+          <ul>
+            <li>Optimasi jadwal produksi secara dinamis mengikuti perubahan order</li>
+            <li>Robot gudang yang belajar navigasi jalur paling efisien</li>
+            <li>Sistem manajemen energi gedung pabrik secara otomatis</li>
+            <li>Dynamic pricing berdasarkan kondisi pasar real-time</li>
+          </ul>
+          <br>
+          <div class="callout warn" style="margin-top:var(--s3);">
+            <span class="callout-icon">⚠️</span>
+            <div class="callout-body">
+              <p style="font-size:13px;">RL lebih kompleks untuk diimplementasikan dibanding dua paradigma sebelumnya. Di industri, banyak masalah "optimasi" diselesaikan lebih dahulu dengan metode OR (Operations Research) klasik sebelum beralih ke RL.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PERBANDINGAN -->
+    <h3 style="margin-top:var(--s6);">Perbandingan Tiga Paradigma</h3>
+    <table class="compare-table">
+      <thead>
+        <tr>
+          <th>Aspek</th>
+          <th class="c-sup">Supervised</th>
+          <th class="c-uns">Unsupervised</th>
+          <th class="c-rl">Reinforcement</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="aspect">Input</td>
+          <td>Data berlabel (input + jawaban benar)</td>
+          <td>Data tanpa label</td>
+          <td>State lingkungan</td>
+        </tr>
+        <tr>
+          <td class="aspect">Output</td>
+          <td>Prediksi / kategori</td>
+          <td>Pola / kelompok</td>
+          <td>Tindakan (action)</td>
+        </tr>
+        <tr>
+          <td class="aspect">Feedback</td>
+          <td>Label benar/salah</td>
+          <td>Tidak ada label</td>
+          <td>Reward / penalty</td>
+        </tr>
+        <tr>
+          <td class="aspect">Tugas utama</td>
+          <td class="c-sup">Klasifikasi, Prediksi/Regresi</td>
+          <td class="c-uns">Segmentasi, Anomaly Detection</td>
+          <td class="c-rl">Optimasi sekuensial</td>
+        </tr>
+        <tr>
+          <td class="aspect">Evaluasi</td>
+          <td>Akurasi, F1, RMSE, MAE</td>
+          <td>Silhouette score, Elbow method</td>
+          <td>Cumulative reward</td>
+        </tr>
+        <tr>
+          <td class="aspect">Butuh data</td>
+          <td>Besar + berlabel</td>
+          <td>Besar, tanpa label</td>
+          <td>Banyak interaksi lingkungan</td>
+        </tr>
+        <tr>
+          <td class="aspect">Kompleksitas impl.</td>
+          <td>Sedang</td>
+          <td>Sedang</td>
+          <td>Tinggi</td>
+        </tr>
+        <tr>
+          <td class="aspect">Contoh industri</td>
+          <td>Prediksi churn, QC produk, demand forecast</td>
+          <td>Segmentasi pelanggan, pengelompokan gerai</td>
+          <td>Penjadwalan produksi, robot gudang</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- CATATAN PENTING -->
+    <div class="callout warn" style="margin-top:var(--s5);">
+      <span class="callout-icon">📌</span>
+      <div class="callout-body">
+        <p><strong>Satu hal yang sering disalahpahami:</strong> Klasifikasi dan prediksi adalah <em>tugas</em> di dalam supervised learning, bukan paradigma tersendiri. Segmentasi adalah tugas di dalam unsupervised. Dan optimasi bisa diselesaikan dengan RL maupun metode non-ML seperti linear programming atau genetic algorithm. Memahami hierarki ini mencegah kita mencampur aduk level abstraksi yang berbeda.</p>
+      </div>
+    </div>
   </div>
+
+  <!-- ══════════════════════════════════════════
+       TOPIK 2: PROSES MENYELESAIKAN MASALAH
+  ══════════════════════════════════════════ -->
+  <div class="content-block" id="proses">
+    <h2>2. Proses Menyelesaikan Masalah Industri dengan ML</h2>
+    <p>Di dunia nyata, kegagalan proyek ML jarang disebabkan oleh algoritma yang salah. Lebih sering karena masalah yang tidak terdefinisi dengan baik, data yang buruk, atau solusi yang tidak bisa diintegrasikan ke proses bisnis. Proses yang terstruktur mencegah semua itu.</p>
+
+    <div class="process-steps">
+
+      <!-- STEP 1 -->
+      <div class="process-step">
+        <div class="step-num-wrap">
+          <div class="step-num">1</div>
+        </div>
+        <div class="step-body">
+          <div class="step-title">Definisikan Masalah Bisnis dengan Presisi</div>
+          <div class="step-desc">Ini tahap yang paling sering dilewati terlalu cepat dan paling sering menjadi akar kegagalan proyek. Masalah yang kabur menghasilkan solusi yang tidak berguna, meskipun model ML-nya sendiri sangat akurat secara teknis.</div>
+          <div class="step-key">
+            <div class="step-key-label">Pertanyaan yang harus dijawab sebelum lanjut</div>
+            <ul>
+              <li>Apa keputusan bisnis yang ingin diperbaiki dengan informasi ini?</li>
+              <li>Siapa yang akan menggunakan output model ini — dan bagaimana?</li>
+              <li>Apa ukuran keberhasilan dalam satuan bisnis, bukan ML? <em>("Downtime turun 20%", bukan "akurasi 90%")</em></li>
+              <li>Apa konsekuensi jika model salah? Apakah false positive lebih mahal dari false negative?</li>
+              <li>Apakah masalah ini memang tepat diselesaikan dengan ML, atau ada solusi lebih sederhana?</li>
+            </ul>
+          </div>
+          <div class="callout tip" style="margin-top:var(--s4);">
+            <span class="callout-icon">✍️</span>
+            <div class="callout-body">
+              <p><strong>Contoh konkret:</strong><br>
+              ❌ <em>"Kurangi produk cacat"</em> — terlalu kabur<br>
+              ✅ <em>"Deteksi produk cacat di lini 3 secara otomatis sebelum packaging, sehingga tingkat lolos cacat turun dari 2,3% ke di bawah 0,5% dalam 6 bulan ke depan"</em></p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 2 -->
+      <div class="process-step">
+        <div class="step-num-wrap">
+          <div class="step-num">2</div>
+        </div>
+        <div class="step-body">
+          <div class="step-title">Kumpulkan & Pahami Data</div>
+          <div class="step-desc">ML tidak bisa bekerja tanpa data yang relevan, cukup, dan berkualitas. Tahap ini sering dianggap sepele, padahal di industri nyata 60–80% waktu proyek ML dihabiskan di sini.</div>
+          <div class="step-key">
+            <div class="step-key-label">Empat dimensi kualitas data yang harus diperiksa</div>
+            <ul>
+              <li><strong style="color:var(--text)">Volume</strong> — apakah datanya cukup? Supervised learning butuh ribuan contoh berlabel untuk hasil yang andal</li>
+              <li><strong style="color:var(--text)">Kelengkapan</strong> — berapa persen data yang hilang (missing values)? Di mana letaknya?</li>
+              <li><strong style="color:var(--text)">Konsistensi</strong> — apakah format, satuan, dan definisi konsisten antar sumber data?</li>
+              <li><strong style="color:var(--text)">Relevansi</strong> — apakah fitur yang tersedia memang berhubungan secara logis dengan masalah?</li>
+            </ul>
+          </div>
+          <div class="callout warn" style="margin-top:var(--s4);">
+            <span class="callout-icon">🗑️</span>
+            <div class="callout-body">
+              <p><strong>Garbage in, garbage out.</strong> Model sebaik apapun tidak akan menghasilkan prediksi yang baik jika datanya buruk. Tidak ada algoritma yang bisa "menyembuhkan" data yang salah dari akarnya.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 3 -->
+      <div class="process-step">
+        <div class="step-num-wrap">
+          <div class="step-num">3</div>
+        </div>
+        <div class="step-body">
+          <div class="step-title">Tentukan Kategori Masalah ML</div>
+          <div class="step-desc">Setelah masalah dan data jelas, tentukan paradigma dan tugas ML yang paling sesuai. Ini adalah inti dari latihan kasus di sesi ini.</div>
+          <div class="decision-tree">
+<span class="dt-q">Apakah ada target/label yang ingin diprediksi?</span>
+├── <span class="dt-ya">Ya</span> → <span class="dt-ans">Supervised Learning</span>
+│   ├── Target berupa <strong>kategori</strong> (ya/tidak, A/B/C) → <span class="dt-sub">Klasifikasi</span>
+│   └── Target berupa <strong>angka</strong> (berapa banyak, berapa lama) → <span class="dt-sub">Prediksi / Regresi</span>
+│
+└── <span class="dt-no">Tidak</span> → <span class="dt-ans">Unsupervised Learning</span>
+    ├── Ingin <strong>mengelompokkan</strong> data → <span class="dt-sub">Segmentasi / Clustering</span>
+    └── Ingin <strong>menemukan anomali</strong> → <span class="dt-sub">Anomaly Detection</span>
+
+<span class="dt-q">Apakah masalahnya pengambilan keputusan sekuensial?</span>
+└── <span class="dt-ya">Ya</span> → <span class="dt-ans">Reinforcement Learning → Optimasi</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 4 -->
+      <div class="process-step">
+        <div class="step-num-wrap">
+          <div class="step-num">4</div>
+        </div>
+        <div class="step-body">
+          <div class="step-title">Siapkan Data (Data Preparation)</div>
+          <div class="step-desc">Data mentah hampir tidak pernah langsung bisa dipakai oleh algoritma ML. Kualitas data preparation menentukan langit-langit performa model yang bisa dicapai.</div>
+          <div class="step-key">
+            <div class="step-key-label">Tahapan utama</div>
+            <ul>
+              <li><strong style="color:var(--text)">Cleaning</strong> — tangani missing values, duplikat, dan outlier ekstrem</li>
+              <li><strong style="color:var(--text)">Encoding</strong> — ubah variabel kategorikal ke angka agar bisa diproses algoritma</li>
+              <li><strong style="color:var(--text)">Scaling</strong> — normalisasi rentang nilai fitur yang berbeda-beda agar tidak ada fitur yang mendominasi</li>
+              <li><strong style="color:var(--text)">Feature Engineering</strong> — buat fitur baru yang lebih informatif. Contoh: dari kolom tanggal, buat fitur "hari dalam seminggu" dan "apakah tanggal merah"</li>
+              <li><strong style="color:var(--text)">Split data</strong> — pisahkan data training dan testing (biasanya 80:20) agar evaluasi jujur</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 5 -->
+      <div class="process-step">
+        <div class="step-num-wrap">
+          <div class="step-num">5</div>
+        </div>
+        <div class="step-body">
+          <div class="step-title">Pilih & Latih Model</div>
+          <div class="step-desc">Pilih algoritma yang sesuai dengan jenis masalah dan karakteristik data, lalu latih model dengan data training.</div>
+          <div class="step-key">
+            <div class="step-key-label">Prinsip pemilihan algoritma</div>
+            <ul>
+              <li>Mulai dari yang <strong style="color:var(--text)">sederhana</strong> sebelum ke yang kompleks — model sederhana lebih mudah dijelaskan ke manajemen dan sering sudah cukup baik</li>
+              <li>Pertimbangkan <strong style="color:var(--text)">ukuran data</strong>: data kecil → algoritma klasik; data sangat besar → deep learning</li>
+              <li>Pertimbangkan <strong style="color:var(--text)">kebutuhan interpretabilitas</strong>: jika harus bisa dijelaskan alasannya, hindari model black-box</li>
+              <li>Di tools no-code seperti Orange atau AutoML, langkah ini dilakukan dengan <strong style="color:var(--text)">drag-and-drop</strong> — tidak perlu coding</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 6 -->
+      <div class="process-step">
+        <div class="step-num-wrap">
+          <div class="step-num">6</div>
+        </div>
+        <div class="step-body">
+          <div class="step-title">Evaluasi Model</div>
+          <div class="step-desc">Jangan pernah mengevaluasi model dengan data yang sama yang dipakai untuk training — itu akan memberikan hasil yang terlalu optimis dan menyesatkan. Gunakan data testing yang benar-benar belum pernah dilihat model.</div>
+
+          <div class="metric-group">
+            <div class="metric-group-title">Metrik untuk Klasifikasi</div>
+            <div class="metric-grid">
+              <div class="metric-item">
+                <div class="metric-name">Akurasi</div>
+                <div class="metric-def">Persentase prediksi yang benar secara keseluruhan. Menyesatkan jika data tidak seimbang.</div>
+              </div>
+              <div class="metric-item">
+                <div class="metric-name">Presisi</div>
+                <div class="metric-def">Dari semua yang diprediksi positif, berapa yang benar-benar positif?</div>
+              </div>
+              <div class="metric-item">
+                <div class="metric-name">Recall</div>
+                <div class="metric-def">Dari semua yang sebenarnya positif, berapa yang berhasil terdeteksi?</div>
+              </div>
+              <div class="metric-item">
+                <div class="metric-name">F1-Score</div>
+                <div class="metric-def">Rata-rata harmonik presisi dan recall. Berguna ketika keduanya sama-sama penting.</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="metric-group">
+            <div class="metric-group-title">Metrik untuk Prediksi / Regresi</div>
+            <div class="metric-grid">
+              <div class="metric-item">
+                <div class="metric-name">MAE</div>
+                <div class="metric-def">Mean Absolute Error — rata-rata selisih absolut prediksi vs aktual.</div>
+              </div>
+              <div class="metric-item">
+                <div class="metric-name">RMSE</div>
+                <div class="metric-def">Root Mean Square Error — lebih sensitif terhadap error besar/outlier.</div>
+              </div>
+              <div class="metric-item">
+                <div class="metric-name">MAPE</div>
+                <div class="metric-def">Error dalam persen. Paling mudah dikomunikasikan ke manajemen non-teknis.</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="callout tip" style="margin-top:var(--s4);">
+            <span class="callout-icon">⚖️</span>
+            <div class="callout-body">
+              <p><strong>Pertanyaan kritis yang harus selalu ditanya:</strong> Mana yang lebih mahal — false positive atau false negative?</p>
+              <p>Contoh QC biskuit: <em>false negative</em> (produk cacat lolos ke konsumen) jauh lebih berbahaya dari <em>false positive</em> (produk bagus dibuang). Maka recall harus diprioritaskan atas presisi — bahkan jika akurasi total sedikit turun.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 7 -->
+      <div class="process-step">
+        <div class="step-num-wrap">
+          <div class="step-num">7</div>
+        </div>
+        <div class="step-body">
+          <div class="step-title">Deploy & Monitor</div>
+          <div class="step-desc">Model yang bagus di laptop tidak berguna jika tidak diintegrasikan ke proses bisnis nyata. Dan model yang sudah berjalan pun tidak bisa dibiarkan begitu saja — dunia nyata berubah.</div>
+          <div class="step-key">
+            <div class="step-key-label">Yang harus dipikirkan sejak awal</div>
+            <ul>
+              <li>Bagaimana output model dikonsumsi? (Dashboard, notifikasi, integrasi ERP, API)</li>
+              <li>Siapa yang bertanggung jawab jika model memberikan prediksi yang salah?</li>
+              <li>Bagaimana model akan diperbarui jika pola data berubah?</li>
+              <li>Apakah pengguna akhir memahami dan mempercayai output model?</li>
+            </ul>
+          </div>
+          <div class="callout warn" style="margin-top:var(--s4);">
+            <span class="callout-icon">📉</span>
+            <div class="callout-body">
+              <p><strong>Model Drift</strong> adalah tantangan nyata: data di dunia nyata berubah seiring waktu. Mesin produksi baru, perubahan bahan baku, atau pergeseran perilaku pelanggan bisa membuat model yang tadinya akurat menjadi tidak relevan. Monitoring berkala bukan opsional — ini keharusan.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- end process-steps -->
+
+    <!-- RINGKASAN PROSES -->
+    <div style="background:var(--bg-2);border:1px solid var(--border);border-radius:var(--r3);padding:var(--s5);margin-top:var(--s5);">
+      <div style="font-family:var(--mono);font-size:10px;color:var(--text-3);letter-spacing:2px;text-transform:uppercase;margin-bottom:var(--s4);">Ringkasan 7 Langkah</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:var(--s3);">
+        <div style="display:flex;gap:var(--s3);align-items:center;font-size:13px;color:var(--text-2);"><span style="font-family:var(--mono);color:var(--teal);font-weight:600;">01</span> Definisikan masalah bisnis</div>
+        <div style="display:flex;gap:var(--s3);align-items:center;font-size:13px;color:var(--text-2);"><span style="font-family:var(--mono);color:var(--teal);font-weight:600;">02</span> Kumpulkan & pahami data</div>
+        <div style="display:flex;gap:var(--s3);align-items:center;font-size:13px;color:var(--text-2);"><span style="font-family:var(--mono);color:var(--teal);font-weight:600;">03</span> Tentukan kategori ML</div>
+        <div style="display:flex;gap:var(--s3);align-items:center;font-size:13px;color:var(--text-2);"><span style="font-family:var(--mono);color:var(--teal);font-weight:600;">04</span> Siapkan data</div>
+        <div style="display:flex;gap:var(--s3);align-items:center;font-size:13px;color:var(--text-2);"><span style="font-family:var(--mono);color:var(--teal);font-weight:600;">05</span> Pilih & latih model</div>
+        <div style="display:flex;gap:var(--s3);align-items:center;font-size:13px;color:var(--text-2);"><span style="font-family:var(--mono);color:var(--teal);font-weight:600;">06</span> Evaluasi model</div>
+        <div style="display:flex;gap:var(--s3);align-items:center;font-size:13px;color:var(--text-2);"><span style="font-family:var(--mono);color:var(--teal);font-weight:600;">07</span> Deploy & monitor</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       KASUS LATIHAN KELOMPOK
+  ══════════════════════════════════════════ -->
+  <div class="content-block" id="kasus">
+    <h2>3. Latihan Kasus Kelompok</h2>
+    <p>Berikut lima kasus dari industri nyata di Indonesia. Setiap kasus dirancang cukup kompleks sehingga membutuhkan diskusi — beberapa kasus bisa masuk lebih dari satu kategori tergantung cara framing masalahnya.</p>
+
+    <div class="case-grid">
+
+      <!-- KASUS 1 -->
+      <div class="case-card">
+        <div class="case-header">
+          <div class="case-num">1</div>
+          <div>
+            <div class="case-industry">Manufaktur · Tekstil</div>
+            <div class="case-title">PT Sejahtera Tekstil — Mesin Tenun Surabaya</div>
+          </div>
+        </div>
+        <div class="case-body">
+          <div class="case-scenario">
+            PT Sejahtera Tekstil memiliki 12 mesin tenun yang beroperasi 24 jam sehari. Data sensor suhu, getaran, dan tekanan dikumpulkan setiap 5 menit dari masing-masing mesin. Dalam 6 bulan terakhir, tiga mesin mengalami kerusakan mendadak yang menyebabkan downtime rata-rata 18 jam per kejadian dan kerugian Rp 45 juta per kejadian. Teknisi saat ini hanya melakukan pemeriksaan rutin mingguan secara manual — tidak ada sistem peringatan dini. Manajemen ingin memanfaatkan data sensor yang sudah terkumpul selama 2 tahun terakhir.
+          </div>
+          <div class="case-data">
+            <div class="case-data-label">Data yang tersedia</div>
+            <div class="case-data-items">
+              <span class="case-data-item">Sensor suhu (°C)</span>
+              <span class="case-data-item">Sensor getaran (Hz)</span>
+              <span class="case-data-item">Sensor tekanan (bar)</span>
+              <span class="case-data-item">Log kerusakan 2 tahun</span>
+              <span class="case-data-item">Jadwal maintenance</span>
+              <span class="case-data-item">Usia mesin (tahun)</span>
+            </div>
+          </div>
+          <div class="case-question">
+            Mesin mana yang kemungkinan akan rusak dalam 7 hari ke depan, sehingga teknisi dapat memprioritaskan pemeriksaan sebelum kerusakan terjadi?
+          </div>
+        </div>
+      </div>
+
+      <!-- KASUS 2 -->
+      <div class="case-card">
+        <div class="case-header">
+          <div class="case-num">2</div>
+          <div>
+            <div class="case-industry">Ritel · Distribusi</div>
+            <div class="case-title">Koperasi Maju Bersama — 47 Gerai Minimarket Jawa Timur</div>
+          </div>
+        </div>
+        <div class="case-body">
+          <div class="case-scenario">
+            Koperasi Maju Bersama mengoperasikan 47 gerai minimarket yang tersebar di Jawa Timur. Setiap gerai memiliki pola penjualan yang berbeda berdasarkan lokasi — ada yang dekat kampus, dekat perumahan, di pinggir jalan utama, atau di dekat pasar tradisional. Selama ini manajemen memperlakukan semua gerai dengan strategi stok dan promosi yang sama, padahal karakteristiknya sangat berbeda. Akibatnya, banyak gerai yang kelebihan stok produk tertentu sementara gerai lain selalu kehabisan.
+          </div>
+          <div class="case-data">
+            <div class="case-data-label">Data yang tersedia</div>
+            <div class="case-data-items">
+              <span class="case-data-item">Total transaksi harian per gerai</span>
+              <span class="case-data-item">Kategori produk terlaris</span>
+              <span class="case-data-item">Jam puncak penjualan</span>
+              <span class="case-data-item">Tipe lokasi gerai</span>
+              <span class="case-data-item">Radius kompetitor terdekat</span>
+              <span class="case-data-item">Rata-rata nilai transaksi</span>
+            </div>
+          </div>
+          <div class="case-question">
+            Bagaimana mengelompokkan 47 gerai ke dalam beberapa tipe berdasarkan karakteristik bisnisnya, agar strategi stok dan promosi bisa lebih tepat sasaran per tipe gerai?
+          </div>
+        </div>
+      </div>
+
+      <!-- KASUS 3 -->
+      <div class="case-card">
+        <div class="case-header">
+          <div class="case-num">3</div>
+          <div>
+            <div class="case-industry">FMCG · Manufaktur</div>
+            <div class="case-title">CV Roti Kita — Quality Control Biskuit Malang</div>
+          </div>
+        </div>
+        <div class="case-body">
+          <div class="case-scenario">
+            CV Roti Kita memproduksi 8 varian biskuit di fasilitas produksi Malang. Quality control dilakukan secara manual oleh 4 orang inspektur di ujung lini produksi — mereka memeriksa bentuk, warna, dan ukuran setiap biskuit yang melintas. Kecepatan conveyor belt adalah 200 biskuit per menit. Dengan kapasitas pemeriksaan manusia yang terbatas, hanya sekitar 30% produk yang bisa diperiksa. Akibatnya, tingkat produk cacat yang lolos ke tangan konsumen mencapai 2,3% — jauh di atas standar industri 0,5% — dan keluhan konsumen meningkat 40% dalam setahun terakhir.
+          </div>
+          <div class="case-data">
+            <div class="case-data-label">Data yang tersedia</div>
+            <div class="case-data-items">
+              <span class="case-data-item">Foto biskuit beresolusi tinggi</span>
+              <span class="case-data-item">Label cacat/tidak cacat (oleh inspektur)</span>
+              <span class="case-data-item">Jenis cacat (bentuk, warna, ukuran)</span>
+              <span class="case-data-item">Parameter oven (suhu, waktu)</span>
+              <span class="case-data-item">Batch produksi</span>
+            </div>
+          </div>
+          <div class="case-question">
+            Apakah setiap biskuit yang melintas di conveyor memenuhi standar kualitas atau tidak — secara otomatis dan real-time untuk seluruh produk, bukan hanya 30%-nya?
+          </div>
+        </div>
+      </div>
+
+      <!-- KASUS 4 -->
+      <div class="case-card">
+        <div class="case-header">
+          <div class="case-num">4</div>
+          <div>
+            <div class="case-industry">Logistik · Distribusi</div>
+            <div class="case-title">PT Gas Nusantara — Distribusi LPG Jawa Timur</div>
+          </div>
+        </div>
+        <div class="case-body">
+          <div class="case-scenario">
+            PT Gas Nusantara mendistribusikan LPG ke 1.200 agen di Jawa Timur menggunakan armada 38 truk. Setiap hari, tim operasional membuat jadwal pengiriman secara manual — mempertimbangkan kapasitas truk (8 ton), jarak antar agen, jam operasional agen, dan prioritas agen yang stoknya menipis. Proses perencanaan ini memakan waktu 3 jam setiap pagi dan hasilnya sering tidak optimal: rata-rata truk hanya terisi 71% kapasitas dan menempuh 340 km per hari. Estimasi pemborosan biaya bahan bakar akibat rute tidak efisien mencapai Rp 180 juta per bulan.
+          </div>
+          <div class="case-data">
+            <div class="case-data-label">Data yang tersedia</div>
+            <div class="case-data-items">
+              <span class="case-data-item">Lokasi GPS 1.200 agen</span>
+              <span class="case-data-item">Kapasitas truk (ton)</span>
+              <span class="case-data-item">Kebutuhan LPG per agen</span>
+              <span class="case-data-item">Jam operasional agen</span>
+              <span class="case-data-item">Historis rute 12 bulan</span>
+              <span class="case-data-item">Data traffic real-time</span>
+            </div>
+          </div>
+          <div class="case-question">
+            Bagaimana menyusun rute dan jadwal pengiriman harian untuk 38 truk agar total jarak tempuh dan biaya bahan bakar minimum, sambil tetap memenuhi kebutuhan seluruh 1.200 agen?
+          </div>
+        </div>
+      </div>
+
+      <!-- KASUS 5 -->
+      <div class="case-card">
+        <div class="case-header">
+          <div class="case-num">5</div>
+          <div>
+            <div class="case-industry">Layanan Kesehatan · Rumah Sakit</div>
+            <div class="case-title">RS Husada Prima — No-Show Pasien Surabaya</div>
+          </div>
+        </div>
+        <div class="case-body">
+          <div class="case-scenario">
+            RS Husada Prima memiliki 150 tempat tidur dan melayani rata-rata 280 pasien rawat jalan per hari. Masalah utama yang dihadapi: tingkat no-show (pasien membuat janji tapi tidak datang tanpa pemberitahuan) mencapai 23%. Ini menyebabkan slot waktu dokter terbuang sia-sia, antrian tidak bisa dioptimalkan, dan potensi pendapatan yang hilang diperkirakan Rp 180 juta per bulan. Saat ini RS hanya mengirimkan satu SMS reminder kepada semua pasien 1 hari sebelum appointment — tanpa membedakan pasien mana yang memang berisiko tinggi tidak datang.
+          </div>
+          <div class="case-data">
+            <div class="case-data-label">Data yang tersedia</div>
+            <div class="case-data-items">
+              <span class="case-data-item">Riwayat 18 bulan appointment</span>
+              <span class="case-data-item">Usia & jenis kelamin pasien</span>
+              <span class="case-data-item">Jarak rumah ke RS (km)</span>
+              <span class="case-data-item">Poli tujuan</span>
+              <span class="case-data-item">Hari & jam appointment</span>
+              <span class="case-data-item">Riwayat no-show sebelumnya</span>
+              <span class="case-data-item">Jenis asuransi / pembayaran</span>
+            </div>
+          </div>
+          <div class="case-question">
+            Pasien mana yang kemungkinan besar tidak akan datang pada appointment mereka, sehingga RS bisa mengambil tindakan pencegahan yang tepat (misalnya: telepon langsung, overbooking terkendali, atau penjadwalan ulang proaktif)?
+          </div>
+        </div>
+      </div>
+
+    </div><!-- end case-grid -->
+
+    <!-- GROUP TASK BOX -->
+    <div class="group-task">
+      <div class="group-task-header">
+        <span class="group-task-icon">👥</span>
+        <div>
+          <div class="group-task-sub">Tugas Kelompok · Pertemuan Ini</div>
+          <div class="group-task-title">Analisis & Kategorisasi Kasus ML</div>
+        </div>
+      </div>
+
+      <div class="instruction-steps">
+        <div class="instruction-step">
+          <p><strong>Bentuk kelompok</strong> beranggotakan 3–4 orang. Setiap kelompok mendapat <strong>satu kasus</strong> yang ditugaskan oleh dosen.</p>
+        </div>
+        <div class="instruction-step">
+          <p><strong>Baca kasus dengan seksama.</strong> Identifikasi: siapa yang terlibat, apa masalah bisnisnya, data apa yang tersedia, dan apa output yang diharapkan.</p>
+        </div>
+        <div class="instruction-step">
+          <p><strong>Tentukan kategori ML</strong> yang paling tepat untuk kasus ini. Gunakan decision tree di Topik 2 sebagai panduan. Jika ada lebih dari satu kategori yang mungkin, jelaskan mana yang jadi prioritas dan mengapa.</p>
+        </div>
+        <div class="instruction-step">
+          <p><strong>Identifikasi data yang dibutuhkan</strong> — apakah data yang tersedia di kasus sudah cukup? Apa yang masih kurang? Data apa yang idealnya harus dikumpulkan?</p>
+        </div>
+        <div class="instruction-step">
+          <p><strong>Tentukan metrik keberhasilan</strong> dalam satuan bisnis (bukan hanya angka akurasi model). Metrik ML apa yang paling relevan untuk kasus ini?</p>
+        </div>
+        <div class="instruction-step">
+          <p><strong>Presentasikan</strong> analisis kelompok selama 5 menit. Kelompok lain dapat mengajukan pertanyaan atau argumen alternatif.</p>
+        </div>
+      </div>
+
+      <div style="font-family:var(--mono);font-size:10px;color:var(--text-3);letter-spacing:2px;text-transform:uppercase;margin-bottom:var(--s3);">Referensi Kategori</div>
+      <div class="category-ref">
+        <div class="cat-ref-item">
+          <div class="cat-ref-dot" style="background:var(--teal);"></div>
+          <div><span class="cat-ref-name">Klasifikasi</span><span class="cat-ref-desc">Output: kategori (ya/tidak, A/B/C). Ada label. Supervised.</span></div>
+        </div>
+        <div class="cat-ref-item">
+          <div class="cat-ref-dot" style="background:var(--amber);"></div>
+          <div><span class="cat-ref-name">Prediksi / Regresi</span><span class="cat-ref-desc">Output: angka (berapa banyak, kapan). Ada label. Supervised.</span></div>
+        </div>
+        <div class="cat-ref-item">
+          <div class="cat-ref-dot" style="background:var(--blue);"></div>
+          <div><span class="cat-ref-name">Segmentasi</span><span class="cat-ref-desc">Output: kelompok/klaster. Tanpa label. Unsupervised.</span></div>
+        </div>
+        <div class="cat-ref-item">
+          <div class="cat-ref-dot" style="background:var(--purple);"></div>
+          <div><span class="cat-ref-name">Optimasi</span><span class="cat-ref-desc">Output: keputusan sekuensial terbaik. RL atau OR klasik.</span></div>
+        </div>
+      </div>
+
+      <div style="font-family:var(--mono);font-size:10px;color:var(--text-3);letter-spacing:2px;text-transform:uppercase;margin:var(--s5) 0 var(--s3);">Deliverable</div>
+      <div class="deliverable-grid">
+        <div class="deliverable-item">
+          <div class="deliverable-label">Di kelas (15 menit diskusi)</div>
+          <div class="deliverable-desc">Presentasi lisan 5 menit per kelompok. Argumen kategorisasi + justifikasi pemilihan metrik.</div>
+        </div>
+        <div class="deliverable-item">
+          <div class="deliverable-label">Dikumpulkan (Google Classroom)</div>
+          <div class="deliverable-desc">Laporan singkat 1 halaman: kategori ML, alasan, data yang dibutuhkan, metrik keberhasilan, dan satu risiko utama proyek ini.</div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- end content-block kasus -->
+
+</main><!-- end content-main -->
+
+<!-- ── ASIDE ── -->
+<aside class="content-aside">
+  <div class="toc">
+    <div class="toc-title">Isi Halaman</div>
+    <ul class="toc-list">
+      <li><a href="#tujuan" class="active">Tujuan Pembelajaran</a></li>
+      <li><a href="#paradigma">1. Tiga Paradigma ML</a></li>
+      <li><a href="#proses">2. Proses Penyelesaian Masalah</a></li>
+      <li><a href="#kasus">3. Latihan Kasus Kelompok</a></li>
+    </ul>
+  </div>
+
+  <div class="sesi-nav-aside">
+    <div class="sesi-nav-title">Navigasi Sesi</div>
+    <a href="../index.html" class="sesi-nav-btn">
+      <span>🏠</span><span>Beranda Teknik Industri</span>
+    </a>
+    <div style="font-size:12px;color:var(--text-3);margin-top:var(--s4);padding:var(--s3) 0;border-top:1px solid var(--border);">Sesi sebelumnya:</div>
+    <a href="#" class="sesi-nav-btn" style="opacity:0.5;pointer-events:none;">
+      <span>←</span><span>P-01: Pengantar AI & Industri</span>
+    </a>
+    <div style="font-size:12px;color:var(--text-3);margin-top:var(--s3);">Sesi berikutnya:</div>
+    <a href="#" class="sesi-nav-btn" style="opacity:0.5;pointer-events:none;">
+      <span>→</span><span>P-03: Praktik AutoML dengan Orange</span>
+    </a>
+  </div>
+
+  <div style="background:var(--bg-2);border:1px solid var(--border);border-radius:var(--r3);padding:var(--s5);margin-top:var(--s4);">
+    <div style="font-family:var(--mono);font-size:10px;color:var(--text-3);letter-spacing:2px;text-transform:uppercase;margin-bottom:var(--s3);">Info Pertemuan</div>
+    <div style="display:flex;flex-direction:column;gap:var(--s3);">
+      <div><div style="font-size:11px;color:var(--text-3);">Tipe</div><div style="font-size:13px;color:var(--text);">Kuliah Teori + Diskusi Kelompok</div></div>
+      <div><div style="font-size:11px;color:var(--text-3);">Durasi</div><div style="font-size:13px;color:var(--text);">85 menit</div></div>
+      <div><div style="font-size:11px;color:var(--text-3);">CPMK</div><div style="font-size:13px;color:var(--text);">C1, C2, C5</div></div>
+      <div><div style="font-size:11px;color:var(--text-3);">Tools</div><div style="font-size:13px;color:var(--text);">Tidak ada (konseptual)</div></div>
+      <div><div style="font-size:11px;color:var(--text-3);">Referensi Utama</div><div style="font-size:13px;color:var(--text);">Gentsch — AI for Business, Ch. 2<br>Ng — AI For Everyone Week 1</div></div>
+    </div>
+  </div>
+</aside>
+
+</div><!-- end content-layout -->
+
+<footer class="footer">
+  <div>AI·UKWMS <span style="color:var(--text-3);">· P-02 Konsep ML untuk Industri · Teknik Industri</span></div>
+  <div><a href="../index.html" style="color:var(--text-3);">← Kembali ke Beranda TI</a></div>
+</footer>
+
+<script>
+  // Active TOC on scroll
+  const headings = document.querySelectorAll('.content-main [id]');
+  const tocLinks = document.querySelectorAll('.toc-list a');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(a => {
+          a.classList.remove('active');
+          if (a.getAttribute('href') === '#' + entry.target.id) a.classList.add('active');
+        });
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px' });
+  headings.forEach(h => observer.observe(h));
+
+  // Active nav links
+  const navLinks = document.querySelectorAll('.nav-links a[href^="#"]');
+  window.addEventListener('scroll', () => {
+    let current = '';
+    headings.forEach(h => { if (window.scrollY >= h.offsetTop - 100) current = h.id; });
+    navLinks.forEach(a => {
+      a.classList.remove('active');
+      if (a.getAttribute('href') === '#' + current) a.classList.add('active');
+    });
+  });
+</script>
+
 </body>
 </html>
