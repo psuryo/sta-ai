@@ -213,28 +213,64 @@
     <!-- BAGIAN 2: CABANG AI -->
     <div class="content-block" id="cabang">
       <h2>2. Ekosistem & Cabang-cabang AI</h2>
-      <p>AI adalah payung besar yang menaungi berbagai subfield. Penting untuk memahami perbedaan di antara mereka agar kamu tidak salah kaprah ketika membaca berita atau berdiskusi di industri.</p>
+      <p>AI adalah payung besar yang menaungi berbagai pendekatan dan subfield. Secara fundamental, ada <strong>dua aliran besar</strong> yang menjadi fondasi seluruh perkembangan AI modern:</p>
 
-      <div class="branch-list">
+      <div class="concept-grid" style="margin:var(--s5) 0;">
+        <div class="concept-card" style="border-top:2px solid var(--blue);">
+          <div class="concept-card-label" style="color:var(--blue);">Aliran 1 · Symbolic AI</div>
+          <div class="concept-card-title">Berbasis Aturan & Logika</div>
+          <div class="concept-card-body">Pengetahuan dikodekan secara <strong style="color:var(--text)">eksplisit</strong> oleh manusia dalam bentuk simbol, aturan, dan relasi logis. Mesin bernalar menggunakan logika formal — bukan belajar dari data. Disebut juga <em>Good Old-Fashioned AI (GOFAI)</em>.<br><br>
+          <strong style="color:var(--text)">Contoh:</strong> Expert systems (MYCIN untuk diagnosis medis), Prolog, Knowledge Graph (Google, Wikidata), theorem prover.<br><br>
+          <strong style="color:var(--text)">Kelebihan:</strong> Transparan, dapat dijelaskan, tidak butuh data besar.<br>
+          <strong style="color:var(--text)">Kelemahan:</strong> Sulit skalakan; tidak bisa menangani ambiguitas.</div>
+        </div>
+        <div class="concept-card" style="border-top:2px solid var(--teal);">
+          <div class="concept-card-label" style="color:var(--teal);">Aliran 2 · Sub-symbolic AI</div>
+          <div class="concept-card-title">Berbasis Data & Statistik</div>
+          <div class="concept-card-body">Pengetahuan <strong style="color:var(--text)">tidak dikodekan eksplisit</strong> — mesin mempelajarinya sendiri dari pola dalam data. Ini yang mendominasi AI modern sejak era deep learning (2012).<br><br>
+          <strong style="color:var(--text)">Contoh:</strong> Machine Learning, Deep Learning, Generative AI, semua LLM modern.<br><br>
+          <strong style="color:var(--text)">Kelebihan:</strong> Sangat powerful untuk data tak terstruktur (gambar, teks, suara).<br>
+          <strong style="color:var(--text)">Kelemahan:</strong> Black box, butuh data besar, rentan bias.</div>
+        </div>
+      </div>
+
+      <div class="callout tip" style="margin-bottom:var(--s5);">
+        <span class="callout-icon">🔗</span>
+        <div class="callout-body">
+          <p><strong>Frontier terkini — Neurosymbolic AI:</strong> Menggabungkan kekuatan keduanya: fleksibilitas sub-symbolic + transparansi symbolic. Contoh paling kuat saat ini: <em>AlphaGeometry</em> dari Google DeepMind (2024) — memecahkan soal olimpiade matematika setara medali emas IMO dengan menggabungkan symbolic reasoning dan neural network. Ini arah yang paling aktif diriset saat ini.</p>
+        </div>
+      </div>
+
+      <h3>Subfield-subfield Utama AI</h3>
+      <p>Di bawah dua aliran besar itu, AI berkembang menjadi berbagai subfield. Penting memahami perbedaannya agar tidak salah kaprah ketika membaca berita atau berdiskusi di industri.</p>
+
+      <div class="branch-list" style="grid-template-columns:1fr 1fr 1fr;">
+        <div class="branch-item" style="border-top:2px solid var(--blue);">
+          <div class="branch-icon">🗂️</div>
+          <div>
+            <div class="branch-name">Symbolic AI</div>
+            <div class="branch-desc">Aturan eksplisit & logika formal. Expert systems, knowledge graph, logic programming. Fondasi CPMK058 (representasi pengetahuan).</div>
+          </div>
+        </div>
         <div class="branch-item">
           <div class="branch-icon">📊</div>
           <div>
             <div class="branch-name">Machine Learning</div>
-            <div class="branch-desc">Sistem yang belajar dari data tanpa diprogram eksplisit. Inti dari kebanyakan AI modern. <em>AI ⊃ ML.</em></div>
+            <div class="branch-desc">Belajar dari data tanpa diprogram eksplisit. Inti dari kebanyakan AI modern. <em>AI ⊃ ML.</em></div>
           </div>
         </div>
         <div class="branch-item">
           <div class="branch-icon">🧠</div>
           <div>
             <div class="branch-name">Deep Learning</div>
-            <div class="branch-desc">Neural network berlapis banyak. Dasar dari image recognition, speech recognition, dan LLM. <em>ML ⊃ DL.</em></div>
+            <div class="branch-desc">Neural network berlapis banyak. Dasar image recognition, speech, dan LLM. <em>ML ⊃ DL.</em></div>
           </div>
         </div>
         <div class="branch-item">
           <div class="branch-icon">💬</div>
           <div>
             <div class="branch-name">NLP</div>
-            <div class="branch-desc">Natural Language Processing — pemrosesan dan pemahaman bahasa manusia oleh mesin. Dasar chatbot, translator, dan LLM.</div>
+            <div class="branch-desc">Natural Language Processing — pemrosesan dan pemahaman bahasa manusia. Dasar chatbot, translator, dan LLM.</div>
           </div>
         </div>
         <div class="branch-item">
@@ -258,12 +294,19 @@
             <div class="branch-desc">Menghasilkan konten baru: teks, gambar, audio, kode. Contoh: GPT-4, Claude, Stable Diffusion, Sora.</div>
           </div>
         </div>
+        <div class="branch-item" style="border-top:2px solid var(--purple); background:rgba(155,124,244,0.04);">
+          <div class="branch-icon">⚗️</div>
+          <div>
+            <div class="branch-name" style="color:var(--purple);">Neurosymbolic AI ✦</div>
+            <div class="branch-desc">Menggabungkan symbolic + sub-symbolic. Frontier aktif: AlphaGeometry (2024). Arah paling menjanjikan untuk AI yang transparan dan powerful.</div>
+          </div>
+        </div>
       </div>
 
       <div class="callout warn">
         <span class="callout-icon">⚠️</span>
         <div class="callout-body">
-          <p><strong>Jangan tertukar:</strong> Tidak semua ML adalah Deep Learning, tidak semua AI adalah ML. AI adalah konsep terluas; ML adalah subset AI; DL adalah subset ML. Generative AI menggunakan DL (transformer) sebagai fondasinya.</p>
+          <p><strong>Jangan tertukar:</strong> AI adalah konsep terluas; ML adalah subset AI; DL adalah subset ML. Symbolic AI dan Sub-symbolic AI adalah dua aliran paralel, bukan hierarki. Generative AI menggunakan DL (transformer) sebagai fondasi, dan termasuk aliran sub-symbolic.</p>
         </div>
       </div>
     </div>
@@ -459,7 +502,8 @@
         <ul>
           <li>AI adalah sistem yang meniru kemampuan kognitif manusia — kamu sudah menggunakannya setiap hari tanpa sadar</li>
           <li>Ada 4 cara mendefinisikan AI; pendekatan <em>rational agent</em> adalah yang dominan saat ini</li>
-          <li>AI memiliki banyak cabang: ML, Deep Learning, NLP, Computer Vision, RL, dan Generative AI</li>
+          <li>Ada dua aliran besar AI: <strong>Symbolic AI</strong> (berbasis aturan & logika) dan <strong>Sub-symbolic AI</strong> (berbasis data & statistik) — keduanya saling melengkapi dalam Neurosymbolic AI</li>
+          <li>Sub-symbolic AI melahirkan banyak subfield: ML, Deep Learning, NLP, Computer Vision, RL, dan Generative AI</li>
           <li>Perjalanan AI selama 70 tahun penuh ups & downs, dan kita kini berada di puncak gelombang ketiga</li>
           <li>72% perusahaan global sudah adopsi AI — dan Indonesia bergerak ke arah yang sama dengan cepat</li>
           <li>AI bukan segalanya: ada yang bisa dilakukan sangat baik, ada yang masih sangat terbatas</li>
@@ -514,7 +558,7 @@
       <ul class="toc-list">
         <li><a href="#tujuan" class="active">Tujuan Pembelajaran</a></li>
         <li><a href="#definisi">1. Definisi AI</a></li>
-        <li><a href="#cabang">2. Cabang-cabang AI</a></li>
+        <li><a href="#cabang">2. Symbolic & Sub-symbolic AI</a></li>
         <li><a href="#sejarah">3. Sejarah AI</a></li>
         <li><a href="#industri">4. Lanskap Industri</a></li>
         <li><a href="#batasan">5. Batas Kemampuan AI</a></li>
