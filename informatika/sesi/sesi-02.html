@@ -551,7 +551,7 @@
       <p>Kita akan membangun pipeline klasifikasi lengkap menggunakan dataset Iris — dataset klasik yang berisi 150 sampel bunga dari 3 spesies berbeda berdasarkan 4 fitur ukuran kelopak dan mahkota.</p>
 
       <h3>Langkah 1: Import & Load Data</h3>
-      <div class="code-block"><span class="c-comment"># Import library yang dibutuhkan</span>
+      <div class="code-block"><pre><code></code></pre><span class="c-comment"># Import library yang dibutuhkan</span>
 <span class="c-kw">import</span> numpy <span class="c-kw">as</span> np
 <span class="c-kw">import</span> pandas <span class="c-kw">as</span> pd
 <span class="c-kw">import</span> matplotlib.pyplot <span class="c-kw">as</span> plt
@@ -571,7 +571,7 @@ y = iris.target     <span class="c-comment"># label: 0=setosa, 1=versicolor, 2=v
 df = pd.<span class="c-fn">DataFrame</span>(X, columns=iris.feature_names)
 df[<span class="c-str">'species'</span>] = iris.target_names[y]
 <span class="c-fn">print</span>(df.<span class="c-fn">head</span>())
-<span class="c-fn">print</span>(df.<span class="c-fn">describe</span>())</div>
+<span class="c-fn">print</span>(df.<span class="c-fn">describe</span>())</code></pre></div>
 
       <h3>Langkah 2: Split Data & Bangun Pipeline</h3>
       <div class="code-block"><span class="c-comment"># Bagi data: 80% train, 20% test — stratified agar distribusi kelas seimbang</span>
