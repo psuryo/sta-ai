@@ -1,0 +1,1088 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Algoritma Unsupervised Learning — Kecerdasan Buatan UKWMS</title>
+<link rel="stylesheet" href="../../css/style.css">
+<style>
+  /* ── page-specific ── */
+  .algo-hero {
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: var(--r3);
+    padding: var(--s5) var(--s6);
+    margin-bottom: var(--s5);
+    display: flex;
+    align-items: flex-start;
+    gap: var(--s5);
+    scroll-margin-top: 80px;
+  }
+  .algo-hero-num {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-3);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    flex-shrink: 0;
+    padding-top: 4px;
+  }
+  .algo-hero-body { flex: 1; min-width: 0; }
+  .algo-hero-name {
+    font-family: var(--serif);
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 4px;
+  }
+  .algo-hero-sub {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-3);
+    margin-bottom: var(--s3);
+  }
+  .algo-hero-desc {
+    font-size: 14px;
+    color: var(--text-2);
+    line-height: 1.7;
+  }
+  .algo-tags {
+    display: flex;
+    gap: var(--s2);
+    flex-wrap: wrap;
+    margin-top: var(--s3);
+  }
+  .algo-tag {
+    font-family: var(--mono);
+    font-size: 10px;
+    padding: 3px 10px;
+    border-radius: 20px;
+    border: 1px solid;
+  }
+
+  .detail-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--s3);
+    margin: var(--s4) 0;
+  }
+  .detail-card {
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: var(--r2);
+    padding: var(--s4) var(--s5);
+  }
+  .detail-card-label {
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: var(--s2);
+  }
+  .detail-card ul {
+    padding-left: var(--s4);
+    color: var(--text-2);
+    font-size: 13px;
+    line-height: 2;
+  }
+  .detail-card li { margin-bottom: 2px; }
+
+  .param-list { display: flex; flex-direction: column; gap: var(--s2); margin: var(--s3) 0; }
+  .param-item {
+    display: flex;
+    gap: var(--s3);
+    align-items: flex-start;
+    padding: var(--s3) var(--s4);
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: var(--r2);
+  }
+  .param-name {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--purple);
+    flex-shrink: 0;
+    min-width: 130px;
+  }
+  .param-desc { font-size: 13px; color: var(--text-2); line-height: 1.5; }
+
+  .code-block {
+    background: #0d1117;
+    border: 1px solid var(--border);
+    border-radius: var(--r2);
+    padding: var(--s5);
+    font-family: var(--mono);
+    font-size: 12px;
+    line-height: 1.8;
+    overflow-x: auto;
+    margin: var(--s4) 0;
+    color: #c9d1d9;
+  }
+  .code-block .c-comment { color: #8b949e; }
+  .code-block .c-kw      { color: #ff7b72; }
+  .code-block .c-str     { color: #a5d6ff; }
+  .code-block .c-fn      { color: #d2a8ff; }
+  .code-block .c-num     { color: #79c0ff; }
+  .code-block .c-cls     { color: #ffa657; }
+
+  .viz-container {
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: var(--r2);
+    padding: var(--s5);
+    margin: var(--s4) 0;
+    text-align: center;
+  }
+  .viz-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text-3);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: var(--s4);
+  }
+
+  /* K-Means viz */
+  .kmeans-canvas {
+    position: relative;
+    width: 100%;
+    max-width: 440px;
+    height: 220px;
+    margin: 0 auto;
+    background: var(--bg-3);
+    border: 1px solid var(--border);
+    border-radius: var(--r2);
+  }
+  .km-dot {
+    position: absolute;
+    width: 9px; height: 9px;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    opacity: 0.85;
+  }
+  .km-centroid {
+    position: absolute;
+    width: 16px; height: 16px;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    border: 3px solid #0d1117;
+    z-index: 3;
+  }
+  .km-region {
+    position: absolute;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    opacity: 0.07;
+  }
+
+  /* DBSCAN viz */
+  .dbscan-canvas {
+    position: relative;
+    width: 100%;
+    max-width: 440px;
+    height: 220px;
+    margin: 0 auto;
+    background: var(--bg-3);
+    border: 1px solid var(--border);
+    border-radius: var(--r2);
+  }
+  .db-dot {
+    position: absolute;
+    width: 9px; height: 9px;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+  }
+  .db-core-ring {
+    position: absolute;
+    border-radius: 50%;
+    border: 1px dashed;
+    transform: translate(-50%, -50%);
+    opacity: 0.3;
+  }
+  .db-noise {
+    width: 7px; height: 7px;
+    background: var(--text-3);
+    border: 1px solid var(--border-2);
+  }
+
+  /* PCA viz */
+  .pca-canvas {
+    position: relative;
+    width: 100%;
+    max-width: 440px;
+    height: 220px;
+    margin: 0 auto;
+    background: var(--bg-3);
+    border: 1px solid var(--border);
+    border-radius: var(--r2);
+    overflow: hidden;
+  }
+  .pca-dot {
+    position: absolute;
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    background: var(--blue);
+    opacity: 0.7;
+  }
+
+  .algo-divider { border: none; border-top: 1px solid var(--border); margin: var(--s7) 0; }
+
+  .comp-table { width: 100%; border-collapse: collapse; margin: var(--s4) 0; font-size: 13px; }
+  .comp-table th { background: var(--bg-3); color: var(--text-2); font-family: var(--mono); font-size: 10px; letter-spacing: 1px; text-transform: uppercase; padding: var(--s3) var(--s4); text-align: left; border-bottom: 1px solid var(--border); }
+  .comp-table td { padding: var(--s3) var(--s4); border-bottom: 1px solid var(--border); color: var(--text-2); vertical-align: middle; }
+  .comp-table tr:last-child td { border-bottom: none; }
+  .comp-table tr:hover td { background: var(--bg-2); }
+  .comp-algo-name { font-weight: 600; color: var(--text); font-family: var(--mono); font-size: 11px; }
+
+  .task-box {
+    background: rgba(155,124,244,0.06);
+    border: 1px solid rgba(155,124,244,0.22);
+    border-radius: var(--r3);
+    padding: var(--s5) var(--s6);
+    margin-top: var(--s5);
+  }
+  .task-box-title {
+    font-weight: 600; font-size: 14px; color: var(--purple);
+    margin-bottom: var(--s4); font-family: var(--mono); letter-spacing: 0.5px;
+  }
+  .reading-box {
+    background: var(--bg-2); border: 1px solid var(--border);
+    border-radius: var(--r3); padding: var(--s5) var(--s6); margin-top: var(--s4);
+  }
+  .reading-box-title {
+    font-weight: 600; font-size: 13px; color: var(--text);
+    margin-bottom: var(--s4); font-family: var(--mono); letter-spacing: 0.5px;
+  }
+  .reading-item {
+    display: flex; gap: var(--s3); align-items: flex-start;
+    padding: var(--s3) 0; border-bottom: 1px solid var(--border);
+    font-size: 13px; color: var(--text-2);
+  }
+  .reading-item:last-child { border-bottom: none; }
+  .reading-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+  .reading-label { line-height: 1.6; }
+
+  .elbow-chart {
+    display: flex;
+    align-items: flex-end;
+    gap: 6px;
+    height: 100px;
+    padding: var(--s3) var(--s4);
+    border-left: 2px solid var(--border);
+    border-bottom: 2px solid var(--border);
+    margin: var(--s4) auto;
+    max-width: 320px;
+  }
+  .elbow-bar-group { display: flex; flex-direction: column; align-items: center; gap: 4px; flex: 1; }
+  .elbow-bar { width: 100%; background: var(--purple); border-radius: 2px 2px 0 0; opacity: 0.7; }
+  .elbow-bar.optimal { opacity: 1; background: var(--teal); }
+  .elbow-bar-label { font-family: var(--mono); font-size: 10px; color: var(--text-3); }
+
+  @media (max-width: 768px) {
+    .detail-grid { grid-template-columns: 1fr; }
+    .content-layout { grid-template-columns: 1fr; }
+    .content-aside { position: static; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ══ NAV ══ -->
+<nav class="nav">
+  <div class="nav-logo">AI<span>·</span>UKWMS</div>
+  <ul class="nav-links">
+    <li><a href="sesi-02.html">← Kembali ke P-02</a></li>
+    <li><a href="#kmeans">K-Means</a></li>
+    <li><a href="#dbscan">DBSCAN</a></li>
+    <li><a href="#pca">PCA</a></li>
+    <li><a href="#perbandingan">Perbandingan</a></li>
+  </ul>
+</nav>
+
+<!-- ══ HERO ══ -->
+<header class="sesi-hero">
+  <div style="max-width:1100px;margin:0 auto;">
+    <div class="sesi-breadcrumb">
+      <a href="../index.html">Kecerdasan Buatan</a>
+      <span>›</span>
+      <a href="sesi-02.html">P-02: Konsep Machine Learning</a>
+      <span>›</span>
+      <span>Unsupervised Learning</span>
+    </div>
+    <div class="sesi-num" style="color:var(--purple);">REFERENSI ALGORITMA · UNSUPERVISED LEARNING</div>
+    <h1 class="sesi-title">Algoritma<br>Unsupervised Learning</h1>
+    <p style="font-size:15px;color:var(--text-2);max-width:620px;line-height:1.8;">Penjelasan mendalam tiga algoritma unsupervised learning — K-Means Clustering, DBSCAN, dan PCA. Memahami cara kerjanya, kapan menggunakannya, dan bagaimana mengimplementasikannya dengan Scikit-learn.</p>
+    <div class="sesi-meta-row">
+      <span class="badge" style="color:var(--purple);border-color:rgba(155,124,244,0.3);background:rgba(155,124,244,0.08);">3 Algoritma</span>
+      <span class="badge badge-blue">Clustering &amp; Reduksi Dimensi</span>
+      <span class="badge badge-amber">Scikit-learn</span>
+    </div>
+  </div>
+</header>
+
+<!-- ══ CONTENT ══ -->
+<div class="content-layout">
+
+  <main class="content-main">
+
+    <!-- INTRO -->
+    <div class="content-block">
+      <h2 style="padding-top:0;">Apa itu Unsupervised Learning?</h2>
+      <p>Unsupervised learning adalah paradigma machine learning di mana model bekerja dengan <strong>data tanpa label</strong>. Tidak ada "jawaban benar" yang diberikan — model harus sendiri menemukan struktur, pola, atau representasi tersembunyi dalam data.</p>
+
+      <div class="callout info">
+        <span class="callout-icon">📌</span>
+        <div class="callout-body">
+          <p><strong>Halaman ini adalah referensi mendalam.</strong> Untuk gambaran umum, kembali ke <a href="sesi-02.html#algoritma">P-02 — Bagian 3: Algoritma Fundamental</a>. Halaman ini cocok dibaca saat kamu ingin memahami cara kerja, hyperparameter, dan kapan menggunakan masing-masing algoritma secara lebih detail.</p>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--s3);margin:var(--s4) 0;">
+        <div style="background:var(--bg-2);border:1px solid var(--border);border-radius:var(--r2);padding:var(--s4) var(--s5);">
+          <div style="font-family:var(--mono);font-size:9px;color:var(--purple);letter-spacing:2px;text-transform:uppercase;margin-bottom:6px;">Clustering</div>
+          <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px;">Mengelompokkan data serupa</div>
+          <div style="font-size:12px;color:var(--text-2);line-height:1.6;">Menemukan kelompok alami dalam data berdasarkan kemiripan. Tidak ada label kelas — model sendiri yang memutuskan mana yang "mirip".</div>
+          <div style="font-family:var(--mono);font-size:11px;color:var(--text-3);margin-top:8px;">Algoritma: K-Means, DBSCAN, Hierarchical</div>
+        </div>
+        <div style="background:var(--bg-2);border:1px solid var(--border);border-radius:var(--r2);padding:var(--s4) var(--s5);">
+          <div style="font-family:var(--mono);font-size:9px;color:var(--blue);letter-spacing:2px;text-transform:uppercase;margin-bottom:6px;">Reduksi Dimensi</div>
+          <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px;">Menyederhanakan representasi data</div>
+          <div style="font-size:12px;color:var(--text-2);line-height:1.6;">Mengurangi jumlah fitur sambil mempertahankan informasi paling penting. Berguna untuk visualisasi, kompresi, dan preprocessing.</div>
+          <div style="font-family:var(--mono);font-size:11px;color:var(--text-3);margin-top:8px;">Algoritma: PCA, t-SNE, UMAP, Autoencoder</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════ -->
+    <!-- 1. K-MEANS          -->
+    <!-- ═══════════════════ -->
+    <div class="content-block" id="kmeans">
+      <h2>1. K-Means Clustering</h2>
+
+      <div class="algo-hero">
+        <div class="algo-hero-num">01 / 03</div>
+        <div class="algo-hero-body">
+          <div class="algo-hero-name">K-Means Clustering</div>
+          <div class="algo-hero-sub">sklearn.cluster.KMeans</div>
+          <div class="algo-hero-desc">Algoritma clustering paling populer dan paling mudah dipahami. Membagi data ke dalam <em>k</em> kelompok (cluster) sehingga setiap titik data masuk ke cluster yang centroid-nya paling dekat. Bekerja secara iteratif sampai posisi centroid tidak berubah.</div>
+          <div class="algo-tags">
+            <span class="algo-tag" style="color:var(--purple);border-color:rgba(155,124,244,0.3);background:rgba(155,124,244,0.06);">Clustering</span>
+            <span class="algo-tag" style="color:var(--teal);border-color:rgba(0,201,177,0.3);background:var(--teal-glow);">Cepat &amp; Skalabel</span>
+            <span class="algo-tag" style="color:var(--amber);border-color:rgba(245,166,35,0.3);background:var(--amber-dim);">Perlu Tentukan k</span>
+          </div>
+        </div>
+      </div>
+
+      <h3>Cara Kerja: Algoritma Lloyd</h3>
+      <p>K-Means bekerja melalui empat langkah yang diulang sampai konvergen:</p>
+      <div style="display:flex;flex-direction:column;gap:var(--s2);margin:var(--s4) 0;">
+        <div style="display:flex;gap:var(--s3);align-items:flex-start;padding:var(--s3) var(--s4);background:var(--bg-2);border:1px solid var(--border);border-radius:var(--r2);">
+          <div style="font-family:var(--mono);font-size:13px;font-weight:600;color:var(--purple);flex-shrink:0;width:28px;">01</div>
+          <div style="font-size:13px;color:var(--text-2);line-height:1.6;"><strong style="color:var(--text);">Inisialisasi</strong> — Pilih k titik sebagai centroid awal (secara acak, atau dengan metode K-Means++ yang lebih cerdas)</div>
+        </div>
+        <div style="display:flex;gap:var(--s3);align-items:flex-start;padding:var(--s3) var(--s4);background:var(--bg-2);border:1px solid var(--border);border-radius:var(--r2);">
+          <div style="font-family:var(--mono);font-size:13px;font-weight:600;color:var(--purple);flex-shrink:0;width:28px;">02</div>
+          <div style="font-size:13px;color:var(--text-2);line-height:1.6;"><strong style="color:var(--text);">Assignment</strong> — Setiap titik data ditetapkan ke cluster dengan centroid terdekat (menggunakan Euclidean distance)</div>
+        </div>
+        <div style="display:flex;gap:var(--s3);align-items:flex-start;padding:var(--s3) var(--s4);background:var(--bg-2);border:1px solid var(--border);border-radius:var(--r2);">
+          <div style="font-family:var(--mono);font-size:13px;font-weight:600;color:var(--purple);flex-shrink:0;width:28px;">03</div>
+          <div style="font-size:13px;color:var(--text-2);line-height:1.6;"><strong style="color:var(--text);">Update</strong> — Hitung ulang posisi centroid sebagai rata-rata semua titik dalam cluster tersebut</div>
+        </div>
+        <div style="display:flex;gap:var(--s3);align-items:flex-start;padding:var(--s3) var(--s4);background:var(--bg-2);border:1px solid var(--border);border-radius:var(--r2);">
+          <div style="font-family:var(--mono);font-size:13px;font-weight:600;color:var(--purple);flex-shrink:0;width:28px;">04</div>
+          <div style="font-size:13px;color:var(--text-2);line-height:1.6;"><strong style="color:var(--text);">Ulangi</strong> — Kembali ke langkah 02 sampai tidak ada titik yang berpindah cluster (konvergen), atau batas iterasi tercapai</div>
+        </div>
+      </div>
+
+      <div class="viz-container">
+        <div class="viz-label">Visualisasi — K-Means dengan k=3</div>
+        <div class="kmeans-canvas">
+          <div class="km-region" style="background:var(--teal);width:160px;height:160px;left:22%;top:35%;"></div>
+          <div class="km-region" style="background:var(--purple);width:150px;height:150px;left:68%;top:25%;"></div>
+          <div class="km-region" style="background:var(--amber);width:140px;height:140px;left:65%;top:72%;"></div>
+          <!-- Cluster 1 -->
+          <div class="km-dot" style="background:var(--teal);left:14%;top:28%;"></div>
+          <div class="km-dot" style="background:var(--teal);left:20%;top:40%;"></div>
+          <div class="km-dot" style="background:var(--teal);left:28%;top:35%;"></div>
+          <div class="km-dot" style="background:var(--teal);left:18%;top:55%;"></div>
+          <div class="km-dot" style="background:var(--teal);left:32%;top:50%;"></div>
+          <div class="km-dot" style="background:var(--teal);left:25%;top:62%;"></div>
+          <div class="km-centroid" style="background:var(--teal);left:22%;top:45%;"></div>
+          <!-- Cluster 2 -->
+          <div class="km-dot" style="background:var(--purple);left:60%;top:15%;"></div>
+          <div class="km-dot" style="background:var(--purple);left:70%;top:22%;"></div>
+          <div class="km-dot" style="background:var(--purple);left:78%;top:18%;"></div>
+          <div class="km-dot" style="background:var(--purple);left:65%;top:30%;"></div>
+          <div class="km-dot" style="background:var(--purple);left:75%;top:32%;"></div>
+          <div class="km-dot" style="background:var(--purple);left:82%;top:26%;"></div>
+          <div class="km-centroid" style="background:var(--purple);left:72%;top:24%;"></div>
+          <!-- Cluster 3 -->
+          <div class="km-dot" style="background:var(--amber);left:58%;top:62%;"></div>
+          <div class="km-dot" style="background:var(--amber);left:68%;top:68%;"></div>
+          <div class="km-dot" style="background:var(--amber);left:76%;top:60%;"></div>
+          <div class="km-dot" style="background:var(--amber);left:62%;top:75%;"></div>
+          <div class="km-dot" style="background:var(--amber);left:74%;top:78%;"></div>
+          <div class="km-dot" style="background:var(--amber);left:84%;top:70%;"></div>
+          <div class="km-centroid" style="background:var(--amber);left:70%;top:68%;"></div>
+          <div style="position:absolute;left:6px;top:6px;font-family:var(--mono);font-size:9px;color:var(--text-3);">● centroid</div>
+        </div>
+        <div style="font-size:11px;color:var(--text-3);margin-top:var(--s3);">Tiga cluster dengan warna berbeda. Centroid (titik besar) adalah rata-rata posisi semua anggota clusternya.</div>
+      </div>
+
+      <h3>Masalah Utama: Menentukan Nilai k</h3>
+      <p>K-Means membutuhkan kamu menentukan jumlah cluster <em>sebelum</em> training. Dua metode paling umum:</p>
+
+      <div class="detail-grid">
+        <div class="detail-card">
+          <div class="detail-card-label" style="color:var(--teal);">Elbow Method</div>
+          <div style="font-size:12px;color:var(--text-2);line-height:1.6;margin-top:var(--s2);">Plot nilai WCSS (Within-Cluster Sum of Squares) untuk berbagai nilai k. Cari "siku" di mana penurunan WCSS mulai melambat — itulah k optimal.</div>
+          <div class="elbow-chart">
+            <div class="elbow-bar-group"><div class="elbow-bar" style="height:90px;"></div><div class="elbow-bar-label">k=1</div></div>
+            <div class="elbow-bar-group"><div class="elbow-bar" style="height:65px;"></div><div class="elbow-bar-label">k=2</div></div>
+            <div class="elbow-bar-group"><div class="elbow-bar optimal" style="height:38px;"></div><div class="elbow-bar-label">k=3</div></div>
+            <div class="elbow-bar-group"><div class="elbow-bar" style="height:30px;"></div><div class="elbow-bar-label">k=4</div></div>
+            <div class="elbow-bar-group"><div class="elbow-bar" style="height:25px;"></div><div class="elbow-bar-label">k=5</div></div>
+            <div class="elbow-bar-group"><div class="elbow-bar" style="height:22px;"></div><div class="elbow-bar-label">k=6</div></div>
+          </div>
+          <div style="font-size:11px;color:var(--text-3);">k=3 adalah "siku" — penambahan cluster setelahnya tidak banyak mengurangi WCSS.</div>
+        </div>
+        <div class="detail-card">
+          <div class="detail-card-label" style="color:var(--blue);">Silhouette Score</div>
+          <div style="font-size:12px;color:var(--text-2);line-height:1.6;margin-top:var(--s2);">Mengukur seberapa baik setiap titik cocok di clusternya sendiri dibanding cluster terdekat lainnya. Nilai −1 sampai +1 — semakin mendekati +1, semakin baik.</div>
+          <div style="background:var(--bg-3);border-radius:var(--r2);padding:var(--s3) var(--s4);margin-top:var(--s3);font-family:var(--mono);font-size:11px;color:var(--text-2);line-height:2;">
+            k=2 → score: 0.52<br>
+            <span style="color:var(--teal);">k=3 → score: 0.71 ✓</span><br>
+            k=4 → score: 0.63<br>
+            k=5 → score: 0.58
+          </div>
+          <div style="font-size:11px;color:var(--text-3);margin-top:var(--s2);">Pilih k dengan silhouette score tertinggi.</div>
+        </div>
+      </div>
+
+      <div class="detail-grid" style="margin-top:0;">
+        <div class="detail-card">
+          <div class="detail-card-label" style="color:var(--teal);">Kelebihan</div>
+          <ul>
+            <li>Sederhana dan mudah dipahami</li>
+            <li>Cepat dan efisien, skala baik ke dataset besar</li>
+            <li>Mudah diimplementasikan</li>
+            <li>Bekerja baik untuk cluster berbentuk bulat (spherical)</li>
+          </ul>
+        </div>
+        <div class="detail-card">
+          <div class="detail-card-label" style="color:var(--red);">Kekurangan</div>
+          <ul>
+            <li>Harus menentukan k di awal</li>
+            <li>Sensitif terhadap inisialisasi awal centroid</li>
+            <li>Tidak bekerja baik untuk cluster non-spherical</li>
+            <li>Sensitif terhadap outlier — centroid tertarik ke outlier</li>
+          </ul>
+        </div>
+      </div>
+
+      <h3>Hyperparameter Penting</h3>
+      <div class="param-list">
+        <div class="param-item">
+          <div class="param-name">n_clusters (k)</div>
+          <div class="param-desc">Jumlah cluster yang diinginkan. <strong>Hyperparameter paling kritis.</strong> Gunakan Elbow Method atau Silhouette Score untuk menentukannya secara empiris.</div>
+        </div>
+        <div class="param-item">
+          <div class="param-name">init</div>
+          <div class="param-desc"><code>k-means++</code> (default) — inisialisasi cerdas yang menyebarkan centroid awal. Jauh lebih baik dari inisialisasi acak. Hampir selalu gunakan <code>k-means++</code>.</div>
+        </div>
+        <div class="param-item">
+          <div class="param-name">n_init</div>
+          <div class="param-desc">Berapa kali K-Means dijalankan dengan inisialisasi berbeda. Default 10. Naikkan ke 20–50 jika hasil tidak stabil.</div>
+        </div>
+        <div class="param-item">
+          <div class="param-name">max_iter</div>
+          <div class="param-desc">Jumlah iterasi maksimum per run. Default 300 sudah cukup untuk kebanyakan kasus.</div>
+        </div>
+      </div>
+
+      <h3>Implementasi Scikit-learn</h3>
+      <div class="code-block"><pre><code><span class="c-kw">from</span> sklearn.cluster <span class="c-kw">import</span> <span class="c-cls">KMeans</span>
+<span class="c-kw">from</span> sklearn.preprocessing <span class="c-kw">import</span> <span class="c-cls">StandardScaler</span>
+<span class="c-kw">from</span> sklearn.metrics <span class="c-kw">import</span> silhouette_score
+<span class="c-kw">import</span> matplotlib.pyplot <span class="c-kw">as</span> plt
+
+<span class="c-comment"># PENTING: scale dulu sebelum clustering</span>
+scaler = <span class="c-cls">StandardScaler</span>()
+X_scaled = scaler.<span class="c-fn">fit_transform</span>(X)
+
+<span class="c-comment"># ── Elbow Method ──</span>
+wcss = []
+k_range = <span class="c-fn">range</span>(<span class="c-num">1</span>, <span class="c-num">11</span>)
+<span class="c-kw">for</span> k <span class="c-kw">in</span> k_range:
+    km = <span class="c-cls">KMeans</span>(n_clusters=k, init=<span class="c-str">'k-means++'</span>, n_init=<span class="c-num">10</span>, random_state=<span class="c-num">42</span>)
+    km.<span class="c-fn">fit</span>(X_scaled)
+    wcss.<span class="c-fn">append</span>(km.inertia_)
+
+plt.<span class="c-fn">plot</span>(k_range, wcss, <span class="c-str">'bo-'</span>)
+plt.<span class="c-fn">xlabel</span>(<span class="c-str">'Jumlah Cluster (k)'</span>); plt.<span class="c-fn">ylabel</span>(<span class="c-str">'WCSS'</span>)
+plt.<span class="c-fn">title</span>(<span class="c-str">'Elbow Method'</span>); plt.<span class="c-fn">show</span>()
+
+<span class="c-comment"># ── Silhouette Score ──</span>
+<span class="c-kw">for</span> k <span class="c-kw">in</span> <span class="c-fn">range</span>(<span class="c-num">2</span>, <span class="c-num">8</span>):
+    km = <span class="c-cls">KMeans</span>(n_clusters=k, init=<span class="c-str">'k-means++'</span>, n_init=<span class="c-num">10</span>, random_state=<span class="c-num">42</span>)
+    labels = km.<span class="c-fn">fit_predict</span>(X_scaled)
+    score = <span class="c-fn">silhouette_score</span>(X_scaled, labels)
+    <span class="c-fn">print</span>(<span class="c-str">f"k={k}: silhouette = {score:.3f}"</span>)
+
+<span class="c-comment"># ── Clustering final ──</span>
+kmeans = <span class="c-cls">KMeans</span>(n_clusters=<span class="c-num">3</span>, init=<span class="c-str">'k-means++'</span>, n_init=<span class="c-num">10</span>, random_state=<span class="c-num">42</span>)
+labels = kmeans.<span class="c-fn">fit_predict</span>(X_scaled)
+
+<span class="c-fn">print</span>(<span class="c-str">f"Distribusi cluster: {pd.Series(labels).value_counts().to_dict()}"</span>)</code></pre></div>
+
+      <div class="callout tip">
+        <span class="callout-icon">💡</span>
+        <div class="callout-body">
+          <p><strong>Validasi clustering:</strong> Karena tidak ada label, evaluasi clustering lebih sulit. Selain metrik internal (silhouette score), lakukan juga <em>visual inspection</em> — plot cluster dengan 2 fitur terpenting atau setelah reduksi dimensi dengan PCA. Jika cluster masuk akal secara domain, itulah yang terpenting.</p>
+        </div>
+      </div>
+    </div>
+
+    <hr class="algo-divider">
+
+    <!-- ═══════════════════ -->
+    <!-- 2. DBSCAN           -->
+    <!-- ═══════════════════ -->
+    <div class="content-block" id="dbscan">
+      <h2>2. DBSCAN</h2>
+
+      <div class="algo-hero">
+        <div class="algo-hero-num">02 / 03</div>
+        <div class="algo-hero-body">
+          <div class="algo-hero-name">DBSCAN</div>
+          <div class="algo-hero-sub">sklearn.cluster.DBSCAN — Density-Based Spatial Clustering of Applications with Noise</div>
+          <div class="algo-hero-desc">Algoritma clustering berbasis kepadatan (density). Tidak perlu menentukan jumlah cluster di awal — cluster terbentuk secara otomatis dari wilayah yang padat, dan titik yang terisolasi diklasifikasikan sebagai <em>noise</em> (anomali). Unggul saat cluster berbentuk tidak beraturan.</div>
+          <div class="algo-tags">
+            <span class="algo-tag" style="color:var(--purple);border-color:rgba(155,124,244,0.3);background:rgba(155,124,244,0.06);">Clustering</span>
+            <span class="algo-tag" style="color:var(--red);border-color:rgba(240,96,96,0.3);background:rgba(240,96,96,0.06);">Deteksi Anomali</span>
+            <span class="algo-tag" style="color:var(--blue);border-color:rgba(74,142,245,0.3);background:var(--blue-dim);">Density-Based</span>
+            <span class="algo-tag" style="color:var(--teal);border-color:rgba(0,201,177,0.3);background:var(--teal-glow);">Bebas Tentukan k</span>
+          </div>
+        </div>
+      </div>
+
+      <h3>Konsep Dasar: Tiga Tipe Titik</h3>
+      <p>DBSCAN mengklasifikasikan setiap titik data berdasarkan dua parameter: <strong>eps</strong> (radius lingkaran) dan <strong>min_samples</strong> (jumlah tetangga minimum).</p>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:var(--s3);margin:var(--s4) 0;">
+        <div style="background:rgba(0,201,177,0.06);border:1px solid rgba(0,201,177,0.25);border-radius:var(--r2);padding:var(--s4);text-align:center;">
+          <div style="font-size:20px;margin-bottom:var(--s2);">🔵</div>
+          <div style="font-family:var(--mono);font-size:11px;color:var(--teal);margin-bottom:6px;">CORE POINT</div>
+          <div style="font-size:12px;color:var(--text-2);line-height:1.6;">Memiliki ≥ <em>min_samples</em> tetangga dalam radius <em>eps</em>. Titik inti dari sebuah cluster.</div>
+        </div>
+        <div style="background:rgba(74,142,245,0.06);border:1px solid rgba(74,142,245,0.25);border-radius:var(--r2);padding:var(--s4);text-align:center;">
+          <div style="font-size:20px;margin-bottom:var(--s2);">🟡</div>
+          <div style="font-family:var(--mono);font-size:11px;color:var(--blue);margin-bottom:6px;">BORDER POINT</div>
+          <div style="font-size:12px;color:var(--text-2);line-height:1.6;">Bukan core point, tapi berada dalam radius <em>eps</em> dari sebuah core point. Anggota cluster di tepi.</div>
+        </div>
+        <div style="background:rgba(240,96,96,0.05);border:1px solid rgba(240,96,96,0.2);border-radius:var(--r2);padding:var(--s4);text-align:center;">
+          <div style="font-size:20px;margin-bottom:var(--s2);">⭕</div>
+          <div style="font-family:var(--mono);font-size:11px;color:var(--red);margin-bottom:6px;">NOISE / OUTLIER</div>
+          <div style="font-size:12px;color:var(--text-2);line-height:1.6;">Bukan core point dan tidak dalam radius <em>eps</em> dari core point manapun. Dianggap anomali — diberi label <code>-1</code>.</div>
+        </div>
+      </div>
+
+      <div class="viz-container">
+        <div class="viz-label">Visualisasi — DBSCAN: Cluster &amp; Noise</div>
+        <div class="dbscan-canvas">
+          <!-- Cluster 1 (teal) -->
+          <div class="db-dot" style="background:var(--teal);left:12%;top:35%;"></div>
+          <div class="db-dot" style="background:var(--teal);left:18%;top:28%;"></div>
+          <div class="db-dot" style="background:var(--teal);left:24%;top:38%;"></div>
+          <div class="db-dot" style="background:var(--teal);left:16%;top:50%;"></div>
+          <div class="db-dot" style="background:var(--teal);left:28%;top:55%;"></div>
+          <div class="db-dot" style="background:var(--teal);left:20%;top:62%;"></div>
+          <div class="db-dot" style="background:var(--teal);left:32%;top:45%;"></div>
+          <div class="db-dot" style="background:var(--teal);left:38%;top:35%;"></div>
+          <div class="db-dot" style="background:var(--teal);left:35%;top:65%;"></div>
+          <div class="db-core-ring" style="border-color:var(--teal);width:52px;height:52px;left:24%;top:38%;margin-left:-26px;margin-top:-26px;"></div>
+          <!-- Cluster 2 (purple) — arc shape -->
+          <div class="db-dot" style="background:var(--purple);left:60%;top:15%;"></div>
+          <div class="db-dot" style="background:var(--purple);left:68%;top:12%;"></div>
+          <div class="db-dot" style="background:var(--purple);left:75%;top:18%;"></div>
+          <div class="db-dot" style="background:var(--purple);left:80%;top:28%;"></div>
+          <div class="db-dot" style="background:var(--purple);left:82%;top:38%;"></div>
+          <div class="db-dot" style="background:var(--purple);left:78%;top:48%;"></div>
+          <div class="db-dot" style="background:var(--purple);left:70%;top:55%;"></div>
+          <!-- Cluster 3 (amber) -->
+          <div class="db-dot" style="background:var(--amber);left:62%;top:70%;"></div>
+          <div class="db-dot" style="background:var(--amber);left:70%;top:75%;"></div>
+          <div class="db-dot" style="background:var(--amber);left:78%;top:68%;"></div>
+          <div class="db-dot" style="background:var(--amber);left:72%;top:82%;"></div>
+          <div class="db-dot" style="background:var(--amber);left:84%;top:78%;"></div>
+          <!-- Noise -->
+          <div class="db-dot db-noise" style="left:45%;top:20%;"></div>
+          <div class="db-dot db-noise" style="left:48%;top:72%;"></div>
+          <div class="db-dot db-noise" style="left:8%;top:80%;"></div>
+          <div class="db-dot db-noise" style="left:90%;top:12%;"></div>
+          <div style="position:absolute;right:6px;bottom:6px;font-family:var(--mono);font-size:9px;color:var(--text-3);">⬜ noise (label −1)</div>
+        </div>
+        <div style="font-size:11px;color:var(--text-3);margin-top:var(--s3);">DBSCAN menemukan 3 cluster dengan bentuk tidak beraturan. Titik abu-abu (noise) tidak masuk cluster manapun — inilah kekuatan DBSCAN untuk deteksi anomali.</div>
+      </div>
+
+      <h3>Cara Kerja</h3>
+      <p>Untuk setiap titik yang belum dikunjungi:</p>
+      <ol>
+        <li>Temukan semua tetangga dalam radius <strong>eps</strong></li>
+        <li>Jika jumlah tetangga ≥ <strong>min_samples</strong> → titik ini adalah <em>core point</em>, buat cluster baru</li>
+        <li>Ekspansi cluster secara rekursif: tambahkan semua titik dalam jangkauan (dan titik yang mereka jangkau pula)</li>
+        <li>Jika jumlah tetangga &lt; min_samples dan tidak terjangkau core point → tandai sebagai <em>noise</em> (label −1)</li>
+      </ol>
+
+      <div class="detail-grid">
+        <div class="detail-card">
+          <div class="detail-card-label" style="color:var(--teal);">Kelebihan</div>
+          <ul>
+            <li>Tidak perlu menentukan k di awal</li>
+            <li>Menemukan cluster berbentuk arbitrary</li>
+            <li>Secara otomatis mengidentifikasi outlier/noise</li>
+            <li>Tahan terhadap outlier — tidak mengacaukan cluster</li>
+          </ul>
+        </div>
+        <div class="detail-card">
+          <div class="detail-card-label" style="color:var(--red);">Kekurangan</div>
+          <ul>
+            <li>Sensitif terhadap pilihan <em>eps</em> dan <em>min_samples</em></li>
+            <li>Tidak bekerja baik pada data dengan kepadatan bervariasi</li>
+            <li>Lambat pada dataset sangat besar (O(n²) worst case)</li>
+            <li>Tidak bisa langsung predict data baru</li>
+          </ul>
+        </div>
+      </div>
+
+      <h3>Hyperparameter Penting</h3>
+      <div class="param-list">
+        <div class="param-item">
+          <div class="param-name">eps</div>
+          <div class="param-desc"><strong>Radius lingkaran tetangga.</strong> Hyperparameter paling kritis. Terlalu kecil → semua titik jadi noise. Terlalu besar → semua titik masuk satu cluster. Cara menentukan: plot k-distance graph — cari "siku".</div>
+        </div>
+        <div class="param-item">
+          <div class="param-name">min_samples</div>
+          <div class="param-desc">Jumlah titik minimum untuk membentuk core point. Aturan umum: <code>min_samples = 2 × n_features</code> sebagai titik awal. Nilai lebih besar → cluster lebih ketat, lebih banyak noise.</div>
+        </div>
+        <div class="param-item">
+          <div class="param-name">metric</div>
+          <div class="param-desc">Fungsi jarak. Default <code>euclidean</code>. Gunakan <code>manhattan</code> untuk data berdimensi tinggi, atau <code>cosine</code> untuk data teks.</div>
+        </div>
+      </div>
+
+      <h3>Implementasi Scikit-learn</h3>
+      <div class="code-block"><pre><code><span class="c-kw">from</span> sklearn.cluster <span class="c-kw">import</span> <span class="c-cls">DBSCAN</span>
+<span class="c-kw">from</span> sklearn.neighbors <span class="c-kw">import</span> <span class="c-cls">NearestNeighbors</span>
+<span class="c-kw">from</span> sklearn.preprocessing <span class="c-kw">import</span> <span class="c-cls">StandardScaler</span>
+<span class="c-kw">import</span> numpy <span class="c-kw">as</span> np
+<span class="c-kw">import</span> matplotlib.pyplot <span class="c-kw">as</span> plt
+
+scaler = <span class="c-cls">StandardScaler</span>()
+X_scaled = scaler.<span class="c-fn">fit_transform</span>(X)
+
+<span class="c-comment"># ── Langkah 1: K-Distance Graph untuk menentukan eps ──</span>
+k = <span class="c-num">2</span> * X.shape[<span class="c-num">1</span>]   <span class="c-comment"># min_samples = 2 × n_features sebagai titik awal</span>
+nbrs = <span class="c-cls">NearestNeighbors</span>(n_neighbors=k).<span class="c-fn">fit</span>(X_scaled)
+distances, _ = nbrs.<span class="c-fn">kneighbors</span>(X_scaled)
+distances = np.<span class="c-fn">sort</span>(distances[:, k-<span class="c-num">1</span>])
+
+plt.<span class="c-fn">plot</span>(distances)
+plt.<span class="c-fn">xlabel</span>(<span class="c-str">'Titik data (diurutkan)'</span>); plt.<span class="c-fn">ylabel</span>(<span class="c-str">'Jarak ke tetangga ke-k'</span>)
+plt.<span class="c-fn">title</span>(<span class="c-str">'K-Distance Graph — cari "siku" untuk eps'</span>)
+plt.<span class="c-fn">axhline</span>(y=<span class="c-num">0.5</span>, color=<span class="c-str">'r'</span>, linestyle=<span class="c-str">'--'</span>, label=<span class="c-str">'eps kandidat'</span>)
+plt.<span class="c-fn">legend</span>(); plt.<span class="c-fn">show</span>()
+
+<span class="c-comment"># ── Langkah 2: Jalankan DBSCAN ──</span>
+dbscan = <span class="c-cls">DBSCAN</span>(eps=<span class="c-num">0.5</span>, min_samples=k)
+labels = dbscan.<span class="c-fn">fit_predict</span>(X_scaled)
+
+n_clusters = <span class="c-fn">len</span>(<span class="c-fn">set</span>(labels)) - (<span class="c-num">1</span> <span class="c-kw">if</span> -<span class="c-num">1</span> <span class="c-kw">in</span> labels <span class="c-kw">else</span> <span class="c-num">0</span>)
+n_noise    = <span class="c-fn">list</span>(labels).<span class="c-fn">count</span>(-<span class="c-num">1</span>)
+<span class="c-fn">print</span>(<span class="c-str">f"Cluster ditemukan: {n_clusters}"</span>)
+<span class="c-fn">print</span>(<span class="c-str">f"Noise points     : {n_noise} ({n_noise/len(labels)*100:.1f}%)"</span>)
+
+<span class="c-comment"># Label -1 = anomali — berguna untuk deteksi fraud</span>
+anomalies = X[labels == -<span class="c-num">1</span>]
+<span class="c-fn">print</span>(<span class="c-str">f"Anomali terdeteksi: {len(anomalies)} titik"</span>)</code></pre></div>
+
+      <div class="callout tip">
+        <span class="callout-icon">🔍</span>
+        <div class="callout-body">
+          <p><strong>DBSCAN untuk deteksi anomali:</strong> Label <code>-1</code> adalah "anomali" yang secara eksplisit teridentifikasi. Ini menjadikan DBSCAN alat yang sangat berguna untuk fraud detection, network intrusion detection, dan quality control manufaktur — kasus di mana kamu ingin menemukan titik-titik "aneh" yang tidak cocok dengan pola normal.</p>
+        </div>
+      </div>
+    </div>
+
+    <hr class="algo-divider">
+
+    <!-- ═══════════════════ -->
+    <!-- 3. PCA              -->
+    <!-- ═══════════════════ -->
+    <div class="content-block" id="pca">
+      <h2>3. PCA — Principal Component Analysis</h2>
+
+      <div class="algo-hero">
+        <div class="algo-hero-num">03 / 03</div>
+        <div class="algo-hero-body">
+          <div class="algo-hero-name">Principal Component Analysis (PCA)</div>
+          <div class="algo-hero-sub">sklearn.decomposition.PCA</div>
+          <div class="algo-hero-desc">Teknik reduksi dimensi paling fundamental. PCA menemukan arah-arah di mana data paling "tersebar" (variansi terbesar) dan memproyeksikan data ke arah-arah tersebut. Hasilnya adalah representasi data yang lebih ringkas namun mempertahankan informasi paling penting.</div>
+          <div class="algo-tags">
+            <span class="algo-tag" style="color:var(--blue);border-color:rgba(74,142,245,0.3);background:var(--blue-dim);">Reduksi Dimensi</span>
+            <span class="algo-tag" style="color:var(--teal);border-color:rgba(0,201,177,0.3);background:var(--teal-glow);">Visualisasi</span>
+            <span class="algo-tag" style="color:var(--amber);border-color:rgba(245,166,35,0.3);background:var(--amber-dim);">Preprocessing</span>
+          </div>
+        </div>
+      </div>
+
+      <h3>Mengapa Reduksi Dimensi Diperlukan?</h3>
+      <p>Dataset nyata sering memiliki puluhan hingga ribuan fitur. Dimensi tinggi menghadirkan beberapa masalah:</p>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:var(--s3);margin:var(--s4) 0;">
+        <div style="background:var(--bg-2);border:1px solid var(--border);border-radius:var(--r2);padding:var(--s4);">
+          <div style="font-family:var(--mono);font-size:10px;color:var(--red);margin-bottom:6px;">CURSE OF DIMENSIONALITY</div>
+          <div style="font-size:12px;color:var(--text-2);line-height:1.5;">Di dimensi tinggi, semua titik data menjadi "jauh" satu sama lain — jarak kehilangan makna, membuat banyak algoritma gagal.</div>
+        </div>
+        <div style="background:var(--bg-2);border:1px solid var(--border);border-radius:var(--r2);padding:var(--s4);">
+          <div style="font-family:var(--mono);font-size:10px;color:var(--amber);margin-bottom:6px;">OVERFITTING</div>
+          <div style="font-size:12px;color:var(--text-2);line-height:1.5;">Fitur berlebihan yang berkorelasi tinggi atau tidak relevan meningkatkan risiko model menghafal noise.</div>
+        </div>
+        <div style="background:var(--bg-2);border:1px solid var(--border);border-radius:var(--r2);padding:var(--s4);">
+          <div style="font-family:var(--mono);font-size:10px;color:var(--blue);margin-bottom:6px;">VISUALISASI</div>
+          <div style="font-size:12px;color:var(--text-2);line-height:1.5;">Tidak bisa memvisualisasikan data berdimensi lebih dari 3. PCA memungkinkan visualisasi ke 2D atau 3D.</div>
+        </div>
+      </div>
+
+      <h3>Cara Kerja: Mencari Arah Variansi Terbesar</h3>
+      <p>PCA menemukan <strong>principal components</strong> — sumbu-sumbu baru yang merupakan kombinasi linier dari fitur asli:</p>
+      <ul>
+        <li><strong>PC1</strong> adalah arah dengan variansi data terbesar</li>
+        <li><strong>PC2</strong> adalah arah dengan variansi terbesar <em>yang tegak lurus terhadap PC1</em></li>
+        <li><strong>PC3</strong>, dst. mengikuti pola yang sama</li>
+      </ul>
+      <p>Secara matematis, PCA melakukan <em>eigendecomposition</em> terhadap matriks kovariansi data. Intuisinya: <strong>PCA merotasi sistem koordinat agar variansi terbesar berada di sumbu pertama.</strong></p>
+
+      <div class="viz-container">
+        <div class="viz-label">Visualisasi — PCA: Arah Principal Components</div>
+        <div class="pca-canvas">
+          <div class="pca-dot" style="left:20%;top:70%;"></div>
+          <div class="pca-dot" style="left:25%;top:65%;"></div>
+          <div class="pca-dot" style="left:30%;top:62%;"></div>
+          <div class="pca-dot" style="left:35%;top:56%;"></div>
+          <div class="pca-dot" style="left:40%;top:52%;"></div>
+          <div class="pca-dot" style="left:43%;top:48%;"></div>
+          <div class="pca-dot" style="left:48%;top:44%;"></div>
+          <div class="pca-dot" style="left:52%;top:40%;"></div>
+          <div class="pca-dot" style="left:58%;top:36%;"></div>
+          <div class="pca-dot" style="left:63%;top:32%;"></div>
+          <div class="pca-dot" style="left:68%;top:28%;"></div>
+          <div class="pca-dot" style="left:73%;top:24%;"></div>
+          <div class="pca-dot" style="left:32%;top:70%;opacity:0.5;"></div>
+          <div class="pca-dot" style="left:44%;top:58%;opacity:0.5;"></div>
+          <div class="pca-dot" style="left:55%;top:33%;opacity:0.5;"></div>
+          <div class="pca-dot" style="left:64%;top:40%;opacity:0.5;"></div>
+          <div class="pca-dot" style="left:28%;top:55%;opacity:0.5;"></div>
+          <div class="pca-dot" style="left:70%;top:20%;opacity:0.5;"></div>
+          <!-- PC1 -->
+          <div style="position:absolute;left:15%;top:76%;width:75%;height:2px;background:var(--teal);transform-origin:left center;transform:rotate(-35deg);"></div>
+          <div style="position:absolute;left:67%;top:23%;font-family:var(--mono);font-size:10px;color:var(--teal);">PC1 →</div>
+          <!-- PC2 -->
+          <div style="position:absolute;left:46%;top:82%;width:30%;height:2px;background:var(--amber);transform-origin:left center;transform:rotate(-125deg);opacity:0.8;"></div>
+          <div style="position:absolute;left:34%;top:32%;font-family:var(--mono);font-size:10px;color:var(--amber);">PC2</div>
+        </div>
+        <div style="font-size:11px;color:var(--text-3);margin-top:var(--s3);">PC1 (teal) menangkap variansi terbesar. PC2 (amber) tegak lurus terhadap PC1, menangkap variansi terbesar yang tersisa.</div>
+      </div>
+
+      <h3>Explained Variance: Berapa Dimensi yang Perlu Dipertahankan?</h3>
+      <p>Setiap principal component menjelaskan sebagian variansi data. Pilih jumlah komponen yang cukup untuk menjelaskan ≥ 95% total variansi — ini mempertahankan sebagian besar informasi sambil mengurangi dimensi secara signifikan.</p>
+
+      <div class="detail-grid">
+        <div class="detail-card">
+          <div class="detail-card-label" style="color:var(--teal);">Kelebihan</div>
+          <ul>
+            <li>Mengurangi dimensi data secara efektif</li>
+            <li>Menghilangkan korelasi antar fitur (orthogonal components)</li>
+            <li>Mempercepat training model downstream</li>
+            <li>Memungkinkan visualisasi data berdimensi tinggi</li>
+            <li>Bisa mengurangi noise dalam data</li>
+          </ul>
+        </div>
+        <div class="detail-card">
+          <div class="detail-card-label" style="color:var(--red);">Kekurangan</div>
+          <ul>
+            <li>Principal components tidak interpretable</li>
+            <li>Kehilangan sebagian informasi</li>
+            <li>Hanya menangkap hubungan <em>linier</em></li>
+            <li>Wajib feature scaling sebelum PCA</li>
+          </ul>
+        </div>
+      </div>
+
+      <h3>Hyperparameter Penting</h3>
+      <div class="param-list">
+        <div class="param-item">
+          <div class="param-name">n_components</div>
+          <div class="param-desc">Jumlah principal component yang dipertahankan. Bisa integer (jumlah komponen) atau float 0–1 (contoh: <code>0.95</code> = pertahankan hingga 95% variansi terjelas). Gunakan float untuk kemudahan.</div>
+        </div>
+        <div class="param-item">
+          <div class="param-name">svd_solver</div>
+          <div class="param-desc"><code>auto</code> (default) memilih solver terbaik otomatis. <code>randomized</code> jauh lebih cepat untuk dataset besar berdimensi tinggi dengan sedikit komponen yang dibutuhkan.</div>
+        </div>
+        <div class="param-item">
+          <div class="param-name">whiten</div>
+          <div class="param-desc">Jika <code>True</code>, hasil PCA dinormalisasi sehingga setiap komponen memiliki variansi 1. Berguna sebagai preprocessing sebelum SVM atau k-NN.</div>
+        </div>
+      </div>
+
+      <h3>Implementasi Scikit-learn</h3>
+      <div class="code-block"><pre><code><span class="c-kw">from</span> sklearn.decomposition <span class="c-kw">import</span> <span class="c-cls">PCA</span>
+<span class="c-kw">from</span> sklearn.preprocessing <span class="c-kw">import</span> <span class="c-cls">StandardScaler</span>
+<span class="c-kw">import</span> matplotlib.pyplot <span class="c-kw">as</span> plt
+<span class="c-kw">import</span> numpy <span class="c-kw">as</span> np
+
+<span class="c-comment"># PENTING: selalu scale sebelum PCA</span>
+scaler = <span class="c-cls">StandardScaler</span>()
+X_scaled = scaler.<span class="c-fn">fit_transform</span>(X)
+
+<span class="c-comment"># ── Analisis berapa komponen yang diperlukan ──</span>
+pca_full = <span class="c-cls">PCA</span>().<span class="c-fn">fit</span>(X_scaled)
+cumvar = np.<span class="c-fn">cumsum</span>(pca_full.explained_variance_ratio_)
+
+plt.<span class="c-fn">plot</span>(<span class="c-fn">range</span>(<span class="c-num">1</span>, <span class="c-fn">len</span>(cumvar)+<span class="c-num">1</span>), cumvar, <span class="c-str">'bo-'</span>)
+plt.<span class="c-fn">axhline</span>(y=<span class="c-num">0.95</span>, color=<span class="c-str">'r'</span>, linestyle=<span class="c-str">'--'</span>, label=<span class="c-str">'95% threshold'</span>)
+plt.<span class="c-fn">xlabel</span>(<span class="c-str">'Jumlah Komponen'</span>); plt.<span class="c-fn">ylabel</span>(<span class="c-str">'Cumulative Explained Variance'</span>)
+plt.<span class="c-fn">legend</span>(); plt.<span class="c-fn">show</span>()
+
+<span class="c-comment"># ── Terapkan PCA dengan n_components optimal ──</span>
+pca = <span class="c-cls">PCA</span>(n_components=<span class="c-num">0.95</span>)   <span class="c-comment"># pertahankan 95% variansi</span>
+X_pca = pca.<span class="c-fn">fit_transform</span>(X_scaled)
+
+<span class="c-fn">print</span>(<span class="c-str">f"Dimensi asli       : {X_scaled.shape[1]} fitur"</span>)
+<span class="c-fn">print</span>(<span class="c-str">f"Dimensi setelah PCA: {X_pca.shape[1]} komponen"</span>)
+<span class="c-fn">print</span>(<span class="c-str">f"Variansi dijelaskan: {pca.explained_variance_ratio_.sum():.3f}"</span>)
+
+<span class="c-comment"># ── Visualisasi 2D ──</span>
+pca_2d = <span class="c-cls">PCA</span>(n_components=<span class="c-num">2</span>)
+X_2d = pca_2d.<span class="c-fn">fit_transform</span>(X_scaled)
+
+plt.<span class="c-fn">figure</span>(figsize=(<span class="c-num">8</span>, <span class="c-num">6</span>))
+colors = [<span class="c-str">'#00C9B1'</span>, <span class="c-str">'#9B7CF4'</span>, <span class="c-str">'#F5A623'</span>]
+<span class="c-kw">for</span> i, cls <span class="c-kw">in</span> <span class="c-fn">enumerate</span>(class_names):
+    mask = y == i
+    plt.<span class="c-fn">scatter</span>(X_2d[mask, <span class="c-num">0</span>], X_2d[mask, <span class="c-num">1</span>], c=colors[i], label=cls, alpha=<span class="c-num">0.7</span>)
+plt.<span class="c-fn">xlabel</span>(<span class="c-str">f"PC1 ({pca_2d.explained_variance_ratio_[0]:.1%} var)"</span>)
+plt.<span class="c-fn">ylabel</span>(<span class="c-str">f"PC2 ({pca_2d.explained_variance_ratio_[1]:.1%} var)"</span>)
+plt.<span class="c-fn">legend</span>(); plt.<span class="c-fn">show</span>()
+
+<span class="c-comment"># ── PCA sebagai preprocessing dalam Pipeline ──</span>
+<span class="c-kw">from</span> sklearn.pipeline <span class="c-kw">import</span> <span class="c-cls">Pipeline</span>
+<span class="c-kw">from</span> sklearn.svm <span class="c-kw">import</span> <span class="c-cls">SVC</span>
+
+pipeline = <span class="c-cls">Pipeline</span>([
+    (<span class="c-str">'scaler'</span>, <span class="c-cls">StandardScaler</span>()),
+    (<span class="c-str">'pca'</span>,    <span class="c-cls">PCA</span>(n_components=<span class="c-num">0.95</span>)),
+    (<span class="c-str">'clf'</span>,    <span class="c-cls">SVC</span>(kernel=<span class="c-str">'rbf'</span>))
+])
+pipeline.<span class="c-fn">fit</span>(X_train, y_train)
+<span class="c-fn">print</span>(<span class="c-str">f"Test accuracy dengan PCA+SVM: {pipeline.score(X_test, y_test):.3f}"</span>)</code></pre></div>
+
+      <div class="callout warn">
+        <span class="callout-icon">⚠️</span>
+        <div class="callout-body">
+          <p><strong>Data leakage pada PCA:</strong> PCA harus di-fit <em>hanya</em> pada data training, lalu di-transform ke data test. Gunakan selalu <code>Pipeline</code> dari Scikit-learn untuk memastikan ini — jangan pernah <code>fit_transform</code> pada seluruh dataset sebelum split.</p>
+        </div>
+      </div>
+    </div>
+
+    <hr class="algo-divider">
+
+    <!-- PERBANDINGAN -->
+    <div class="content-block" id="perbandingan">
+      <h2>Perbandingan &amp; Panduan Memilih</h2>
+
+      <table class="comp-table">
+        <thead>
+          <tr>
+            <th>Algoritma</th>
+            <th>Tujuan</th>
+            <th>Perlu Tentukan k/dim</th>
+            <th>Deteksi Anomali</th>
+            <th>Skala ke Data Besar</th>
+            <th>Terbaik Untuk</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="comp-algo-name">K-Means</span></td>
+            <td style="color:var(--purple);">Clustering</td>
+            <td style="color:var(--amber);">Ya — harus tentukan k</td>
+            <td style="color:var(--red);">Tidak</td>
+            <td style="color:var(--teal);">Sangat baik</td>
+            <td style="font-size:12px;color:var(--text-2);">Segmentasi pelanggan, cluster berbentuk bulat, dataset besar</td>
+          </tr>
+          <tr>
+            <td><span class="comp-algo-name">DBSCAN</span></td>
+            <td style="color:var(--purple);">Clustering</td>
+            <td style="color:var(--teal);">Tidak — otomatis</td>
+            <td style="color:var(--teal);">Ya — bawaan</td>
+            <td style="color:var(--amber);">Sedang</td>
+            <td style="font-size:12px;color:var(--text-2);">Cluster tidak beraturan, deteksi fraud/anomali, data geografis</td>
+          </tr>
+          <tr>
+            <td><span class="comp-algo-name">PCA</span></td>
+            <td style="color:var(--blue);">Reduksi Dimensi</td>
+            <td style="color:var(--amber);">Ya — tentukan n_components</td>
+            <td style="color:var(--red);">Tidak langsung</td>
+            <td style="color:var(--teal);">Baik</td>
+            <td style="font-size:12px;color:var(--text-2);">Visualisasi, preprocessing sebelum ML, kompresi fitur</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3 style="margin-top:var(--s5);">Alur Keputusan</h3>
+      <div class="callout info">
+        <span class="callout-icon">🗺️</span>
+        <div class="callout-body">
+          <ol style="font-size:14px;line-height:2.4;margin:0;padding-left:var(--s5);">
+            <li>Apakah tujuanmu <strong>mengelompokkan</strong> data? → pilih Clustering</li>
+            <li>Apakah tujuanmu <strong>menyederhanakan/visualisasi</strong> data? → pilih PCA</li>
+            <li>Untuk clustering: apakah cluster kemungkinan <strong>berbentuk bulat dan jumlahnya diketahui</strong>? → <strong>K-Means</strong></li>
+            <li>Untuk clustering: apakah cluster <strong>bentuknya tidak beraturan</strong> atau kamu perlu <strong>deteksi anomali</strong>? → <strong>DBSCAN</strong></li>
+            <li>Sebelum supervised learning dengan data berdimensi tinggi → gunakan <strong>PCA sebagai preprocessing</strong></li>
+            <li>Untuk visualisasi data berdimensi tinggi → <strong>PCA</strong> (cepat, linier) atau <strong>t-SNE/UMAP</strong> (lebih baik untuk struktur non-linier)</li>
+          </ol>
+        </div>
+      </div>
+
+      <h3 style="margin-top:var(--s5);">Tantangan Umum Unsupervised Learning</h3>
+      <div class="detail-grid">
+        <div class="detail-card">
+          <div class="detail-card-label" style="color:var(--amber);">Evaluasi Sulit</div>
+          <div style="font-size:12px;color:var(--text-2);line-height:1.6;margin-top:var(--s2);">Tidak ada "jawaban benar" — evaluasi bergantung pada metrik internal (silhouette score, WCSS) dan domain expertise. Selalu validasi hasil dengan visualisasi dan knowledge bisnis.</div>
+        </div>
+        <div class="detail-card">
+          <div class="detail-card-label" style="color:var(--amber);">Wajib Preprocessing</div>
+          <div style="font-size:12px;color:var(--text-2);line-height:1.6;margin-top:var(--s2);">Semua algoritma unsupervised sangat sensitif terhadap skala fitur. Selalu lakukan <code>StandardScaler</code> sebelum K-Means, DBSCAN, maupun PCA.</div>
+        </div>
+      </div>
+
+      <div class="task-box">
+        <div class="task-box-title">📋 Latihan: Segmentasi Pelanggan</div>
+        <p style="font-size:13px;color:var(--text-2);margin-bottom:var(--s4);">Cari dataset pelanggan di Kaggle (contoh: "Mall Customers", "Customer Segmentation"). Lakukan:</p>
+        <ol style="font-size:14px;color:var(--text);line-height:2.2;">
+          <li>EDA dan preprocessing — scaling, handle missing values</li>
+          <li>Gunakan PCA untuk visualisasi — plot 2D dan amati apakah ada cluster yang terlihat</li>
+          <li>Jalankan K-Means — tentukan k optimal dengan Elbow Method dan Silhouette Score</li>
+          <li>Jalankan DBSCAN — bandingkan cluster yang ditemukan dengan K-Means, amati titik noise</li>
+          <li>Interpretasikan tiap cluster: apa karakteristik pelanggan di masing-masing kelompok?</li>
+        </ol>
+      </div>
+
+      <div class="reading-box" style="margin-top:var(--s5);">
+        <div class="reading-box-title">📖 Referensi Lanjutan</div>
+        <div class="reading-item">
+          <span class="reading-icon">📗</span>
+          <div class="reading-label">
+            <strong>Hands-On ML — Aurélien Géron, Chapter 8 &amp; 9</strong><br>
+            Dimensionality Reduction &amp; Unsupervised Learning Techniques.
+          </div>
+        </div>
+        <div class="reading-item">
+          <span class="reading-icon">🌐</span>
+          <div class="reading-label">
+            <strong>Scikit-learn User Guide — Clustering &amp; Decomposition</strong><br>
+            Dokumentasi resmi dengan visualisasi perbandingan berbagai algoritma clustering pada berbagai jenis dataset.
+          </div>
+        </div>
+        <div class="reading-item">
+          <span class="reading-icon">📄</span>
+          <div class="reading-label">
+            <strong>StatQuest — "PCA Step by Step" &amp; "K-Means Clustering" (YouTube)</strong><br>
+            Visualisasi intuitif yang sangat membantu membangun intuisi sebelum mempelajari matematikanya.
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ── ASIDE ── -->
+  <aside class="content-aside">
+    <div class="toc">
+      <div class="toc-title">Isi Halaman</div>
+      <ul class="toc-list">
+        <li><a href="#kmeans" class="active">1. K-Means Clustering</a></li>
+        <li><a href="#dbscan">2. DBSCAN</a></li>
+        <li><a href="#pca">3. PCA</a></li>
+        <li><a href="#perbandingan">Perbandingan</a></li>
+      </ul>
+    </div>
+
+    <div class="sesi-nav-aside">
+      <div class="sesi-nav-title">Navigasi</div>
+      <a href="sesi-02-supervised.html" class="sesi-nav-btn">
+        <span>←</span>
+        <span>Algoritma Supervised</span>
+      </a>
+      <a href="sesi-02.html" class="sesi-nav-btn" style="margin-top:var(--s2);">
+        <span>🏠</span>
+        <span>P-02: Konsep ML (ringkasan)</span>
+      </a>
+    </div>
+
+    <div style="background:var(--bg-2);border:1px solid var(--border);border-radius:var(--r3);padding:var(--s5);margin-top:var(--s4);">
+      <div style="font-family:var(--mono);font-size:10px;color:var(--text-3);letter-spacing:2px;text-transform:uppercase;margin-bottom:var(--s4);">3 Algoritma Dibahas</div>
+      <div style="display:flex;flex-direction:column;gap:var(--s3);">
+        <a href="#kmeans" style="font-size:13px;color:var(--text-2);display:flex;align-items:center;gap:var(--s2);text-decoration:none;">
+          <span style="font-family:var(--mono);font-size:10px;color:var(--text-3);">01</span> K-Means Clustering
+        </a>
+        <a href="#dbscan" style="font-size:13px;color:var(--text-2);display:flex;align-items:center;gap:var(--s2);text-decoration:none;">
+          <span style="font-family:var(--mono);font-size:10px;color:var(--text-3);">02</span> DBSCAN
+        </a>
+        <a href="#pca" style="font-size:13px;color:var(--text-2);display:flex;align-items:center;gap:var(--s2);text-decoration:none;">
+          <span style="font-family:var(--mono);font-size:10px;color:var(--text-3);">03</span> PCA
+        </a>
+      </div>
+    </div>
+  </aside>
+
+</div>
+
+<!-- ══ FOOTER ══ -->
+<footer class="footer">
+  <div>AI·UKWMS <span style="color:var(--text-3);">· Algoritma Unsupervised Learning</span></div>
+  <div style="display:flex;gap:var(--s4);">
+    <a href="sesi-02-supervised.html" style="color:var(--text-3);">← Supervised</a>
+    <a href="sesi-02.html" style="color:var(--text-3);">P-02 Ringkasan →</a>
+  </div>
+</footer>
+
+<script>
+  const headings = document.querySelectorAll('.content-main [id]');
+  const tocLinks = document.querySelectorAll('.toc-list a');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(a => {
+          a.classList.remove('active');
+          if (a.getAttribute('href') === '#' + entry.target.id) a.classList.add('active');
+        });
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px' });
+  headings.forEach(h => observer.observe(h));
+
+  const navLinks = document.querySelectorAll('.nav-links a[href^="#"]');
+  window.addEventListener('scroll', () => {
+    let current = '';
+    headings.forEach(h => { if (window.scrollY >= h.offsetTop - 100) current = h.id; });
+    navLinks.forEach(a => {
+      a.classList.remove('active');
+      if (a.getAttribute('href') === '#' + current) a.classList.add('active');
+    });
+  });
+</script>
+
+</body>
+</html>

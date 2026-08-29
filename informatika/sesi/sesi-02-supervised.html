@@ -1,0 +1,1527 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Algoritma Supervised Learning — Kecerdasan Buatan UKWMS</title>
+<link rel="stylesheet" href="../../css/style.css">
+<style>
+  /* ── page-specific ── */
+  .algo-hero {
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: var(--r3);
+    padding: var(--s5) var(--s6);
+    margin-bottom: var(--s5);
+    display: flex;
+    align-items: flex-start;
+    gap: var(--s5);
+    scroll-margin-top: 80px;
+  }
+  .algo-hero-num {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-3);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    flex-shrink: 0;
+    padding-top: 4px;
+  }
+  .algo-hero-body { flex: 1; min-width: 0; }
+  .algo-hero-name {
+    font-family: var(--serif);
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 4px;
+  }
+  .algo-hero-sub {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-3);
+    margin-bottom: var(--s3);
+  }
+  .algo-hero-desc {
+    font-size: 14px;
+    color: var(--text-2);
+    line-height: 1.7;
+  }
+  .algo-tags {
+    display: flex;
+    gap: var(--s2);
+    flex-wrap: wrap;
+    margin-top: var(--s3);
+  }
+  .algo-tag {
+    font-family: var(--mono);
+    font-size: 10px;
+    padding: 3px 10px;
+    border-radius: 20px;
+    border: 1px solid;
+  }
+
+  /* ── detail sections ── */
+  .detail-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--s3);
+    margin: var(--s4) 0;
+  }
+  .detail-card {
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: var(--r2);
+    padding: var(--s4) var(--s5);
+  }
+  .detail-card-label {
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: var(--s2);
+  }
+  .detail-card ul {
+    padding-left: var(--s4);
+    color: var(--text-2);
+    font-size: 13px;
+    line-height: 2;
+  }
+  .detail-card li { margin-bottom: 2px; }
+
+  /* ── hyperparams ── */
+  .param-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s2);
+    margin: var(--s3) 0;
+  }
+  .param-item {
+    display: flex;
+    gap: var(--s3);
+    align-items: flex-start;
+    padding: var(--s3) var(--s4);
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: var(--r2);
+  }
+  .param-name {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--teal);
+    flex-shrink: 0;
+    min-width: 130px;
+  }
+  .param-desc {
+    font-size: 13px;
+    color: var(--text-2);
+    line-height: 1.5;
+  }
+
+  /* ── code block (reused from sesi-02) ── */
+  .code-block {
+    background: #0d1117;
+    border: 1px solid var(--border);
+    border-radius: var(--r2);
+    padding: var(--s5);
+    font-family: var(--mono);
+    font-size: 12px;
+    line-height: 1.8;
+    overflow-x: auto;
+    margin: var(--s4) 0;
+    color: #c9d1d9;
+  }
+  .code-block .c-comment { color: #8b949e; }
+  .code-block .c-kw      { color: #ff7b72; }
+  .code-block .c-str     { color: #a5d6ff; }
+  .code-block .c-fn      { color: #d2a8ff; }
+  .code-block .c-num     { color: #79c0ff; }
+  .code-block .c-cls     { color: #ffa657; }
+
+  /* ── visual diagrams ── */
+  .viz-container {
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: var(--r2);
+    padding: var(--s5);
+    margin: var(--s4) 0;
+    text-align: center;
+  }
+  .viz-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text-3);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: var(--s4);
+  }
+
+  /* Linear regression viz */
+  .scatter-plot {
+    position: relative;
+    width: 100%;
+    max-width: 420px;
+    height: 200px;
+    margin: 0 auto;
+    border-left: 2px solid var(--border);
+    border-bottom: 2px solid var(--border);
+  }
+  .scatter-dot {
+    position: absolute;
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--blue);
+    transform: translate(-50%, 50%);
+    opacity: 0.8;
+  }
+  .regression-line {
+    position: absolute;
+    bottom: 10px; left: 5px;
+    width: 95%; height: 2px;
+    background: linear-gradient(90deg, var(--teal), var(--teal));
+    transform-origin: left;
+    transform: rotate(-28deg) translateY(-50px);
+    opacity: 0.9;
+  }
+
+  /* Decision tree viz */
+  .tree-viz {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+    padding: var(--s4) 0;
+  }
+  .tree-level {
+    display: flex;
+    justify-content: center;
+    gap: var(--s7);
+    position: relative;
+  }
+  .tree-node {
+    background: var(--bg-3);
+    border: 1px solid var(--border);
+    border-radius: var(--r2);
+    padding: var(--s2) var(--s4);
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-2);
+    white-space: nowrap;
+    position: relative;
+  }
+  .tree-node.root { border-color: var(--teal); color: var(--teal); }
+  .tree-node.leaf-yes { border-color: rgba(0,201,177,0.4); color: var(--teal); background: var(--teal-glow); }
+  .tree-node.leaf-no  { border-color: rgba(240,96,96,0.4); color: var(--red); background: rgba(240,96,96,0.05); }
+  .tree-connector {
+    width: 2px;
+    height: 20px;
+    background: var(--border);
+    margin: 0 auto;
+  }
+  .tree-branch-row {
+    display: flex;
+    justify-content: center;
+    gap: var(--s7);
+  }
+  .tree-branch {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+  }
+  .branch-label {
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--text-3);
+    margin-bottom: 2px;
+  }
+
+  /* k-NN viz */
+  .knn-viz {
+    position: relative;
+    width: 100%;
+    max-width: 340px;
+    height: 200px;
+    margin: 0 auto;
+    border: 1px solid var(--border);
+    border-radius: var(--r2);
+    background: var(--bg-3);
+  }
+  .knn-dot {
+    position: absolute;
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+  }
+  .knn-query {
+    width: 14px; height: 14px;
+    background: var(--amber);
+    border: 2px solid rgba(245,166,35,0.6);
+    z-index: 3;
+  }
+  .knn-circle {
+    position: absolute;
+    border-radius: 50%;
+    border: 1px dashed rgba(245,166,35,0.4);
+    transform: translate(-50%, -50%);
+    z-index: 1;
+  }
+
+  /* SVM viz */
+  .svm-viz {
+    position: relative;
+    width: 100%;
+    max-width: 380px;
+    height: 200px;
+    margin: 0 auto;
+    border: 1px solid var(--border);
+    border-radius: var(--r2);
+    background: var(--bg-3);
+    overflow: hidden;
+  }
+  .svm-hyperplane {
+    position: absolute;
+    top: 0; bottom: 0;
+    left: 50%;
+    width: 2px;
+    background: var(--teal);
+    transform: rotate(15deg) translateX(-50%);
+    transform-origin: center;
+  }
+  .svm-margin {
+    position: absolute;
+    top: 0; bottom: 0;
+    left: calc(50% - 30px);
+    width: 60px;
+    background: rgba(0,201,177,0.06);
+    transform: rotate(15deg);
+    transform-origin: center;
+  }
+  .svm-margin-line {
+    position: absolute;
+    top: 0; bottom: 0;
+    width: 1px;
+    background: rgba(0,201,177,0.3);
+    transform: rotate(15deg);
+    transform-origin: center;
+  }
+  .svm-dot {
+    position: absolute;
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+  }
+  .svm-support {
+    width: 12px; height: 12px;
+    box-shadow: 0 0 0 3px rgba(0,201,177,0.3);
+  }
+
+  /* algo divider */
+  .algo-divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: var(--s7) 0;
+  }
+
+  /* comparison table */
+  .comp-table { width: 100%; border-collapse: collapse; margin: var(--s4) 0; font-size: 13px; }
+  .comp-table th { background: var(--bg-3); color: var(--text-2); font-family: var(--mono); font-size: 10px; letter-spacing: 1px; text-transform: uppercase; padding: var(--s3) var(--s4); text-align: left; border-bottom: 1px solid var(--border); }
+  .comp-table td { padding: var(--s3) var(--s4); border-bottom: 1px solid var(--border); color: var(--text-2); vertical-align: middle; }
+  .comp-table tr:last-child td { border-bottom: none; }
+  .comp-table tr:hover td { background: var(--bg-2); }
+  .comp-algo-name { font-weight: 600; color: var(--text); font-family: var(--mono); font-size: 11px; }
+  .dot-fill { display: inline-flex; gap: 2px; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--border-2); }
+  .dot.on { background: var(--teal); }
+
+  /* reading/task boxes */
+  .task-box {
+    background: rgba(74,142,245,0.06);
+    border: 1px solid rgba(74,142,245,0.2);
+    border-radius: var(--r3);
+    padding: var(--s5) var(--s6);
+    margin-top: var(--s5);
+  }
+  .task-box-title {
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--blue);
+    margin-bottom: var(--s4);
+    font-family: var(--mono);
+    letter-spacing: 0.5px;
+  }
+  .reading-box {
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: var(--r3);
+    padding: var(--s5) var(--s6);
+    margin-top: var(--s4);
+  }
+  .reading-box-title {
+    font-weight: 600;
+    font-size: 13px;
+    color: var(--text);
+    margin-bottom: var(--s4);
+    font-family: var(--mono);
+    letter-spacing: 0.5px;
+  }
+  .reading-item {
+    display: flex;
+    gap: var(--s3);
+    align-items: flex-start;
+    padding: var(--s3) 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+    color: var(--text-2);
+  }
+  .reading-item:last-child { border-bottom: none; }
+  .reading-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+  .reading-label { line-height: 1.6; }
+
+  @media (max-width: 768px) {
+    .detail-grid { grid-template-columns: 1fr; }
+    .content-layout { grid-template-columns: 1fr; }
+    .content-aside { position: static; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ══ NAV ══ -->
+<nav class="nav">
+  <div class="nav-logo">AI<span>·</span>UKWMS</div>
+  <ul class="nav-links">
+    <li><a href="sesi-02.html">← Kembali ke P-02</a></li>
+    <li><a href="#linear">Linear/Logistic</a></li>
+    <li><a href="#decision-tree">Decision Tree</a></li>
+    <li><a href="#random-forest">Random Forest</a></li>
+    <li><a href="#gradient-boosting">Gradient Boosting</a></li>
+    <li><a href="#knn">k-NN</a></li>
+    <li><a href="#svm">SVM</a></li>
+  </ul>
+</nav>
+
+<!-- ══ HERO ══ -->
+<header class="sesi-hero">
+  <div style="max-width:1100px;margin:0 auto;">
+    <div class="sesi-breadcrumb">
+      <a href="../index.html">Kecerdasan Buatan</a>
+      <span>›</span>
+      <a href="sesi-02.html">P-02: Konsep Machine Learning</a>
+      <span>›</span>
+      <span>Supervised Learning</span>
+    </div>
+    <div class="sesi-num">REFERENSI ALGORITMA · SUPERVISED LEARNING</div>
+    <h1 class="sesi-title">Algoritma<br>Supervised Learning</h1>
+    <p style="font-size:15px;color:var(--text-2);max-width:620px;line-height:1.8;">Penjelasan mendalam enam algoritma supervised learning yang paling sering digunakan di industri — cara kerja, intuisi visual, hyperparameter kritis, dan implementasi dengan Scikit-learn.</p>
+    <div class="sesi-meta-row">
+      <span class="badge badge-teal">6 Algoritma</span>
+      <span class="badge badge-blue">Klasifikasi &amp; Regresi</span>
+      <span class="badge badge-amber">Scikit-learn</span>
+    </div>
+  </div>
+</header>
+
+<!-- ══ CONTENT ══ -->
+<div class="content-layout">
+
+  <!-- ── MAIN ── -->
+  <main class="content-main">
+
+    <!-- INTRO -->
+    <div class="content-block">
+      <h2 style="padding-top:0;">Apa itu Supervised Learning?</h2>
+      <p>Supervised learning adalah paradigma machine learning di mana model dilatih menggunakan <strong>data berlabel</strong> — setiap sampel input <em>x</em> memiliki pasangan output <em>y</em> yang diketahui. Tujuannya adalah mempelajari fungsi <em>f(x) → y</em> sehingga model dapat memprediksi output untuk input baru yang belum pernah dilihat.</p>
+
+      <div class="callout info">
+        <span class="callout-icon">📌</span>
+        <div class="callout-body">
+          <p><strong>Halaman ini adalah referensi mendalam.</strong> Untuk gambaran umum dan perbandingan singkat, kembali ke <a href="sesi-02.html#algoritma">P-02 — Bagian 3: Algoritma Fundamental</a>. Gunakan halaman ini saat kamu ingin memahami cara kerja, hyperparameter, dan implementasi masing-masing algoritma secara lebih detail.</p>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--s3);margin:var(--s4) 0;">
+        <div style="background:var(--bg-2);border:1px solid var(--border);border-radius:var(--r2);padding:var(--s4) var(--s5);">
+          <div style="font-family:var(--mono);font-size:9px;color:var(--teal);letter-spacing:2px;text-transform:uppercase;margin-bottom:6px;">Klasifikasi</div>
+          <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px;">Output berupa kategori</div>
+          <div style="font-size:12px;color:var(--text-2);line-height:1.6;">Memprediksi kelas/label diskrit. Contoh: spam/bukan spam, jenis tumor, sentimen teks.</div>
+          <div style="font-family:var(--mono);font-size:11px;color:var(--text-3);margin-top:8px;">Algoritma: Logistic Reg, Decision Tree, RF, XGBoost, k-NN, SVM</div>
+        </div>
+        <div style="background:var(--bg-2);border:1px solid var(--border);border-radius:var(--r2);padding:var(--s4) var(--s5);">
+          <div style="font-family:var(--mono);font-size:9px;color:var(--purple);letter-spacing:2px;text-transform:uppercase;margin-bottom:6px;">Regresi</div>
+          <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px;">Output berupa angka kontinu</div>
+          <div style="font-size:12px;color:var(--text-2);line-height:1.6;">Memprediksi nilai numerik. Contoh: harga rumah, suhu esok hari, prediksi penjualan.</div>
+          <div style="font-family:var(--mono);font-size:11px;color:var(--text-3);margin-top:8px;">Algoritma: Linear Reg, Decision Tree, RF, XGBoost, k-NN, SVR</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════════════════════════════ -->
+    <!-- 1. LINEAR / LOGISTIC REGRESSION -->
+    <!-- ════════════════════════════════ -->
+    <div class="content-block" id="linear">
+      <h2>1. Linear &amp; Logistic Regression</h2>
+
+      <div class="algo-hero">
+        <div class="algo-hero-num">01 / 06</div>
+        <div class="algo-hero-body">
+          <div class="algo-hero-name">Linear &amp; Logistic Regression</div>
+          <div class="algo-hero-sub">sklearn.linear_model.LinearRegression · LogisticRegression</div>
+          <div class="algo-hero-desc">Keluarga model paling sederhana dan paling sering digunakan sebagai baseline. Linear Regression memodelkan hubungan linier antara fitur dan target numerik; Logistic Regression menggunakannya untuk klasifikasi dengan fungsi sigmoid.</div>
+          <div class="algo-tags">
+            <span class="algo-tag" style="color:var(--teal);border-color:rgba(0,201,177,0.3);background:var(--teal-glow);">Klasifikasi</span>
+            <span class="algo-tag" style="color:var(--purple);border-color:rgba(155,124,244,0.3);background:rgba(155,124,244,0.06);">Regresi</span>
+            <span class="algo-tag" style="color:var(--blue);border-color:rgba(74,142,245,0.3);background:var(--blue-dim);">Interpretable</span>
+            <span class="algo-tag" style="color:var(--amber);border-color:rgba(245,166,35,0.3);background:var(--amber-dim);">Baseline</span>
+          </div>
+        </div>
+      </div>
+
+      <h3>Cara Kerja</h3>
+      <p><strong>Linear Regression</strong> mencari garis (atau hyperplane di dimensi tinggi) yang meminimalkan jumlah kuadrat selisih antara nilai prediksi dan nilai aktual (disebut <em>Ordinary Least Squares</em>).</p>
+      <p>Fungsi prediksi: <code style="background:var(--bg-3);padding:2px 8px;border-radius:4px;font-size:13px;">ŷ = β₀ + β₁x₁ + β₂x₂ + ... + βₙxₙ</code></p>
+      <p>Model belajar menemukan nilai koefisien (β) yang optimal sehingga error prediksi sekecil mungkin.</p>
+
+      <p><strong>Logistic Regression</strong> menggunakan output linear yang sama, tetapi membungkusnya dengan fungsi sigmoid untuk menghasilkan probabilitas (0–1):</p>
+      <p><code style="background:var(--bg-3);padding:2px 8px;border-radius:4px;font-size:13px;">P(y=1|x) = 1 / (1 + e⁻ᶻ)</code> &nbsp;di mana <code style="background:var(--bg-3);padding:2px 8px;border-radius:4px;font-size:13px;">z = β₀ + β₁x₁ + ...</code></p>
+      <p>Jika probabilitas ≥ 0.5 → prediksi kelas 1; jika &lt; 0.5 → kelas 0. Batas keputusan (decision boundary) adalah garis yang memisahkan kedua kelas.</p>
+
+      <div class="viz-container">
+        <div class="viz-label">Visualisasi Intuitif — Regresi Linier</div>
+        <div class="scatter-plot">
+          <div class="scatter-dot" style="left:8%;bottom:12%;"></div>
+          <div class="scatter-dot" style="left:15%;bottom:20%;"></div>
+          <div class="scatter-dot" style="left:22%;bottom:28%;"></div>
+          <div class="scatter-dot" style="left:30%;bottom:33%;"></div>
+          <div class="scatter-dot" style="left:38%;bottom:42%;"></div>
+          <div class="scatter-dot" style="left:45%;bottom:48%;"></div>
+          <div class="scatter-dot" style="left:55%;bottom:55%;"></div>
+          <div class="scatter-dot" style="left:62%;bottom:60%;"></div>
+          <div class="scatter-dot" style="left:70%;bottom:68%;"></div>
+          <div class="scatter-dot" style="left:78%;bottom:74%;"></div>
+          <div class="scatter-dot" style="left:88%;bottom:80%;"></div>
+          <div class="regression-line" style="transform:rotate(-28deg) translateY(-46px);"></div>
+        </div>
+        <div style="font-size:11px;color:var(--text-3);margin-top:var(--s3);">Garis regresi meminimalkan total jarak kuadrat semua titik data ke garis tersebut.</div>
+      </div>
+
+      <div class="detail-grid">
+        <div class="detail-card">
+          <div class="detail-card-label" style="color:var(--teal);">Kelebihan</div>
+          <ul>
+            <li>Sangat cepat dilatih dan diprediksi</li>
+            <li>Koefisien mudah diinterpretasikan</li>
+            <li>Baseline yang kuat — wajib dicoba pertama</li>
+            <li>Tidak rentan overfit pada data besar</li>
+            <li>Bekerja baik saat hubungan benar-benar linier</li>
+          </ul>
+        </div>
+        <div class="detail-card">
+          <div class="detail-card-label" style="color:var(--red);">Kekurangan</div>
+          <ul>
+            <li>Tidak bisa menangkap pola non-linier</li>
+            <li>Sensitif terhadap outlier</li>
+            <li>Asumsi independensi fitur sering dilanggar</li>
+            <li>Perlu feature scaling untuk konvergensi optimal</li>
+            <li>Performa rendah jika fitur berkorelasi tinggi (multikolinearitas)</li>
+          </ul>
+        </div>
+      </div>
+
+      <h3>Hyperparameter Penting</h3>
+      <div class="param-list">
+        <div class="param-item">
+          <div class="param-name">C (LogReg)</div>
+          <div class="param-desc">Invers kekuatan regularisasi. C kecil → regularisasi kuat (model lebih sederhana, kurangi overfit). C besar → regularisasi lemah (model lebih fleksibel). Default: 1.0.</div>
+        </div>
+        <div class="param-item">
+          <div class="param-name">penalty</div>
+          <div class="param-desc"><code>l2</code> (Ridge, default) mengurangi semua koefisien secara proporsional. <code>l1</code> (Lasso) mendorong koefisien menjadi nol — berguna untuk feature selection otomatis.</div>
+        </div>
+        <div class="param-item">
+          <div class="param-name">solver</div>
+          <div class="param-desc">Algoritma optimasi. <code>lbfgs</code> untuk dataset kecil-menengah; <code>saga</code> untuk dataset besar dan mendukung l1. Jarang perlu diganti dari default.</div>
+        </div>
+        <div class="param-item">
+          <div class="param-name">max_iter</div>
+          <div class="param-desc">Jumlah iterasi maksimum untuk konvergensi. Naikkan (misal 500 atau 1000) jika muncul peringatan ConvergenceWarning.</div>
+        </div>
+      </div>
+
+      <h3>Implementasi Scikit-learn</h3>
+      <div class="code-block"><pre><code><span class="c-kw">from</span> sklearn.linear_model <span class="c-kw">import</span> <span class="c-cls">LogisticRegression</span>, <span class="c-cls">LinearRegression</span>
+<span class="c-kw">from</span> sklearn.preprocessing <span class="c-kw">import</span> <span class="c-cls">StandardScaler</span>
+<span class="c-kw">from</span> sklearn.pipeline <span class="c-kw">import</span> <span class="c-cls">Pipeline</span>
+<span class="c-kw">from</span> sklearn.metrics <span class="c-kw">import</span> classification_report
+
+<span class="c-comment"># Klasifikasi — Logistic Regression</span>
+clf_pipeline = <span class="c-cls">Pipeline</span>([
+    (<span class="c-str">'scaler'</span>, <span class="c-cls">StandardScaler</span>()),          <span class="c-comment"># wajib: LR sensitif terhadap skala fitur</span>
+    (<span class="c-str">'clf'</span>, <span class="c-cls">LogisticRegression</span>(
+        C=<span class="c-num">1.0</span>,                               <span class="c-comment"># regularisasi — coba 0.01, 0.1, 1, 10</span>
+        penalty=<span class="c-str">'l2'</span>,                        <span class="c-comment"># 'l1' untuk feature selection</span>
+        max_iter=<span class="c-num">500</span>,
+        random_state=<span class="c-num">42</span>
+    ))
+])
+clf_pipeline.<span class="c-fn">fit</span>(X_train, y_train)
+y_pred = clf_pipeline.<span class="c-fn">predict</span>(X_test)
+<span class="c-fn">print</span>(<span class="c-fn">classification_report</span>(y_test, y_pred))
+
+<span class="c-comment"># Lihat koefisien — ini kekuatan utama LR</span>
+model = clf_pipeline.named_steps[<span class="c-str">'clf'</span>]
+<span class="c-kw">import</span> pandas <span class="c-kw">as</span> pd
+coef_df = pd.<span class="c-cls">DataFrame</span>({
+    <span class="c-str">'fitur'</span>: feature_names,
+    <span class="c-str">'koefisien'</span>: model.coef_[<span class="c-num">0</span>]
+}).<span class="c-fn">sort_values</span>(<span class="c-str">'koefisien'</span>, ascending=<span class="c-kw">False</span>)
+<span class="c-fn">print</span>(coef_df)</code></pre></div>
+
+      <div class="callout tip">
+        <span class="callout-icon">💡</span>
+        <div class="callout-body">
+          <p><strong>Kapan menggunakan Logistic Regression:</strong> Selalu mulai dari sini sebagai baseline. Jika akurasi sudah cukup, tidak perlu lanjut ke model yang lebih kompleks. Juga pilihan terbaik saat kamu perlu <em>menjelaskan</em> mengapa model mengambil keputusan tertentu kepada stakeholder non-teknis.</p>
+        </div>
+      </div>
+    </div>
+
+    <hr class="algo-divider">
+
+    <!-- ═══════════════════ -->
+    <!-- 2. DECISION TREE   -->
+    <!-- ═══════════════════ -->
+    <div class="content-block" id="decision-tree">
+      <h2>2. Decision Tree</h2>
+
+      <div class="algo-hero">
+        <div class="algo-hero-num">02 / 06</div>
+        <div class="algo-hero-body">
+          <div class="algo-hero-name">Decision Tree</div>
+          <div class="algo-hero-sub">sklearn.tree.DecisionTreeClassifier · DecisionTreeRegressor</div>
+          <div class="algo-hero-desc">Model berbentuk pohon keputusan yang membagi data secara rekursif berdasarkan fitur paling informatif. Hasilnya adalah serangkaian aturan if-else yang mudah dipahami manusia.</div>
+          <div class="algo-tags">
+            <span class="algo-tag" style="color:var(--teal);border-color:rgba(0,201,177,0.3);background:var(--teal-glow);">Klasifikasi</span>
+            <span class="algo-tag" style="color:var(--purple);border-color:rgba(155,124,244,0.3);background:rgba(155,124,244,0.06);">Regresi</span>
+            <span class="algo-tag" style="color:var(--blue);border-color:rgba(74,142,245,0.3);background:var(--blue-dim);">Interpretable</span>
+            <span class="algo-tag" style="color:var(--amber);border-color:rgba(245,166,35,0.3);background:var(--amber-dim);">Non-linear</span>
+          </div>
+        </div>
+      </div>
+
+      <h3>Cara Kerja</h3>
+      <p>Algoritma membangun pohon secara top-down, mulai dari seluruh dataset di root node. Di setiap node, ia memilih <strong>fitur dan threshold</strong> yang paling baik memisahkan kelas, menggunakan kriteria seperti <em>Gini Impurity</em> atau <em>Information Gain</em>.</p>
+      <ul>
+        <li><strong>Gini Impurity:</strong> mengukur seberapa "kotor" sebuah node — 0 berarti node murni (satu kelas). Semakin rendah, semakin baik.</li>
+        <li><strong>Information Gain (Entropy):</strong> mengukur penurunan ketidakpastian setelah split. Model memilih split yang memaksimalkan information gain.</li>
+      </ul>
+      <p>Proses ini diulang secara rekursif hingga semua daun (leaf nodes) murni, atau kondisi berhenti terpenuhi (misal: kedalaman maksimum, jumlah sampel minimum).</p>
+
+      <div class="viz-container">
+        <div class="viz-label">Visualisasi — Struktur Pohon Keputusan</div>
+        <div class="tree-viz">
+          <div class="tree-node root">Petal length ≤ 2.45?</div>
+          <div class="tree-connector"></div>
+          <div style="display:flex;gap:var(--s7);justify-content:center;">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:0;">
+              <div class="branch-label">Ya</div>
+              <div class="tree-connector"></div>
+              <div class="tree-node leaf-yes">Setosa ✓</div>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:0;">
+              <div class="branch-label">Tidak</div>
+              <div class="tree-connector"></div>
+              <div class="tree-node">Petal width ≤ 1.75?</div>
+              <div class="tree-connector"></div>
+              <div style="display:flex;gap:var(--s5);">
+                <div style="display:flex;flex-direction:column;align-items:center;">
+                  <div class="branch-label">Ya</div>
+                  <div class="tree-connector"></div>
+                  <div class="tree-node leaf-yes">Versicolor ✓</div>
+                </div>
+                <div style="display:flex;flex-direction:column;align-items:center;">
+                  <div class="branch-label">Tidak</div>
+                  <div class="tree-connector"></div>
+                  <div class="tree-node leaf-no">Virginica ✗</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div style="font-size:11px;color:var(--text-3);margin-top:var(--s3);">Contoh pohon keputusan pada dataset Iris. Setiap internal node adalah pertanyaan tentang fitur; leaf node adalah prediksi kelas.</div>
+      </div>
+
+      <div class="detail-grid">
+        <div class="detail-card">
+          <div class="detail-card-label" style="color:var(--teal);">Kelebihan</div>
+          <ul>
+            <li>Mudah divisualisasi dan dijelaskan</li>
+            <li>Tidak butuh feature scaling</li>
+            <li>Menangani fitur numerik dan kategorik</li>
+            <li>Implisit melakukan feature selection</li>
+            <li>Cepat untuk dataset kecil-menengah</li>
+          </ul>
+        </div>
+        <div class="detail-card">
+          <div class="detail-card-label" style="color:var(--red);">Kekurangan</div>
+          <ul>
+            <li><strong>Mudah overfit</strong> — pohon dalam tanpa pruning menghafal data</li>
+            <li>Tidak stabil — data sedikit berubah → pohon berubah besar</li>
+            <li>Bias terhadap fitur dengan banyak nilai unik</li>
+            <li>Performa lebih rendah dari ensemble (RF/XGBoost)</li>
+          </ul>
+        </div>
+      </div>
+
+      <h3>Hyperparameter Penting</h3>
+      <div class="param-list">
+        <div class="param-item">
+          <div class="param-name">max_depth</div>
+          <div class="param-desc">Kedalaman maksimum pohon. <strong>Paling penting untuk mencegah overfit.</strong> Mulai dari 3–5 dan naikkan bertahap. Default: None (tidak dibatasi = overfit parah).</div>
+        </div>
+        <div class="param-item">
+          <div class="param-name">min_samples_split</div>
+          <div class="param-desc">Jumlah sampel minimum di sebuah node agar bisa di-split. Nilai lebih besar = pohon lebih konservatif. Default: 2.</div>
+        </div>
+        <div class="param-item">
+          <div class="param-name">min_samples_leaf</div>
+          <div class="param-desc">Jumlah sampel minimum di leaf node. Cegah daun yang berisi hanya 1-2 sampel (overfit). Default: 1.</div>
+        </div>
+        <div class="param-item">
+          <div class="param-name">criterion</div>
+          <div class="param-desc"><code>gini</code> (default, lebih cepat) atau <code>entropy</code> (information gain). Dalam praktik perbedaannya kecil — cukup gunakan gini.</div>
+        </div>
+      </div>
+
+      <h3>Implementasi Scikit-learn</h3>
+      <div class="code-block"><pre><code><span class="c-kw">from</span> sklearn.tree <span class="c-kw">import</span> <span class="c-cls">DecisionTreeClassifier</span>, <span class="c-fn">export_text</span>, <span class="c-fn">plot_tree</span>
+<span class="c-kw">import</span> matplotlib.pyplot <span class="c-kw">as</span> plt
+
+dt = <span class="c-cls">DecisionTreeClassifier</span>(
+    max_depth=<span class="c-num">4</span>,              <span class="c-comment"># batasi kedalaman untuk cegah overfit</span>
+    min_samples_leaf=<span class="c-num">5</span>,       <span class="c-comment"># setiap daun minimal 5 sampel</span>
+    criterion=<span class="c-str">'gini'</span>,
+    random_state=<span class="c-num">42</span>
+)
+dt.<span class="c-fn">fit</span>(X_train, y_train)
+<span class="c-fn">print</span>(<span class="c-str">f"Train acc: {dt.score(X_train, y_train):.3f}"</span>)
+<span class="c-fn">print</span>(<span class="c-str">f"Test  acc: {dt.score(X_test, y_test):.3f}"</span>)
+
+<span class="c-comment"># Visualisasi pohon dalam bentuk teks</span>
+<span class="c-fn">print</span>(<span class="c-fn">export_text</span>(dt, feature_names=feature_names))
+
+<span class="c-comment"># Visualisasi pohon dalam bentuk grafis</span>
+plt.figure(figsize=(<span class="c-num">16</span>, <span class="c-num">8</span>))
+<span class="c-fn">plot_tree</span>(dt, feature_names=feature_names, class_names=class_names,
+          filled=<span class="c-kw">True</span>, rounded=<span class="c-kw">True</span>)
+plt.<span class="c-fn">show</span>()</code></pre></div>
+
+      <div class="callout warn">
+        <span class="callout-icon">⚠️</span>
+        <div class="callout-body">
+          <p><strong>Perhatikan overfit:</strong> Jika train accuracy jauh lebih tinggi dari test accuracy (misal 99% vs 75%), pohon terlalu dalam. Kurangi <code>max_depth</code> atau naikkan <code>min_samples_leaf</code>. Decision Tree tanpa pembatasan hampir selalu overfit.</p>
+        </div>
+      </div>
+    </div>
+
+    <hr class="algo-divider">
+
+    <!-- ════════════════ -->
+    <!-- 3. RANDOM FOREST -->
+    <!-- ════════════════ -->
+    <div class="content-block" id="random-forest">
+      <h2>3. Random Forest</h2>
+
+      <div class="algo-hero">
+        <div class="algo-hero-num">03 / 06</div>
+        <div class="algo-hero-body">
+          <div class="algo-hero-name">Random Forest</div>
+          <div class="algo-hero-sub">sklearn.ensemble.RandomForestClassifier · RandomForestRegressor</div>
+          <div class="algo-hero-desc">Ensemble dari banyak Decision Tree yang dilatih pada subsampel data dan fitur yang berbeda-beda (teknik ini disebut <em>bagging</em>). Prediksi akhir ditentukan oleh voting mayoritas (klasifikasi) atau rata-rata (regresi). Lebih kuat dan tahan overfit dibanding satu Decision Tree.</div>
+          <div class="algo-tags">
+            <span class="algo-tag" style="color:var(--teal);border-color:rgba(0,201,177,0.3);background:var(--teal-glow);">Klasifikasi</span>
+            <span class="algo-tag" style="color:var(--purple);border-color:rgba(155,124,244,0.3);background:rgba(155,124,244,0.06);">Regresi</span>
+            <span class="algo-tag" style="color:var(--amber);border-color:rgba(245,166,35,0.3);background:var(--amber-dim);">Ensemble</span>
+            <span class="algo-tag" style="color:var(--red);border-color:rgba(240,96,96,0.3);background:rgba(240,96,96,0.06);">Tahan Overfit</span>
+          </div>
+        </div>
+      </div>
+
+      <h3>Cara Kerja: Bagging + Random Feature Subspace</h3>
+      <p>Random Forest menggabungkan dua ide utama:</p>
+      <ol>
+        <li><strong>Bootstrap Aggregating (Bagging):</strong> Setiap pohon dilatih pada sampel acak <em>dengan penggantian</em> dari dataset asli. Sekitar 37% data tidak terambil per pohon — ini disebut <em>out-of-bag (OOB) samples</em> dan bisa digunakan sebagai validasi internal.</li>
+        <li><strong>Random Feature Subspace:</strong> Di setiap split, hanya sebagian kecil fitur yang dipertimbangkan (biasanya √n_fitur untuk klasifikasi). Ini memastikan pohon-pohon yang dihasilkan beragam dan tidak berkorelasi satu sama lain.</li>
+      </ol>
+      <p>Karena setiap pohon membuat keputusan berdasarkan data dan fitur yang berbeda, error satu pohon tidak berkorelasi dengan error pohon lain. Saat di-voting/rata-rata, error-error ini saling menghapus — ini yang membuat ensemble jauh lebih akurat.</p>
+
+      <div style="background:var(--bg-2);border:1px solid var(--border);border-radius:var(--r2);padding:var(--s5);margin:var(--s4) 0;">
+        <div style="font-family:var(--mono);font-size:10px;color:var(--text-3);letter-spacing:2px;text-transform:uppercase;margin-bottom:var(--s4);">Ilustrasi Ensemble Voting</div>
+        <div style="display:flex;gap:var(--s3);align-items:center;flex-wrap:wrap;justify-content:center;">
+          <div style="background:var(--bg-3);border:1px solid var(--border);border-radius:var(--r2);padding:var(--s3) var(--s4);text-align:center;">
+            <div style="font-family:var(--mono);font-size:9px;color:var(--text-3);margin-bottom:4px;">Tree 1</div>
+            <div style="font-size:12px;color:var(--teal);">Spam</div>
+          </div>
+          <div style="background:var(--bg-3);border:1px solid var(--border);border-radius:var(--r2);padding:var(--s3) var(--s4);text-align:center;">
+            <div style="font-family:var(--mono);font-size:9px;color:var(--text-3);margin-bottom:4px;">Tree 2</div>
+            <div style="font-size:12px;color:var(--teal);">Spam</div>
+          </div>
+          <div style="background:var(--bg-3);border:1px solid var(--border);border-radius:var(--r2);padding:var(--s3) var(--s4);text-align:center;">
+            <div style="font-family:var(--mono);font-size:9px;color:var(--text-3);margin-bottom:4px;">Tree 3</div>
+            <div style="font-size:12px;color:var(--red);">Ham</div>
+          </div>
+          <div style="background:var(--bg-3);border:1px solid var(--border);border-radius:var(--r2);padding:var(--s3) var(--s4);text-align:center;">
+            <div style="font-family:var(--mono);font-size:9px;color:var(--text-3);margin-bottom:4px;">Tree 4</div>
+            <div style="font-size:12px;color:var(--teal);">Spam</div>
+          </div>
+          <div style="background:var(--bg-3);border:1px solid var(--border);border-radius:var(--r2);padding:var(--s3) var(--s4);text-align:center;">
+            <div style="font-family:var(--mono);font-size:9px;color:var(--text-3);margin-bottom:4px;">Tree 5</div>
+            <div style="font-size:12px;color:var(--teal);">Spam</div>
+          </div>
+          <div style="font-size:18px;color:var(--text-3);">→</div>
+          <div style="background:var(--teal-glow);border:1px solid rgba(0,201,177,0.3);border-radius:var(--r2);padding:var(--s3) var(--s5);text-align:center;">
+            <div style="font-family:var(--mono);font-size:9px;color:var(--text-3);margin-bottom:4px;">Voting Akhir</div>
+            <div style="font-size:13px;font-weight:600;color:var(--teal);">Spam (4/5)</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="detail-grid">
+        <div class="detail-card">
+          <div class="detail-card-label" style="color:var(--teal);">Kelebihan</div>
+          <ul>
+            <li>Akurasi tinggi, tahan overfit secara alami</li>
+            <li>Memberikan <em>feature importance</em> yang reliabel</li>
+            <li>Tidak perlu feature scaling</li>
+            <li>Toleran terhadap missing values dan outlier</li>
+            <li>OOB score = validasi gratis tanpa validation set</li>
+          </ul>
+        </div>
+        <div class="detail-card">
+          <div class="detail-card-label" style="color:var(--red);">Kekurangan</div>
+          <ul>
+            <li>Model besar — lambat diprediksi di produksi</li>
+            <li>Sulit diinterpretasikan (black box)</li>
+            <li>Kurang optimal untuk data sangat sparse (NLP)</li>
+            <li>Membutuhkan lebih banyak memori dari single tree</li>
+          </ul>
+        </div>
+      </div>
+
+      <h3>Hyperparameter Penting</h3>
+      <div class="param-list">
+        <div class="param-item">
+          <div class="param-name">n_estimators</div>
+          <div class="param-desc">Jumlah pohon dalam forest. Lebih banyak = lebih baik, tapi ada titik diminishing return. 100–500 biasanya sudah cukup. Monitor OOB score untuk menentukan titik optimal.</div>
+        </div>
+        <div class="param-item">
+          <div class="param-name">max_features</div>
+          <div class="param-desc">Jumlah fitur yang dipertimbangkan di setiap split. <code>sqrt</code> (default klasifikasi) = √n_features. <code>log2</code> untuk dataset berdimensi tinggi. Nilai lebih kecil → pohon lebih beragam → ensemble lebih kuat.</div>
+        </div>
+        <div class="param-item">
+          <div class="param-name">max_depth</div>
+          <div class="param-desc">Kedalaman maksimum setiap pohon. Berbeda dengan Decision Tree, RF sudah tahan overfit secara alami — sering dibiarkan <code>None</code>. Batasi jika memori atau kecepatan jadi masalah.</div>
+        </div>
+        <div class="param-item">
+          <div class="param-name">oob_score</div>
+          <div class="param-desc">Set ke <code>True</code> untuk mendapatkan estimasi performa gratis menggunakan out-of-bag samples. Berguna sebagai pengganti cross-validation cepat.</div>
+        </div>
+      </div>
+
+      <h3>Implementasi Scikit-learn</h3>
+      <div class="code-block"><pre><code><span class="c-kw">from</span> sklearn.ensemble <span class="c-kw">import</span> <span class="c-cls">RandomForestClassifier</span>
+<span class="c-kw">import</span> matplotlib.pyplot <span class="c-kw">as</span> plt
+<span class="c-kw">import</span> numpy <span class="c-kw">as</span> np
+
+rf = <span class="c-cls">RandomForestClassifier</span>(
+    n_estimators=<span class="c-num">200</span>,          <span class="c-comment"># 200 pohon — cukup untuk kebanyakan kasus</span>
+    max_features=<span class="c-str">'sqrt'</span>,       <span class="c-comment"># default untuk klasifikasi</span>
+    oob_score=<span class="c-kw">True</span>,            <span class="c-comment"># aktifkan estimasi OOB</span>
+    n_jobs=-<span class="c-num">1</span>,                 <span class="c-comment"># pakai semua CPU core</span>
+    random_state=<span class="c-num">42</span>
+)
+rf.<span class="c-fn">fit</span>(X_train, y_train)
+
+<span class="c-fn">print</span>(<span class="c-str">f"OOB Score:  {rf.oob_score_:.3f}"</span>)    <span class="c-comment"># estimasi tanpa test set</span>
+<span class="c-fn">print</span>(<span class="c-str">f"Test Score: {rf.score(X_test, y_test):.3f}"</span>)
+
+<span class="c-comment"># Feature importance — mana fitur paling berpengaruh?</span>
+importances = rf.feature_importances_
+sorted_idx = np.<span class="c-fn">argsort</span>(importances)
+plt.<span class="c-fn">barh</span>(np.array(feature_names)[sorted_idx], importances[sorted_idx], color=<span class="c-str">'#00C9B1'</span>)
+plt.<span class="c-fn">xlabel</span>(<span class="c-str">'Feature Importance'</span>)
+plt.<span class="c-fn">title</span>(<span class="c-str">'Random Forest — Feature Importance'</span>)
+plt.<span class="c-fn">show</span>()</code></pre></div>
+    </div>
+
+    <hr class="algo-divider">
+
+    <!-- ═══════════════════════ -->
+    <!-- 4. GRADIENT BOOSTING   -->
+    <!-- ═══════════════════════ -->
+    <div class="content-block" id="gradient-boosting">
+      <h2>4. Gradient Boosting (XGBoost)</h2>
+
+      <div class="algo-hero">
+        <div class="algo-hero-num">04 / 06</div>
+        <div class="algo-hero-body">
+          <div class="algo-hero-name">Gradient Boosting / XGBoost</div>
+          <div class="algo-hero-sub">sklearn.ensemble.GradientBoostingClassifier · xgboost.XGBClassifier</div>
+          <div class="algo-hero-desc">Ensemble yang membangun pohon secara <em>sekuensial</em>, di mana setiap pohon baru berfokus pada memperbaiki kesalahan pohon sebelumnya. Berbeda dengan Random Forest yang membangun pohon secara paralel dan independen. Sering menjadi juara di kompetisi data science untuk tabular data.</div>
+          <div class="algo-tags">
+            <span class="algo-tag" style="color:var(--teal);border-color:rgba(0,201,177,0.3);background:var(--teal-glow);">Klasifikasi</span>
+            <span class="algo-tag" style="color:var(--purple);border-color:rgba(155,124,244,0.3);background:rgba(155,124,244,0.06);">Regresi</span>
+            <span class="algo-tag" style="color:var(--amber);border-color:rgba(245,166,35,0.3);background:var(--amber-dim);">Boosting</span>
+            <span class="algo-tag" style="color:var(--red);border-color:rgba(240,96,96,0.3);background:rgba(240,96,96,0.06);">State-of-the-art</span>
+          </div>
+        </div>
+      </div>
+
+      <h3>Cara Kerja: Boosting Sekuensial</h3>
+      <p>Ide inti gradient boosting adalah <strong>membangun model yang lebih kuat dari kumpulan model lemah secara bertahap:</strong></p>
+      <ol>
+        <li>Buat prediksi awal (bisa sesederhana rata-rata semua nilai target)</li>
+        <li>Hitung <strong>residual</strong> (selisih antara prediksi dan nilai aktual)</li>
+        <li>Latih pohon baru untuk memprediksi residual tersebut</li>
+        <li>Tambahkan pohon baru ke model dengan bobot tertentu (<em>learning rate</em>)</li>
+        <li>Ulangi langkah 2–4 sampai n_estimators pohon terbentuk</li>
+      </ol>
+      <p>Secara matematis, ini adalah optimasi gradient descent di <em>function space</em> — setiap iterasi mengurangi loss function dengan langkah kecil ke arah gradient negatifnya.</p>
+
+      <div style="background:var(--bg-2);border:1px solid var(--border);border-radius:var(--r2);padding:var(--s5);margin:var(--s4) 0;">
+        <div style="font-family:var(--mono);font-size:10px;color:var(--text-3);letter-spacing:2px;text-transform:uppercase;margin-bottom:var(--s4);">Perbandingan: Bagging vs Boosting</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--s3);">
+          <div style="padding:var(--s4);border:1px solid var(--border);border-radius:var(--r2);">
+            <div style="font-family:var(--mono);font-size:10px;color:var(--blue);letter-spacing:1px;margin-bottom:var(--s2);">BAGGING (Random Forest)</div>
+            <div style="font-size:12px;color:var(--text-2);line-height:1.8;">
+              Pohon dibangun <strong>paralel</strong> dan independen<br>
+              Setiap pohon belajar dari data berbeda<br>
+              Kombinasi: voting / rata-rata<br>
+              Tujuan: <em>kurangi variance</em>
+            </div>
+          </div>
+          <div style="padding:var(--s4);border:1px solid rgba(245,166,35,0.3);border-radius:var(--r2);background:var(--amber-dim);">
+            <div style="font-family:var(--mono);font-size:10px;color:var(--amber);letter-spacing:1px;margin-bottom:var(--s2);">BOOSTING (Gradient Boosting)</div>
+            <div style="font-size:12px;color:var(--text-2);line-height:1.8;">
+              Pohon dibangun <strong>sekuensial</strong><br>
+              Setiap pohon belajar dari <em>error</em> pohon sebelumnya<br>
+              Kombinasi: penjumlahan berbobot<br>
+              Tujuan: <em>kurangi bias</em>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="detail-grid">
+        <div class="detail-card">
+          <div class="detail-card-label" style="color:var(--teal);">Kelebihan</div>
+          <ul>
+            <li>Akurasi terbaik untuk tabular data terstruktur</li>
+            <li>Menangani missing values secara otomatis (XGBoost)</li>
+            <li>Feature importance yang informatif</li>
+            <li>Mendukung berbagai loss function (custom)</li>
+            <li>Regularisasi bawaan (L1/L2 di XGBoost)</li>
+          </ul>
+        </div>
+        <div class="detail-card">
+          <div class="detail-card-label" style="color:var(--red);">Kekurangan</div>
+          <ul>
+            <li>Banyak hyperparameter → butuh tuning lebih hati-hati</li>
+            <li>Lebih lambat dari Random Forest saat training</li>
+            <li>Rentan overfit jika learning rate terlalu besar</li>
+            <li>Tidak baik untuk data non-tabular (citra, teks mentah)</li>
+          </ul>
+        </div>
+      </div>
+
+      <h3>Hyperparameter Penting</h3>
+      <div class="param-list">
+        <div class="param-item">
+          <div class="param-name">n_estimators</div>
+          <div class="param-desc">Jumlah pohon/iterasi boosting. Berbeda dari RF, terlalu banyak bisa overfit. Gunakan <em>early stopping</em> untuk menemukan nilai optimal secara otomatis.</div>
+        </div>
+        <div class="param-item">
+          <div class="param-name">learning_rate</div>
+          <div class="param-desc"><strong>Hyperparameter paling kritis.</strong> Mengontrol kontribusi setiap pohon. Nilai kecil (0.01–0.1) + banyak pohon = lebih akurat tapi lebih lambat. Biasanya learning_rate kecil lebih baik.</div>
+        </div>
+        <div class="param-item">
+          <div class="param-name">max_depth</div>
+          <div class="param-desc">Kedalaman setiap pohon. Boosting menggunakan <em>weak learners</em> — pohon yang lebih dangkal (3–6) seringkali lebih baik. Pohon dalam mudah overfit.</div>
+        </div>
+        <div class="param-item">
+          <div class="param-name">subsample</div>
+          <div class="param-desc">Fraksi sampel yang digunakan per iterasi (seperti bagging untuk boosting). 0.8 biasanya baik — menambahkan randomness untuk kurangi overfit.</div>
+        </div>
+      </div>
+
+      <h3>Implementasi Scikit-learn + XGBoost</h3>
+      <div class="code-block"><pre><code><span class="c-comment"># Opsi 1: sklearn built-in</span>
+<span class="c-kw">from</span> sklearn.ensemble <span class="c-kw">import</span> <span class="c-cls">GradientBoostingClassifier</span>
+
+gb_sklearn = <span class="c-cls">GradientBoostingClassifier</span>(
+    n_estimators=<span class="c-num">200</span>,
+    learning_rate=<span class="c-num">0.05</span>,        <span class="c-comment"># kecil + banyak pohon = lebih akurat</span>
+    max_depth=<span class="c-num">4</span>,
+    subsample=<span class="c-num">0.8</span>,
+    random_state=<span class="c-num">42</span>
+)
+gb_sklearn.<span class="c-fn">fit</span>(X_train, y_train)
+
+<span class="c-comment"># Opsi 2: XGBoost (install: pip install xgboost)</span>
+<span class="c-kw">from</span> xgboost <span class="c-kw">import</span> <span class="c-cls">XGBClassifier</span>
+
+xgb = <span class="c-cls">XGBClassifier</span>(
+    n_estimators=<span class="c-num">500</span>,
+    learning_rate=<span class="c-num">0.05</span>,
+    max_depth=<span class="c-num">4</span>,
+    subsample=<span class="c-num">0.8</span>,
+    eval_metric=<span class="c-str">'logloss'</span>,
+    early_stopping_rounds=<span class="c-num">20</span>,  <span class="c-comment"># hentikan jika 20 ronde tidak ada perbaikan</span>
+    random_state=<span class="c-num">42</span>
+)
+xgb.<span class="c-fn">fit</span>(X_train, y_train,
+      eval_set=[(X_test, y_test)],    <span class="c-comment"># pantau performa di validation set</span>
+      verbose=<span class="c-num">50</span>)                     <span class="c-comment"># cetak log setiap 50 ronde</span>
+<span class="c-fn">print</span>(<span class="c-str">f"Best iteration: {xgb.best_iteration}"</span>)</code></pre></div>
+
+      <div class="callout tip">
+        <span class="callout-icon">🏆</span>
+        <div class="callout-body">
+          <p><strong>Kapan menggunakan Gradient Boosting:</strong> Saat kamu butuh performa terbaik pada tabular data terstruktur dan punya waktu untuk tuning hyperparameter. XGBoost, LightGBM, atau CatBoost adalah pilihan pertama di kompetisi data science. Untuk prototyping cepat, mulai dulu dengan Random Forest.</p>
+        </div>
+      </div>
+    </div>
+
+    <hr class="algo-divider">
+
+    <!-- ════════════════════════ -->
+    <!-- 5. k-NEAREST NEIGHBORS  -->
+    <!-- ════════════════════════ -->
+    <div class="content-block" id="knn">
+      <h2>5. k-Nearest Neighbors (k-NN)</h2>
+
+      <div class="algo-hero">
+        <div class="algo-hero-num">05 / 06</div>
+        <div class="algo-hero-body">
+          <div class="algo-hero-name">k-Nearest Neighbors</div>
+          <div class="algo-hero-sub">sklearn.neighbors.KNeighborsClassifier · KNeighborsRegressor</div>
+          <div class="algo-hero-desc">Algoritma non-parametrik paling intuitif: prediksi dilakukan berdasarkan k titik data latih yang paling mirip dengan input baru. Tidak ada "fase training" — semua komputasi terjadi saat prediksi (lazy learning).</div>
+          <div class="algo-tags">
+            <span class="algo-tag" style="color:var(--teal);border-color:rgba(0,201,177,0.3);background:var(--teal-glow);">Klasifikasi</span>
+            <span class="algo-tag" style="color:var(--purple);border-color:rgba(155,124,244,0.3);background:rgba(155,124,244,0.06);">Regresi</span>
+            <span class="algo-tag" style="color:var(--blue);border-color:rgba(74,142,245,0.3);background:var(--blue-dim);">Non-parametric</span>
+            <span class="algo-tag" style="color:var(--amber);border-color:rgba(245,166,35,0.3);background:var(--amber-dim);">Lazy Learning</span>
+          </div>
+        </div>
+      </div>
+
+      <h3>Cara Kerja</h3>
+      <p>Untuk memprediksi input baru <strong>x</strong>:</p>
+      <ol>
+        <li>Hitung jarak antara <strong>x</strong> dengan semua titik di data training (biasanya menggunakan <em>Euclidean distance</em>)</li>
+        <li>Ambil <strong>k</strong> titik terdekat</li>
+        <li>Untuk klasifikasi: prediksi = kelas yang paling banyak muncul di antara k tetangga</li>
+        <li>Untuk regresi: prediksi = rata-rata nilai target k tetangga</li>
+      </ol>
+
+      <div class="viz-container">
+        <div class="viz-label">Visualisasi — k-NN dengan k=3</div>
+        <div class="knn-viz">
+          <!-- class A dots (blue) -->
+          <div class="knn-dot" style="background:var(--blue);left:20%;top:30%;"></div>
+          <div class="knn-dot" style="background:var(--blue);left:28%;top:45%;"></div>
+          <div class="knn-dot" style="background:var(--blue);left:15%;top:55%;"></div>
+          <div class="knn-dot" style="background:var(--blue);left:35%;top:65%;"></div>
+          <div class="knn-dot" style="background:var(--blue);left:22%;top:72%;"></div>
+          <!-- class B dots (red) -->
+          <div class="knn-dot" style="background:var(--red);left:65%;top:25%;"></div>
+          <div class="knn-dot" style="background:var(--red);left:72%;top:40%;"></div>
+          <div class="knn-dot" style="background:var(--red);left:80%;top:55%;"></div>
+          <div class="knn-dot" style="background:var(--red);left:60%;top:60%;"></div>
+          <div class="knn-dot" style="background:var(--red);left:75%;top:70%;"></div>
+          <!-- query point -->
+          <div class="knn-dot knn-query" style="left:48%;top:48%;"></div>
+          <!-- radius circle -->
+          <div class="knn-circle" style="left:48%;top:48%;width:80px;height:80px;margin-left:-40px;margin-top:-40px;"></div>
+          <!-- nearest neighbors highlighted -->
+          <div class="knn-dot" style="background:var(--blue);left:35%;top:65%;box-shadow:0 0 0 3px rgba(74,142,245,0.5);z-index:2;"></div>
+          <div class="knn-dot" style="background:var(--blue);left:28%;top:45%;box-shadow:0 0 0 3px rgba(74,142,245,0.5);z-index:2;"></div>
+          <div class="knn-dot" style="background:var(--red);left:60%;top:60%;box-shadow:0 0 0 3px rgba(240,96,96,0.5);z-index:2;"></div>
+        </div>
+        <div style="font-size:11px;color:var(--text-3);margin-top:var(--s3);">Titik kuning (query) mencari 3 tetangga terdekat: 2 biru + 1 merah → prediksi: Kelas Biru (voting mayoritas)</div>
+      </div>
+
+      <h3>Pemilihan Nilai k</h3>
+      <p>Nilai k sangat mempengaruhi perilaku model:</p>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:var(--s3);margin:var(--s4) 0;">
+        <div style="background:rgba(240,96,96,0.05);border:1px solid rgba(240,96,96,0.2);border-radius:var(--r2);padding:var(--s4);text-align:center;">
+          <div style="font-family:var(--mono);font-size:18px;font-weight:600;color:var(--red);">k = 1</div>
+          <div style="font-size:12px;color:var(--text-2);margin-top:var(--s2);line-height:1.6;">Overfit — sangat sensitif terhadap noise. Decision boundary sangat irregular.</div>
+        </div>
+        <div style="background:var(--teal-glow);border:1px solid rgba(0,201,177,0.3);border-radius:var(--r2);padding:var(--s4);text-align:center;">
+          <div style="font-family:var(--mono);font-size:18px;font-weight:600;color:var(--teal);">k optimal</div>
+          <div style="font-size:12px;color:var(--text-2);margin-top:var(--s2);line-height:1.6;">Sweet spot. Cari dengan cross-validation. Biasanya k = √n_samples sebagai titik awal.</div>
+        </div>
+        <div style="background:rgba(155,124,244,0.05);border:1px solid rgba(155,124,244,0.2);border-radius:var(--r2);padding:var(--s4);text-align:center;">
+          <div style="font-family:var(--mono);font-size:18px;font-weight:600;color:var(--purple);">k terlalu besar</div>
+          <div style="font-size:12px;color:var(--text-2);margin-top:var(--s2);line-height:1.6;">Underfit — decision boundary terlalu halus, melewatkan pola penting.</div>
+        </div>
+      </div>
+
+      <div class="detail-grid">
+        <div class="detail-card">
+          <div class="detail-card-label" style="color:var(--teal);">Kelebihan</div>
+          <ul>
+            <li>Sangat sederhana, tidak ada asumsi tentang distribusi data</li>
+            <li>Tidak perlu fase training (lazy learner)</li>
+            <li>Secara alami multiclass</li>
+            <li>Mudah dipahami dan diimplementasikan</li>
+            <li>Bisa non-linear dengan pilihan k yang tepat</li>
+          </ul>
+        </div>
+        <div class="detail-card">
+          <div class="detail-card-label" style="color:var(--red);">Kekurangan</div>
+          <ul>
+            <li><strong>Prediksi sangat lambat</strong> pada dataset besar (hitung jarak ke semua sampel)</li>
+            <li>Memori besar — menyimpan seluruh dataset training</li>
+            <li><strong>Wajib feature scaling</strong> — fitur skala besar mendominasi jarak</li>
+            <li>Performa menurun drastis di dimensi tinggi (<em>curse of dimensionality</em>)</li>
+            <li>Sensitif terhadap fitur tidak relevan</li>
+          </ul>
+        </div>
+      </div>
+
+      <h3>Hyperparameter Penting</h3>
+      <div class="param-list">
+        <div class="param-item">
+          <div class="param-name">n_neighbors (k)</div>
+          <div class="param-desc">Jumlah tetangga. Gunakan angka ganjil untuk klasifikasi biner (menghindari seri). Cari nilai terbaik dengan GridSearchCV.</div>
+        </div>
+        <div class="param-item">
+          <div class="param-name">metric</div>
+          <div class="param-desc"><code>euclidean</code> (default, jarak lurus) atau <code>manhattan</code> (jarak kota/L1, lebih tahan outlier) atau <code>minkowski</code> (generalisasi keduanya). Untuk fitur kategorik, pertimbangkan Hamming distance.</div>
+        </div>
+        <div class="param-item">
+          <div class="param-name">weights</div>
+          <div class="param-desc"><code>uniform</code> (default) = semua tetangga berbobot sama. <code>distance</code> = tetangga lebih dekat berbobot lebih besar. <code>distance</code> biasanya lebih baik.</div>
+        </div>
+        <div class="param-item">
+          <div class="param-name">algorithm</div>
+          <div class="param-desc"><code>auto</code> memilih otomatis. <code>ball_tree</code> atau <code>kd_tree</code> lebih efisien untuk dataset besar dimensi rendah. <code>brute</code> untuk dimensi sangat tinggi atau dataset kecil.</div>
+        </div>
+      </div>
+
+      <h3>Implementasi Scikit-learn</h3>
+      <div class="code-block"><pre><code><span class="c-kw">from</span> sklearn.neighbors <span class="c-kw">import</span> <span class="c-cls">KNeighborsClassifier</span>
+<span class="c-kw">from</span> sklearn.preprocessing <span class="c-kw">import</span> <span class="c-cls">StandardScaler</span>
+<span class="c-kw">from</span> sklearn.pipeline <span class="c-kw">import</span> <span class="c-cls">Pipeline</span>
+<span class="c-kw">from</span> sklearn.model_selection <span class="c-kw">import</span> <span class="c-cls">GridSearchCV</span>
+
+<span class="c-comment"># PENTING: selalu scaling sebelum k-NN</span>
+knn_pipeline = <span class="c-cls">Pipeline</span>([
+    (<span class="c-str">'scaler'</span>, <span class="c-cls">StandardScaler</span>()),
+    (<span class="c-str">'knn'</span>, <span class="c-cls">KNeighborsClassifier</span>())
+])
+
+<span class="c-comment"># Cari nilai k terbaik dengan GridSearchCV</span>
+param_grid = {
+    <span class="c-str">'knn__n_neighbors'</span>: [<span class="c-num">3</span>, <span class="c-num">5</span>, <span class="c-num">7</span>, <span class="c-num">9</span>, <span class="c-num">11</span>, <span class="c-num">15</span>, <span class="c-num">21</span>],
+    <span class="c-str">'knn__weights'</span>: [<span class="c-str">'uniform'</span>, <span class="c-str">'distance'</span>],
+    <span class="c-str">'knn__metric'</span>: [<span class="c-str">'euclidean'</span>, <span class="c-str">'manhattan'</span>]
+}
+grid_search = <span class="c-cls">GridSearchCV</span>(knn_pipeline, param_grid, cv=<span class="c-num">5</span>, scoring=<span class="c-str">'f1_macro'</span>)
+grid_search.<span class="c-fn">fit</span>(X_train, y_train)
+
+<span class="c-fn">print</span>(<span class="c-str">f"Best params: {grid_search.best_params_}"</span>)
+<span class="c-fn">print</span>(<span class="c-str">f"Best CV score: {grid_search.best_score_:.3f}"</span>)
+<span class="c-fn">print</span>(<span class="c-str">f"Test score: {grid_search.score(X_test, y_test):.3f}"</span>)</code></pre></div>
+    </div>
+
+    <hr class="algo-divider">
+
+    <!-- ══════════════════════════════ -->
+    <!-- 6. SUPPORT VECTOR MACHINE     -->
+    <!-- ══════════════════════════════ -->
+    <div class="content-block" id="svm">
+      <h2>6. Support Vector Machine (SVM)</h2>
+
+      <div class="algo-hero">
+        <div class="algo-hero-num">06 / 06</div>
+        <div class="algo-hero-body">
+          <div class="algo-hero-name">Support Vector Machine</div>
+          <div class="algo-hero-sub">sklearn.svm.SVC · SVR</div>
+          <div class="algo-hero-desc">Algoritma yang mencari <em>hyperplane</em> optimal yang memisahkan kelas dengan margin terlebar. Dapat menangani pola non-linier melalui teknik <em>kernel trick</em> — memproyeksikan data ke dimensi lebih tinggi tanpa komputasi eksplisit. Secara teoritis sangat kuat.</div>
+          <div class="algo-tags">
+            <span class="algo-tag" style="color:var(--teal);border-color:rgba(0,201,177,0.3);background:var(--teal-glow);">Klasifikasi</span>
+            <span class="algo-tag" style="color:var(--purple);border-color:rgba(155,124,244,0.3);background:rgba(155,124,244,0.06);">Regresi</span>
+            <span class="algo-tag" style="color:var(--blue);border-color:rgba(74,142,245,0.3);background:var(--blue-dim);">Kernel Trick</span>
+            <span class="algo-tag" style="color:var(--amber);border-color:rgba(245,166,35,0.3);background:var(--amber-dim);">High Dimension</span>
+          </div>
+        </div>
+      </div>
+
+      <h3>Cara Kerja: Maximum Margin Classifier</h3>
+      <p>SVM bekerja dengan mencari <strong>hyperplane</strong> (garis di 2D, bidang di 3D, dst.) yang:</p>
+      <ol>
+        <li>Memisahkan semua kelas dengan benar</li>
+        <li>Memaksimalkan <strong>margin</strong> — jarak antara hyperplane dan titik data terdekat dari masing-masing kelas</li>
+      </ol>
+      <p>Titik data yang berada tepat di batas margin disebut <strong>support vectors</strong> — hanya titik-titik inilah yang menentukan posisi hyperplane. Karena itu model tidak terpengaruh oleh titik data yang jauh dari batas keputusan.</p>
+
+      <div class="viz-container">
+        <div class="viz-label">Visualisasi — SVM: Hyperplane &amp; Margin</div>
+        <div class="svm-viz">
+          <!-- margin region -->
+          <div style="position:absolute;top:0;bottom:0;left:calc(50% - 35px);width:70px;background:rgba(0,201,177,0.05);transform:skewX(-15deg);transform-origin:center;"></div>
+          <!-- hyperplane -->
+          <div style="position:absolute;top:0;bottom:0;left:50%;width:2px;background:var(--teal);opacity:0.9;transform:skewX(-15deg);transform-origin:top;"></div>
+          <!-- margin lines -->
+          <div style="position:absolute;top:0;bottom:0;left:calc(50% - 35px);width:1px;background:rgba(0,201,177,0.35);transform:skewX(-15deg);transform-origin:top;"></div>
+          <div style="position:absolute;top:0;bottom:0;left:calc(50% + 35px);width:1px;background:rgba(0,201,177,0.35);transform:skewX(-15deg);transform-origin:top;"></div>
+          <!-- left class dots (blue) -->
+          <div class="svm-dot svm-support" style="background:var(--blue);left:30%;top:35%;"></div>
+          <div class="svm-dot" style="background:var(--blue);left:18%;top:50%;"></div>
+          <div class="svm-dot" style="background:var(--blue);left:25%;top:65%;"></div>
+          <div class="svm-dot" style="background:var(--blue);left:12%;top:30%;"></div>
+          <div class="svm-dot svm-support" style="background:var(--blue);left:32%;top:68%;"></div>
+          <!-- right class dots (red) -->
+          <div class="svm-dot svm-support" style="background:var(--red);left:68%;top:40%;"></div>
+          <div class="svm-dot" style="background:var(--red);left:78%;top:25%;"></div>
+          <div class="svm-dot" style="background:var(--red);left:82%;top:60%;"></div>
+          <div class="svm-dot" style="background:var(--red);left:72%;top:72%;"></div>
+          <div class="svm-dot svm-support" style="background:var(--red);left:65%;top:62%;"></div>
+          <!-- labels -->
+          <div style="position:absolute;left:8px;top:8px;font-family:var(--mono);font-size:9px;color:var(--text-3);">Margin →</div>
+          <div style="position:absolute;left:44%;top:4px;font-family:var(--mono);font-size:9px;color:var(--teal);">Hyperplane</div>
+        </div>
+        <div style="font-size:11px;color:var(--text-3);margin-top:var(--s3);">Support vectors (dengan lingkaran) menentukan posisi margin. Titik-titik lain tidak mempengaruhi hyperplane.</div>
+      </div>
+
+      <h3>Kernel Trick: Menangani Data Non-Linier</h3>
+      <p>Jika data tidak bisa dipisahkan secara linier, SVM menggunakan <strong>kernel function</strong> yang secara implisit memetakan data ke dimensi yang lebih tinggi di mana pemisahan linier menjadi mungkin.</p>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:var(--s3);margin:var(--s4) 0;">
+        <div style="background:var(--bg-2);border:1px solid var(--border);border-radius:var(--r2);padding:var(--s4);">
+          <div style="font-family:var(--mono);font-size:10px;color:var(--teal);margin-bottom:6px;">LINEAR</div>
+          <div style="font-size:12px;color:var(--text-2);line-height:1.6;">Garis/bidang lurus. Gunakan saat data linearly separable atau dimensi sangat tinggi (teks).</div>
+        </div>
+        <div style="background:var(--bg-2);border:1px solid var(--border);border-radius:var(--r2);padding:var(--s4);">
+          <div style="font-family:var(--mono);font-size:10px;color:var(--amber);margin-bottom:6px;">RBF (Radial Basis)</div>
+          <div style="font-size:12px;color:var(--text-2);line-height:1.6;">Default dan paling serbaguna. Bisa menangkap batas keputusan yang sangat non-linier.</div>
+        </div>
+        <div style="background:var(--bg-2);border:1px solid var(--border);border-radius:var(--r2);padding:var(--s4);">
+          <div style="font-family:var(--mono);font-size:10px;color:var(--purple);margin-bottom:6px;">POLYNOMIAL</div>
+          <div style="font-size:12px;color:var(--text-2);line-height:1.6;">Untuk data dengan hubungan polinomial. Lebih lambat dari RBF, jarang menjadi pilihan pertama.</div>
+        </div>
+      </div>
+
+      <div class="detail-grid">
+        <div class="detail-card">
+          <div class="detail-card-label" style="color:var(--teal);">Kelebihan</div>
+          <ul>
+            <li>Sangat efektif di dimensi tinggi (teks, genomik)</li>
+            <li>Tahan terhadap overfitting di dimensi tinggi</li>
+            <li>Kernel trick memberikan fleksibilitas non-linier</li>
+            <li>Prediksi hanya bergantung pada support vectors</li>
+          </ul>
+        </div>
+        <div class="detail-card">
+          <div class="detail-card-label" style="color:var(--red);">Kekurangan</div>
+          <ul>
+            <li>Sangat lambat pada dataset besar (O(n²) atau O(n³))</li>
+            <li>Tidak memberikan probabilitas langsung (butuh <code>probability=True</code>)</li>
+            <li>Sensitif terhadap pilihan hyperparameter C dan gamma</li>
+            <li>Tidak interpretable sama sekali</li>
+          </ul>
+        </div>
+      </div>
+
+      <h3>Hyperparameter Penting</h3>
+      <div class="param-list">
+        <div class="param-item">
+          <div class="param-name">C</div>
+          <div class="param-desc"><strong>Regularization parameter.</strong> C kecil → margin lebih lebar, lebih toleran terhadap misklasifikasi (soft margin). C besar → margin lebih sempit, berusaha mengklasifikasikan semua titik dengan benar (bisa overfit).</div>
+        </div>
+        <div class="param-item">
+          <div class="param-name">kernel</div>
+          <div class="param-desc"><code>rbf</code> (default) untuk kebanyakan kasus. <code>linear</code> untuk data berdimensi sangat tinggi (lebih cepat). <code>poly</code> jarang digunakan.</div>
+        </div>
+        <div class="param-item">
+          <div class="param-name">gamma (RBF)</div>
+          <div class="param-desc">Mengontrol "jangkauan pengaruh" setiap support vector. Gamma besar → setiap titik hanya mempengaruhi area kecil (bisa overfit). Gamma kecil → pengaruh lebih luas (bisa underfit). Default: <code>scale</code> = 1/(n_features × var(X)).</div>
+        </div>
+      </div>
+
+      <h3>Implementasi Scikit-learn</h3>
+      <div class="code-block"><pre><code><span class="c-kw">from</span> sklearn.svm <span class="c-kw">import</span> <span class="c-cls">SVC</span>
+<span class="c-kw">from</span> sklearn.preprocessing <span class="c-kw">import</span> <span class="c-cls">StandardScaler</span>
+<span class="c-kw">from</span> sklearn.pipeline <span class="c-kw">import</span> <span class="c-cls">Pipeline</span>
+<span class="c-kw">from</span> sklearn.model_selection <span class="c-kw">import</span> <span class="c-cls">GridSearchCV</span>
+
+<span class="c-comment"># SVM wajib di-scale terlebih dahulu</span>
+svm_pipeline = <span class="c-cls">Pipeline</span>([
+    (<span class="c-str">'scaler'</span>, <span class="c-cls">StandardScaler</span>()),
+    (<span class="c-str">'svm'</span>, <span class="c-cls">SVC</span>(kernel=<span class="c-str">'rbf'</span>, probability=<span class="c-kw">True</span>, random_state=<span class="c-num">42</span>))
+])
+
+<span class="c-comment"># Grid search untuk C dan gamma — wajib di-tune</span>
+param_grid = {
+    <span class="c-str">'svm__C'</span>:     [<span class="c-num">0.1</span>, <span class="c-num">1</span>, <span class="c-num">10</span>, <span class="c-num">100</span>],
+    <span class="c-str">'svm__gamma'</span>: [<span class="c-str">'scale'</span>, <span class="c-str">'auto'</span>, <span class="c-num">0.001</span>, <span class="c-num">0.01</span>]
+}
+grid_search = <span class="c-cls">GridSearchCV</span>(svm_pipeline, param_grid, cv=<span class="c-num">5</span>,
+                            scoring=<span class="c-str">'f1_macro'</span>, n_jobs=-<span class="c-num">1</span>)
+grid_search.<span class="c-fn">fit</span>(X_train, y_train)
+
+<span class="c-fn">print</span>(<span class="c-str">f"Best: C={grid_search.best_params_['svm__C']}, gamma={grid_search.best_params_['svm__gamma']}"</span>)
+<span class="c-fn">print</span>(<span class="c-str">f"Test score: {grid_search.score(X_test, y_test):.3f}"</span>)
+
+<span class="c-comment"># Probabilitas per kelas (butuh probability=True saat inisialisasi)</span>
+proba = grid_search.<span class="c-fn">predict_proba</span>(X_test[:5])
+<span class="c-fn">print</span>(<span class="c-str">"Probabilitas 5 sampel pertama:"</span>, proba)</code></pre></div>
+
+      <div class="callout tip">
+        <span class="callout-icon">📝</span>
+        <div class="callout-body">
+          <p><strong>Kapan menggunakan SVM:</strong> Ideal untuk klasifikasi teks (TF-IDF menghasilkan dimensi sangat tinggi) dan data berdimensi tinggi lainnya seperti citra setelah ekstraksi fitur. Untuk dataset besar (&gt;50k sampel), pertimbangkan <code>LinearSVC</code> yang jauh lebih cepat, atau gunakan Random Forest/XGBoost sebagai alternatif.</p>
+        </div>
+      </div>
+    </div>
+
+    <hr class="algo-divider">
+
+    <!-- ════════════════════════════ -->
+    <!-- COMPARISON TABLE            -->
+    <!-- ════════════════════════════ -->
+    <div class="content-block" id="perbandingan">
+      <h2>Perbandingan & Panduan Memilih</h2>
+      <p>Tabel ringkasan untuk membantu memilih algoritma yang tepat berdasarkan kebutuhan proyek:</p>
+
+      <table class="comp-table">
+        <thead>
+          <tr>
+            <th>Algoritma</th>
+            <th>Akurasi</th>
+            <th>Kecepatan Train</th>
+            <th>Kecepatan Prediksi</th>
+            <th>Interpretable</th>
+            <th>Perlu Scaling</th>
+            <th>Terbaik Untuk</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="comp-algo-name">Linear/Logistic Reg</span></td>
+            <td><span class="dot-fill"><span class="dot on"></span><span class="dot on"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span></span></td>
+            <td><span class="dot-fill"><span class="dot on"></span><span class="dot on"></span><span class="dot on"></span><span class="dot on"></span><span class="dot on"></span></span></td>
+            <td><span class="dot-fill"><span class="dot on"></span><span class="dot on"></span><span class="dot on"></span><span class="dot on"></span><span class="dot on"></span></span></td>
+            <td style="color:var(--teal);">✓ Sangat</td>
+            <td style="color:var(--amber);">Ya</td>
+            <td style="font-size:12px;color:var(--text-2);">Baseline, hubungan linier, butuh interpretasi</td>
+          </tr>
+          <tr>
+            <td><span class="comp-algo-name">Decision Tree</span></td>
+            <td><span class="dot-fill"><span class="dot on"></span><span class="dot on"></span><span class="dot on"></span><span class="dot"></span><span class="dot"></span></span></td>
+            <td><span class="dot-fill"><span class="dot on"></span><span class="dot on"></span><span class="dot on"></span><span class="dot on"></span><span class="dot"></span></span></td>
+            <td><span class="dot-fill"><span class="dot on"></span><span class="dot on"></span><span class="dot on"></span><span class="dot on"></span><span class="dot on"></span></span></td>
+            <td style="color:var(--teal);">✓ Sangat</td>
+            <td style="color:var(--teal);">Tidak</td>
+            <td style="font-size:12px;color:var(--text-2);">Perlu penjelasan aturan, data kategorik</td>
+          </tr>
+          <tr>
+            <td><span class="comp-algo-name">Random Forest</span></td>
+            <td><span class="dot-fill"><span class="dot on"></span><span class="dot on"></span><span class="dot on"></span><span class="dot on"></span><span class="dot"></span></span></td>
+            <td><span class="dot-fill"><span class="dot on"></span><span class="dot on"></span><span class="dot on"></span><span class="dot"></span><span class="dot"></span></span></td>
+            <td><span class="dot-fill"><span class="dot on"></span><span class="dot on"></span><span class="dot on"></span><span class="dot"></span><span class="dot"></span></span></td>
+            <td style="color:var(--amber);">Cukup</td>
+            <td style="color:var(--teal);">Tidak</td>
+            <td style="font-size:12px;color:var(--text-2);">Tabular data, produksi, performa cepat</td>
+          </tr>
+          <tr>
+            <td><span class="comp-algo-name">Gradient Boosting</span></td>
+            <td><span class="dot-fill"><span class="dot on"></span><span class="dot on"></span><span class="dot on"></span><span class="dot on"></span><span class="dot on"></span></span></td>
+            <td><span class="dot-fill"><span class="dot on"></span><span class="dot on"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span></span></td>
+            <td><span class="dot-fill"><span class="dot on"></span><span class="dot on"></span><span class="dot on"></span><span class="dot"></span><span class="dot"></span></span></td>
+            <td style="color:var(--amber);">Cukup</td>
+            <td style="color:var(--teal);">Tidak</td>
+            <td style="font-size:12px;color:var(--text-2);">Kompetisi, tabular data, akurasi maksimum</td>
+          </tr>
+          <tr>
+            <td><span class="comp-algo-name">k-NN</span></td>
+            <td><span class="dot-fill"><span class="dot on"></span><span class="dot on"></span><span class="dot on"></span><span class="dot"></span><span class="dot"></span></span></td>
+            <td><span class="dot-fill"><span class="dot on"></span><span class="dot on"></span><span class="dot on"></span><span class="dot on"></span><span class="dot on"></span></span></td>
+            <td><span class="dot-fill"><span class="dot on"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span></span></td>
+            <td style="color:var(--teal);">✓</td>
+            <td style="color:var(--amber);">Ya, wajib</td>
+            <td style="font-size:12px;color:var(--text-2);">Dataset kecil, prototipe, rekomendasi</td>
+          </tr>
+          <tr>
+            <td><span class="comp-algo-name">SVM</span></td>
+            <td><span class="dot-fill"><span class="dot on"></span><span class="dot on"></span><span class="dot on"></span><span class="dot on"></span><span class="dot"></span></span></td>
+            <td><span class="dot-fill"><span class="dot on"></span><span class="dot on"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span></span></td>
+            <td><span class="dot-fill"><span class="dot on"></span><span class="dot on"></span><span class="dot on"></span><span class="dot on"></span><span class="dot"></span></span></td>
+            <td style="color:var(--red);">✗</td>
+            <td style="color:var(--amber);">Ya, wajib</td>
+            <td style="font-size:12px;color:var(--text-2);">Teks, dimensi tinggi, dataset &lt;50k sampel</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3 style="margin-top:var(--s5);">Alur Keputusan Cepat</h3>
+      <div class="callout info">
+        <span class="callout-icon">🗺️</span>
+        <div class="callout-body">
+          <ol style="font-size:14px;line-height:2.4;margin:0;padding-left:var(--s5);">
+            <li><strong>Mulai selalu dari Logistic/Linear Regression</strong> sebagai baseline — jika cukup, selesai</li>
+            <li>Jika perlu lebih baik dan interpretabilitas penting → <strong>Decision Tree</strong> (dengan pruning)</li>
+            <li>Jika perlu lebih baik tanpa interpretabilitas → <strong>Random Forest</strong> (mudah, tahan overfit)</li>
+            <li>Jika butuh akurasi maksimum dan mau tuning → <strong>XGBoost / LightGBM</strong></li>
+            <li>Jika data teks atau berdimensi tinggi → <strong>SVM (linear kernel)</strong> atau <strong>Logistic Regression</strong></li>
+            <li>Jika dataset sangat kecil atau butuh prototyping cepat → <strong>k-NN</strong></li>
+          </ol>
+        </div>
+      </div>
+
+      <div class="task-box">
+        <div class="task-box-title">📋 Latihan: Bandingkan Semua Algoritma</div>
+        <p style="font-size:13px;color:var(--text-2);margin-bottom:var(--s4);">Gunakan dataset yang sama (Iris atau dataset pilihanmu) dan implementasikan semua 6 algoritma di atas. Buat tabel perbandingan berisi Accuracy, F1-Score, dan waktu training/prediksi. Analisis: pada dataset ini, mana yang terbaik dan mengapa?</p>
+        <div class="code-block" style="margin:0;"><pre><code><span class="c-kw">from</span> sklearn.pipeline <span class="c-kw">import</span> <span class="c-cls">Pipeline</span>
+<span class="c-kw">from</span> sklearn.preprocessing <span class="c-kw">import</span> <span class="c-cls">StandardScaler</span>
+<span class="c-kw">from</span> sklearn.model_selection <span class="c-kw">import</span> <span class="c-fn">cross_val_score</span>
+<span class="c-kw">import</span> time
+
+models = {
+    <span class="c-str">"Logistic Regression"</span>: <span class="c-cls">LogisticRegression</span>(max_iter=<span class="c-num">500</span>),
+    <span class="c-str">"Decision Tree"</span>:       <span class="c-cls">DecisionTreeClassifier</span>(max_depth=<span class="c-num">5</span>),
+    <span class="c-str">"Random Forest"</span>:       <span class="c-cls">RandomForestClassifier</span>(n_estimators=<span class="c-num">100</span>),
+    <span class="c-str">"Gradient Boosting"</span>:   <span class="c-cls">GradientBoostingClassifier</span>(n_estimators=<span class="c-num">100</span>),
+    <span class="c-str">"k-NN"</span>:               <span class="c-cls">KNeighborsClassifier</span>(n_neighbors=<span class="c-num">7</span>),
+    <span class="c-str">"SVM"</span>:                <span class="c-cls">SVC</span>(probability=<span class="c-kw">True</span>),
+}
+
+<span class="c-fn">print</span>(<span class="c-str">f"{'Model':<25} {'F1 (CV)':<12} {'Train Time'}"</span>)
+<span class="c-fn">print</span>(<span class="c-str">"-" * 50</span>)
+<span class="c-kw">for</span> name, model <span class="c-kw">in</span> models.items():
+    pipe = <span class="c-cls">Pipeline</span>([(<span class="c-str">'sc'</span>, <span class="c-cls">StandardScaler</span>()), (<span class="c-str">'m'</span>, model)])
+    start = time.<span class="c-fn">time</span>()
+    scores = <span class="c-fn">cross_val_score</span>(pipe, X, y, cv=<span class="c-num">5</span>, scoring=<span class="c-str">'f1_macro'</span>)
+    elapsed = time.<span class="c-fn">time</span>() - start
+    <span class="c-fn">print</span>(<span class="c-str">f"{name:<25} {scores.mean():.3f} ± {scores.std():.3f}  {elapsed:.2f}s"</span>)</code></pre></div>
+      </div>
+
+      <div class="reading-box" style="margin-top:var(--s5);">
+        <div class="reading-box-title">📖 Referensi Lanjutan</div>
+        <div class="reading-item">
+          <span class="reading-icon">📗</span>
+          <div class="reading-label">
+            <strong>Hands-On Machine Learning — Aurélien Géron (O'Reilly)</strong><br>
+            Chapter 4–7: Linear Models, Decision Trees, Ensemble Methods, SVM. Penjelasan paling praktis yang ada.
+          </div>
+        </div>
+        <div class="reading-item">
+          <span class="reading-icon">🌐</span>
+          <div class="reading-label">
+            <strong>Scikit-learn User Guide — Supervised Learning</strong><br>
+            Dokumentasi resmi dengan contoh dan penjelasan matematis untuk setiap algoritma.
+          </div>
+        </div>
+        <div class="reading-item">
+          <span class="reading-icon">📄</span>
+          <div class="reading-label">
+            <strong>StatQuest with Josh Starmer (YouTube)</strong><br>
+            Visualisasi intuitif untuk setiap algoritma — sangat direkomendasikan sebelum membaca matematis.
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ── ASIDE ── -->
+  <aside class="content-aside">
+    <div class="toc">
+      <div class="toc-title">Isi Halaman</div>
+      <ul class="toc-list">
+        <li><a href="#linear" class="active">1. Linear/Logistic Reg</a></li>
+        <li><a href="#decision-tree">2. Decision Tree</a></li>
+        <li><a href="#random-forest">3. Random Forest</a></li>
+        <li><a href="#gradient-boosting">4. Gradient Boosting</a></li>
+        <li><a href="#knn">5. k-NN</a></li>
+        <li><a href="#svm">6. SVM</a></li>
+        <li><a href="#perbandingan">Perbandingan</a></li>
+      </ul>
+    </div>
+
+    <div class="sesi-nav-aside">
+      <div class="sesi-nav-title">Navigasi</div>
+      <a href="sesi-02.html" class="sesi-nav-btn">
+        <span>←</span>
+        <span>P-02: Konsep ML (ringkasan)</span>
+      </a>
+      <a href="sesi-02-unsupervised.html" class="sesi-nav-btn" style="margin-top:var(--s2);">
+        <span>→</span>
+        <span>Algoritma Unsupervised</span>
+      </a>
+    </div>
+
+    <div style="background:var(--bg-2);border:1px solid var(--border);border-radius:var(--r3);padding:var(--s5);margin-top:var(--s4);">
+      <div style="font-family:var(--mono);font-size:10px;color:var(--text-3);letter-spacing:2px;text-transform:uppercase;margin-bottom:var(--s4);">6 Algoritma Dibahas</div>
+      <div style="display:flex;flex-direction:column;gap:var(--s3);">
+        <a href="#linear" style="font-size:13px;color:var(--text-2);display:flex;align-items:center;gap:var(--s2);text-decoration:none;">
+          <span style="font-family:var(--mono);font-size:10px;color:var(--text-3);">01</span> Linear / Logistic Reg
+        </a>
+        <a href="#decision-tree" style="font-size:13px;color:var(--text-2);display:flex;align-items:center;gap:var(--s2);text-decoration:none;">
+          <span style="font-family:var(--mono);font-size:10px;color:var(--text-3);">02</span> Decision Tree
+        </a>
+        <a href="#random-forest" style="font-size:13px;color:var(--text-2);display:flex;align-items:center;gap:var(--s2);text-decoration:none;">
+          <span style="font-family:var(--mono);font-size:10px;color:var(--text-3);">03</span> Random Forest
+        </a>
+        <a href="#gradient-boosting" style="font-size:13px;color:var(--text-2);display:flex;align-items:center;gap:var(--s2);text-decoration:none;">
+          <span style="font-family:var(--mono);font-size:10px;color:var(--text-3);">04</span> Gradient Boosting
+        </a>
+        <a href="#knn" style="font-size:13px;color:var(--text-2);display:flex;align-items:center;gap:var(--s2);text-decoration:none;">
+          <span style="font-family:var(--mono);font-size:10px;color:var(--text-3);">05</span> k-Nearest Neighbors
+        </a>
+        <a href="#svm" style="font-size:13px;color:var(--text-2);display:flex;align-items:center;gap:var(--s2);text-decoration:none;">
+          <span style="font-family:var(--mono);font-size:10px;color:var(--text-3);">06</span> Support Vector Machine
+        </a>
+      </div>
+    </div>
+  </aside>
+
+</div>
+
+<!-- ══ FOOTER ══ -->
+<footer class="footer">
+  <div>AI·UKWMS <span style="color:var(--text-3);">· Algoritma Supervised Learning</span></div>
+  <div style="display:flex;gap:var(--s4);">
+    <a href="sesi-02.html" style="color:var(--text-3);">← P-02 Ringkasan</a>
+    <a href="sesi-02-unsupervised.html" style="color:var(--text-3);">Unsupervised →</a>
+  </div>
+</footer>
+
+<script>
+  const headings = document.querySelectorAll('.content-main [id]');
+  const tocLinks = document.querySelectorAll('.toc-list a');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(a => {
+          a.classList.remove('active');
+          if (a.getAttribute('href') === '#' + entry.target.id) a.classList.add('active');
+        });
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px' });
+  headings.forEach(h => observer.observe(h));
+
+  const navLinks = document.querySelectorAll('.nav-links a[href^="#"]');
+  window.addEventListener('scroll', () => {
+    let current = '';
+    headings.forEach(h => { if (window.scrollY >= h.offsetTop - 100) current = h.id; });
+    navLinks.forEach(a => {
+      a.classList.remove('active');
+      if (a.getAttribute('href') === '#' + current) a.classList.add('active');
+    });
+  });
+</script>
+
+</body>
+</html>
