@@ -574,7 +574,7 @@ df[<span class="c-str">'species'</span>] = iris.target_names[y]
 <span class="c-fn">print</span>(df.<span class="c-fn">describe</span>())</code></pre></div>
 
       <h3>Langkah 2: Split Data & Bangun Pipeline</h3>
-      <div class="code-block"><span class="c-comment"># Bagi data: 80% train, 20% test — stratified agar distribusi kelas seimbang</span>
+      <div class="code-block"><pre><code><span class="c-comment"># Bagi data: 80% train, 20% test — stratified agar distribusi kelas seimbang</span>
 X_train, X_test, y_train, y_test = <span class="c-fn">train_test_split</span>(
     X, y, test_size=<span class="c-num">0.2</span>, random_state=<span class="c-num">42</span>, stratify=y
 )
@@ -587,10 +587,10 @@ pipeline = <span class="c-cls">Pipeline</span>([
 
 <span class="c-comment"># Latih model</span>
 pipeline.<span class="c-fn">fit</span>(X_train, y_train)
-<span class="c-fn">print</span>(<span class="c-str">"Training selesai!"</span>)</div>
+<span class="c-fn">print</span>(<span class="c-str">"Training selesai!"</span>)</code></pre></div>
 
       <h3>Langkah 3: Evaluasi Model</h3>
-      <div class="code-block"><span class="c-comment"># Prediksi di test set</span>
+      <div class="code-block"><pre><code><span class="c-comment"># Prediksi di test set</span>
 y_pred = pipeline.<span class="c-fn">predict</span>(X_test)
 
 <span class="c-comment"># Laporan lengkap: precision, recall, F1 per kelas</span>
@@ -609,7 +609,7 @@ cv_scores = <span class="c-fn">cross_val_score</span>(pipeline, X, y, cv=<span c
 rf_model = pipeline.named_steps[<span class="c-str">'clf'</span>]
 importances = pd.<span class="c-cls">Series</span>(rf_model.feature_importances_, index=iris.feature_names)
 importances.<span class="c-fn">sort_values</span>().<span class="c-fn">plot</span>(kind=<span class="c-str">'barh'</span>, title=<span class="c-str">'Feature Importance'</span>)
-plt.<span class="c-fn">show</span>()</div>
+plt.<span class="c-fn">show</span>()</code></pre></div>
 
       <div class="callout tip" style="margin-top:var(--s4);">
         <span class="callout-icon">🧪</span>
