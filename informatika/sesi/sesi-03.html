@@ -296,8 +296,8 @@
             <div class="edlink-text">
               <strong>Edlink — Materi Pertemuan 3</strong><br>
               Masuk ke Edlink → pilih mata kuliah Kecerdasan Buatan → Pertemuan 3 → unduh dua file dataset:
-              <br><span class="edlink-path">telco_churn.csv</span>
-              <span class="edlink-path" style="margin-left:var(--s2);">house_price.csv</span>
+              <br><span class="edlink-path">Telco_customer_churn.xlsx</span>
+              <span class="edlink-path" style="margin-left:var(--s2);">house_prices.csv</span>
             </div>
           </div>
         </div>
@@ -315,13 +315,13 @@
         <span class="code-label-name">cell_00_verify.py</span>
         <span class="code-label-badge">Run first</span>
       </div>
-      <div class="code-block"><span class="c-kw">import</span> sys, sklearn, pandas, numpy, matplotlib, seaborn
+      <div class="code-block"><pre><code><span class="c-kw">import</span> sys, sklearn, pandas, numpy, matplotlib, seaborn
 
 <span class="c-fn">print</span>(<span class="c-str">f"Python : {sys.version.split()[0]}"</span>)
 <span class="c-fn">print</span>(<span class="c-str">f"sklearn: {sklearn.__version__}"</span>)
 <span class="c-fn">print</span>(<span class="c-str">f"pandas : {pandas.__version__}"</span>)
 <span class="c-fn">print</span>(<span class="c-str">f"numpy  : {numpy.__version__}"</span>)
-<span class="c-fn">print</span>(<span class="c-str">"\n✓ Semua library siap!"</span>)</div>
+<span class="c-fn">print</span>(<span class="c-str">"\n✓ Semua library siap!"</span>)</code></pre></div>
 
       <div class="output-block">
         <div class="output-label">Expected Output</div>
@@ -360,7 +360,7 @@ numpy  : 1.x.x
             <div class="dmeta-lbl">Tingkat Churn</div>
           </div>
           <div class="dmeta-item">
-            <div class="dmeta-num">telco_churn.csv</div>
+            <div class="dmeta-num">Telco_customer_churn.xlsx</div>
             <div class="dmeta-lbl" style="font-size:9px;">File di Edlink</div>
           </div>
         </div>
@@ -387,7 +387,7 @@ numpy  : 1.x.x
         <span class="code-label-name">cell_01_load.py</span>
         <span class="code-label-badge">Klasifikasi</span>
       </div>
-      <div class="code-block"><span class="c-kw">import</span> pandas <span class="c-kw">as</span> pd
+      <div class="code-block"><pre><code><span class="c-kw">import</span> pandas <span class="c-kw">as</span> pd
 <span class="c-kw">import</span> numpy <span class="c-kw">as</span> np
 <span class="c-kw">import</span> matplotlib.pyplot <span class="c-kw">as</span> plt
 <span class="c-kw">import</span> seaborn <span class="c-kw">as</span> sns
@@ -402,13 +402,13 @@ df = pd.<span class="c-fn">read_csv</span>(<span class="c-str">"telco_churn.csv"
 <span class="c-fn">print</span>(<span class="c-str">"\nMissing values:"</span>)
 <span class="c-fn">print</span>(df.<span class="c-fn">isnull</span>().<span class="c-fn">sum</span>()[df.<span class="c-fn">isnull</span>().<span class="c-fn">sum</span>() > <span class="c-num">0</span>])
 <span class="c-fn">print</span>(<span class="c-str">"\nDistribusi target:"</span>)
-<span class="c-fn">print</span>(df[<span class="c-str">"Churn"</span>].<span class="c-fn">value_counts</span>(normalize=<span class="c-kw">True</span>).<span class="c-fn">round</span>(<span class="c-num">3</span>))</div>
+<span class="c-fn">print</span>(df[<span class="c-str">"Churn"</span>].<span class="c-fn">value_counts</span>(normalize=<span class="c-kw">True</span>).<span class="c-fn">round</span>(<span class="c-num">3</span>))</code></pre></div>
 
       <div class="code-label">
         <span class="code-label-name">cell_02_eda.py</span>
         <span class="code-label-badge">EDA</span>
       </div>
-      <div class="code-block"><span class="c-comment"># Visualisasi distribusi churn berdasarkan fitur kunci</span>
+      <div class="code-block"><pre><code><span class="c-comment"># Visualisasi distribusi churn berdasarkan fitur kunci</span>
 fig, axes = plt.<span class="c-fn">subplots</span>(<span class="c-num">1</span>, <span class="c-num">3</span>, figsize=(<span class="c-num">15</span>, <span class="c-num">4</span>))
 
 <span class="c-comment"># 1. Distribusi tenure per kelas churn</span>
@@ -433,7 +433,7 @@ axes[<span class="c-num">2</span>].<span class="c-fn">set_xlabel</span>(<span cl
 axes[<span class="c-num">2</span>].<span class="c-fn">set_ylabel</span>(<span class="c-str">"Monthly Charges"</span>)
 
 plt.<span class="c-fn">tight_layout</span>()
-plt.<span class="c-fn">show</span>()</div>
+plt.<span class="c-fn">show</span>()</code></pre></div>
 
       <h3>Langkah 2 — Preprocessing</h3>
 
@@ -441,7 +441,7 @@ plt.<span class="c-fn">show</span>()</div>
         <span class="code-label-name">cell_03_preprocess.py</span>
         <span class="code-label-badge">Preprocessing</span>
       </div>
-      <div class="code-block"><span class="c-kw">from</span> sklearn.model_selection <span class="c-kw">import</span> <span class="c-fn">train_test_split</span>
+      <div class="code-block"><pre><code><span class="c-kw">from</span> sklearn.model_selection <span class="c-kw">import</span> <span class="c-fn">train_test_split</span>
 <span class="c-kw">from</span> sklearn.preprocessing <span class="c-kw">import</span> <span class="c-fn">StandardScaler</span>, <span class="c-fn">LabelEncoder</span>
 
 <span class="c-comment"># 1. Hapus kolom ID (tidak informatif)</span>
@@ -467,7 +467,7 @@ X_train, X_test, y_train, y_test = <span class="c-fn">train_test_split</span>(
     X, y, test_size=<span class="c-num">0.2</span>, random_state=<span class="c-num">42</span>, stratify=y
 )
 <span class="c-fn">print</span>(<span class="c-str">f"Train: {X_train.shape[0]} | Test: {X_test.shape[0]}"</span>)
-<span class="c-fn">print</span>(<span class="c-str">f"Churn rate train: {y_train.mean():.3f} | test: {y_test.mean():.3f}"</span>)</div>
+<span class="c-fn">print</span>(<span class="c-str">f"Churn rate train: {y_train.mean():.3f} | test: {y_test.mean():.3f}"</span>)</code></pre></div>
 
       <h3>Langkah 3 — Training & Evaluasi Model</h3>
 
@@ -475,7 +475,7 @@ X_train, X_test, y_train, y_test = <span class="c-fn">train_test_split</span>(
         <span class="code-label-name">cell_04_train_classify.py</span>
         <span class="code-label-badge">Model Training</span>
       </div>
-      <div class="code-block"><span class="c-kw">from</span> sklearn.pipeline <span class="c-kw">import</span> <span class="c-fn">Pipeline</span>
+      <div class="code-block"><pre><code><span class="c-kw">from</span> sklearn.pipeline <span class="c-kw">import</span> <span class="c-fn">Pipeline</span>
 <span class="c-kw">from</span> sklearn.linear_model <span class="c-kw">import</span> <span class="c-fn">LogisticRegression</span>
 <span class="c-kw">from</span> sklearn.ensemble <span class="c-kw">import</span> <span class="c-fn">RandomForestClassifier</span>
 <span class="c-kw">from</span> sklearn.metrics <span class="c-kw">import</span> (
@@ -508,7 +508,7 @@ y_proba_rf  = pipe_rf.<span class="c-fn">predict_proba</span>(X_test)[:, <span c
 
 <span class="c-fn">print</span>(<span class="c-str">"\n═══ Random Forest ═══"</span>)
 <span class="c-fn">print</span>(<span class="c-fn">classification_report</span>(y_test, y_pred_rf, target_names=[<span class="c-str">"No Churn"</span>, <span class="c-str">"Churn"</span>]))
-<span class="c-fn">print</span>(<span class="c-str">f"AUC-ROC: {roc_auc_score(y_test, y_proba_rf):.4f}"</span>)</div>
+<span class="c-fn">print</span>(<span class="c-str">f"AUC-ROC: {roc_auc_score(y_test, y_proba_rf):.4f}"</span>)</code></pre></div>
 
       <div class="output-block">
         <div class="output-label">Expected Output (approx.)</div>
@@ -533,7 +533,7 @@ AUC-ROC: 0.8621
         <span class="code-label-name">cell_05_visualize.py</span>
         <span class="code-label-badge">Visualize</span>
       </div>
-      <div class="code-block"><span class="c-comment"># ── Confusion Matrix ─────────────────────────────────────────</span>
+      <div class="code-block"><pre><code><span class="c-comment"># ── Confusion Matrix ─────────────────────────────────────────</span>
 fig, axes = plt.<span class="c-fn">subplots</span>(<span class="c-num">1</span>, <span class="c-num">2</span>, figsize=(<span class="c-num">10</span>, <span class="c-num">4</span>))
 <span class="c-kw">for</span> ax, model, name <span class="c-kw">in</span> <span class="c-fn">zip</span>(
     axes,
@@ -564,7 +564,7 @@ plt.<span class="c-fn">tight_layout</span>()
 plt.<span class="c-fn">show</span>()
 
 <span class="c-fn">print</span>(<span class="c-str">"\n📊 Top 5 prediktor churn:"</span>)
-<span class="c-fn">print</span>(importances.head(<span class="c-num">5</span>).<span class="c-fn">to_string</span>())</div>
+<span class="c-fn">print</span>(importances.head(<span class="c-num">5</span>).<span class="c-fn">to_string</span>())</code></pre></div>
 
       <div class="callout tip">
         <span class="callout-icon">💼</span>
@@ -627,7 +627,7 @@ plt.<span class="c-fn">show</span>()
         <span class="code-label-name">cell_06_load_house.py</span>
         <span class="code-label-badge">Regresi</span>
       </div>
-      <div class="code-block"><span class="c-comment"># Load dataset harga rumah</span>
+      <div class="code-block"><pre><code><span class="c-comment"># Load dataset harga rumah</span>
 house = pd.<span class="c-fn">read_csv</span>(<span class="c-str">"house_price.csv"</span>)
 
 <span class="c-fn">print</span>(<span class="c-str">"Shape:"</span>, house.<span class="c-fn">shape</span>)
@@ -653,7 +653,7 @@ sns.<span class="c-fn">heatmap</span>(house[num_cols].<span class="c-fn">corr</s
             cmap=<span class="c-str">"coolwarm"</span>, center=<span class="c-num">0</span>, square=<span class="c-kw">True</span>, linewidths=<span class="c-num">0.5</span>)
 plt.<span class="c-fn">title</span>(<span class="c-str">"Korelasi Fitur Numerik"</span>)
 plt.<span class="c-fn">tight_layout</span>()
-plt.<span class="c-fn">show</span>()</div>
+plt.<span class="c-fn">show</span>()</code></pre></div>
 
       <h3>Langkah 2 — Preprocessing & Feature Engineering</h3>
 
@@ -661,7 +661,7 @@ plt.<span class="c-fn">show</span>()</div>
         <span class="code-label-name">cell_07_prep_house.py</span>
         <span class="code-label-badge">Feature Engineering</span>
       </div>
-      <div class="code-block"><span class="c-kw">from</span> sklearn.impute <span class="c-kw">import</span> <span class="c-fn">SimpleImputer</span>
+      <div class="code-block"><pre><code><span class="c-kw">from</span> sklearn.impute <span class="c-kw">import</span> <span class="c-fn">SimpleImputer</span>
 <span class="c-kw">from</span> sklearn.compose <span class="c-kw">import</span> <span class="c-fn">ColumnTransformer</span>
 <span class="c-kw">from</span> sklearn.preprocessing <span class="c-kw">import</span> <span class="c-fn">OneHotEncoder</span>, <span class="c-fn">StandardScaler</span>
 <span class="c-kw">from</span> sklearn.pipeline <span class="c-kw">import</span> <span class="c-fn">Pipeline</span>
@@ -696,7 +696,7 @@ preprocessor = <span class="c-cls">ColumnTransformer</span>([
 X_h_train, X_h_test, y_h_train, y_h_test = <span class="c-fn">train_test_split</span>(
     X_h, y_h, test_size=<span class="c-num">0.2</span>, random_state=<span class="c-num">42</span>
 )
-<span class="c-fn">print</span>(<span class="c-str">f"Train: {X_h_train.shape[0]} | Test: {X_h_test.shape[0]}"</span>)</div>
+<span class="c-fn">print</span>(<span class="c-str">f"Train: {X_h_train.shape[0]} | Test: {X_h_test.shape[0]}"</span>)</code></pre></div>
 
       <h3>Langkah 3 — Training & Evaluasi Regresi</h3>
 
@@ -704,7 +704,7 @@ X_h_train, X_h_test, y_h_train, y_h_test = <span class="c-fn">train_test_split</
         <span class="code-label-name">cell_08_train_regress.py</span>
         <span class="code-label-badge">Model Training</span>
       </div>
-      <div class="code-block"><span class="c-kw">from</span> sklearn.linear_model <span class="c-kw">import</span> <span class="c-fn">LinearRegression</span>, <span class="c-fn">Ridge</span>
+      <div class="code-block"><pre><code><span class="c-kw">from</span> sklearn.linear_model <span class="c-kw">import</span> <span class="c-fn">LinearRegression</span>, <span class="c-fn">Ridge</span>
 <span class="c-kw">from</span> sklearn.metrics <span class="c-kw">import</span> <span class="c-fn">mean_absolute_error</span>, <span class="c-fn">mean_squared_error</span>, <span class="c-fn">r2_score</span>
 
 <span class="c-kw">def</span> <span class="c-fn">eval_regression</span>(name, model, X_train, y_train, X_test, y_test):
@@ -733,7 +733,7 @@ pipe_linear = <span class="c-cls">Pipeline</span>([(<span class="c-str">"prep"</
 <span class="c-comment"># Model 2: Ridge Regression (regularisasi L2)</span>
 pipe_ridge = <span class="c-cls">Pipeline</span>([(<span class="c-str">"prep"</span>, preprocessor), (<span class="c-str">"reg"</span>, <span class="c-cls">Ridge</span>(alpha=<span class="c-num">10.0</span>))])
 <span class="c-fn">eval_regression</span>(<span class="c-str">"Ridge Regression (α=10)"</span>, pipe_ridge,
-                X_h_train, y_h_train, X_h_test, y_h_test)</div>
+                X_h_train, y_h_train, X_h_test, y_h_test)</code></pre></div>
 
       <div class="output-block">
         <div class="output-label">Expected Output (approx.)</div>
@@ -752,7 +752,7 @@ R²   : 0.8301
         <span class="code-label-name">cell_09_residual.py</span>
         <span class="code-label-badge">Residual Plot</span>
       </div>
-      <div class="code-block"><span class="c-comment"># Plot Predicted vs Actual — model Ridge</span>
+      <div class="code-block"><pre><code><span class="c-comment"># Plot Predicted vs Actual — model Ridge</span>
 pipe_ridge.<span class="c-fn">fit</span>(X_h_train, y_h_train)
 y_pred_ridge = np.<span class="c-fn">expm1</span>(pipe_ridge.<span class="c-fn">predict</span>(X_h_test))
 y_actual     = np.<span class="c-fn">expm1</span>(y_h_test.values)
@@ -765,7 +765,7 @@ plt.<span class="c-fn">xlabel</span>(<span class="c-str">"Harga Aktual (USD)"</s
 plt.<span class="c-fn">ylabel</span>(<span class="c-str">"Harga Diprediksi (USD)"</span>)
 plt.<span class="c-fn">title</span>(<span class="c-str">"Predicted vs Actual — Ridge Regression"</span>)
 plt.<span class="c-fn">tight_layout</span>()
-plt.<span class="c-fn">show</span>()</div>
+plt.<span class="c-fn">show</span>()</code></pre></div>
 
       <div class="callout tip">
         <span class="callout-icon">📐</span>
