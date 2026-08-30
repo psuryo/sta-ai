@@ -161,7 +161,7 @@
     </div>
     <div>
       <div style="font-family:var(--mono);font-size:9px;color:var(--text-3);letter-spacing:2px;text-transform:uppercase;margin-bottom:4px;">Tools Utama</div>
-      <div style="font-size:14px;color:var(--text);font-weight:500;">Python · Scikit-learn · LangChain</div>
+      <div style="font-size:14px;color:var(--text);font-weight:500;">Python · Scikit-learn · TensorFlow/Keras · LangChain · Streamlit</div>
     </div>
   </div>
 </div>
@@ -175,8 +175,8 @@
     <div style="display:grid; grid-template-columns:1fr 1fr; gap:var(--s7); margin-bottom:var(--s7);">
       <div>
         <h3 style="font-family:var(--serif);font-size:18px;color:var(--text);margin-bottom:var(--s4);">Deskripsi</h3>
-        <p style="font-size:14px;color:var(--text-2);line-height:1.8;">Mata kuliah Kecerdasan Buatan membahas konsep, teknik, dan aplikasi AI mulai dari Machine Learning klasik hingga Large Language Model modern. Fokus ditempatkan pada <strong style="color:var(--text)">aplikasi AI untuk bisnis dan industri</strong>, bukan derivasi matematis mendalam — karena hal tersebut dicakup di mata kuliah Machine Learning di semester atas.</p>
-        <p style="font-size:14px;color:var(--text-2);line-height:1.8;margin-top:var(--s4);">Mahasiswa akan belajar menggunakan tools AI siap pakai, membangun pipeline data sederhana, mengintegrasikan LLM via API, dan menyelesaikan proyek akhir berupa solusi AI untuk masalah bisnis nyata.</p>
+        <p style="font-size:14px;color:var(--text-2);line-height:1.8;">Mata kuliah Kecerdasan Buatan membahas konsep, teknik, dan aplikasi AI mulai dari Machine Learning klasik hingga Large Language Model modern. Fokus ditempatkan pada <strong style="color:var(--text)">aplikasi AI untuk bisnis dan industri</strong>, bukan derivasi matematis mendalam — karena hal tersebut dicakup di mata kuliah Machine Learning di semester atas. Teknik pemrosesan gambar dasar dicakup di mata kuliah Pengolahan Citra Digital tersendiri; mata kuliah ini menempatkan Computer Vision sebagai studi kasus aplikasi bisnis.</p>
+        <p style="font-size:14px;color:var(--text-2);line-height:1.8;margin-top:var(--s4);">Mahasiswa akan belajar menggunakan tools AI siap pakai, membangun pipeline data sederhana, mengintegrasikan LLM via API, mendeploy model ke aplikasi web, dan menyelesaikan proyek akhir berupa solusi AI untuk masalah bisnis nyata.</p>
       </div>
       <div>
         <h3 style="font-family:var(--serif);font-size:18px;color:var(--text);margin-bottom:var(--s4);">Prasyarat</h3>
@@ -281,8 +281,8 @@
       <div class="session-item" data-sesi="4" data-href="sesi/sesi-04.html" data-tag="praktik">
         <div class="session-num">P-04</div>
         <div>
-          <div class="session-title">Data Preparation & Feature Engineering</div>
-          <div class="session-sub">EDA, handling missing values, encoding, scaling, feature selection dengan Pandas</div>
+          <div class="session-title">AI untuk Bisnis: Studi Kasus & Deployment</div>
+          <div class="session-sub">Studi kasus penerapan AI di industri; deploy model sederhana sebagai aplikasi web menggunakan Streamlit</div>
         </div>
         <span class="session-tag tag-praktik">Praktik</span>
       </div>
@@ -350,8 +350,8 @@
       <div class="session-item" data-sesi="10" data-href="sesi/sesi-10.html" data-tag="praktik">
         <div class="session-num">P-10</div>
         <div>
-          <div class="session-title">RAG — Chatbot Berbasis Dokumen</div>
-          <div class="session-sub">Vector database, embedding, LangChain dasar; membangun chatbot dokumen perusahaan</div>
+          <div class="session-title">RAG Part 1: Embedding & Vector Database</div>
+          <div class="session-sub">Konsep embedding, vector database, LangChain dasar</div>
         </div>
         <span class="session-tag tag-praktik">Praktik</span>
       </div>
@@ -359,8 +359,8 @@
       <div class="session-item" data-sesi="11" data-href="sesi/sesi-11.html" data-tag="praktik">
         <div class="session-num">P-11</div>
         <div>
-          <div class="session-title">AI untuk Prediksi & Rekomendasi Bisnis</div>
-          <div class="session-sub">Demand forecasting, recommendation system (collaborative filtering), customer segmentation</div>
+          <div class="session-title">RAG Part 2 & AI untuk Prediksi/Rekomendasi Bisnis</div>
+          <div class="session-sub">Menyelesaikan chatbot berbasis dokumen (lanjutan P10); pengantar: demand forecasting, recommendation system, customer segmentation</div>
         </div>
         <span class="session-tag tag-praktik">Praktik</span>
       </div>
@@ -368,8 +368,8 @@
       <div class="session-item" data-sesi="12" data-href="sesi/sesi-12.html" data-tag="teori">
         <div class="session-num">P-12</div>
         <div>
-          <div class="session-title">Computer Vision untuk Industri & AI Ethics</div>
-          <div class="session-sub">Object detection, OCR, quality control; bias model, responsible AI, regulasi</div>
+          <div class="session-title">Sintesis Etika AI, Regulasi Indonesia & Computer Vision</div>
+          <div class="session-sub">Rekap etika AI; regulasi AI & UU PDP Indonesia; Computer Vision sebagai studi kasus aplikasi bisnis</div>
         </div>
         <span class="session-tag tag-teori">Teori</span>
       </div>
@@ -517,6 +517,16 @@
         </div>
       </div>
 
+      <div class="card book-card">
+        <div class="book-spine" style="background:var(--teal);"></div>
+        <div>
+          <div class="book-title">Dokumentasi Resmi LangChain</div>
+          <div class="book-author">LangChain · python.langchain.com (selalu diperbarui)</div>
+          <span class="book-tag badge badge-teal">Tooling LLM/RAG</span>
+          <p style="font-size:12px;color:var(--text-2);margin-top:var(--s3);line-height:1.6;">Wajib dicek langsung — buku cetak cepat basi untuk tooling LLM/RAG. Digunakan di P9, P10, P11.</p>
+        </div>
+      </div>
+
     </div>
 
     <h3 style="font-size:14px;font-family:var(--mono);color:var(--text-3);letter-spacing:2px;text-transform:uppercase;margin-bottom:var(--s4);">Laporan Industri (Data & Statistik)</h3>
@@ -539,6 +549,31 @@
           <div class="book-author">McKinsey & Company · mckinsey.com (tahunan)</div>
           <span class="book-tag badge badge-amber">Bisnis & Industri</span>
           <p style="font-size:12px;color:var(--text-2);margin-top:var(--s3);line-height:1.6;">Statistik adopsi AI di perusahaan global beserta dampak ekonomi dan tenaga kerja. Digunakan di P1 dan P8.</p>
+        </div>
+      </div>
+
+    </div>
+
+    <h3 style="font-size:14px;font-family:var(--mono);color:var(--text-3);letter-spacing:2px;text-transform:uppercase;margin-bottom:var(--s4);">Regulasi & Etika (Indonesia)</h3>
+    <div class="book-grid">
+
+      <div class="card book-card">
+        <div class="book-spine" style="background:var(--red);"></div>
+        <div>
+          <div class="book-title">UU No. 27 Tahun 2022 tentang Pelindungan Data Pribadi (PDP)</div>
+          <div class="book-author">Pemerintah Republik Indonesia · peraturan.go.id</div>
+          <span class="book-tag" style="background:rgba(240,96,96,0.1);color:var(--red);border:1px solid rgba(240,96,96,0.2);font-family:var(--mono);font-size:10px;padding:2px 8px;border-radius:20px;">Regulasi</span>
+          <p style="font-size:12px;color:var(--text-2);margin-top:var(--s3);line-height:1.6;">Undang-undang perlindungan data pribadi Indonesia. Wajib dibahas di P12 dalam konteks tanggung jawab hukum penggunaan AI.</p>
+        </div>
+      </div>
+
+      <div class="card book-card">
+        <div class="book-spine" style="background:var(--purple);"></div>
+        <div>
+          <div class="book-title">Draf/Rancangan Regulasi AI Indonesia</div>
+          <div class="book-author">Kemenkominfo & BSSN · (terkini)</div>
+          <span class="book-tag" style="background:rgba(155,124,244,0.1);color:var(--purple);border:1px solid rgba(155,124,244,0.2);font-family:var(--mono);font-size:10px;padding:2px 8px;border-radius:20px;">Regulasi</span>
+          <p style="font-size:12px;color:var(--text-2);margin-top:var(--s3);line-height:1.6;">Perkembangan regulasi AI Indonesia yang terus bergerak. Digunakan di P12 untuk konteks kebijakan lokal.</p>
         </div>
       </div>
 
