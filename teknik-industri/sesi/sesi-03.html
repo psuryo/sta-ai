@@ -3,17 +3,76 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>P-03: Praktik AutoML — Klasifikasi & Prediksi dengan Orange · Teknik Industri UKWMS</title>
+<title>P-03: Praktik ML — Klasifikasi & Prediksi dengan Google Colab · Teknik Industri UKWMS</title>
 <link rel="stylesheet" href="../../css/style.css">
 <style>
-  .orange-flow {
+  /* Colab notebook cell */
+  .colab-cell {
+    background: var(--bg-1);
+    border: 1px solid var(--border);
+    border-radius: var(--r2);
+    margin: var(--s3) 0;
+    overflow: hidden;
+  }
+  .cell-header {
+    display: flex;
+    align-items: center;
+    gap: var(--s3);
+    padding: var(--s2) var(--s4);
+    background: var(--bg-2);
+    border-bottom: 1px solid var(--border);
+  }
+  .cell-badge {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-3);
+    min-width: 52px;
+  }
+  .cell-tag {
+    font-size: 11px;
+    color: var(--text-3);
+    padding: 2px 8px;
+    background: var(--bg-1);
+    border-radius: var(--r1);
+    border: 1px solid var(--border);
+  }
+  .cell-code {
+    margin: 0;
+    padding: var(--s4);
+    font-family: var(--mono);
+    font-size: 12.5px;
+    line-height: 1.7;
+    color: var(--text);
+    overflow-x: auto;
+    background: transparent;
+    white-space: pre;
+  }
+  .cell-output {
+    padding: var(--s3) var(--s4);
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--text-2);
+    border-top: 1px solid var(--border);
+    background: var(--bg-2);
+    line-height: 1.6;
+  }
+  .cell-output-label {
+    font-size: 10px;
+    color: var(--text-3);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 4px;
+  }
+
+  /* Notebook flow */
+  .nb-flow {
     display: flex;
     align-items: center;
     gap: var(--s3);
     flex-wrap: wrap;
     margin: var(--s5) 0;
   }
-  .flow-step {
+  .nb-step {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -25,39 +84,12 @@
     min-width: 110px;
     text-align: center;
   }
-  .flow-step-icon { font-size: 22px; }
-  .flow-step-name { font-size: 12px; font-weight: 600; color: var(--text); }
-  .flow-step-sub  { font-size: 10px; color: var(--text-3); font-family: var(--mono); }
+  .nb-step-icon { font-size: 22px; }
+  .nb-step-name { font-size: 12px; font-weight: 600; color: var(--text); }
+  .nb-step-sub  { font-size: 10px; color: var(--text-3); font-family: var(--mono); }
   .flow-arrow { color: var(--text-3); font-size: 18px; flex-shrink: 0; }
 
-  .widget-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: var(--s3);
-    margin: var(--s4) 0;
-  }
-  .widget-card {
-    background: var(--bg-2);
-    border: 1px solid var(--border);
-    border-radius: var(--r2);
-    padding: var(--s4);
-  }
-  .widget-name {
-    font-family: var(--mono);
-    font-size: 12px;
-    color: var(--blue);
-    font-weight: 600;
-    margin-bottom: 4px;
-  }
-  .widget-cat {
-    font-size: 10px;
-    color: var(--text-3);
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    margin-bottom: var(--s2);
-  }
-  .widget-desc { font-size: 12px; color: var(--text-2); line-height: 1.5; }
-
+  /* Step list */
   .step-list {
     counter-reset: step-counter;
     list-style: none;
@@ -94,6 +126,7 @@
     margin-top: 2px;
   }
 
+  /* Metric grid */
   .metric-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -124,6 +157,7 @@
   }
   .metric-when { font-size: 11px; color: var(--text-2); line-height: 1.5; }
 
+  /* Scenario block */
   .scenario-block {
     background: var(--bg-2);
     border: 1px solid var(--border);
@@ -141,6 +175,7 @@
   .scenario-title { font-size: 16px; font-weight: 600; color: var(--text); }
   .scenario-sub { font-size: 12px; color: var(--text-3); font-family: var(--mono); }
 
+  /* Dataset info */
   .dataset-info {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
@@ -188,6 +223,26 @@
     color: var(--teal);
     border: 1px solid rgba(0,201,177,0.3);
   }
+
+  /* Library badges */
+  .lib-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s2);
+    margin: var(--s3) 0;
+  }
+  .lib-badge {
+    font-family: var(--mono);
+    font-size: 12px;
+    padding: 4px 10px;
+    border-radius: var(--r1);
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    color: var(--text-2);
+  }
+  .lib-badge.blue { background: var(--blue-dim); border-color: rgba(74,142,245,0.3); color: var(--blue); }
+  .lib-badge.teal { background: rgba(0,201,177,0.1); border-color: rgba(0,201,177,0.3); color: var(--teal); }
+  .lib-badge.amber { background: rgba(245,180,69,0.1); border-color: rgba(245,180,69,0.3); color: var(--amber); }
 </style>
 </head>
 <body>
@@ -198,7 +253,7 @@
   <ul class="nav-links">
     <li><a href="../index.html">← Beranda</a></li>
     <li><a href="#tujuan" class="active">Tujuan</a></li>
-    <li><a href="#orange">Orange</a></li>
+    <li><a href="#colab">Colab</a></li>
     <li><a href="#klasifikasi">Klasifikasi</a></li>
     <li><a href="#evaluasi">Evaluasi</a></li>
     <li><a href="#tugas">Tugas</a></li>
@@ -214,8 +269,8 @@
       <span>Pertemuan 3</span>
     </div>
     <div class="sesi-num">PERTEMUAN 03 · PRAKTIK</div>
-    <h1 class="sesi-title">Praktik AutoML:<br>Klasifikasi & Prediksi<br><em style="color:var(--teal);">dengan Orange</em></h1>
-    <p style="font-size:15px;color:var(--text-2);max-width:640px;line-height:1.8;">Membangun model prediksi cacat produk dan churn pelanggan menggunakan drag-and-drop di Orange Data Mining — tanpa menulis satu baris kode pun.</p>
+    <h1 class="sesi-title">Praktik ML:<br>Klasifikasi & Prediksi<br><em style="color:var(--teal);">dengan Google Colab</em></h1>
+    <p style="font-size:15px;color:var(--text-2);max-width:640px;line-height:1.8;">Membangun model prediksi kegagalan mesin dan churn pelanggan menggunakan Python di Google Colab — salin kode, jalankan sel per sel, dan interpretasi hasilnya langsung di browser.</p>
     <div class="sesi-meta-row">
       <span class="badge badge-teal">Praktik</span>
       <span class="badge badge-blue">100 menit</span>
@@ -235,200 +290,387 @@
       <h2>Tujuan Pembelajaran</h2>
       <p>Setelah mengikuti pertemuan ini, mahasiswa diharapkan mampu:</p>
       <ol>
-        <li>Menginstal dan menjalankan antarmuka Orange Data Mining dengan benar</li>
-        <li>Membangun alur kerja (workflow) klasifikasi dan regresi menggunakan widget drag-and-drop</li>
-        <li>Memuat dataset industri, melakukan inspeksi awal, dan mengidentifikasi variabel target</li>
-        <li>Melatih model Decision Tree dan k-NN untuk prediksi cacat produk</li>
-        <li>Memahami dan menginterpretasi metrik evaluasi model: akurasi, precision, recall, dan AUC</li>
-        <li>Membandingkan performa dua algoritma berbeda untuk kasus yang sama</li>
+        <li>Membuka Google Colab dan menjalankan sel kode Python secara berurutan</li>
+        <li>Memuat dataset publik dari Kaggle ke dalam DataFrame Pandas di Colab</li>
+        <li>Melakukan eksplorasi data awal (EDA): distribusi fitur, nilai kosong, proporsi kelas target</li>
+        <li>Melatih model Decision Tree dan k-NN menggunakan scikit-learn</li>
+        <li>Mengevaluasi model dengan cross-validation, confusion matrix, dan ROC-AUC</li>
+        <li>Menginterpretasi hasil evaluasi dalam konteks bisnis industri nyata</li>
       </ol>
 
       <div class="callout tip" style="margin-top:var(--s5);">
-        <span class="callout-icon">🛠️</span>
+        <span class="callout-icon">💡</span>
         <div class="callout-body">
-          <p><strong>Persiapan:</strong> Pastikan Orange 3.x sudah terinstal di laptop kamu sebelum sesi dimulai (link instalasi ada di Edlink). Bawa laptop dengan minimal 4GB RAM. Dataset yang digunakan hari ini sudah tersedia di folder <code>resources/P03/</code> di Edlink.</p>
+          <p><strong>Mengapa Google Colab?</strong> Colab berjalan sepenuhnya di browser — tidak perlu instal Python, tidak perlu konfigurasi lokal, tidak perlu laptop bertenaga tinggi. Cukup buka <strong>colab.research.google.com</strong> dengan akun Google, buat notebook baru, dan langsung mulai.</p>
+        </div>
+      </div>
+
+      <div class="callout info" style="margin-top:var(--s3);">
+        <span class="callout-icon">📋</span>
+        <div class="callout-body">
+          <p><strong>Persiapan:</strong> Bawa laptop dengan koneksi internet dan akun Google aktif. Dataset diunduh dari Kaggle — link ada di Edlink. Kamu tidak perlu memahami semua kode yang berjalan; fokus pada <em>apa yang dilakukan</em> setiap sel dan <em>bagaimana membaca outputnya</em>.</p>
         </div>
       </div>
     </div>
 
-    <!-- ORANGE INTRO -->
-    <div class="content-block" id="orange">
-      <h2>1. Mengenal Orange Data Mining</h2>
-      <p>Orange adalah platform machine learning visual berbasis Python yang dikembangkan oleh Universitas Ljubljana, Slovenia. Filosofinya sederhana: semua langkah analisis data — dari loading, preprocessing, modeling, hingga evaluasi — dilakukan dengan menyambungkan widget secara visual di kanvas.</p>
+    <!-- COLAB INTRO -->
+    <div class="content-block" id="colab">
+      <h2>1. Mengenal Google Colab</h2>
+      <p>Google Colab (Colaboratory) adalah lingkungan notebook berbasis cloud yang memungkinkan kamu menulis dan menjalankan kode Python langsung di browser. Setiap dokumen terdiri dari <strong>sel</strong> — kamu menjalankan sel satu per satu menggunakan <kbd>Shift + Enter</kbd>, dan outputnya langsung muncul di bawah sel tersebut.</p>
 
       <div class="callout info" style="margin-bottom:var(--s5);">
-        <span class="callout-icon">💡</span>
+        <span class="callout-icon">🎯</span>
         <div class="callout-body">
-          <p><strong>Mengapa Orange untuk TI?</strong> Sebagai insinyur industri, tugas kamu bukan menulis kode ML dari nol — melainkan memahami masalah, memilih metode yang tepat, dan menginterpretasi hasilnya. Orange memungkinkan kamu melakukan semua ini tanpa barrier pemrograman.</p>
+          <p><strong>Mengapa ini relevan untuk TI?</strong> Sebagai insinyur industri, kamu tidak perlu menjadi programmer — tapi kamu perlu bisa <em>membaca dan memodifikasi</em> kode analitik, serta <em>menginterpretasi outputnya</em>. Colab memungkinkan kamu melakukan itu semua tanpa setup yang rumit.</p>
         </div>
       </div>
 
-      <h3>Alur Kerja Standar di Orange</h3>
-      <div class="orange-flow">
-        <div class="flow-step">
-          <span class="flow-step-icon">📁</span>
-          <span class="flow-step-name">File / CSV</span>
-          <span class="flow-step-sub">Load data</span>
+      <h3>Alur Kerja Notebook</h3>
+      <div class="nb-flow">
+        <div class="nb-step">
+          <span class="nb-step-icon">📦</span>
+          <span class="nb-step-name">Import</span>
+          <span class="nb-step-sub">Cell 1</span>
         </div>
         <span class="flow-arrow">→</span>
-        <div class="flow-step">
-          <span class="flow-step-icon">🔍</span>
-          <span class="flow-step-name">Data Table</span>
-          <span class="flow-step-sub">Inspeksi awal</span>
+        <div class="nb-step">
+          <span class="nb-step-icon">📁</span>
+          <span class="nb-step-name">Load Data</span>
+          <span class="nb-step-sub">Cell 2</span>
         </div>
         <span class="flow-arrow">→</span>
-        <div class="flow-step">
-          <span class="flow-step-icon">⚙️</span>
-          <span class="flow-step-name">Preprocess</span>
-          <span class="flow-step-sub">Bersihkan data</span>
+        <div class="nb-step">
+          <span class="nb-step-icon">🔍</span>
+          <span class="nb-step-name">EDA</span>
+          <span class="nb-step-sub">Cell 3–4</span>
         </div>
         <span class="flow-arrow">→</span>
-        <div class="flow-step">
-          <span class="flow-step-icon">🧪</span>
-          <span class="flow-step-name">Test & Score</span>
-          <span class="flow-step-sub">Cross-validation</span>
+        <div class="nb-step">
+          <span class="nb-step-icon">⚙️</span>
+          <span class="nb-step-name">Preprocess</span>
+          <span class="nb-step-sub">Cell 5</span>
         </div>
         <span class="flow-arrow">→</span>
-        <div class="flow-step">
-          <span class="flow-step-icon">📊</span>
-          <span class="flow-step-name">Confusion Matrix</span>
-          <span class="flow-step-sub">Evaluasi hasil</span>
+        <div class="nb-step">
+          <span class="nb-step-icon">🧠</span>
+          <span class="nb-step-name">Train</span>
+          <span class="nb-step-sub">Cell 6</span>
         </div>
         <span class="flow-arrow">→</span>
-        <div class="flow-step">
-          <span class="flow-step-icon">📈</span>
-          <span class="flow-step-name">ROC Curve</span>
-          <span class="flow-step-sub">AUC analysis</span>
+        <div class="nb-step">
+          <span class="nb-step-icon">📈</span>
+          <span class="nb-step-name">Evaluasi</span>
+          <span class="nb-step-sub">Cell 7–8</span>
         </div>
       </div>
 
-      <h3>Widget-widget Penting di Orange</h3>
-      <div class="widget-grid">
-        <div class="widget-card">
-          <div class="widget-name">File</div>
-          <div class="widget-cat">Data · Input</div>
-          <div class="widget-desc">Memuat dataset dari CSV, Excel, atau format lainnya ke dalam workflow Orange.</div>
+      <h3>Library yang Digunakan</h3>
+      <div class="lib-list">
+        <span class="lib-badge blue">pandas</span>
+        <span class="lib-badge blue">numpy</span>
+        <span class="lib-badge teal">scikit-learn</span>
+        <span class="lib-badge amber">matplotlib</span>
+        <span class="lib-badge amber">seaborn</span>
+      </div>
+      <p style="font-size:13px;color:var(--text-2);margin-top:var(--s3);">Semua library di atas sudah tersedia di Google Colab — <strong>tidak perlu install manual</strong>. Cukup import di awal notebook.</p>
+
+      <h3>Cell Pertama — Setup Awal</h3>
+      <p style="font-size:14px;color:var(--text-2);">Buat notebook baru di Colab (<em>File → New Notebook</em>), lalu salin dan jalankan sel berikut:</p>
+
+      <div class="colab-cell">
+        <div class="cell-header">
+          <span class="cell-badge">In [1]</span>
+          <span class="cell-tag">Setup — Import Library</span>
         </div>
-        <div class="widget-card">
-          <div class="widget-name">Data Table</div>
-          <div class="widget-cat">Data · Visualize</div>
-          <div class="widget-desc">Menampilkan data dalam bentuk tabel, memeriksa tipe variabel dan nilai yang hilang.</div>
-        </div>
-        <div class="widget-card">
-          <div class="widget-name">Distributions</div>
-          <div class="widget-cat">Visualize · EDA</div>
-          <div class="widget-desc">Menampilkan distribusi setiap fitur — histogram dan bar chart otomatis sesuai tipe data.</div>
-        </div>
-        <div class="widget-card">
-          <div class="widget-name">Scatter Plot</div>
-          <div class="widget-cat">Visualize · EDA</div>
-          <div class="widget-desc">Korelasi antar dua variabel numerik, dapat diwarnai berdasarkan kelas target.</div>
-        </div>
-        <div class="widget-card">
-          <div class="widget-name">Preprocess</div>
-          <div class="widget-cat">Data · Transform</div>
-          <div class="widget-desc">Normalisasi, imputasi nilai kosong, encoding kategori — semua dalam satu widget.</div>
-        </div>
-        <div class="widget-card">
-          <div class="widget-name">Decision Tree</div>
-          <div class="widget-cat">Model · Classify</div>
-          <div class="widget-desc">Algoritma berbasis aturan IF-THEN yang mudah diinterpretasi — cocok untuk kasus industri.</div>
-        </div>
-        <div class="widget-card">
-          <div class="widget-name">k-NN</div>
-          <div class="widget-cat">Model · Classify</div>
-          <div class="widget-desc">k-Nearest Neighbors — mengklasifikasi berdasarkan kemiripan dengan data historis terdekat.</div>
-        </div>
-        <div class="widget-card">
-          <div class="widget-name">Test and Score</div>
-          <div class="widget-cat">Evaluate</div>
-          <div class="widget-desc">Menjalankan cross-validation pada satu atau beberapa model sekaligus dan menampilkan metrik.</div>
-        </div>
-        <div class="widget-card">
-          <div class="widget-name">Confusion Matrix</div>
-          <div class="widget-cat">Evaluate · Visual</div>
-          <div class="widget-desc">Matriks TP, TN, FP, FN — menampilkan di mana model salah dan benar dalam klasifikasi.</div>
+        <pre class="cell-code">import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+from sklearn.tree import DecisionTreeClassifier, plot_tree, export_text
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.preprocessing import StandardScaler, LabelEncoder
+from sklearn.model_selection import cross_val_score, StratifiedKFold, train_test_split
+from sklearn.metrics import (classification_report, confusion_matrix,
+                              ConfusionMatrixDisplay, RocCurveDisplay)
+
+print("✓ Semua library berhasil diimport")</pre>
+        <div class="cell-output">
+          <div class="cell-output-label">Output</div>
+          ✓ Semua library berhasil diimport
         </div>
       </div>
 
       <div class="callout warn">
         <span class="callout-icon">⚠️</span>
         <div class="callout-body">
-          <p><strong>Koneksi widget:</strong> Di Orange, setiap widget memiliki titik input (kiri) dan output (kanan). Tarik garis dari output satu widget ke input widget berikutnya. Jika garis berwarna merah, berarti ada ketidakcocokan tipe data — periksa urutan widget dan tipe data yang dikirim.</p>
+          <p><strong>Urutan sel penting:</strong> Di Colab, sel harus dijalankan berurutan dari atas ke bawah. Jika kamu melewati atau menjalankan sel secara acak, kode berikutnya bisa error karena variabel belum terdefinisi. Selalu mulai dari Cell 1 jika ada yang bermasalah.</p>
         </div>
       </div>
     </div>
 
-    <!-- SKENARIO 1: KLASIFIKASI CACAT PRODUK -->
+    <!-- SKENARIO 1: PREDICTIVE MAINTENANCE -->
     <div class="content-block" id="klasifikasi">
-      <h2>2. Skenario A — Klasifikasi Cacat Produk</h2>
+      <h2>2. Skenario A — Prediksi Kegagalan Mesin</h2>
 
       <div class="scenario-block">
         <div class="scenario-header">
-          <span class="scenario-icon">🔍</span>
+          <span class="scenario-icon">⚙️</span>
           <div>
-            <div class="scenario-title">Prediksi Cacat Produk di Lini Produksi</div>
-            <div class="scenario-sub">KASUS NYATA · Quality Control · Manufaktur FMCG</div>
+            <div class="scenario-title">Predictive Maintenance: Kapan Mesin Akan Gagal?</div>
+            <div class="scenario-sub">KASUS NYATA · Predictive Maintenance · Manufaktur</div>
           </div>
         </div>
-        <p style="font-size:14px;color:var(--text-2);line-height:1.8;">Sebuah pabrik FMCG (Fast-Moving Consumer Goods) di Surabaya mengalami tingkat reject produk 4,2% — jauh di atas target 1,5%. Inspektur QC sudah kewalahan memeriksa 15.000 unit per hari secara manual. Manajer produksi memintamu membangun model yang bisa <strong>memprediksi apakah sebuah unit akan cacat</strong> berdasarkan parameter proses produksi yang tercatat di sistem MES.</p>
+        <p style="font-size:14px;color:var(--text-2);line-height:1.8;">Sebuah pabrik manufaktur mencatat parameter operasional mesin secara real-time: suhu udara, suhu proses, kecepatan putar, torsi, dan keausan pahat. Selama ini teknisi hanya melakukan perawatan terjadwal — bukan berdasarkan kondisi aktual mesin. Biaya downtime akibat kerusakan mendadak 3× lebih mahal dari perawatan preventif. Tugasmu: membangun model yang bisa <strong>memprediksi apakah mesin akan gagal berdasarkan parameter sensor</strong>, sehingga perawatan bisa dilakukan tepat waktu.</p>
       </div>
 
-      <h3>Dataset: <code>produk_cacat.csv</code></h3>
-      <p style="font-size:14px;color:var(--text-2);">Dataset berisi 2.400 observasi dari data historis produksi selama 6 bulan terakhir.</p>
+      <h3>Dataset: <code>predictive_maintenance.csv</code></h3>
+      <p style="font-size:14px;color:var(--text-2);">Dataset <strong>AI4I 2020 Predictive Maintenance</strong> — tersedia di Kaggle (<em>Machine Predictive Maintenance Classification</em> oleh shivamb). Berisi 10.000 observasi data sensor mesin yang mensimulasikan kondisi pabrik nyata.</p>
       <div class="dataset-info">
         <div class="dataset-col">
           <div class="dataset-col-label">Fitur Input (X)</div>
           <ul>
-            <li>suhu_mesin</li>
-            <li>tekanan_cetakan</li>
-            <li>kecepatan_ban_berjalan</li>
-            <li>kelembaban_ruangan</li>
-            <li>umur_cetakan_hari</li>
-            <li>shift (pagi/siang/malam)</li>
-            <li>operator_id</li>
+            <li>Type (L/M/H)</li>
+            <li>Air temperature [K]</li>
+            <li>Process temperature [K]</li>
+            <li>Rotational speed [rpm]</li>
+            <li>Torque [Nm]</li>
+            <li>Tool wear [min]</li>
           </ul>
         </div>
         <div class="dataset-col">
           <div class="dataset-col-label">Variabel Target (Y)</div>
           <ul>
-            <li style="background:rgba(0,201,177,0.12);color:var(--teal);border:1px solid rgba(0,201,177,0.3);">status_produk</li>
+            <li style="background:rgba(0,201,177,0.12);color:var(--teal);border:1px solid rgba(0,201,177,0.3);">Machine failure</li>
           </ul>
           <div style="margin-top:var(--s3);font-size:12px;color:var(--text-2);">
-            Nilai: <br>
-            <span class="target-badge">OK</span> — tidak cacat<br>
-            <span style="font-size:11px;padding:2px 8px;border-radius:var(--r1);font-family:var(--mono);font-weight:600;background:rgba(240,96,96,0.1);color:var(--red);border:1px solid rgba(240,96,96,0.3);display:inline-block;margin-top:4px;">CACAT</span> — perlu dibuang/rework
+            Nilai:<br>
+            <span class="target-badge">0</span> — mesin normal<br>
+            <span style="font-size:11px;padding:2px 8px;border-radius:var(--r1);font-family:var(--mono);font-weight:600;background:rgba(240,96,96,0.1);color:var(--red);border:1px solid rgba(240,96,96,0.3);display:inline-block;margin-top:4px;">1</span> — terjadi kegagalan
           </div>
         </div>
         <div class="dataset-col">
           <div class="dataset-col-label">Statistik Dataset</div>
           <ul>
-            <li style="background:transparent;color:var(--text-2);">2.400 baris observasi</li>
-            <li style="background:transparent;color:var(--text-2);">7 fitur input</li>
+            <li style="background:transparent;color:var(--text-2);">10.000 observasi</li>
+            <li style="background:transparent;color:var(--text-2);">6 fitur input</li>
             <li style="background:transparent;color:var(--text-2);">1 target biner</li>
-            <li style="background:transparent;color:var(--text-2);">Kelas OK: 78,4%</li>
-            <li style="background:transparent;color:var(--text-2);">Kelas CACAT: 21,6%</li>
-            <li style="background:transparent;color:var(--text-2);">Nilai kosong: ~3%</li>
+            <li style="background:transparent;color:var(--text-2);">Normal (0): 96,6%</li>
+            <li style="background:transparent;color:var(--text-2);">Gagal (1): 3,4%</li>
+            <li style="background:transparent;color:var(--text-2);">Kelas sangat tidak seimbang!</li>
           </ul>
         </div>
       </div>
 
-      <h3>Langkah Praktik — Bangun Workflow di Orange</h3>
-      <ol class="step-list">
-        <li><strong>Load data:</strong> Buka Orange → seret widget <code>File</code> ke kanvas → klik dua kali → pilih file <code>produk_cacat.csv</code>. Periksa di pojok kanan bawah widget bahwa Orange berhasil membaca 2.400 baris dan 8 kolom.</li>
-        <li><strong>Inspeksi awal:</strong> Sambungkan <code>File</code> → <code>Data Table</code>. Lihat apakah kolom <code>status_produk</code> bertipe "categorical" (bukan numerik). Jika belum, klik kanan kolom tersebut → Set as Target.</li>
-        <li><strong>Distribusi fitur:</strong> Sambungkan <code>File</code> → <code>Distributions</code>. Pilih fitur <code>suhu_mesin</code> dan <code>shift</code> bergantian. Perhatikan apakah ada perbedaan distribusi antara produk OK dan CACAT.</li>
-        <li><strong>Preprocessing:</strong> Sambungkan <code>File</code> → <code>Preprocess</code>. Aktifkan: <em>Impute Missing Values</em> (pilih "Average/Most frequent"), <em>Normalize Features</em>. Ini penting karena k-NN sensitif terhadap skala fitur.</li>
-        <li><strong>Masukkan dua model:</strong> Dari panel kiri kategori "Model", seret <code>Decision Tree</code> dan <code>kNN</code> ke kanvas. Sambungkan keduanya ke output <code>Preprocess</code>.</li>
-        <li><strong>Test dan evaluasi:</strong> Seret widget <code>Test and Score</code> → sambungkan output <code>Preprocess</code> sebagai Data, dan kedua model sebagai Learner. Atur metode ke <em>Cross Validation, k=10 folds</em>. Klik Run.</li>
-        <li><strong>Lihat Confusion Matrix:</strong> Sambungkan <code>Test and Score</code> → <code>Confusion Matrix</code>. Pilih model yang ditampilkan dan amati di mana model salah mengklasifikasi.</li>
-        <li><strong>ROC Curve:</strong> Sambungkan <code>Test and Score</code> → <code>ROC Analysis</code>. Bandingkan kurva AUC Decision Tree vs k-NN pada kelas CACAT.</li>
-      </ol>
+      <h3>Langkah 1 — Unduh & Muat Dataset</h3>
+      <p style="font-size:14px;color:var(--text-2);">Unduh <code>predictive_maintenance.csv</code> dari Kaggle (link di Edlink), lalu upload ke sesi Colab:</p>
+
+      <div class="colab-cell">
+        <div class="cell-header">
+          <span class="cell-badge">In [2]</span>
+          <span class="cell-tag">Load Data — Upload dari lokal</span>
+        </div>
+        <pre class="cell-code">from google.colab import files
+
+# Tombol upload akan muncul — pilih predictive_maintenance.csv
+uploaded = files.upload()
+
+df = pd.read_csv('predictive_maintenance.csv')
+print(f"Dataset dimuat: {df.shape[0]} baris × {df.shape[1]} kolom")
+print(df.head(3))</pre>
+        <div class="cell-output">
+          <div class="cell-output-label">Output</div>
+          Dataset dimuat: 10000 baris × 10 kolom
+        </div>
+      </div>
+
+      <h3>Langkah 2 — Eksplorasi Data Awal (EDA)</h3>
+
+      <div class="colab-cell">
+        <div class="cell-header">
+          <span class="cell-badge">In [3]</span>
+          <span class="cell-tag">EDA — Struktur & Distribusi Kelas</span>
+        </div>
+        <pre class="cell-code"># Tipe data dan nilai kosong
+print(df.dtypes)
+print("\nNilai kosong per kolom:")
+print(df.isnull().sum())
+
+# Distribusi target
+print("\nDistribusi kelas target:")
+vc = df['Machine failure'].value_counts()
+print(vc)
+print(f"\nProporsi kegagalan: {vc[1]/len(df):.1%}")</pre>
+        <div class="cell-output">
+          <div class="cell-output-label">Output (contoh)</div>
+          Distribusi kelas target:<br>
+          0    9661<br>
+          1     339<br>
+          Proporsi kegagalan: 3.4%
+        </div>
+      </div>
+
+      <div class="colab-cell">
+        <div class="cell-header">
+          <span class="cell-badge">In [4]</span>
+          <span class="cell-tag">EDA — Visualisasi Distribusi Fitur</span>
+        </div>
+        <pre class="cell-code">fitur_num = ['Air temperature [K]', 'Process temperature [K]',
+             'Rotational speed [rpm]', 'Torque [Nm]', 'Tool wear [min]']
+
+fig, axes = plt.subplots(2, 3, figsize=(14, 7))
+axes = axes.flatten()
+
+for i, f in enumerate(fitur_num):
+    df[df['Machine failure']==0][f].hist(ax=axes[i], alpha=0.6,
+                                          label='Normal (0)', color='steelblue', bins=30)
+    df[df['Machine failure']==1][f].hist(ax=axes[i], alpha=0.7,
+                                          label='Gagal (1)', color='tomato', bins=30)
+    axes[i].set_title(f, fontsize=9)
+    axes[i].legend(fontsize=8)
+
+axes[-1].set_visible(False)
+plt.suptitle('Distribusi Fitur: Mesin Normal vs Gagal', fontsize=12, fontweight='bold')
+plt.tight_layout()
+plt.show()</pre>
+        <div class="cell-output">
+          <div class="cell-output-label">Output</div>
+          [5 histogram — biru = mesin normal, merah = mesin gagal. Amati perbedaan distribusi Torque dan Tool wear]
+        </div>
+      </div>
+
+      <h3>Langkah 3 — Preprocessing</h3>
+
+      <div class="colab-cell">
+        <div class="cell-header">
+          <span class="cell-badge">In [5]</span>
+          <span class="cell-tag">Preprocessing — Encode & Normalisasi</span>
+        </div>
+        <pre class="cell-code"># Hapus kolom yang tidak relevan (ID dan sub-tipe kegagalan)
+kolom_buang = ['UDI', 'Product ID', 'TWF', 'HDF', 'PWF', 'OSF', 'RNF']
+df_bersih = df.drop(columns=[k for k in kolom_buang if k in df.columns])
+
+# Encode kolom kategorik 'Type' (L/M/H) → angka
+df_bersih['Type'] = LabelEncoder().fit_transform(df_bersih['Type'])
+
+# Pisahkan fitur (X) dan target (y)
+X = df_bersih.drop(columns=['Machine failure'])
+y = df_bersih['Machine failure']
+
+# Normalisasi — wajib untuk k-NN agar semua fitur punya skala sama
+scaler = StandardScaler()
+X_scaled = pd.DataFrame(scaler.fit_transform(X), columns=X.columns)
+
+print("Fitur:", list(X.columns))
+print(f"X: {X_scaled.shape} | y: {y.shape}")
+print(f"Proporsi gagal dalam y: {y.mean():.1%}")</pre>
+        <div class="cell-output">
+          <div class="cell-output-label">Output</div>
+          Fitur: ['Type', 'Air temperature [K]', 'Process temperature [K]', 'Rotational speed [rpm]', 'Torque [Nm]', 'Tool wear [min]']<br>
+          X: (10000, 6) | y: (10000,)<br>
+          Proporsi gagal dalam y: 3.4%
+        </div>
+      </div>
+
+      <h3>Langkah 4 — Latih Model & Evaluasi Cross-Validation</h3>
+
+      <div class="colab-cell">
+        <div class="cell-header">
+          <span class="cell-badge">In [6]</span>
+          <span class="cell-tag">Training — Cross-Validation 10-fold</span>
+        </div>
+        <pre class="cell-code"># Definisikan dua model
+model_dt  = DecisionTreeClassifier(max_depth=5, random_state=42)
+model_knn = KNeighborsClassifier(n_neighbors=5)
+
+# Stratified: setiap fold mempertahankan proporsi kelas yang sama
+cv = StratifiedKFold(n_splits=10, shuffle=True, random_state=42)
+
+print("=== Hasil 10-fold Stratified Cross-Validation ===\n")
+for nama, mdl in [('Decision Tree', model_dt), ('k-NN (k=5)', model_knn)]:
+    auc = cross_val_score(mdl, X_scaled, y, cv=cv, scoring='roc_auc')
+    rec = cross_val_score(mdl, X_scaled, y, cv=cv, scoring='recall')
+    print(f"{nama:20s} | AUC: {auc.mean():.3f} ± {auc.std():.3f}"
+          f" | Recall: {rec.mean():.3f} ± {rec.std():.3f}")</pre>
+        <div class="cell-output">
+          <div class="cell-output-label">Output (contoh)</div>
+          === Hasil 10-fold Stratified Cross-Validation ===<br><br>
+          Decision Tree        | AUC: 0.872 ± 0.023 | Recall: 0.751 ± 0.048<br>
+          k-NN (k=5)           | AUC: 0.841 ± 0.027 | Recall: 0.612 ± 0.061
+        </div>
+      </div>
+
+      <h3>Langkah 5 — Confusion Matrix & Laporan Klasifikasi</h3>
+
+      <div class="colab-cell">
+        <div class="cell-header">
+          <span class="cell-badge">In [7]</span>
+          <span class="cell-tag">Evaluasi — Confusion Matrix</span>
+        </div>
+        <pre class="cell-code">X_train, X_test, y_train, y_test = train_test_split(
+    X_scaled, y, test_size=0.2, stratify=y, random_state=42)
+
+fig, axes = plt.subplots(1, 2, figsize=(12, 4))
+
+for ax, (nama, mdl) in zip(axes, [('Decision Tree', model_dt), ('k-NN (k=5)', model_knn)]):
+    mdl.fit(X_train, y_train)
+    ConfusionMatrixDisplay.from_predictions(
+        y_test, mdl.predict(X_test), ax=ax,
+        display_labels=['Normal', 'Gagal'],
+        colorbar=False, cmap='Blues')
+    ax.set_title(f'Confusion Matrix — {nama}', fontsize=11)
+
+plt.tight_layout()
+plt.show()
+
+# Laporan lengkap Decision Tree
+print("\n=== Laporan Klasifikasi: Decision Tree ===")
+print(classification_report(y_test, model_dt.predict(X_test),
+                             target_names=['Normal', 'Gagal']))</pre>
+        <div class="cell-output">
+          <div class="cell-output-label">Output</div>
+          [2 confusion matrix] + tabel precision/recall/f1 per kelas
+        </div>
+      </div>
+
+      <h3>Langkah 6 — Visualisasi & Aturan Decision Tree</h3>
+
+      <div class="colab-cell">
+        <div class="cell-header">
+          <span class="cell-badge">In [8]</span>
+          <span class="cell-tag">Interpretasi — Plot Pohon Keputusan</span>
+        </div>
+        <pre class="cell-code"># Pohon dangkal agar mudah dibaca (max_depth=3)
+dt_vis = DecisionTreeClassifier(max_depth=3, random_state=42)
+dt_vis.fit(X_train, y_train)
+
+plt.figure(figsize=(20, 8))
+plot_tree(dt_vis,
+          feature_names=list(X.columns),
+          class_names=['Normal', 'Gagal'],
+          filled=True, rounded=True, fontsize=9)
+plt.title('Pohon Keputusan — Prediksi Kegagalan Mesin (max_depth=3)', fontsize=12)
+plt.tight_layout()
+plt.show()
+
+# Aturan dalam format teks
+print(export_text(dt_vis, feature_names=list(X.columns)))</pre>
+        <div class="cell-output">
+          <div class="cell-output-label">Output (contoh aturan)</div>
+          |--- Torque [Nm] &lt;= 46.55<br>
+          |   |--- Tool wear [min] &lt;= 200.50<br>
+          |   |   |--- class: Normal<br>
+          |   |--- Tool wear [min] &gt; 200.50<br>
+          |   |   |--- class: Gagal<br>
+          |--- Torque [Nm] &gt; 46.55<br>
+          |   |--- class: Gagal
+        </div>
+      </div>
 
       <div class="callout tip">
         <span class="callout-icon">🎯</span>
         <div class="callout-body">
-          <p><strong>Fokus pada kelas CACAT:</strong> Dalam konteks QC, biaya <em>false negative</em> (produk cacat lolos = sampai ke konsumen) jauh lebih mahal dari <em>false positive</em> (produk bagus dibuang = kerugian material). Artinya, kita lebih mementingkan <em>Recall</em> untuk kelas CACAT daripada akurasi keseluruhan.</p>
+          <p><strong>Fokus pada Recall kelas Gagal:</strong> Dengan hanya 3,4% data berlabel "Gagal", model yang <em>selalu</em> prediksi Normal akan mencapai 96,6% akurasi — terlihat bagus, tapi 100% kegagalan terlewat. Dalam predictive maintenance, <strong>Recall kelas Gagal</strong> adalah metrik paling kritis: berapa persen kegagalan nyata yang berhasil terdeteksi sebelum terjadi?</p>
         </div>
       </div>
     </div>
@@ -442,63 +684,197 @@
           <span class="scenario-icon">👥</span>
           <div>
             <div class="scenario-title">Prediksi Pelanggan yang Akan Berhenti Berlangganan</div>
-            <div class="scenario-sub">KASUS NYATA · Customer Retention · Industri Distribusi</div>
+            <div class="scenario-sub">KASUS NYATA · Customer Retention · Industri Layanan</div>
           </div>
         </div>
-        <p style="font-size:14px;color:var(--text-2);line-height:1.8;">Perusahaan distributor spare part industri di Jawa Timur kehilangan 12% pelanggan korporat per tahun. Biaya akuisisi pelanggan baru 5× lebih mahal daripada mempertahankan pelanggan lama. Tim sales memintamu membangun model yang bisa <strong>mengidentifikasi pelanggan berisiko tinggi churn</strong> — agar tim bisa melakukan intervensi proaktif sebelum mereka pergi.</p>
+        <p style="font-size:14px;color:var(--text-2);line-height:1.8;">Perusahaan layanan internet mengalami churn 26,5% per tahun. Biaya akuisisi pelanggan baru 5× lebih mahal dari mempertahankan pelanggan lama. Tim marketing memintamu membangun model yang bisa <strong>mengidentifikasi pelanggan berisiko tinggi churn</strong> sebelum mereka pergi — sehingga tim bisa memberikan penawaran retensi yang tepat sasaran, bukan menghamburkan anggaran ke semua pelanggan.</p>
       </div>
 
-      <h3>Dataset: <code>pelanggan_distribusi.csv</code></h3>
+      <h3>Dataset: <code>WA_Fn-UseC_-Telco-Customer-Churn.csv</code></h3>
+      <p style="font-size:14px;color:var(--text-2);">Dataset <strong>Telco Customer Churn</strong> dari IBM Watson Analytics — tersedia di Kaggle (<em>Telco Customer Churn</em> oleh blastchar). Dataset standar industri yang digunakan luas sebagai benchmark churn prediction.</p>
       <div class="dataset-info">
         <div class="dataset-col">
           <div class="dataset-col-label">Fitur Input (X)</div>
           <ul>
-            <li>total_pembelian_6bln</li>
-            <li>frekuensi_order</li>
-            <li>rata_nilai_order</li>
-            <li>hari_sejak_terakhir_order</li>
-            <li>jumlah_keluhan</li>
-            <li>tenure_bulan</li>
-            <li>tipe_kontrak</li>
+            <li>tenure (bulan)</li>
+            <li>MonthlyCharges</li>
+            <li>TotalCharges</li>
+            <li>Contract (type)</li>
+            <li>InternetService</li>
+            <li>PaymentMethod</li>
+            <li>gender + 13 fitur lain</li>
           </ul>
         </div>
         <div class="dataset-col">
           <div class="dataset-col-label">Variabel Target (Y)</div>
           <ul>
-            <li style="background:rgba(0,201,177,0.12);color:var(--teal);border:1px solid rgba(0,201,177,0.3);">churn</li>
+            <li style="background:rgba(0,201,177,0.12);color:var(--teal);border:1px solid rgba(0,201,177,0.3);">Churn</li>
           </ul>
           <div style="margin-top:var(--s3);font-size:12px;color:var(--text-2);">
-            Nilai: <br>
-            <span class="target-badge">0</span> — masih aktif<br>
-            <span style="font-size:11px;padding:2px 8px;border-radius:var(--r1);font-family:var(--mono);font-weight:600;background:rgba(240,96,96,0.1);color:var(--red);border:1px solid rgba(240,96,96,0.3);display:inline-block;margin-top:4px;">1</span> — sudah churn
+            Nilai:<br>
+            <span class="target-badge">No</span> — masih aktif<br>
+            <span style="font-size:11px;padding:2px 8px;border-radius:var(--r1);font-family:var(--mono);font-weight:600;background:rgba(240,96,96,0.1);color:var(--red);border:1px solid rgba(240,96,96,0.3);display:inline-block;margin-top:4px;">Yes</span> — sudah churn
           </div>
         </div>
         <div class="dataset-col">
           <div class="dataset-col-label">Statistik Dataset</div>
           <ul>
-            <li style="background:transparent;color:var(--text-2);">1.800 pelanggan</li>
-            <li style="background:transparent;color:var(--text-2);">7 fitur input</li>
+            <li style="background:transparent;color:var(--text-2);">7.043 pelanggan</li>
+            <li style="background:transparent;color:var(--text-2);">19 fitur input</li>
             <li style="background:transparent;color:var(--text-2);">1 target biner</li>
-            <li style="background:transparent;color:var(--text-2);">Aktif (0): 88,1%</li>
-            <li style="background:transparent;color:var(--text-2);">Churn (1): 11,9%</li>
-            <li style="background:transparent;color:var(--text-2);">Nilai kosong: &lt;1%</li>
+            <li style="background:transparent;color:var(--text-2);">Aktif (No): 73,5%</li>
+            <li style="background:transparent;color:var(--text-2);">Churn (Yes): 26,5%</li>
+            <li style="background:transparent;color:var(--text-2);">Mix numerik + kategorik</li>
           </ul>
         </div>
       </div>
 
-      <h3>Langkah Tambahan — Interpretasi Decision Tree</h3>
-      <ol class="step-list">
-        <li>Ulangi alur workflow Skenario A dengan dataset <code>pelanggan_distribusi.csv</code> dan target kolom <code>churn</code>.</li>
-        <li>Setelah melatih model, sambungkan <code>Decision Tree</code> → <code>Decision Tree Viewer</code>. Visualisasi pohon keputusan akan muncul.</li>
-        <li>Identifikasi <em>root node</em> — fitur apa yang paling pertama digunakan untuk memisahkan data? Ini adalah prediktor terkuat churn.</li>
-        <li>Telusuri path menuju node "Churn = 1". Aturan apa yang terbentuk? Contoh: <em>"Jika hari_sejak_terakhir_order &gt; 60 AND jumlah_keluhan &gt; 2, maka kemungkinan churn 87%"</em></li>
-        <li>Catat 3 aturan IF-THEN terpenting yang dihasilkan pohon. Aturan-aturan ini langsung bisa dikomunikasikan ke tim sales sebagai <em>early warning indicators</em>.</li>
-      </ol>
+      <h3>Langkah 1 — Muat & Bersihkan Data Churn</h3>
+
+      <div class="colab-cell">
+        <div class="cell-header">
+          <span class="cell-badge">In [9]</span>
+          <span class="cell-tag">Load & Clean — Telco Churn</span>
+        </div>
+        <pre class="cell-code"># Upload file dari Kaggle
+uploaded2 = files.upload()   # pilih WA_Fn-UseC_-Telco-Customer-Churn.csv
+df2 = pd.read_csv('WA_Fn-UseC_-Telco-Customer-Churn.csv')
+
+# TotalCharges ada yang berupa spasi — perbaiki
+df2['TotalCharges'] = pd.to_numeric(df2['TotalCharges'], errors='coerce')
+df2.dropna(inplace=True)
+df2.reset_index(drop=True, inplace=True)
+
+# Encode target: Yes → 1, No → 0
+df2['Churn'] = (df2['Churn'] == 'Yes').astype(int)
+
+print(f"Setelah dibersihkan: {df2.shape[0]} baris")
+print(f"Distribusi churn:\n{df2['Churn'].value_counts()}")
+print(f"\nProporsi churn: {df2['Churn'].mean():.1%}")</pre>
+        <div class="cell-output">
+          <div class="cell-output-label">Output</div>
+          Setelah dibersihkan: 7032 baris<br>
+          Distribusi churn:<br>
+          0    5163<br>
+          1    1869<br>
+          Proporsi churn: 26.6%
+        </div>
+      </div>
+
+      <div class="colab-cell">
+        <div class="cell-header">
+          <span class="cell-badge">In [10]</span>
+          <span class="cell-tag">Preprocessing — Encode Kategorik</span>
+        </div>
+        <pre class="cell-code"># Pilih fitur numerik + beberapa kategorik penting
+fitur_num2 = ['tenure', 'MonthlyCharges', 'TotalCharges']
+fitur_kat2 = ['Contract', 'InternetService', 'PaymentMethod',
+              'gender', 'SeniorCitizen', 'Partner', 'Dependents']
+
+# one-hot encoding untuk kategorik
+X2 = pd.get_dummies(df2[fitur_num2 + fitur_kat2], drop_first=True)
+y2 = df2['Churn']
+
+# Normalisasi
+X2_scaled = pd.DataFrame(
+    StandardScaler().fit_transform(X2), columns=X2.columns)
+
+print(f"Fitur setelah encoding: {X2.shape[1]} kolom")
+print(f"Daftar fitur: {list(X2.columns)}")</pre>
+        <div class="cell-output">
+          <div class="cell-output-label">Output</div>
+          Fitur setelah encoding: 12 kolom<br>
+          Daftar fitur: ['tenure', 'MonthlyCharges', 'TotalCharges', ...]
+        </div>
+      </div>
+
+      <h3>Langkah 2 — Bandingkan Dua Model</h3>
+
+      <div class="colab-cell">
+        <div class="cell-header">
+          <span class="cell-badge">In [11]</span>
+          <span class="cell-tag">Cross-Validation — Churn</span>
+        </div>
+        <pre class="cell-code">model_dt2  = DecisionTreeClassifier(max_depth=5, random_state=42)
+model_knn2 = KNeighborsClassifier(n_neighbors=5)
+cv2 = StratifiedKFold(n_splits=10, shuffle=True, random_state=42)
+
+print("=== Hasil 10-fold CV — Prediksi Churn ===\n")
+for nama, mdl in [('Decision Tree', model_dt2), ('k-NN (k=5)', model_knn2)]:
+    auc = cross_val_score(mdl, X2_scaled, y2, cv=cv2, scoring='roc_auc')
+    rec = cross_val_score(mdl, X2_scaled, y2, cv=cv2, scoring='recall')
+    pre = cross_val_score(mdl, X2_scaled, y2, cv=cv2, scoring='precision')
+    print(f"{nama}")
+    print(f"  AUC:       {auc.mean():.3f} ± {auc.std():.3f}")
+    print(f"  Recall:    {rec.mean():.3f} ± {rec.std():.3f}")
+    print(f"  Precision: {pre.mean():.3f} ± {pre.std():.3f}\n")</pre>
+      </div>
+
+      <h3>Langkah 3 — ROC Curve</h3>
+
+      <div class="colab-cell">
+        <div class="cell-header">
+          <span class="cell-badge">In [12]</span>
+          <span class="cell-tag">ROC Curve — Perbandingan Model</span>
+        </div>
+        <pre class="cell-code">X2_tr, X2_te, y2_tr, y2_te = train_test_split(
+    X2_scaled, y2, test_size=0.2, stratify=y2, random_state=42)
+
+fig, ax = plt.subplots(figsize=(8, 6))
+for nama, mdl in [('Decision Tree', model_dt2), ('k-NN (k=5)', model_knn2)]:
+    mdl.fit(X2_tr, y2_tr)
+    RocCurveDisplay.from_estimator(mdl, X2_te, y2_te, ax=ax, name=nama)
+
+ax.plot([0,1],[0,1], 'k--', alpha=0.5, label='Random (AUC=0.5)')
+ax.set_title('ROC Curve — Prediksi Churn Pelanggan', fontsize=12)
+ax.legend(loc='lower right')
+plt.tight_layout()
+plt.show()</pre>
+        <div class="cell-output">
+          <div class="cell-output-label">Output</div>
+          [Grafik ROC Curve — kurva Decision Tree vs k-NN vs garis diagonal acak. AUC yang lebih tinggi = model lebih baik]
+        </div>
+      </div>
+
+      <h3>Langkah 4 — Baca Aturan Decision Tree untuk Tim Marketing</h3>
+
+      <div class="colab-cell">
+        <div class="cell-header">
+          <span class="cell-badge">In [13]</span>
+          <span class="cell-tag">Interpretasi — Aturan IF-THEN</span>
+        </div>
+        <pre class="cell-code"># Pohon dangkal untuk kemudahan interpretasi
+dt_churn = DecisionTreeClassifier(max_depth=3, random_state=42)
+dt_churn.fit(X2_tr, y2_tr)
+
+print("=== Aturan Keputusan — Prediksi Churn ===")
+print(export_text(dt_churn, feature_names=list(X2.columns)))
+
+# Fitur paling berpengaruh
+imp = pd.Series(dt_churn.feature_importances_,
+                index=X2.columns).sort_values(ascending=False)
+print("\n=== Feature Importance (Top 5) ===")
+print(imp.head(5).round(3))</pre>
+        <div class="cell-output">
+          <div class="cell-output-label">Output (contoh)</div>
+          === Aturan Keputusan — Prediksi Churn ===<br>
+          |--- Contract_One year &lt;= 0.50<br>
+          |   |--- tenure &lt;= 15.50<br>
+          |   |   |--- class: 1 (Churn)<br>
+          |   |--- tenure &gt; 15.50<br>
+          |   |   |--- class: 0 (No Churn)<br>
+          <br>
+          === Feature Importance (Top 5) ===<br>
+          tenure               0.421<br>
+          Contract_One year    0.187<br>
+          MonthlyCharges       0.143
+        </div>
+      </div>
 
       <div class="callout info">
         <span class="callout-icon">💼</span>
         <div class="callout-body">
-          <p><strong>Nilai bisnis nyata:</strong> Aturan yang dihasilkan Decision Tree bisa langsung digunakan sebagai trigger otomatis di sistem CRM — misalnya: kirimkan alert ke sales manager ketika pelanggan memenuhi kondisi risiko tinggi, tanpa perlu memahami matematika di balik model.</p>
+          <p><strong>Nilai bisnis nyata:</strong> Aturan yang dihasilkan Decision Tree bisa langsung diterjemahkan menjadi trigger di CRM. Contoh: <em>"Jika pelanggan memiliki kontrak bulan-ke-bulan AND tenure &lt; 16 bulan, masukkan ke segmen high-risk churn dan kirim penawaran diskon perpanjangan kontrak."</em> — tanpa perlu memahami matematika di balik model.</p>
         </div>
       </div>
     </div>
@@ -506,28 +882,28 @@
     <!-- EVALUASI MODEL -->
     <div class="content-block" id="evaluasi">
       <h2>4. Membaca & Menginterpretasi Hasil Evaluasi</h2>
-      <p>Angka yang dihasilkan widget <em>Test and Score</em> hanya bermakna jika kamu memahami apa yang mereka ukur dan dalam konteks apa mereka penting. Berikut empat metrik utama yang akan kamu temui:</p>
+      <p>Angka yang muncul di output cross-validation hanya bermakna jika kamu memahami apa yang mereka ukur dan dalam konteks apa mereka penting. Berikut empat metrik utama yang akan kamu temui:</p>
 
       <div class="metric-grid">
         <div class="metric-card">
           <div class="metric-name">Accuracy</div>
           <div class="metric-formula">(TP + TN) / Total</div>
-          <div class="metric-when">Cocok ketika kelas seimbang. <strong>Menyesatkan</strong> jika kelas sangat tidak seimbang (misal: 95% OK, 5% cacat — model yang selalu prediksi OK sudah 95% akurat).</div>
+          <div class="metric-when">Cocok ketika kelas seimbang. <strong>Menyesatkan</strong> untuk kelas tidak seimbang — model yang selalu prediksi "Normal" sudah 96,6% akurat di data kegagalan mesin.</div>
         </div>
         <div class="metric-card">
           <div class="metric-name">Precision</div>
           <div class="metric-formula">TP / (TP + FP)</div>
-          <div class="metric-when">Dari semua yang diprediksi cacat, berapa yang benar-benar cacat? Penting jika biaya <em>false alarm</em> tinggi (membuang produk bagus).</div>
+          <div class="metric-when">Dari semua yang diprediksi gagal/churn, berapa yang benar? Penting jika biaya <em>false alarm</em> tinggi — mis. menghubungi pelanggan yang tidak akan churn.</div>
         </div>
         <div class="metric-card">
           <div class="metric-name">Recall</div>
           <div class="metric-formula">TP / (TP + FN)</div>
-          <div class="metric-when">Dari semua cacat nyata, berapa yang berhasil terdeteksi? Penting jika biaya <em>missed detection</em> tinggi (cacat lolos ke konsumen).</div>
+          <div class="metric-when">Dari semua kejadian nyata, berapa yang terdeteksi? Penting untuk kegagalan mesin — kegagalan yang terlewat = downtime mahal dan tak terduga.</div>
         </div>
         <div class="metric-card">
           <div class="metric-name">AUC</div>
           <div class="metric-formula">Area under ROC Curve</div>
-          <div class="metric-when">Mengukur kemampuan model membedakan dua kelas di semua threshold. AUC = 1,0 sempurna, AUC = 0,5 sama dengan tebak acak. Metrik terbaik untuk kelas tidak seimbang.</div>
+          <div class="metric-when">Mengukur kemampuan model membedakan dua kelas di semua threshold. AUC = 1,0 sempurna, AUC = 0,5 sama dengan tebakan acak. Metrik terbaik untuk kelas tidak seimbang.</div>
         </div>
       </div>
 
@@ -543,27 +919,27 @@
         </thead>
         <tbody>
           <tr>
+            <td>Prediksi kegagalan mesin</td>
+            <td><strong style="color:var(--teal);">Recall</strong></td>
+            <td>Kegagalan yang tidak terdeteksi = downtime mendadak, biaya perbaikan jauh lebih besar</td>
+            <td>Recall rendah → breakdown tak terduga → downtime produksi, kerusakan sekunder</td>
+          </tr>
+          <tr>
             <td>Deteksi cacat produk QC</td>
             <td><strong style="color:var(--teal);">Recall</strong></td>
             <td>Tidak boleh ada produk cacat yang lolos ke konsumen</td>
-            <td>Recall rendah → recall = produk cacat lolos → komplain pelanggan, recall produk mahal</td>
+            <td>Recall rendah → produk cacat lolos → komplain, recall produk, reputasi rusak</td>
           </tr>
           <tr>
             <td>Prediksi churn pelanggan</td>
             <td><strong style="color:var(--blue);">Recall + Precision</strong></td>
             <td>Seimbangkan: tangkap sebanyak mungkin churn, tapi jangan ganggu pelanggan loyal terlalu sering</td>
-            <td>Precision rendah → sales menghubungi terlalu banyak pelanggan yang tidak akan churn = pemborosan</td>
-          </tr>
-          <tr>
-            <td>Predictive maintenance mesin</td>
-            <td><strong style="color:var(--teal);">Recall</strong></td>
-            <td>Kerusakan mesin yang tidak terdeteksi jauh lebih mahal dari penggantian komponen yang belum rusak</td>
-            <td>Recall rendah → breakdown tak terduga → downtime produksi, kerusakan sekunder</td>
+            <td>Precision rendah → sales menghubungi terlalu banyak non-churner = pemborosan anggaran</td>
           </tr>
           <tr>
             <td>Fraud detection pembayaran</td>
             <td><strong style="color:var(--amber);">Precision</strong></td>
-            <td>Memblokir transaksi sah (false positive) merusak pengalaman pelanggan dan reputasi</td>
+            <td>Memblokir transaksi sah merusak pengalaman pelanggan dan reputasi</td>
             <td>Precision rendah → terlalu banyak transaksi sah diblokir → pelanggan marah, churn</td>
           </tr>
         </tbody>
@@ -572,40 +948,40 @@
       <div class="callout warn" style="margin-top:var(--s5);">
         <span class="callout-icon">⚠️</span>
         <div class="callout-body">
-          <p><strong>Jangan tertipu akurasi tinggi:</strong> Dataset cacat produk kita 78% OK dan 22% CACAT. Model yang selalu memprediksi "OK" akan mendapat akurasi 78% — terlihat bagus, tapi sama sekali tidak berguna karena 100% cacat lolos. Selalu periksa confusion matrix untuk memahami di mana model gagal.</p>
+          <p><strong>Jangan tertipu akurasi tinggi:</strong> Di dataset kegagalan mesin, model yang selalu prediksi "Normal" akan 96,6% akurat — terlihat luar biasa, tapi 100% kegagalan terlewat. Selalu periksa <code>classification_report()</code> dan gunakan AUC atau Recall sebagai metrik utama untuk dataset tidak seimbang.</p>
         </div>
       </div>
     </div>
 
-    <!-- DISKUSI & PERBANDINGAN -->
+    <!-- DISKUSI -->
     <div class="content-block" id="diskusi">
       <h2>5. Diskusi Kelas — Decision Tree vs k-NN</h2>
       <p>Setelah menjalankan kedua model di dua skenario, diskusikan pertanyaan berikut dalam kelompok (5–10 menit):</p>
 
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--s4);margin:var(--s4) 0;">
         <div style="background:var(--bg-2);border:1px solid var(--border);border-radius:var(--r2);padding:var(--s4);">
-          <div style="font-family:var(--mono);font-size:10px;color:var(--blue);letter-spacing:2px;text-transform:uppercase;margin-bottom:var(--s3);">Decision Tree</div>
+          <div style="font-family:var(--mono);font-size:10px;color:var(--blue);letter-spacing:2px;text-transform:uppercase;margin-bottom:var(--s3);">DecisionTreeClassifier</div>
           <ul style="font-size:13px;color:var(--text-2);line-height:1.8;padding-left:var(--s4);">
-            <li>Menghasilkan aturan yang bisa dibaca manusia</li>
+            <li>Menghasilkan aturan IF-THEN yang bisa dibaca manusia</li>
             <li>Mudah dijelaskan ke manajer non-teknis</li>
-            <li>Cepat saat prediksi</li>
-            <li>Rentan overfitting jika pohon terlalu dalam</li>
-            <li>Tidak butuh normalisasi fitur</li>
+            <li>Bisa divisualisasikan dengan <code>plot_tree()</code></li>
+            <li>Rentan overfitting jika <code>max_depth</code> tidak dibatasi</li>
+            <li>Tidak sensitif terhadap skala fitur</li>
           </ul>
         </div>
         <div style="background:var(--bg-2);border:1px solid var(--border);border-radius:var(--r2);padding:var(--s4);">
-          <div style="font-family:var(--mono);font-size:10px;color:var(--purple);letter-spacing:2px;text-transform:uppercase;margin-bottom:var(--s3);">k-Nearest Neighbors</div>
+          <div style="font-family:var(--mono);font-size:10px;color:var(--purple);letter-spacing:2px;text-transform:uppercase;margin-bottom:var(--s3);">KNeighborsClassifier</div>
           <ul style="font-size:13px;color:var(--text-2);line-height:1.8;padding-left:var(--s4);">
             <li>Tidak ada "model" eksplisit — hanya ingat data training</li>
-            <li>Performa baik pada dataset kecil-menengah</li>
+            <li>Performa baik pada dataset bersih ukuran menengah</li>
             <li>Lambat untuk dataset sangat besar</li>
-            <li>Sangat sensitif terhadap skala fitur (harus dinormalisasi)</li>
+            <li>Wajib normalisasi — sangat sensitif terhadap skala fitur</li>
             <li>Sulit dijelaskan mengapa suatu prediksi dibuat</li>
           </ul>
         </div>
       </div>
 
-      <p style="font-size:14px;color:var(--text-2);line-height:1.8;"><strong style="color:var(--text);">Pertanyaan diskusi:</strong> Dari dua skenario yang kamu coba (cacat produk & churn pelanggan), model mana yang lebih baik? Pertimbangkan tidak hanya metrik AUC, tapi juga: siapa yang akan menggunakan hasil prediksi ini? Apakah mereka perlu memahami <em>mengapa</em> model membuat keputusan tertentu?</p>
+      <p style="font-size:14px;color:var(--text-2);line-height:1.8;"><strong style="color:var(--text);">Pertanyaan diskusi:</strong> Dari dua skenario yang kamu coba (kegagalan mesin &amp; churn pelanggan), model mana yang lebih tepat diimplementasikan? Pertimbangkan tidak hanya metrik AUC, tapi juga: siapa yang akan menggunakan hasil prediksi ini? Apakah mereka perlu memahami <em>mengapa</em> model membuat keputusan tertentu?</p>
     </div>
 
     <!-- RINGKASAN & TUGAS -->
@@ -613,11 +989,11 @@
       <h2>Ringkasan Pertemuan Ini</h2>
       <div style="background:var(--bg-2);border:1px solid var(--border);border-radius:var(--r3);padding:var(--s5);">
         <ul>
-          <li>Orange Data Mining memungkinkan membangun model ML lengkap — dari load data hingga evaluasi — tanpa satu baris kode pun</li>
-          <li>Alur standar: File → Preprocess → Model (Decision Tree / kNN) → Test &amp; Score → Confusion Matrix → ROC Analysis</li>
-          <li>Decision Tree menghasilkan aturan IF-THEN yang bisa langsung diterjemahkan menjadi prosedur operasional</li>
-          <li>Pemilihan metrik evaluasi bergantung pada konteks bisnis — Recall lebih penting dari Precision untuk kasus QC dan predictive maintenance</li>
-          <li>Kelas tidak seimbang (imbalanced class) adalah tantangan umum di data industri — akurasi bisa menyesatkan, AUC lebih andal</li>
+          <li>Google Colab memungkinkan menjalankan Python ML di browser — tanpa instalasi, tanpa konfigurasi lokal</li>
+          <li>Alur standar notebook: Import → Load Data → EDA → Preprocess → Train → Cross-Validate → Evaluate</li>
+          <li>scikit-learn menyediakan Decision Tree dan k-NN dalam antarmuka konsisten: <code>.fit()</code>, <code>.predict()</code>, <code>cross_val_score()</code></li>
+          <li>Decision Tree menghasilkan aturan IF-THEN via <code>export_text()</code> yang bisa langsung diterjemahkan menjadi prosedur operasional</li>
+          <li>Kelas tidak seimbang (imbalanced) adalah tantangan umum di data industri — gunakan AUC dan Recall, bukan akurasi keseluruhan</li>
           <li>Setiap prediksi model harus diinterpretasi dalam konteks biaya bisnis: biaya false positive vs false negative berbeda tiap kasus</li>
         </ul>
       </div>
@@ -625,12 +1001,12 @@
       <!-- TASK BOX -->
       <div class="task-box" id="tugas">
         <div class="task-box-title">📋 Tugas Pertemuan Ini</div>
-        <p style="font-size:13px;color:var(--text-2);margin-bottom:var(--s4);">Dikumpulkan sebelum pertemuan ke-4 melalui Edlink. Format: PDF laporan singkat + screenshot workflow Orange.</p>
+        <p style="font-size:13px;color:var(--text-2);margin-bottom:var(--s4);">Dikumpulkan sebelum pertemuan ke-4 melalui Edlink. Format: <strong>link Google Colab notebook</strong> (ubah sharing ke "Anyone with the link can view") + PDF laporan singkat.</p>
         <ol style="font-size:14px;color:var(--text);line-height:2;">
-          <li>Selesaikan kedua workflow Orange (cacat produk & churn pelanggan) dan <strong>screenshot hasil Test and Score</strong> beserta Confusion Matrix untuk masing-masing model. Sertakan dalam laporan.</li>
-          <li>Untuk kasus cacat produk: Decision Tree atau k-NN yang kamu pilih sebagai model final? <strong>Jelaskan alasanmu dalam 100–150 kata</strong>, sertakan angka AUC dan Recall sebagai dasar argumen.</li>
-          <li>Dari Decision Tree Viewer pada kasus churn, <strong>tulis 3 aturan IF-THEN</strong> yang dihasilkan model. Ubah setiap aturan menjadi rekomendasi tindakan nyata yang bisa dilakukan tim sales (contoh: "Hubungi pelanggan dalam 7 hari jika...").</li>
-          <li><em>Opsional (bonus):</em> Coba parameter <em>Maximum depth</em> di Decision Tree widget — ubah dari 3 ke 5 ke 10. Bagaimana dampaknya terhadap akurasi training vs akurasi cross-validation? Fenomena apa yang kamu amati?</li>
+          <li>Selesaikan kedua skenario di Google Colab dan <strong>pastikan semua output terlihat</strong> (confusion matrix, tabel cross-validation, ROC curve). Sertakan link notebook yang bisa diakses dosen.</li>
+          <li>Untuk kasus kegagalan mesin: Decision Tree atau k-NN yang kamu pilih sebagai model final? <strong>Jelaskan dalam 100–150 kata</strong> — sertakan angka AUC dan Recall sebagai dasar argumen, bukan hanya opini.</li>
+          <li>Dari output <code>export_text()</code> pada kasus churn, <strong>tulis 3 aturan IF-THEN</strong> yang dihasilkan model. Ubah setiap aturan menjadi rekomendasi tindakan nyata untuk tim marketing (contoh: "Hubungi pelanggan dalam 7 hari jika kontrak bulanan dan tenure &lt; 16 bulan").</li>
+          <li><em>Opsional (bonus):</em> Ubah parameter <code>max_depth</code> di Decision Tree dari 3 → 5 → 10 → tanpa batas (<code>None</code>). Bandingkan AUC training vs cross-validation. Fenomena apa yang kamu amati? Apa nama fenomena tersebut dalam ML?</li>
         </ol>
       </div>
 
@@ -647,22 +1023,22 @@
         <div class="reading-item">
           <span class="reading-icon">🎥</span>
           <div class="reading-label">
-            <strong>Orange Tutorial Resmi — "Classification" (YouTube)</strong>
-            Playlist "Orange Beginners" di channel resmi orangedatamining — tonton video Classification dan Confusion Matrix (~30 menit total)
-          </div>
-        </div>
-        <div class="reading-item">
-          <span class="reading-icon">🔧</span>
-          <div class="reading-label">
-            <strong>Instal Power BI Desktop</strong>
-            Download gratis dari microsoft.com/power-bi — akan digunakan di P-04 untuk visualisasi data operasional. Pastikan terinstal sebelum pertemuan ke-4.
+            <strong>scikit-learn — "Choosing the right estimator" (dokumentasi resmi)</strong>
+            Baca halaman "Getting Started" dan diagram pemilihan algoritma di scikit-learn.org — membantu kamu memahami kapan menggunakan algoritma apa (~20 menit)
           </div>
         </div>
         <div class="reading-item">
           <span class="reading-icon">📊</span>
           <div class="reading-label">
+            <strong>Kaggle — "Intro to Machine Learning" (free micro-course)</strong>
+            Kursus gratis 3 jam di Kaggle Learn — reinforcement konsep Decision Tree dan evaluasi model yang sudah kita praktikkan hari ini
+          </div>
+        </div>
+        <div class="reading-item">
+          <span class="reading-icon">🔧</span>
+          <div class="reading-label">
             <strong>Eksplorasi Dataset P-04 (di Edlink)</strong>
-            Buka file <code>data_produksi_mentah.xlsx</code> di Excel dan identifikasi: ada berapa kolom kosong? ada nilai yang terlihat tidak wajar? Catat temuanmu — akan didiskusikan di awal P-04.
+            Buka file <code>data_produksi_mentah.xlsx</code> di Excel dan identifikasi: ada berapa kolom kosong? ada nilai yang tidak wajar? Catat temuanmu — akan didiskusikan di awal P-04.
           </div>
         </div>
       </div>
@@ -677,12 +1053,12 @@
       <div class="toc-title">Isi Halaman</div>
       <ul class="toc-list">
         <li><a href="#tujuan" class="active">Tujuan Pembelajaran</a></li>
-        <li><a href="#orange">1. Mengenal Orange</a></li>
-        <li><a href="#klasifikasi">2. Klasifikasi Cacat Produk</a></li>
+        <li><a href="#colab">1. Mengenal Google Colab</a></li>
+        <li><a href="#klasifikasi">2. Kegagalan Mesin</a></li>
         <li><a href="#churn">3. Prediksi Churn</a></li>
         <li><a href="#evaluasi">4. Interpretasi Evaluasi</a></li>
         <li><a href="#diskusi">5. Diskusi Kelas</a></li>
-        <li><a href="#ringkasan">Ringkasan & Tugas</a></li>
+        <li><a href="#ringkasan">Ringkasan &amp; Tugas</a></li>
       </ul>
     </div>
 
@@ -694,9 +1070,9 @@
         <span>P-02: Konsep ML untuk Industri</span>
       </a>
       <div style="font-size:12px;color:var(--text-3);margin-top:var(--s4);padding:var(--s3) 0;border-top:1px solid var(--border);">Sesi berikutnya:</div>
-      <a href="#" class="sesi-nav-btn" style="opacity:0.5;pointer-events:none;">
+      <a href="sesi-04.html" class="sesi-nav-btn">
         <span>→</span>
-        <span>P-04: Data Industri: Pembersihan & Visualisasi</span>
+        <span>P-04: Data Industri: Pembersihan &amp; Visualisasi</span>
       </a>
       <div style="margin-top:var(--s4);padding-top:var(--s4);border-top:1px solid var(--border);">
         <a href="../index.html" class="sesi-nav-btn">
@@ -724,11 +1100,11 @@
         </div>
         <div>
           <div style="font-size:11px;color:var(--text-3);">Tools</div>
-          <div style="font-size:13px;color:var(--text);">Orange Data Mining 3.x</div>
+          <div style="font-size:13px;color:var(--text);">Google Colab · scikit-learn · pandas</div>
         </div>
         <div>
           <div style="font-size:11px;color:var(--text-3);">Dataset</div>
-          <div style="font-size:13px;color:var(--text);">produk_cacat.csv · pelanggan_distribusi.csv</div>
+          <div style="font-size:13px;color:var(--text);">AI4I 2020 Predictive Maintenance · Telco Customer Churn (Kaggle)</div>
         </div>
         <div>
           <div style="font-size:11px;color:var(--text-3);">Referensi Utama</div>
@@ -742,16 +1118,16 @@
       <div style="font-family:var(--mono);font-size:10px;color:var(--text-3);letter-spacing:2px;text-transform:uppercase;margin-bottom:var(--s4);">Algoritma Hari Ini</div>
       <div style="display:flex;flex-direction:column;gap:var(--s4);">
         <div>
-          <div style="font-size:12px;font-weight:600;color:var(--blue);margin-bottom:4px;">Decision Tree</div>
-          <div style="font-size:11px;color:var(--text-2);line-height:1.6;">Membagi data berdasarkan aturan IF-THEN. Mudah diinterpretasi, cocok untuk presentasi ke manajemen.</div>
+          <div style="font-size:12px;font-weight:600;color:var(--blue);margin-bottom:4px;">DecisionTreeClassifier</div>
+          <div style="font-size:11px;color:var(--text-2);line-height:1.6;">Membagi data berdasarkan aturan IF-THEN. Parameter kunci: <code>max_depth</code> untuk mencegah overfitting.</div>
         </div>
         <div>
-          <div style="font-size:12px;font-weight:600;color:var(--purple);margin-bottom:4px;">k-NN (k=5)</div>
-          <div style="font-size:11px;color:var(--text-2);line-height:1.6;">Prediksi berdasarkan 5 tetangga terdekat di data historis. Intuitif, tapi perlu normalisasi fitur.</div>
+          <div style="font-size:12px;font-weight:600;color:var(--purple);margin-bottom:4px;">KNeighborsClassifier (k=5)</div>
+          <div style="font-size:11px;color:var(--text-2);line-height:1.6;">Prediksi berdasarkan 5 tetangga terdekat. Wajib normalisasi fitur sebelum digunakan.</div>
         </div>
         <div style="padding-top:var(--s3);border-top:1px solid var(--border);">
           <div style="font-size:11px;color:var(--text-3);">Cross-validation:</div>
-          <div style="font-size:12px;color:var(--text-2);margin-top:2px;">10-fold CV — data dibagi 10 bagian, model dilatih dan diuji 10 kali, hasilnya dirata-rata. Lebih andal dari single train-test split.</div>
+          <div style="font-size:12px;color:var(--text-2);margin-top:2px;"><code>StratifiedKFold(10)</code> — mempertahankan proporsi kelas di setiap fold, penting untuk data tidak seimbang.</div>
         </div>
       </div>
     </div>
@@ -761,7 +1137,7 @@
 
 <!-- ══ FOOTER ══ -->
 <footer class="footer">
-  <div>AI·UKWMS <span style="color:var(--text-3);">· P-03 Praktik AutoML: Klasifikasi & Prediksi dengan Orange — Teknik Industri</span></div>
+  <div>AI·UKWMS <span style="color:var(--text-3);">· P-03 Praktik ML: Klasifikasi &amp; Prediksi dengan Google Colab — Teknik Industri</span></div>
   <div><a href="../index.html" style="color:var(--text-3);">← Kembali ke Beranda TI</a></div>
 </footer>
 
