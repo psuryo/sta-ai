@@ -392,6 +392,9 @@ numpy  : 1.x.x
 <span class="c-kw">import</span> matplotlib.pyplot <span class="c-kw">as</span> plt
 <span class="c-kw">import</span> seaborn <span class="c-kw">as</span> sns
 
+<span class="c-comment"> # Tombol upload akan muncul — pilih telco_churn.csv</span>
+uploaded = files.upload()
+        
 <span class="c-comment"># Load dataset</span>
 df = pd.<span class="c-fn">read_csv</span>(<span class="c-str">"telco_churn.csv"</span>)
 
