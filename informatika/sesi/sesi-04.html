@@ -409,7 +409,7 @@
         <span class="code-label-name">01_train_and_save.py</span>
         <span class="code-label-badge">Training + Save</span>
       </div>
-      <div class="code-block"><span class="c-kw">import</span> pandas <span class="c-kw">as</span> pd
+      <div class="code-block"><pre><code><span class="c-kw">import</span> pandas <span class="c-kw">as</span> pd
 <span class="c-kw">import</span> joblib
 <span class="c-kw">from</span> sklearn.ensemble <span class="c-kw">import</span> <span class="c-cls">RandomForestClassifier</span>
 <span class="c-kw">from</span> sklearn.model_selection <span class="c-kw">import</span> <span class="c-fn">train_test_split</span>
@@ -448,7 +448,7 @@ joblib.<span class="c-fn">dump</span>(pipeline, <span class="c-str">"churn_model
 <span class="c-fn">print</span>(<span class="c-str">"Model disimpan ke churn_model.pkl"</span>)
 
 <span class="c-comment"># Simpan juga daftar nama fitur agar konsisten saat prediksi</span>
-joblib.<span class="c-fn">dump</span>(FEATURES, <span class="c-str">"feature_names.pkl"</span>)
+joblib.<span class="c-fn">dump</span>(FEATURES, <span class="c-str">"feature_names.pkl"</span>)</code></pre>
 </div>
 
       <div class="callout warn">
