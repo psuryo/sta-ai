@@ -469,12 +469,12 @@ joblib.<span class="c-fn">dump</span>(FEATURES, <span class="c-str">"feature_nam
         <span class="code-label-name">struktur folder</span>
         <span class="code-label-badge">Project Layout</span>
       </div>
-      <div class="code-block"><span class="c-comment">churn-app/</span>
+      <div class="code-block"><pre><span class="c-comment">churn-app/</span>
 ├── app.py               <span class="c-comment"># file utama Streamlit</span>
 ├── churn_model.pkl      <span class="c-comment"># model yang sudah dilatih</span>
 ├── feature_names.pkl    <span class="c-comment"># nama fitur</span>
 ├── requirements.txt     <span class="c-comment"># daftar dependensi</span>
-└── README.md</div>
+└── README.md</pre></div>
 
       <h3 style="margin-top:var(--s5);">App Lengkap — Prediksi Churn Pelanggan</h3>
 
@@ -482,7 +482,7 @@ joblib.<span class="c-fn">dump</span>(FEATURES, <span class="c-str">"feature_nam
         <span class="code-label-name">app.py</span>
         <span class="code-label-badge">Streamlit App</span>
       </div>
-      <div class="code-block"><span class="c-kw">import</span> streamlit <span class="c-kw">as</span> st
+      <div class="code-block"><pre><code><span class="c-kw">import</span> streamlit <span class="c-kw">as</span> st
 <span class="c-kw">import</span> pandas <span class="c-kw">as</span> pd
 <span class="c-kw">import</span> joblib
 
@@ -544,7 +544,7 @@ col1, col2 = st.<span class="c-fn">columns</span>(<span class="c-num">2</span>)
 
     <span class="c-comment"># Tampilkan data input sebagai tabel</span>
     st.<span class="c-fn">subheader</span>(<span class="c-str">"Data yang Dimasukkan"</span>)
-    st.<span class="c-fn">dataframe</span>(input_data, use_container_width=<span class="c-kw">True</span>, hide_index=<span class="c-kw">True</span>)</div>
+    st.<span class="c-fn">dataframe</span>(input_data, use_container_width=<span class="c-kw">True</span>, hide_index=<span class="c-kw">True</span>)</code></pre></div>
 
       <h3 style="margin-top:var(--s5);">Menjalankan App Secara Lokal</h3>
       <div class="code-label">
