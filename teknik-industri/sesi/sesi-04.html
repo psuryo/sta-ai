@@ -161,6 +161,66 @@
   .kpi-lbl { font-size: 11px; color: var(--text-3); text-transform: uppercase; letter-spacing: 1px; }
 
   .bad-row { background: rgba(240,96,96,0.05); }
+
+  /* ── Python equivalents section ── */
+  .py-compare {
+    display: grid;
+    grid-template-columns: 1fr 1.3fr;
+    gap: 0;
+    border: 1px solid var(--border);
+    border-radius: var(--r2);
+    margin: var(--s3) 0;
+    overflow: hidden;
+  }
+  .py-compare-excel {
+    padding: var(--s4);
+    background: var(--bg-2);
+    border-right: 1px solid var(--border);
+  }
+  .py-compare-python {
+    padding: var(--s4);
+    background: var(--bg-1);
+  }
+  .py-compare-label {
+    font-size: 10px;
+    font-family: var(--mono);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-bottom: var(--s3);
+    font-weight: 600;
+  }
+  .py-compare-excel .py-compare-label { color: var(--amber); }
+  .py-compare-python .py-compare-label { color: var(--blue); }
+  .py-compare-excel p {
+    font-size: 12px;
+    color: var(--text-2);
+    line-height: 1.7;
+    margin: 0;
+  }
+  pre.py-code {
+    margin: 0;
+    font-size: 12px;
+    font-family: var(--mono);
+    color: var(--text-2);
+    white-space: pre;
+    overflow-x: auto;
+    line-height: 1.75;
+    background: none;
+  }
+  .py-step-wrap {
+    border-bottom: 1px solid var(--border);
+    padding-bottom: var(--s5);
+    margin-bottom: var(--s5);
+  }
+  .py-step-wrap:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+  .py-step-header {
+    display: flex;
+    align-items: center;
+    gap: var(--s3);
+    margin-bottom: var(--s3);
+  }
+  .py-step-header .step-badge { margin-top: 0; }
+  .py-step-title { font-size: 13px; font-weight: 600; color: var(--text); }
 </style>
 </head>
 <body>
@@ -173,6 +233,7 @@
     <li><a href="#tujuan" class="active">Tujuan</a></li>
     <li><a href="#masalah">Masalah Data</a></li>
     <li><a href="#cleaning">Pembersihan</a></li>
+    <li><a href="#python">Python</a></li>
     <li><a href="#visualisasi">Visualisasi</a></li>
     <li><a href="#tugas">Tugas</a></li>
   </ul>
@@ -485,6 +546,239 @@
       <p style="font-size:12px;color:var(--text-3);margin-top:-var(--s3);">* Angka di atas adalah estimasi untuk dataset <code>data_produksi_mentah.xlsx</code> — hasilmu bisa berbeda tergantung temuan masing-masing.</p>
     </div>
 
+    <!-- PYTHON EQUIVALENT -->
+    <div class="content-block" id="python">
+      <h2>Ekuivalen Python: Data Cleaning dengan Pandas <span class="badge badge-teal" style="vertical-align:middle;font-size:11px;margin-left:6px;">Bonus</span></h2>
+      <p>Setiap langkah Excel yang sudah kamu pelajari punya padanannya di Python. Memahami keduanya membuat kamu lebih efektif — kamu tahu <em>apa</em> yang dilakukan kode, bukan sekadar menyalin tanpa mengerti.</p>
+
+      <div class="callout info" style="margin-bottom:var(--s5);">
+        <span class="callout-icon">🐍</span>
+        <div class="callout-body">
+          <p><strong>Jalankan di Google Colab</strong> — buka <strong>colab.research.google.com</strong>, upload <code>data_produksi_mentah.xlsx</code> ke sesi Colab (ikon folder → upload), lalu ikuti kode di bawah secara berurutan. Semua library sudah tersedia di Colab tanpa instalasi tambahan.</p>
+        </div>
+      </div>
+
+      <!-- Langkah 0 -->
+      <div class="py-step-wrap">
+        <div class="py-step-header">
+          <span class="step-badge badge-remove">AUDIT</span>
+          <span class="py-step-title">Langkah 0 — Audit Data Sebelum Menyentuh Apapun</span>
+        </div>
+        <div class="py-compare">
+          <div class="py-compare-excel">
+            <div class="py-compare-label">Di Excel</div>
+            <p>Ctrl+End untuk lihat ukuran dataset, COUNTA per kolom untuk cek isi, scroll manual untuk kenali struktur kolom.</p>
+          </div>
+          <div class="py-compare-python">
+            <div class="py-compare-label">Di Python (Pandas)</div>
+<pre class="py-code">import pandas as pd
+
+df = pd.read_excel("data_produksi_mentah.xlsx",
+                   sheet_name="Produksi")
+
+print(df.shape)          # (baris, kolom)
+print(df.dtypes)         # tipe data tiap kolom
+print(df.isnull().sum()) # jumlah missing per kolom
+print(df.duplicated().sum()) # jumlah baris duplikat
+df.head(10)              # preview 10 baris pertama</pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- Langkah 1 -->
+      <div class="py-step-wrap">
+        <div class="py-step-header">
+          <span class="step-badge badge-remove">HAPUS</span>
+          <span class="py-step-title">Langkah 1 — Hapus Duplikasi</span>
+        </div>
+        <div class="py-compare">
+          <div class="py-compare-excel">
+            <div class="py-compare-label">Di Excel</div>
+            <p>Data → Remove Duplicates → pilih kolom kunci ID_Produksi. Catat berapa duplikat ditemukan dan dihapus.</p>
+          </div>
+          <div class="py-compare-python">
+            <div class="py-compare-label">Di Python (Pandas)</div>
+<pre class="py-code"># Duplikat berdasarkan semua kolom
+print(f"Duplikat penuh: {df.duplicated().sum()}")
+df = df.drop_duplicates()
+
+# Duplikat berdasarkan ID_Produksi saja
+dup = df[df.duplicated("ID_Produksi", keep=False)]
+print(f"ID duplikat: {len(dup)} baris")
+
+# Simpan satu baris per ID
+df = df.drop_duplicates(subset="ID_Produksi",
+                        keep="first")
+print(f"Sisa: {len(df)} baris")</pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- Langkah 2 -->
+      <div class="py-step-wrap">
+        <div class="py-step-header">
+          <span class="step-badge badge-fill">ISI</span>
+          <span class="py-step-title">Langkah 2 — Tangani Missing Values</span>
+        </div>
+        <div class="py-compare">
+          <div class="py-compare-excel">
+            <div class="py-compare-label">Di Excel</div>
+            <p>Ctrl+H → Find kosong → Replace dengan nilai statistik (AVERAGE/MEDIAN) atau "Tidak Diketahui". Hapus baris jika kolom kritis kosong.</p>
+          </div>
+          <div class="py-compare-python">
+            <div class="py-compare-label">Di Python (Pandas)</div>
+<pre class="py-code"># Proporsi missing per kolom (%)
+missing_pct = df.isnull().mean().mul(100).round(1)
+print(missing_pct[missing_pct &gt; 0])
+
+# Isi kolom numerik dengan nilai median
+num_cols = ["Target_Produksi", "Realisasi_Produksi",
+            "Downtime_Menit",  "Kualitas_Persen"]
+df[num_cols] = df[num_cols].fillna(
+    df[num_cols].median())
+
+# Hapus baris jika kolom kritis masih kosong
+df = df.dropna(subset=["Tanggal", "ID_Mesin"])</pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- Langkah 3 -->
+      <div class="py-step-wrap">
+        <div class="py-step-header">
+          <span class="step-badge badge-fix">FORMAT</span>
+          <span class="py-step-title">Langkah 3 — Standardisasi Format &amp; Konsistensi</span>
+        </div>
+        <div class="py-compare">
+          <div class="py-compare-excel">
+            <div class="py-compare-label">Di Excel</div>
+            <p>TEXT(A2,"YYYY-MM-DD") untuk tanggal. TRIM(UPPER(A2)) untuk standarisasi teks. Paste Special → Values setelah formula.</p>
+          </div>
+          <div class="py-compare-python">
+            <div class="py-compare-label">Di Python (Pandas)</div>
+<pre class="py-code"># Tanggal: parsing otomatis berbagai format
+df["Tanggal"] = pd.to_datetime(
+    df["Tanggal"], dayfirst=True, errors="coerce")
+
+# Shift: hapus spasi + title-case (Pagi/Siang/Malam)
+df["Shift"] = df["Shift"].str.strip().str.title()
+
+# Produk &amp; ID_Mesin: strip spasi + uppercase
+df["Produk"]   = df["Produk"].str.strip().str.upper()
+df["ID_Mesin"] = df["ID_Mesin"].str.strip().str.upper()
+
+# Validasi: cek nilai unik setelah standarisasi
+print(df["Shift"].unique())
+print(df["ID_Mesin"].unique())</pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- Langkah 4 -->
+      <div class="py-step-wrap">
+        <div class="py-step-header">
+          <span class="step-badge badge-flag">FLAG</span>
+          <span class="py-step-title">Langkah 4 — Identifikasi &amp; Tangani Outlier</span>
+        </div>
+        <div class="py-compare">
+          <div class="py-compare-excel">
+            <div class="py-compare-label">Di Excel</div>
+            <p>Conditional Formatting atau formula IQR manual. Tandai sel merah untuk outlier, tambah kolom "flag_outlier" berisi TRUE/FALSE.</p>
+          </div>
+          <div class="py-compare-python">
+            <div class="py-compare-label">Di Python (Pandas)</div>
+<pre class="py-code"># Metode IQR untuk Realisasi_Produksi
+Q1  = df["Realisasi_Produksi"].quantile(0.25)
+Q3  = df["Realisasi_Produksi"].quantile(0.75)
+IQR = Q3 - Q1
+df["flag_outlier_realisasi"] = ~df[
+    "Realisasi_Produksi"].between(
+    Q1 - 1.5*IQR, Q3 + 1.5*IQR)
+
+# Outlier logis: kualitas di luar 0–100
+df["flag_outlier_kualitas"] = (
+    (df["Kualitas_Persen"] &gt; 100) |
+    (df["Kualitas_Persen"] &lt; 0))
+
+# Ringkasan flag
+print(df[["flag_outlier_realisasi",
+          "flag_outlier_kualitas"]].sum())</pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- Langkah 5 -->
+      <div class="py-step-wrap">
+        <div class="py-step-header">
+          <span class="step-badge badge-fix">TIPE</span>
+          <span class="py-step-title">Langkah 5 — Verifikasi Tipe Data</span>
+        </div>
+        <div class="py-compare">
+          <div class="py-compare-excel">
+            <div class="py-compare-label">Di Excel</div>
+            <p>Cek lewat Format Cells — apakah kolom angka tidak tersimpan sebagai teks? Ciri: rata kiri, muncul tanda segitiga hijau di pojok sel.</p>
+          </div>
+          <div class="py-compare-python">
+            <div class="py-compare-label">Di Python (Pandas)</div>
+<pre class="py-code"># Konversi kolom integer (Int64 = nullable int)
+int_cols = ["Target_Produksi", "Realisasi_Produksi",
+            "Waktu_Produksi_Menit", "Downtime_Menit"]
+df[int_cols] = df[int_cols].astype("Int64")
+
+# Kolom kategorikal (hemat memori)
+df["Shift"]  = df["Shift"].astype("category")
+df["Produk"] = df["Produk"].astype("category")
+
+# Verifikasi hasil
+print(df.dtypes)
+print(f"Memori: {df.memory_usage(deep=True).sum()/1024:.1f} KB")</pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- Langkah 6 -->
+      <div class="py-step-wrap">
+        <div class="py-step-header">
+          <span class="step-badge badge-fill">LOG</span>
+          <span class="py-step-title">Langkah 6 — Dokumentasikan &amp; Ekspor</span>
+        </div>
+        <div class="py-compare">
+          <div class="py-compare-excel">
+            <div class="py-compare-label">Di Excel</div>
+            <p>Buat sheet "cleaning_log" secara manual: catat setiap perubahan, jumlah baris terdampak, dan alasan keputusan. Submit file Excel bersih.</p>
+          </div>
+          <div class="py-compare-python">
+            <div class="py-compare-label">Di Python (Pandas)</div>
+<pre class="py-code">cleaning_log = pd.DataFrame([
+  {"Langkah": "Hapus duplikat",
+   "Jumlah": 18, "Kolom": "semua"},
+  {"Langkah": "Isi missing (median)",
+   "Jumlah": 85, "Kolom": "numerik"},
+  {"Langkah": "Hapus missing kritis",
+   "Jumlah": 20, "Kolom": "Tanggal, ID_Mesin"},
+  {"Langkah": "Standarisasi teks",
+   "Jumlah": "–", "Kolom": "Shift, Produk"},
+  {"Langkah": "Flag outlier",
+   "Jumlah": 15, "Kolom": "Realisasi, Kualitas"},
+])
+
+with pd.ExcelWriter("data_produksi_bersih.xlsx") as w:
+    df.to_excel(w, sheet_name="Produksi_Bersih",
+                index=False)
+    cleaning_log.to_excel(w, sheet_name="cleaning_log",
+                          index=False)</pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="callout success" style="margin-top:var(--s5);">
+        <span class="callout-icon">💡</span>
+        <div class="callout-body">
+          <p><strong>Mengapa belajar keduanya?</strong> Excel lebih cepat untuk eksplorasi awal dan komunikasi dengan non-teknis. Python lebih andal untuk dataset besar (&gt;10.000 baris), dapat direproduksi (kode = dokumentasi otomatis), dan mudah diotomasi. Seorang analis industri yang baik tahu kapan memakai yang mana.</p>
+        </div>
+      </div>
+    </div>
+
     <!-- EDA & VISUALISASI -->
     <div class="content-block" id="visualisasi">
       <h2>3. Visualisasi Data dengan Power BI / Looker Studio</h2>
@@ -743,6 +1037,7 @@
           <li>Setiap visualisasi harus menjawab pertanyaan bisnis spesifik, bukan sekadar menampilkan data</li>
           <li>Pilihan chart bergantung pada jenis pertanyaan: perbandingan → bar, tren → line, korelasi → scatter, proporsi → pie/donut, distribusi → box plot</li>
           <li>EDA menghasilkan hipotesis, bukan kesimpulan — korelasi yang ditemukan perlu diverifikasi dengan investigasi domain</li>
+          <li>Setiap langkah Excel punya padanannya di Python/Pandas: <code>drop_duplicates()</code>, <code>fillna()</code>, <code>str.strip()</code>, IQR method, <code>astype()</code> — keduanya saling melengkapi, bukan saling menggantikan</li>
         </ul>
       </div>
 
@@ -803,6 +1098,7 @@
         <li><a href="#tujuan" class="active">Tujuan Pembelajaran</a></li>
         <li><a href="#masalah">1. Masalah Kualitas Data</a></li>
         <li><a href="#cleaning">2. Data Cleaning</a></li>
+        <li><a href="#python" style="color:var(--teal);">↳ Ekuivalen Python</a></li>
         <li><a href="#visualisasi">3. Visualisasi Power BI</a></li>
         <li><a href="#eda">4. Pola dalam EDA</a></li>
         <li><a href="#ringkasan">Ringkasan & Tugas</a></li>
