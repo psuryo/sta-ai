@@ -791,7 +791,7 @@
             <span class="code-label-name">sequential_model.py</span>
             <span class="code-label-badge">Keras</span>
           </div>
-          <div class="code-block"><span class="c-kw">import</span> tensorflow <span class="c-kw">as</span> tf
+          <div class="code-block"><pre><code><span class="c-kw">import</span> tensorflow <span class="c-kw">as</span> tf
 <span class="c-kw">from</span> tensorflow <span class="c-kw">import</span> keras
 
 model = keras.<span class="c-cls">Sequential</span>([
@@ -808,7 +808,7 @@ model.<span class="c-fn">compile</span>(
     metrics=[<span class="c-str">'accuracy'</span>]
 )
 
-model.<span class="c-fn">summary</span>()  <span class="c-comment"># cetak arsitektur</span></div>
+model.<span class="c-fn">summary</span>()  <span class="c-comment"># cetak arsitektur</span></code></pre></div>
         </div>
         <div>
           <h3>Training & Evaluasi</h3>
@@ -817,7 +817,7 @@ model.<span class="c-fn">summary</span>()  <span class="c-comment"># cetak arsit
             <span class="code-label-name">train_evaluate.py</span>
             <span class="code-label-badge">Keras</span>
           </div>
-          <div class="code-block"><span class="c-kw">from</span> tensorflow.keras.callbacks <span class="c-kw">import</span> (
+          <div class="code-block"><pre><code><span class="c-kw">from</span> tensorflow.keras.callbacks <span class="c-kw">import</span> (
     <span class="c-cls">EarlyStopping</span>, <span class="c-cls">ModelCheckpoint</span>
 )
 
@@ -840,7 +840,7 @@ history = model.<span class="c-fn">fit</span>(
 
 <span class="c-comment"># Evaluasi pada test set</span>
 loss, acc = model.<span class="c-fn">evaluate</span>(X_test, y_test)
-<span class="c-fn">print</span>(<span class="c-str">f"Test accuracy: {acc:.4f}"</span>)</div>
+<span class="c-fn">print</span>(<span class="c-str">f"Test accuracy: {acc:.4f}"</span>)</code></pre></div>
         </div>
       </div>
 
@@ -849,7 +849,7 @@ loss, acc = model.<span class="c-fn">evaluate</span>(X_test, y_test)
         <span class="code-label-name">plot_history.py</span>
         <span class="code-label-badge">Keras</span>
       </div>
-      <div class="code-block"><span class="c-kw">import</span> matplotlib.pyplot <span class="c-kw">as</span> plt
+      <div class="code-block"><pre><code><span class="c-kw">import</span> matplotlib.pyplot <span class="c-kw">as</span> plt
 
 fig, axes = plt.<span class="c-fn">subplots</span>(<span class="c-num">1</span>, <span class="c-num">2</span>, figsize=(<span class="c-num">12</span>, <span class="c-num">4</span>))
 
@@ -868,7 +868,7 @@ axes[<span class="c-num">1</span>].<span class="c-fn">set_xlabel</span>(<span cl
 axes[<span class="c-num">1</span>].<span class="c-fn">legend</span>()
 
 plt.<span class="c-fn">tight_layout</span>()
-plt.<span class="c-fn">show</span>()</div>
+plt.<span class="c-fn">show</span>()</code></pre></div>
 
       <div class="callout tip">
         <span class="callout-icon">💡</span>
