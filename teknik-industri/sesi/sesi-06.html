@@ -1,0 +1,1321 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>P-06: Praktik Prediksi Demand & Simulasi Rantai Pasok — Teknik Industri UKWMS</title>
+<link rel="stylesheet" href="../../css/style.css">
+<style>
+  /* Colab notebook cell */
+  .colab-cell {
+    background: var(--bg-1);
+    border: 1px solid var(--border);
+    border-radius: var(--r2);
+    margin: var(--s3) 0;
+    overflow: hidden;
+  }
+  .cell-header {
+    display: flex;
+    align-items: center;
+    gap: var(--s3);
+    padding: var(--s2) var(--s4);
+    background: var(--bg-2);
+    border-bottom: 1px solid var(--border);
+  }
+  .cell-badge {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-3);
+    min-width: 52px;
+  }
+  .cell-tag {
+    font-size: 11px;
+    color: var(--text-3);
+    padding: 2px 8px;
+    background: var(--bg-1);
+    border-radius: var(--r1);
+    border: 1px solid var(--border);
+  }
+  .cell-code {
+    margin: 0;
+    padding: var(--s4);
+    font-family: var(--mono);
+    font-size: 12.5px;
+    line-height: 1.7;
+    color: var(--text);
+    overflow-x: auto;
+    background: transparent;
+    white-space: pre;
+  }
+  .cell-output {
+    padding: var(--s3) var(--s4);
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--text-2);
+    border-top: 1px solid var(--border);
+    background: var(--bg-2);
+    line-height: 1.6;
+  }
+  .cell-output-label {
+    font-size: 10px;
+    color: var(--text-3);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 4px;
+  }
+
+  /* Notebook flow */
+  .nb-flow {
+    display: flex;
+    align-items: center;
+    gap: var(--s3);
+    flex-wrap: wrap;
+    margin: var(--s5) 0;
+  }
+  .nb-step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--s2);
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: var(--r2);
+    padding: var(--s3) var(--s4);
+    min-width: 110px;
+    text-align: center;
+  }
+  .nb-step-icon { font-size: 22px; }
+  .nb-step-name { font-size: 12px; font-weight: 600; color: var(--text); }
+  .nb-step-sub  { font-size: 10px; color: var(--text-3); font-family: var(--mono); }
+  .flow-arrow { color: var(--text-3); font-size: 18px; flex-shrink: 0; }
+
+  /* Dataset info */
+  .dataset-info {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: var(--s3);
+    margin: var(--s4) 0;
+  }
+  .dataset-col {
+    background: var(--bg-1);
+    border: 1px solid var(--border);
+    border-radius: var(--r2);
+    padding: var(--s3) var(--s4);
+  }
+  .dataset-col-label {
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--text-3);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: var(--s2);
+  }
+  .dataset-col ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .dataset-col ul li {
+    font-size: 12px;
+    color: var(--text-2);
+    padding: 3px 6px;
+    background: var(--bg-2);
+    border-radius: var(--r1);
+    font-family: var(--mono);
+  }
+
+  /* Library badges */
+  .lib-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s2);
+    margin: var(--s3) 0;
+  }
+  .lib-badge {
+    font-family: var(--mono);
+    font-size: 12px;
+    padding: 4px 10px;
+    border-radius: var(--r1);
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    color: var(--text-2);
+  }
+  .lib-badge.blue  { background: var(--blue-dim); border-color: rgba(74,142,245,0.3); color: var(--blue); }
+  .lib-badge.teal  { background: rgba(0,201,177,0.1); border-color: rgba(0,201,177,0.3); color: var(--teal); }
+  .lib-badge.amber { background: rgba(245,180,69,0.1); border-color: rgba(245,180,69,0.3); color: var(--amber); }
+
+  /* Scenario block */
+  .scenario-block {
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: var(--r3);
+    padding: var(--s5);
+    margin-bottom: var(--s4);
+  }
+  .scenario-header {
+    display: flex;
+    align-items: center;
+    gap: var(--s3);
+    margin-bottom: var(--s4);
+  }
+  .scenario-icon  { font-size: 28px; }
+  .scenario-title { font-size: 16px; font-weight: 600; color: var(--text); }
+  .scenario-sub   { font-size: 12px; color: var(--text-3); font-family: var(--mono); }
+
+  /* Metrik evaluasi grid */
+  .metric-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--s3);
+    margin: var(--s4) 0;
+  }
+  .metric-card {
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: var(--r2);
+    padding: var(--s4);
+    text-align: center;
+  }
+  .metric-name    { font-family: var(--mono); font-size: 11px; color: var(--text-3); text-transform: uppercase; letter-spacing: 1px; margin-bottom: var(--s2); }
+  .metric-formula { font-size: 13px; color: var(--teal); font-family: var(--mono); margin-bottom: var(--s2); word-break: break-word; }
+  .metric-when    { font-size: 11px; color: var(--text-2); line-height: 1.5; }
+
+  /* Simulasi table */
+  .sim-table-wrap { overflow-x: auto; margin: var(--s4) 0; }
+  .sim-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+  .sim-table th {
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    padding: var(--s3) var(--s4);
+    text-align: left;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-3);
+    letter-spacing: 1px;
+    white-space: nowrap;
+  }
+  .sim-table td {
+    border: 1px solid var(--border);
+    padding: var(--s3) var(--s4);
+    color: var(--text-2);
+    line-height: 1.5;
+    vertical-align: top;
+  }
+  .sim-table tr:hover td { background: var(--bg-2); }
+  .sim-table .good { color: var(--teal); font-weight: 600; }
+  .sim-table .warn { color: var(--amber); }
+  .sim-table .bad  { color: var(--red); }
+</style>
+</head>
+<body>
+
+<!-- ══ NAV ══ -->
+<nav class="nav">
+  <div class="nav-logo">AI<span>·</span>UKWMS</div>
+  <ul class="nav-links">
+    <li><a href="../index.html">← Beranda</a></li>
+    <li><a href="#tujuan" class="active">Tujuan</a></li>
+    <li><a href="#setup">Setup</a></li>
+    <li><a href="#eda">EDA</a></li>
+    <li><a href="#forecasting">Forecasting</a></li>
+    <li><a href="#evaluasi">Evaluasi</a></li>
+    <li><a href="#simulasi">Simulasi Stok</a></li>
+    <li><a href="#tugas">Tugas</a></li>
+  </ul>
+</nav>
+
+<!-- ══ HERO ══ -->
+<header class="sesi-hero" style="--hero-accent: var(--teal);">
+  <div style="max-width:1100px;margin:0 auto;">
+    <div class="sesi-breadcrumb">
+      <a href="../index.html">Kecerdasan Buatan · Teknik Industri</a>
+      <span>›</span>
+      <span>Pertemuan 6</span>
+    </div>
+    <div class="sesi-num" style="color:var(--teal);">PERTEMUAN 06 · PRAKTIK</div>
+    <h1 class="sesi-title">Prediksi Demand<br><em style="color:var(--teal);">&amp; Simulasi Rantai Pasok</em></h1>
+    <p style="font-size:15px;color:var(--text-2);max-width:660px;line-height:1.8;">Membangun model demand forecasting dari data historis penjualan FMCG menggunakan Google Colab — mulai dari eksplorasi pola musiman, perbandingan tiga metode prediksi, hingga simulasi dampaknya terhadap keputusan stok.</p>
+    <div class="sesi-meta-row">
+      <span class="badge badge-teal">Praktik</span>
+      <span class="badge badge-blue">100 menit</span>
+      <span class="badge" style="color:var(--amber);border-color:rgba(245,180,69,0.3);background:rgba(245,180,69,0.08);">CPMK: C2, C3, C4</span>
+    </div>
+  </div>
+</header>
+
+<!-- ══ CONTENT LAYOUT ══ -->
+<div class="content-layout">
+  <main class="content-main">
+
+    <!-- TUJUAN -->
+    <div class="content-block" id="tujuan">
+      <h2>Tujuan Pembelajaran</h2>
+      <p>Setelah mengikuti pertemuan ini, mahasiswa diharapkan mampu:</p>
+      <ol>
+        <li>Memuat dan memvisualisasikan data time series penjualan untuk mengidentifikasi pola tren, musiman, dan anomali</li>
+        <li>Mengimplementasikan Moving Average dan Exponential Smoothing menggunakan Python dan menginterpretasi hasilnya</li>
+        <li>Membangun model forecasting berbasis Random Forest dengan feature engineering untuk data time series</li>
+        <li>Menghitung dan membandingkan akurasi model menggunakan metrik MAPE, MAE, dan RMSE</li>
+        <li>Mensimulasikan dampak akurasi prediksi terhadap keputusan reorder point dan safety stock</li>
+        <li>Mengomunikasikan rekomendasi forecasting kepada pengambil keputusan non-teknis secara ringkas</li>
+      </ol>
+
+      <div class="callout info" style="margin-top:var(--s5);">
+        <span class="callout-icon">🔗</span>
+        <div class="callout-body">
+          <p><strong>Koneksi antar pertemuan:</strong> P-05 membangun pemahaman konseptual tentang demand forecasting dan inventory optimization. Pertemuan ini mengubah konsep tersebut menjadi kode yang bisa dijalankan — dari data mentah penjualan hingga rekomendasi reorder point yang siap disampaikan kepada manajer gudang.</p>
+        </div>
+      </div>
+
+      <div class="callout tip" style="margin-top:var(--s3);">
+        <span class="callout-icon">📦</span>
+        <div class="callout-body">
+          <p><strong>Persiapan:</strong> Unduh <code>penjualan_bulanan.xlsx</code> dari <strong>Google Classroom → Pertemuan 6</strong> sebelum sesi dimulai. Bawa laptop dengan koneksi internet dan akun Google aktif untuk menggunakan Google Colab.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- SETUP -->
+    <div class="content-block" id="setup">
+      <h2>1. Setup Google Colab</h2>
+      <p>Buat notebook baru di <strong>colab.research.google.com</strong> dan jalankan sel-sel berikut secara berurutan. Semua library sudah tersedia di Colab — tidak perlu install manual.</p>
+
+      <h3>Library yang Digunakan</h3>
+      <div class="lib-list">
+        <span class="lib-badge blue">pandas</span>
+        <span class="lib-badge blue">numpy</span>
+        <span class="lib-badge amber">matplotlib</span>
+        <span class="lib-badge amber">seaborn</span>
+        <span class="lib-badge teal">scikit-learn</span>
+        <span class="lib-badge teal">statsmodels</span>
+      </div>
+
+      <h3>Alur Kerja Sesi Ini</h3>
+      <div class="nb-flow">
+        <div class="nb-step">
+          <span class="nb-step-icon">📥</span>
+          <span class="nb-step-name">Load Data</span>
+          <span class="nb-step-sub">Cell 1–2</span>
+        </div>
+        <span class="flow-arrow">→</span>
+        <div class="nb-step">
+          <span class="nb-step-icon">📊</span>
+          <span class="nb-step-name">EDA Time Series</span>
+          <span class="nb-step-sub">Cell 3–5</span>
+        </div>
+        <span class="flow-arrow">→</span>
+        <div class="nb-step">
+          <span class="nb-step-icon">📈</span>
+          <span class="nb-step-name">Forecasting</span>
+          <span class="nb-step-sub">Cell 6–10</span>
+        </div>
+        <span class="flow-arrow">→</span>
+        <div class="nb-step">
+          <span class="nb-step-icon">🎯</span>
+          <span class="nb-step-name">Evaluasi</span>
+          <span class="nb-step-sub">Cell 11–12</span>
+        </div>
+        <span class="flow-arrow">→</span>
+        <div class="nb-step">
+          <span class="nb-step-icon">📦</span>
+          <span class="nb-step-name">Simulasi Stok</span>
+          <span class="nb-step-sub">Cell 13–14</span>
+        </div>
+      </div>
+
+      <h3>Cell 1 — Import Library</h3>
+
+      <div class="colab-cell">
+        <div class="cell-header">
+          <span class="cell-badge">In [1]</span>
+          <span class="cell-tag">Setup — Import Library</span>
+        </div>
+        <pre class="cell-code">import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+import warnings
+warnings.filterwarnings('ignore')
+
+from statsmodels.tsa.holtwinters import ExponentialSmoothing
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.metrics import mean_absolute_error, mean_squared_error
+from sklearn.model_selection import TimeSeriesSplit
+
+plt.rcParams['figure.dpi'] = 110
+plt.rcParams['font.size']   = 10
+
+print("✓ Semua library berhasil diimport")</pre>
+        <div class="cell-output">
+          <div class="cell-output-label">Output</div>
+          ✓ Semua library berhasil diimport
+        </div>
+      </div>
+    </div>
+
+    <!-- EDA -->
+    <div class="content-block" id="eda">
+      <h2>2. Memuat &amp; Mengeksplorasi Data</h2>
+
+      <div class="scenario-block">
+        <div class="scenario-header">
+          <span class="scenario-icon">🧴</span>
+          <div>
+            <div class="scenario-title">Forecasting Penjualan Produk FMCG</div>
+            <div class="scenario-sub">KASUS PRAKTIK · Demand Forecasting · Supply Chain</div>
+          </div>
+        </div>
+        <p style="font-size:14px;color:var(--text-2);line-height:1.8;">Sebuah perusahaan FMCG Indonesia memiliki 3 tahun data penjualan bulanan dari 4 wilayah distribusi: Surabaya, Jakarta, Semarang, dan Makassar. Manajer supply chain kesulitan menentukan berapa banyak stok yang harus dipesan setiap bulan — terlalu banyak berarti biaya penyimpanan tinggi, terlalu sedikit berarti kehilangan penjualan. Tugasmu: membangun model prediksi demand bulanan dan mensimulasikan dampaknya terhadap keputusan pemesanan stok.</p>
+      </div>
+
+      <h3>Dataset: <code>penjualan_bulanan.xlsx</code></h3>
+      <p style="font-size:14px;color:var(--text-2);">Dataset berisi 36 bulan data penjualan produk FMCG dari Google Classroom — unduh sebelum sesi dimulai.</p>
+
+      <div class="dataset-info">
+        <div class="dataset-col">
+          <div class="dataset-col-label">Kolom Dataset</div>
+          <ul>
+            <li>tanggal</li>
+            <li>wilayah</li>
+            <li>volume_terjual</li>
+            <li>harga_satuan</li>
+            <li>total_pendapatan</li>
+            <li>stok_awal</li>
+            <li>stok_akhir</li>
+          </ul>
+        </div>
+        <div class="dataset-col">
+          <div class="dataset-col-label">Konteks Data</div>
+          <ul>
+            <li style="background:transparent;color:var(--text-2);">36 bulan (Jan 2022 – Des 2024)</li>
+            <li style="background:transparent;color:var(--text-2);">4 wilayah distribusi</li>
+            <li style="background:transparent;color:var(--text-2);">144 baris total</li>
+            <li style="background:transparent;color:var(--text-2);">Pola Lebaran kuat</li>
+            <li style="background:transparent;color:var(--text-2);">Tren naik ~8%/tahun</li>
+          </ul>
+        </div>
+        <div class="dataset-col">
+          <div class="dataset-col-label">Target Prediksi</div>
+          <ul>
+            <li style="background:rgba(0,201,177,0.12);color:var(--teal);border:1px solid rgba(0,201,177,0.3);">volume_terjual</li>
+          </ul>
+          <div style="margin-top:var(--s3);font-size:12px;color:var(--text-2);">
+            Horizon prediksi:<br>
+            3 bulan ke depan<br>per wilayah
+          </div>
+        </div>
+      </div>
+
+      <h3>Cell 2 — Muat Dataset</h3>
+
+      <div class="colab-cell">
+        <div class="cell-header">
+          <span class="cell-badge">In [2]</span>
+          <span class="cell-tag">Load Data — Upload dari Google Classroom</span>
+        </div>
+        <pre class="cell-code">from google.colab import files
+
+# Tombol upload akan muncul — pilih penjualan_bulanan.xlsx
+uploaded = files.upload()
+
+df = pd.read_excel('penjualan_bulanan.xlsx', parse_dates=['tanggal'])
+df = df.sort_values('tanggal').reset_index(drop=True)
+
+print(f"Dataset dimuat: {df.shape[0]} baris × {df.shape[1]} kolom")
+print(f"\nPeriode: {df['tanggal'].min().strftime('%b %Y')} s/d {df['tanggal'].max().strftime('%b %Y')}")
+print(f"Wilayah: {df['wilayah'].unique()}")
+print(f"\nPreview data:")
+print(df.head(6).to_string(index=False))</pre>
+        <div class="cell-output">
+          <div class="cell-output-label">Output</div>
+          Dataset dimuat: 144 baris × 7 kolom<br>
+          <br>
+          Periode: Jan 2022 s/d Des 2024<br>
+          Wilayah: ['Surabaya' 'Jakarta' 'Semarang' 'Makassar']<br>
+          <br>
+          Preview data:<br>
+          tanggal   wilayah  volume_terjual  harga_satuan  ...
+        </div>
+      </div>
+
+      <h3>Cell 3 — Statistik Deskriptif per Wilayah</h3>
+
+      <div class="colab-cell">
+        <div class="cell-header">
+          <span class="cell-badge">In [3]</span>
+          <span class="cell-tag">EDA — Ringkasan Statistik</span>
+        </div>
+        <pre class="cell-code">print("=== Statistik Volume Penjualan per Wilayah ===\n")
+ringkasan = df.groupby('wilayah')['volume_terjual'].agg(
+    ['mean', 'std', 'min', 'max', 'sum']
+).round(0).astype(int)
+ringkasan.columns = ['Rata-rata', 'StdDev', 'Min', 'Maks', 'Total']
+print(ringkasan.to_string())
+
+print("\n=== Nilai Kosong ===")
+print(df.isnull().sum())
+
+print("\n=== Tipe Data ===")
+print(df.dtypes)</pre>
+        <div class="cell-output">
+          <div class="cell-output-label">Output (contoh)</div>
+          === Statistik Volume Penjualan per Wilayah ===<br><br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Rata-rata  StdDev  Min   Maks   Total<br>
+          Jakarta       3240      487   2310   4850   116640<br>
+          Makassar      1820      294   1280   2760    65520<br>
+          Semarang      2150      331   1540   3210    77400<br>
+          Surabaya      2890      422   2040   4320   104040
+        </div>
+      </div>
+
+      <h3>Cell 4 — Visualisasi Time Series per Wilayah</h3>
+
+      <div class="colab-cell">
+        <div class="cell-header">
+          <span class="cell-badge">In [4]</span>
+          <span class="cell-tag">EDA — Plot Time Series</span>
+        </div>
+        <pre class="cell-code">wilayah_list = df['wilayah'].unique()
+warna = {'Jakarta': '#4a8ef5', 'Surabaya': '#00c9b1',
+         'Semarang': '#f5b445', 'Makassar': '#f06060'}
+
+fig, axes = plt.subplots(2, 2, figsize=(14, 8), sharex=True)
+axes = axes.flatten()
+
+for i, wil in enumerate(wilayah_list):
+    d = df[df['wilayah'] == wil].set_index('tanggal')
+    axes[i].plot(d.index, d['volume_terjual'],
+                 color=warna[wil], linewidth=2, marker='o', markersize=4)
+    axes[i].set_title(f'Penjualan — {wil}', fontsize=11, fontweight='bold')
+    axes[i].set_ylabel('Unit')
+    axes[i].grid(alpha=0.3)
+    # Tandai bulan Lebaran
+    for yr in [2022, 2023, 2024]:
+        axes[i].axvline(pd.Timestamp(f'{yr}-04-01'), color='orange',
+                        linestyle='--', alpha=0.5, linewidth=1)
+
+axes[0].text(pd.Timestamp('2022-04-05'), axes[0].get_ylim()[1]*0.95,
+             'Lebaran', color='orange', fontsize=8)
+
+plt.suptitle('Volume Penjualan Bulanan per Wilayah\n(garis oranye = bulan Lebaran)',
+             fontsize=13, fontweight='bold')
+plt.tight_layout()
+plt.show()</pre>
+        <div class="cell-output">
+          <div class="cell-output-label">Output</div>
+          [4 plot line chart — satu per wilayah. Amati: lonjakan volume saat Lebaran, tren naik bertahap di Jakarta & Surabaya]
+        </div>
+      </div>
+
+      <h3>Cell 5 — Dekomposisi Tren &amp; Musiman</h3>
+
+      <div class="colab-cell">
+        <div class="cell-header">
+          <span class="cell-badge">In [5]</span>
+          <span class="cell-tag">EDA — Seasonal Decomposition (Surabaya)</span>
+        </div>
+        <pre class="cell-code">from statsmodels.tsa.seasonal import seasonal_decompose
+
+# Fokus pada Surabaya untuk dekomposisi
+d_sby = df[df['wilayah'] == 'Surabaya'].set_index('tanggal')['volume_terjual']
+d_sby.index.freq = 'MS'  # Monthly Start
+
+dekomposisi = seasonal_decompose(d_sby, model='additive', period=12)
+
+fig, (ax1, ax2, ax3, ax4) = plt.subplots(4, 1, figsize=(12, 10))
+dekomposisi.observed.plot(ax=ax1, title='Data Asli', color='#4a8ef5')
+dekomposisi.trend.plot(ax=ax2, title='Komponen Tren', color='#00c9b1')
+dekomposisi.seasonal.plot(ax=ax3, title='Komponen Musiman', color='#f5b445')
+dekomposisi.resid.plot(ax=ax4, title='Residu (Noise)', color='#f06060')
+
+for ax in [ax1, ax2, ax3, ax4]:
+    ax.grid(alpha=0.3)
+
+plt.suptitle('Dekomposisi Time Series — Surabaya', fontsize=13, y=1.01)
+plt.tight_layout()
+plt.show()
+
+# Kekuatan musiman
+s_strength = 1 - dekomposisi.resid.var() / (dekomposisi.seasonal + dekomposisi.resid).var()
+print(f"\nKekuatan pola musiman (Surabaya): {s_strength:.2f}")
+print("Interpretasi: nilai mendekati 1 → pola musiman sangat kuat")</pre>
+        <div class="cell-output">
+          <div class="cell-output-label">Output</div>
+          [4 panel dekomposisi: asli, tren, musiman, residu]<br><br>
+          Kekuatan pola musiman (Surabaya): 0.74<br>
+          Interpretasi: nilai mendekati 1 → pola musiman sangat kuat
+        </div>
+      </div>
+
+      <div class="callout tip">
+        <span class="callout-icon">💡</span>
+        <div class="callout-body">
+          <p><strong>Apa yang harus diamati:</strong> Komponen musiman akan menunjukkan lonjakan di bulan Lebaran (April/Mei) dan penurunan di awal tahun. Komponen tren menunjukkan pertumbuhan tahunan. Residu yang besar di bulan tertentu bisa menandakan promosi atau gangguan supply yang tidak tercermin di pola normal.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- FORECASTING -->
+    <div class="content-block" id="forecasting">
+      <h2>3. Membangun Model Forecasting</h2>
+      <p>Kita akan membandingkan tiga pendekatan yang dipelajari di P-05: Moving Average (baseline), Exponential Smoothing (konvensional), dan Random Forest (ML-based). Semua model dilatih dengan data 2022–2024 dan dievaluasi menggunakan hold-out 6 bulan terakhir.</p>
+
+      <div class="callout info" style="margin-bottom:var(--s5);">
+        <span class="callout-icon">📐</span>
+        <div class="callout-body">
+          <p><strong>Train-Test Split untuk Time Series:</strong> Data time series TIDAK boleh dibagi secara acak — kita akan kehilangan informasi urutan waktu. Gunakan <em>temporal split</em>: data lama untuk training, data terbaru untuk testing. Kita pakai 30 bulan training (Jan 2022 – Jun 2024) dan 6 bulan testing (Jul 2024 – Des 2024).</p>
+        </div>
+      </div>
+
+      <h3>Cell 6 — Siapkan Data Surabaya &amp; Split Train/Test</h3>
+
+      <div class="colab-cell">
+        <div class="cell-header">
+          <span class="cell-badge">In [6]</span>
+          <span class="cell-tag">Persiapan — Train/Test Split Temporal</span>
+        </div>
+        <pre class="cell-code"># Fokus wilayah Surabaya untuk demonstrasi
+sby = df[df['wilayah'] == 'Surabaya'][['tanggal', 'volume_terjual']].copy()
+sby = sby.set_index('tanggal').sort_index()
+sby.index.freq = 'MS'
+
+# Split: 30 bulan training, 6 bulan testing
+cutoff = '2024-06-01'
+train = sby[sby.index <= cutoff]['volume_terjual']
+test  = sby[sby.index >  cutoff]['volume_terjual']
+
+print(f"Training : {len(train)} bulan ({train.index[0].strftime('%b %Y')} – {train.index[-1].strftime('%b %Y')})")
+print(f"Testing  : {len(test)} bulan ({test.index[0].strftime('%b %Y')} – {test.index[-1].strftime('%b %Y')})")
+
+# Visualisasi split
+plt.figure(figsize=(12, 4))
+train.plot(label='Training', color='#4a8ef5', linewidth=2, marker='o', markersize=3)
+test.plot(label='Testing', color='#f5b445', linewidth=2, marker='o', markersize=4)
+plt.axvline(pd.Timestamp(cutoff), color='red', linestyle='--', alpha=0.7, label='Cutoff')
+plt.title('Train/Test Split — Data Penjualan Surabaya', fontsize=12)
+plt.ylabel('Volume (unit)')
+plt.legend()
+plt.grid(alpha=0.3)
+plt.tight_layout()
+plt.show()</pre>
+        <div class="cell-output">
+          <div class="cell-output-label">Output</div>
+          Training : 30 bulan (Jan 2022 – Jun 2024)<br>
+          Testing  : 6 bulan (Jul 2024 – Des 2024)<br>
+          [Grafik dengan warna biru = training, kuning = testing, garis merah = batas split]
+        </div>
+      </div>
+
+      <h3>Cell 7 — Model 1: Moving Average (Baseline)</h3>
+
+      <div class="colab-cell">
+        <div class="cell-header">
+          <span class="cell-badge">In [7]</span>
+          <span class="cell-tag">Model 1 — Moving Average (window = 3 & 12)</span>
+        </div>
+        <pre class="cell-code">hasil = pd.DataFrame({'aktual': test})
+
+# Moving Average 3 bulan
+ma3 = sby['volume_terjual'].rolling(window=3).mean()
+hasil['MA_3bln'] = ma3.shift(1).reindex(test.index)
+
+# Moving Average 12 bulan (capture musiman)
+ma12 = sby['volume_terjual'].rolling(window=12).mean()
+hasil['MA_12bln'] = ma12.shift(1).reindex(test.index)
+
+print("=== Hasil Prediksi Moving Average ===\n")
+print(hasil.round(0).to_string())
+
+# Visualisasi
+plt.figure(figsize=(12, 5))
+test.plot(label='Aktual', color='#00c9b1', linewidth=2.5, marker='o')
+hasil['MA_3bln'].plot(label='MA 3 bulan', color='#4a8ef5', linestyle='--', linewidth=1.8)
+hasil['MA_12bln'].plot(label='MA 12 bulan', color='#f5b445', linestyle='--', linewidth=1.8)
+plt.title('Moving Average vs Aktual — Surabaya (6 bulan uji)', fontsize=12)
+plt.ylabel('Volume (unit)')
+plt.legend()
+plt.grid(alpha=0.3)
+plt.tight_layout()
+plt.show()</pre>
+        <div class="cell-output">
+          <div class="cell-output-label">Output</div>
+          === Hasil Prediksi Moving Average ===<br><br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;aktual  MA_3bln  MA_12bln<br>
+          2024-07-01    2830     2743      2680<br>
+          2024-08-01    2750     2810      2695<br>
+          2024-09-01    2890     2760      2710<br>
+          ...
+        </div>
+      </div>
+
+      <h3>Cell 8 — Model 2: Exponential Smoothing (Holt-Winters)</h3>
+
+      <div class="colab-cell">
+        <div class="cell-header">
+          <span class="cell-badge">In [8]</span>
+          <span class="cell-tag">Model 2 — Holt-Winters (additive tren + musiman)</span>
+        </div>
+        <pre class="cell-code"># Holt-Winters dengan komponen tren + musiman additif
+model_hw = ExponentialSmoothing(
+    train,
+    trend='add',
+    seasonal='add',
+    seasonal_periods=12
+)
+fit_hw = model_hw.fit(optimized=True)
+
+# Prediksi 6 bulan ke depan
+pred_hw = fit_hw.forecast(len(test))
+pred_hw.index = test.index
+hasil['HoltWinters'] = pred_hw
+
+print("=== Parameter Model Holt-Winters ===")
+print(f"  Alpha (level):    {fit_hw.params['smoothing_level']:.3f}")
+print(f"  Beta (trend):     {fit_hw.params['smoothing_trend']:.3f}")
+print(f"  Gamma (musiman):  {fit_hw.params['smoothing_seasonal']:.3f}")
+
+print("\n=== Prediksi vs Aktual ===")
+perbandingan = pd.DataFrame({
+    'Aktual':       test.values,
+    'Holt-Winters': pred_hw.values
+}, index=test.index)
+perbandingan['Error (%)'] = ((perbandingan['Aktual'] - perbandingan['Holt-Winters'])
+                              / perbandingan['Aktual'] * 100).round(1)
+print(perbandingan.round(0).to_string())</pre>
+        <div class="cell-output">
+          <div class="cell-output-label">Output</div>
+          === Parameter Model Holt-Winters ===<br>
+          &nbsp;&nbsp;Alpha (level):    0.312<br>
+          &nbsp;&nbsp;Beta (trend):     0.041<br>
+          &nbsp;&nbsp;Gamma (musiman):  0.187<br>
+          <br>
+          === Prediksi vs Aktual ===<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Aktual  Holt-Winters  Error (%)<br>
+          2024-07-01    2830          2791         -1.4<br>
+          2024-08-01    2750          2734         -0.6<br>
+          ...
+        </div>
+      </div>
+
+      <h3>Cell 9 — Feature Engineering untuk Random Forest</h3>
+
+      <div class="colab-cell">
+        <div class="cell-header">
+          <span class="cell-badge">In [9]</span>
+          <span class="cell-tag">Feature Engineering — Fitur Kalender &amp; Lag</span>
+        </div>
+        <pre class="cell-code">def buat_fitur(series):
+    """Buat fitur time series untuk model ML."""
+    df_f = pd.DataFrame({'volume': series})
+    df_f.index = pd.to_datetime(df_f.index)
+
+    # Fitur kalender
+    df_f['bulan']       = df_f.index.month
+    df_f['kuartal']     = df_f.index.quarter
+    df_f['bulan_sin']   = np.sin(2 * np.pi * df_f['bulan'] / 12)
+    df_f['bulan_cos']   = np.cos(2 * np.pi * df_f['bulan'] / 12)
+    df_f['is_lebaran']  = df_f['bulan'].isin([4, 5]).astype(int)
+
+    # Fitur lag (nilai historis)
+    df_f['lag_1']  = df_f['volume'].shift(1)   # bulan lalu
+    df_f['lag_2']  = df_f['volume'].shift(2)   # 2 bulan lalu
+    df_f['lag_3']  = df_f['volume'].shift(3)   # 3 bulan lalu
+    df_f['lag_12'] = df_f['volume'].shift(12)  # setahun lalu
+
+    # Fitur rolling
+    df_f['ma_3']   = df_f['volume'].shift(1).rolling(3).mean()
+    df_f['ma_6']   = df_f['volume'].shift(1).rolling(6).mean()
+
+    return df_f.dropna()
+
+# Buat fitur dari seluruh data Surabaya
+df_fitur = buat_fitur(sby['volume_terjual'])
+
+fitur_kolom = ['bulan', 'kuartal', 'bulan_sin', 'bulan_cos',
+               'is_lebaran', 'lag_1', 'lag_2', 'lag_3', 'lag_12',
+               'ma_3', 'ma_6']
+
+X = df_fitur[fitur_kolom]
+y = df_fitur['volume']
+
+# Split temporal (sama seperti sebelumnya)
+mask_train = X.index <= cutoff
+mask_test  = X.index >  cutoff
+
+X_train, X_test = X[mask_train], X[mask_test]
+y_train, y_test = y[mask_train], y[mask_test]
+
+print(f"Training set: {len(X_train)} sampel | Fitur: {len(fitur_kolom)}")
+print(f"Testing set:  {len(X_test)} sampel")
+print(f"\nFitur yang digunakan:\n{fitur_kolom}")</pre>
+        <div class="cell-output">
+          <div class="cell-output-label">Output</div>
+          Training set: 18 sampel | Fitur: 11<br>
+          Testing set:  6 sampel<br>
+          <br>
+          Fitur yang digunakan:<br>
+          ['bulan', 'kuartal', 'bulan_sin', 'bulan_cos', 'is_lebaran', 'lag_1', 'lag_2', 'lag_3', 'lag_12', 'ma_3', 'ma_6']
+        </div>
+      </div>
+
+      <h3>Cell 10 — Model 3: Random Forest Regressor</h3>
+
+      <div class="colab-cell">
+        <div class="cell-header">
+          <span class="cell-badge">In [10]</span>
+          <span class="cell-tag">Model 3 — Random Forest + Feature Importance</span>
+        </div>
+        <pre class="cell-code">rf = RandomForestRegressor(
+    n_estimators=200,
+    max_depth=5,
+    random_state=42
+)
+rf.fit(X_train, y_train)
+pred_rf = rf.predict(X_test)
+hasil['RandomForest'] = pred_rf
+
+print("=== Prediksi Random Forest vs Aktual ===")
+perb_rf = pd.DataFrame({
+    'Aktual':        y_test.values,
+    'Random Forest': pred_rf
+}, index=y_test.index)
+perb_rf['Error (%)'] = ((perb_rf['Aktual'] - perb_rf['Random Forest'])
+                         / perb_rf['Aktual'] * 100).round(1)
+print(perb_rf.round(0).to_string())
+
+# Feature importance
+print("\n=== Kepentingan Fitur (Top 6) ===")
+imp = pd.Series(rf.feature_importances_, index=fitur_kolom).sort_values(ascending=False)
+print(imp.head(6).round(3).to_string())
+
+# Visualisasi feature importance
+plt.figure(figsize=(9, 4))
+imp.head(8).sort_values().plot(kind='barh', color='#4a8ef5')
+plt.xlabel('Importance Score')
+plt.title('Feature Importance — Random Forest Forecasting', fontsize=11)
+plt.tight_layout()
+plt.show()</pre>
+        <div class="cell-output">
+          <div class="cell-output-label">Output</div>
+          === Kepentingan Fitur (Top 6) ===<br>
+          lag_1         0.341<br>
+          lag_12        0.218<br>
+          ma_3          0.175<br>
+          is_lebaran    0.089<br>
+          bulan_sin     0.074<br>
+          lag_2         0.053<br>
+          [Bar chart horizontal feature importance]
+        </div>
+      </div>
+    </div>
+
+    <!-- EVALUASI -->
+    <div class="content-block" id="evaluasi">
+      <h2>4. Evaluasi &amp; Perbandingan Model</h2>
+      <p>Kita gunakan tiga metrik evaluasi khusus untuk regresi time series. Memahami perbedaannya penting — setiap metrik menjawab pertanyaan yang berbeda.</p>
+
+      <div class="metric-grid">
+        <div class="metric-card">
+          <div class="metric-name">MAPE</div>
+          <div class="metric-formula">mean(|aktual−pred| / aktual)</div>
+          <div class="metric-when"><strong>Mean Absolute Percentage Error</strong> — error dalam persen. Mudah dikomunikasikan: "prediksi kami rata-rata meleset 8%." Sensitif terhadap nilai aktual mendekati nol.</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-name">MAE</div>
+          <div class="metric-formula">mean(|aktual − pred|)</div>
+          <div class="metric-when"><strong>Mean Absolute Error</strong> — error dalam satuan asli (unit). Mudah diinterpretasi: "rata-rata meleset 230 unit/bulan." Tidak terlalu sensitif terhadap outlier.</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-name">RMSE</div>
+          <div class="metric-formula">√mean((aktual − pred)²)</div>
+          <div class="metric-when"><strong>Root Mean Squared Error</strong> — seperti MAE tapi menghukum error besar lebih berat. Lebih relevan jika error besar sangat merugikan (mis. kekurangan stok saat Lebaran).</div>
+        </div>
+      </div>
+
+      <h3>Cell 11 — Hitung Semua Metrik</h3>
+
+      <div class="colab-cell">
+        <div class="cell-header">
+          <span class="cell-badge">In [11]</span>
+          <span class="cell-tag">Evaluasi — MAPE, MAE, RMSE per Model</span>
+        </div>
+        <pre class="cell-code">def hitung_metrik(aktual, prediksi, nama):
+    mae  = mean_absolute_error(aktual, prediksi)
+    rmse = np.sqrt(mean_squared_error(aktual, prediksi))
+    mape = np.mean(np.abs((aktual - prediksi) / aktual)) * 100
+    return {'Model': nama, 'MAPE (%)': round(mape, 2),
+            'MAE (unit)': round(mae, 0), 'RMSE (unit)': round(rmse, 0)}
+
+aktual = hasil['aktual'].values
+
+rows = [
+    hitung_metrik(aktual, hasil['MA_3bln'].values,    'Moving Average 3 bln'),
+    hitung_metrik(aktual, hasil['MA_12bln'].values,   'Moving Average 12 bln'),
+    hitung_metrik(aktual, hasil['HoltWinters'].values,'Holt-Winters ES'),
+    hitung_metrik(aktual, hasil['RandomForest'].values,'Random Forest ML'),
+]
+tabel = pd.DataFrame(rows).set_index('Model')
+print("=== Perbandingan Akurasi Model (6 bulan uji) ===\n")
+print(tabel.to_string())
+
+print("\n⭐ Model terbaik (MAPE terendah):",
+      tabel['MAPE (%)'].idxmin(),
+      f"→ MAPE = {tabel['MAPE (%)'].min():.2f}%")</pre>
+        <div class="cell-output">
+          <div class="cell-output-label">Output (contoh)</div>
+          === Perbandingan Akurasi Model (6 bulan uji) ===<br><br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;MAPE (%)  MAE (unit)  RMSE (unit)<br>
+          Moving Average 3 bln          9.42         274          331<br>
+          Moving Average 12 bln         7.85         228          287<br>
+          Holt-Winters ES               5.31         154          196<br>
+          Random Forest ML              4.18         122          158<br><br>
+          ⭐ Model terbaik (MAPE terendah): Random Forest ML → MAPE = 4.18%
+        </div>
+      </div>
+
+      <h3>Cell 12 — Visualisasi Perbandingan Prediksi</h3>
+
+      <div class="colab-cell">
+        <div class="cell-header">
+          <span class="cell-badge">In [12]</span>
+          <span class="cell-tag">Visualisasi — Semua Model vs Aktual</span>
+        </div>
+        <pre class="cell-code">plt.figure(figsize=(13, 6))
+
+# Plot training (referensi)
+train_vis = sby['volume_terjual'][sby.index <= cutoff]
+plt.plot(train_vis.index, train_vis.values,
+         color='#888', linewidth=1.5, alpha=0.5, label='Data training')
+
+# Plot aktual testing
+plt.plot(test.index, test.values,
+         color='#00c9b1', linewidth=2.5, marker='o', markersize=7,
+         zorder=5, label='Aktual (test)')
+
+# Plot semua model
+warna_model = {
+    'MA_3bln':     ('#f06060', '--', 'MA 3 bln'),
+    'MA_12bln':    ('#f5b445', '--', 'MA 12 bln'),
+    'HoltWinters': ('#9b7cf4', '-.',  'Holt-Winters'),
+    'RandomForest':('#4a8ef5', '-',   'Random Forest'),
+}
+for col, (warna, ls, label) in warna_model.items():
+    plt.plot(hasil.index, hasil[col],
+             color=warna, linestyle=ls, linewidth=2,
+             marker='s', markersize=5, label=label)
+
+plt.axvline(pd.Timestamp(cutoff), color='red', linestyle=':', alpha=0.6)
+plt.title('Perbandingan Model Forecasting — Surabaya (Jul–Des 2024)', fontsize=12)
+plt.ylabel('Volume Penjualan (unit)')
+plt.legend(bbox_to_anchor=(1.01, 1), loc='upper left', fontsize=9)
+plt.grid(alpha=0.3)
+plt.tight_layout()
+plt.show()</pre>
+        <div class="cell-output">
+          <div class="cell-output-label">Output</div>
+          [Grafik perbandingan lengkap: data training abu-abu, aktual hijau, 4 garis prediksi model. Random Forest paling mendekati garis aktual]
+        </div>
+      </div>
+
+      <div class="callout info" style="margin-top:var(--s4);">
+        <span class="callout-icon">📌</span>
+        <div class="callout-body">
+          <p><strong>Interpretasi MAPE untuk konteks stok:</strong> Jika MAPE = 5%, dan rata-rata demand adalah 2.890 unit/bulan, maka rata-rata error prediksi = 2.890 × 5% = 145 unit. Inilah angka yang harus menjadi safety stock minimum — karena itulah besarnya ketidakpastian prediksi yang harus di-cover oleh buffer stok.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- SIMULASI STOK -->
+    <div class="content-block" id="simulasi">
+      <h2>5. Simulasi Keputusan Stok</h2>
+      <p>Ini adalah bagian yang paling langsung relevan untuk seorang insinyur industri: bagaimana akurasi model forecasting diterjemahkan menjadi keputusan operasional yang nyata — khususnya reorder point dan safety stock.</p>
+
+      <h3>Dari Prediksi ke Keputusan Reorder</h3>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--s4);margin:var(--s4) 0;">
+        <div style="background:var(--bg-2);border:1px solid var(--border);border-radius:var(--r2);padding:var(--s4);">
+          <div style="font-family:var(--mono);font-size:10px;color:var(--text-3);letter-spacing:2px;text-transform:uppercase;margin-bottom:var(--s3);">Formula Konvensional</div>
+          <div style="font-size:13px;color:var(--text-2);line-height:2;">
+            <div>ROP = d̄ × L + SS</div>
+            <div>SS = Z × σ × √L</div>
+            <div style="font-size:11px;color:var(--text-3);margin-top:var(--s2);">d̄ = rata-rata demand<br>L = lead time (bulan)<br>σ = standar deviasi demand<br>Z = Z-score service level</div>
+          </div>
+        </div>
+        <div style="background:rgba(0,201,177,0.05);border:1px solid rgba(0,201,177,0.2);border-radius:var(--r2);padding:var(--s4);">
+          <div style="font-family:var(--mono);font-size:10px;color:var(--teal);letter-spacing:2px;text-transform:uppercase;margin-bottom:var(--s3);">Dengan Prediksi AI</div>
+          <div style="font-size:13px;color:var(--text-2);line-height:2;">
+            <div>ROP = <em>pred</em> × L + SS<sub>AI</sub></div>
+            <div>SS<sub>AI</sub> = Z × MAPE × <em>pred</em> × √L</div>
+            <div style="font-size:11px;color:var(--text-3);margin-top:var(--s2);">pred = demand yang diprediksi model<br>SS<sub>AI</sub> dinamis sesuai ketidakpastian<br>MAPE mengukur ketidakpastian model</div>
+          </div>
+        </div>
+      </div>
+
+      <h3>Cell 13 — Simulasi Keputusan Stok per Model</h3>
+
+      <div class="colab-cell">
+        <div class="cell-header">
+          <span class="cell-badge">In [13]</span>
+          <span class="cell-tag">Simulasi — Reorder Point & Safety Stock per Model</span>
+        </div>
+        <pre class="cell-code">import scipy.stats as stats
+
+# Parameter operasional
+lead_time     = 2      # bulan (waktu dari order ke terima)
+service_level = 0.95   # target: 95% tidak stockout
+Z = stats.norm.ppf(service_level)  # Z = 1.645
+
+print(f"Parameter: Lead Time = {lead_time} bln | Service Level = {service_level*100:.0f}% | Z = {Z:.3f}")
+print("="*70)
+
+model_mape = {
+    'Moving Average 3 bln':  9.42 / 100,
+    'Holt-Winters ES':       5.31 / 100,
+    'Random Forest ML':      4.18 / 100,
+}
+
+model_pred_bulan_depan = {
+    'Moving Average 3 bln':  hasil['MA_3bln'].mean(),
+    'Holt-Winters ES':       hasil['HoltWinters'].mean(),
+    'Random Forest ML':      hasil['RandomForest'].mean(),
+}
+
+print(f"\n{'Model':<25} {'Pred Demand':>11} {'Safety Stock':>13} {'Reorder Point':>14} {'Total Stok Pesanan':>19}")
+print("-"*85)
+
+for nama in model_mape:
+    pred    = model_pred_bulan_depan[nama]
+    mape    = model_mape[nama]
+    ss      = Z * mape * pred * np.sqrt(lead_time)
+    rop     = pred * lead_time + ss
+    order   = pred + ss  # stok yang dipesan per siklus
+    print(f"{nama:<25} {pred:>10.0f}  {ss:>12.0f}  {rop:>13.0f}  {order:>18.0f}")
+
+print("-"*85)
+# Baseline konvensional (rata-rata historis)
+d_bar = train.mean()
+sigma = train.std()
+ss_conv = Z * sigma * np.sqrt(lead_time)
+rop_conv = d_bar * lead_time + ss_conv
+print(f"{'Konvensional (rata2)':<25} {d_bar:>10.0f}  {ss_conv:>12.0f}  {rop_conv:>13.0f}  {d_bar+ss_conv:>18.0f}")</pre>
+        <div class="cell-output">
+          <div class="cell-output-label">Output (contoh)</div>
+          Parameter: Lead Time = 2 bln | Service Level = 95% | Z = 1.645<br>
+          ======================================================================<br><br>
+          Model&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Pred Demand&nbsp; Safety Stock  Reorder Point  Total Stok Pesanan<br>
+          ─────────────────────────────────────────────────────────────────────<br>
+          Moving Average 3 bln&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 2801&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;775&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;6377&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3576<br>
+          Holt-Winters ES&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 2789&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;433&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;6011&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3222<br>
+          Random Forest ML&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2798&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;341&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;5937&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3139<br>
+          Konvensional (rata2)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 2730&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;971&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;6431&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3701
+        </div>
+      </div>
+
+      <h3>Cell 14 — Dampak Finansial: Biaya Safety Stock</h3>
+
+      <div class="colab-cell">
+        <div class="cell-header">
+          <span class="cell-badge">In [14]</span>
+          <span class="cell-tag">Simulasi — Perbandingan Biaya Penyimpanan Safety Stock</span>
+        </div>
+        <pre class="cell-code">harga_satuan    = 45_000    # Rp per unit
+holding_rate    = 0.25      # 25% dari nilai stok per tahun (biaya simpan)
+holding_per_bln = holding_rate / 12
+
+print("=== Dampak Biaya Penyimpanan Safety Stock (per bulan) ===\n")
+print(f"Asumsi harga satuan: Rp {harga_satuan:,.0f}")
+print(f"Holding cost rate: {holding_rate*100:.0f}% per tahun = {holding_per_bln*100:.2f}% per bulan")
+print("="*65)
+
+ss_per_model = {
+    'Konvensional (rata-rata)': 971,
+    'Moving Average 3 bln':     775,
+    'Holt-Winters ES':          433,
+    'Random Forest ML':         341,
+}
+ref_biaya = None
+
+print(f"\n{'Model':<28} {'Safety Stock':>13} {'Biaya/bln (Rp)':>16} {'Penghematan/bln':>17}")
+print("-"*75)
+
+for nama, ss in ss_per_model.items():
+    biaya = ss * harga_satuan * holding_per_bln
+    if ref_biaya is None:
+        ref_biaya = biaya
+        hemat = 0
+    else:
+        hemat = ref_biaya - biaya
+    print(f"{nama:<28} {ss:>12,}  {biaya:>15,.0f}  {hemat:>16,.0f}")
+
+print("-"*75)
+ss_rf  = ss_per_model['Random Forest ML']
+ss_kon = ss_per_model['Konvensional (rata-rata)']
+selisih_ss  = ss_kon - ss_rf
+selisih_bln = selisih_ss * harga_satuan * holding_per_bln
+print(f"\n✅ Menggunakan Random Forest vs Konvensional:")
+print(f"   Safety stock berkurang {selisih_ss:,} unit")
+print(f"   Penghematan biaya holding: Rp {selisih_bln:,.0f}/bulan")
+print(f"   = Rp {selisih_bln*12:,.0f}/tahun per wilayah")</pre>
+        <div class="cell-output">
+          <div class="cell-output-label">Output (contoh)</div>
+          === Dampak Biaya Penyimpanan Safety Stock (per bulan) ===<br><br>
+          Asumsi harga satuan: Rp 45,000<br>
+          Holding cost rate: 25% per tahun = 2.08% per bulan<br>
+          =================================================================<br><br>
+          Model&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Safety Stock  Biaya/bln (Rp)  Penghematan/bln<br>
+          ───────────────────────────────────────────────────────────────────────<br>
+          Konvensional (rata-rata)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;971&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;909,563&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0<br>
+          Moving Average 3 bln&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;775&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;725,625&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;183,938<br>
+          Holt-Winters ES&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;433&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;405,563&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;504,000<br>
+          Random Forest ML&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;341&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;319,313&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;590,250<br><br>
+          ✅ Menggunakan Random Forest vs Konvensional:<br>
+          &nbsp;&nbsp; Safety stock berkurang 630 unit<br>
+          &nbsp;&nbsp; Penghematan biaya holding: Rp 590,250/bulan<br>
+          &nbsp;&nbsp; = Rp 7,083,000/tahun per wilayah
+        </div>
+      </div>
+
+      <div class="callout tip" style="margin-top:var(--s4);">
+        <span class="callout-icon">💼</span>
+        <div class="callout-body">
+          <p><strong>Cara menyampaikan ke manajemen:</strong> Jangan tunjukkan angka MAPE ke direktur. Terjemahkan ke bahasa keuangan: <em>"Jika kita mengganti metode rata-rata manual dengan model AI, safety stock bisa dikurangi 630 unit tanpa menurunkan service level. Ini setara penghematan Rp 7 juta per tahun hanya untuk wilayah Surabaya — atau Rp 28 juta jika diterapkan di 4 wilayah."</em></p>
+        </div>
+      </div>
+
+      <h3>Perbandingan Metode — Ringkasan untuk Manajemen</h3>
+      <div class="sim-table-wrap">
+        <table class="sim-table">
+          <thead>
+            <tr>
+              <th>Metode</th>
+              <th>MAPE</th>
+              <th>Safety Stock (unit)</th>
+              <th>Biaya Holding/bln</th>
+              <th>Kompleksitas</th>
+              <th>Cocok Untuk</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Konvensional</strong></td>
+              <td class="bad">~15–20%</td>
+              <td class="bad">971</td>
+              <td class="bad">Rp 909K</td>
+              <td class="good">Sangat rendah</td>
+              <td>Demand stabil, tidak ada pola musiman kuat</td>
+            </tr>
+            <tr>
+              <td><strong>Moving Average 3 bln</strong></td>
+              <td class="warn">9.4%</td>
+              <td class="warn">775</td>
+              <td class="warn">Rp 726K</td>
+              <td class="good">Rendah</td>
+              <td>Permulaan, benchmark sederhana</td>
+            </tr>
+            <tr>
+              <td><strong>Holt-Winters ES</strong></td>
+              <td class="warn">5.3%</td>
+              <td class="warn">433</td>
+              <td class="warn">Rp 406K</td>
+              <td class="warn">Sedang</td>
+              <td>Data dengan tren + musiman, tanpa variabel eksternal</td>
+            </tr>
+            <tr>
+              <td><strong>Random Forest ML</strong></td>
+              <td class="good">4.2%</td>
+              <td class="good">341</td>
+              <td class="good">Rp 319K</td>
+              <td class="warn">Sedang</td>
+              <td>Data berlimpah dengan banyak pola, fitur kalender penting</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- RINGKASAN & TUGAS -->
+    <div class="content-block" id="ringkasan">
+      <h2>Ringkasan Pertemuan Ini</h2>
+      <div style="background:var(--bg-2);border:1px solid var(--border);border-radius:var(--r3);padding:var(--s5);">
+        <ul>
+          <li>Data time series harus dieksplorasi dulu untuk memahami pola tren, musiman, dan anomali sebelum membangun model — dekomposisi <code>seasonal_decompose()</code> membantu memvisualisasikan ketiga komponen ini</li>
+          <li>Train-test split untuk time series harus temporal, bukan acak — data terbaru dipakai untuk pengujian agar tidak "bocor" informasi masa depan ke model</li>
+          <li>Moving Average adalah baseline yang baik, Holt-Winters menangkap tren dan musiman dengan baik, Random Forest unggul ketika banyak fitur kontekstual (Lebaran, lag historis) tersedia</li>
+          <li>MAPE adalah metrik paling komunikatif untuk demand forecasting — langsung terjemahkan ke unit produk dan biaya untuk percakapan dengan manajemen</li>
+          <li>Prediksi yang lebih akurat (MAPE lebih rendah) memungkinkan safety stock yang lebih kecil tanpa menurunkan service level — ini adalah nilai bisnis nyata dari investasi di forecasting AI</li>
+          <li>Feature engineering (fitur lag, musiman, kalender) adalah kunci keunggulan Random Forest untuk data time series industri — bukan kompleksitas model itu sendiri</li>
+        </ul>
+      </div>
+
+      <!-- TASK BOX -->
+      <div class="task-box" id="tugas">
+        <div class="task-box-title">📋 Tugas Pertemuan Ini</div>
+        <p style="font-size:13px;color:var(--text-2);margin-bottom:var(--s4);">Dikumpulkan sebelum pertemuan ke-7 melalui <strong>Google Classroom → Pertemuan 6</strong>. Format: <strong>link Google Colab notebook</strong> (sharing "Anyone with the link can view") + PDF laporan 2–3 halaman.</p>
+        <ol style="font-size:14px;color:var(--text);line-height:2.1;">
+          <li><strong>Replikasi untuk wilayah lain:</strong> Jalankan seluruh pipeline forecasting (EDA, MA, Holt-Winters, Random Forest, evaluasi) untuk wilayah <strong>Jakarta</strong>. Bandingkan MAPE ketiga model. Apakah urutan performa model sama dengan Surabaya? Jelaskan mengapa atau mengapa tidak dalam 150–200 kata.</li>
+          <li><strong>Analisis feature importance:</strong> Dari model Random Forest yang kamu bangun untuk Jakarta, identifikasi 3 fitur terpenting. Terjemahkan masing-masing fitur ke dalam bahasa bisnis: apa implikasinya bagi tim perencanaan supply chain perusahaan?</li>
+          <li><strong>Laporan rekomendasi:</strong> Tulis rekomendasi 1 halaman kepada manajer supply chain (non-teknis) berisi: (a) model mana yang direkomendasikan untuk produksi dan mengapa, (b) berapa safety stock yang diusulkan untuk bulan Januari 2025, (c) berapa penghematan biaya holding yang diproyeksikan jika model ini diterapkan di semua 4 wilayah.</li>
+          <li><em>Bonus:</em> Tambahkan satu fitur baru ke dalam Random Forest — misalnya <code>is_akhir_tahun</code> (bernilai 1 untuk November–Desember) atau <code>lag_6</code>. Apakah MAPE membaik? Jelaskan mengapa fitur tersebut kamu pilih dari perspektif bisnis FMCG.</li>
+        </ol>
+      </div>
+
+      <!-- READING BOX -->
+      <div class="reading-box">
+        <div class="reading-box-title">📖 Persiapan Pertemuan Ke-7 (Review &amp; Persiapan UTS)</div>
+        <div class="reading-item">
+          <span class="reading-icon">📗</span>
+          <div class="reading-label">
+            <strong>Review Materi P-01 hingga P-06</strong>
+            Buat ringkasan satu halaman untuk setiap pertemuan: konsep utama, satu contoh kasus nyata, dan satu pertanyaan yang masih belum kamu pahami sepenuhnya. Bawa ke P-07 untuk diskusi.
+          </div>
+        </div>
+        <div class="reading-item">
+          <span class="reading-icon">🎯</span>
+          <div class="reading-label">
+            <strong>Kisi-kisi UTS — Google Classroom → P-07</strong>
+            Unduh kisi-kisi UTS dari Google Classroom. UTS mencakup konsep P-01 hingga P-06: definisi AI/ML, interpretasi output model, pemilihan algoritma, demand forecasting, dan evaluasi solusi AI untuk kasus industri.
+          </div>
+        </div>
+        <div class="reading-item">
+          <span class="reading-icon">📄</span>
+          <div class="reading-label">
+            <strong>Davenport — "The AI Advantage", Chapter 3: Enhancing Business Processes</strong>
+            Baca bagian "Forecasting and Planning" (hal. 68–82). Konteks manajerial yang kuat sebelum UTS — bagaimana perusahaan memutuskan kapan dan di mana menerapkan AI secara strategis.
+          </div>
+        </div>
+        <div class="reading-item">
+          <span class="reading-icon">🔧</span>
+          <div class="reading-label">
+            <strong>Selesaikan tugas notebook P-06 sebelum P-07</strong>
+            Pastikan notebook kamu sudah berjalan lengkap dari Cell 1 sampai Cell 14. Di P-07 kita akan mendiskusikan temuan bersama — termasuk kenapa model tertentu lebih baik untuk wilayah tertentu.
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ── ASIDE ── -->
+  <aside class="content-aside">
+    <!-- TOC -->
+    <div class="toc">
+      <div class="toc-title">Isi Halaman</div>
+      <ul class="toc-list">
+        <li><a href="#tujuan" class="active">Tujuan Pembelajaran</a></li>
+        <li><a href="#setup">1. Setup Colab</a></li>
+        <li><a href="#eda">2. Memuat &amp; Eksplorasi Data</a></li>
+        <li><a href="#forecasting">3. Membangun Model</a></li>
+        <li><a href="#evaluasi">4. Evaluasi Model</a></li>
+        <li><a href="#simulasi">5. Simulasi Stok</a></li>
+        <li><a href="#ringkasan">Ringkasan &amp; Tugas</a></li>
+      </ul>
+    </div>
+
+    <!-- Sesi nav -->
+    <div class="sesi-nav-aside">
+      <div class="sesi-nav-title">Navigasi Sesi</div>
+      <a href="sesi-05.html" class="sesi-nav-btn">
+        <span>←</span>
+        <span>P-05: AI untuk Optimasi Produksi &amp; Supply Chain</span>
+      </a>
+      <div style="font-size:12px;color:var(--text-3);margin-top:var(--s4);padding:var(--s3) 0;border-top:1px solid var(--border);">Sesi berikutnya:</div>
+      <a href="#" class="sesi-nav-btn" style="opacity:0.5;pointer-events:none;">
+        <span>→</span>
+        <span>P-07: Review &amp; Persiapan UTS</span>
+      </a>
+      <div style="margin-top:var(--s4);padding-top:var(--s4);border-top:1px solid var(--border);">
+        <a href="../index.html" class="sesi-nav-btn">
+          <span>🏠</span>
+          <span>Kembali ke Beranda TI</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- Info box -->
+    <div style="background:var(--bg-2);border:1px solid var(--border);border-radius:var(--r3);padding:var(--s5);margin-top:var(--s4);">
+      <div style="font-family:var(--mono);font-size:10px;color:var(--text-3);letter-spacing:2px;text-transform:uppercase;margin-bottom:var(--s3);">Info Pertemuan</div>
+      <div style="display:flex;flex-direction:column;gap:var(--s3);">
+        <div>
+          <div style="font-size:11px;color:var(--text-3);">Tipe</div>
+          <div style="font-size:13px;color:var(--text);">Praktik Hands-on</div>
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--text-3);">Durasi</div>
+          <div style="font-size:13px;color:var(--text);">100 menit</div>
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--text-3);">CPMK</div>
+          <div style="font-size:13px;color:var(--text);">C2 (ML tanpa coding), C3 (Analisis data), C4 (AI untuk proses industri)</div>
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--text-3);">Tools</div>
+          <div style="font-size:13px;color:var(--text);">Google Colab · scikit-learn · statsmodels · pandas</div>
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--text-3);">Dataset</div>
+          <div style="font-size:13px;color:var(--text);">penjualan_bulanan.xlsx — Google Classroom P-06</div>
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--text-3);">Referensi Utama</div>
+          <div style="font-size:13px;color:var(--text);">Davenport — AI Advantage, Ch. 5 | Gentsch — AI for Business, Ch. 6</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Istilah kunci -->
+    <div style="background:var(--bg-2);border:1px solid var(--border);border-radius:var(--r3);padding:var(--s5);margin-top:var(--s4);">
+      <div style="font-family:var(--mono);font-size:10px;color:var(--text-3);letter-spacing:2px;text-transform:uppercase;margin-bottom:var(--s4);">Istilah Kunci</div>
+      <div style="display:flex;flex-direction:column;gap:var(--s3);font-size:12px;">
+        <div><span style="color:var(--teal);font-family:var(--mono);">MAPE</span><div style="color:var(--text-2);">Mean Absolute Percentage Error — akurasi forecast dalam persen</div></div>
+        <div><span style="color:var(--teal);font-family:var(--mono);">Safety Stock</span><div style="color:var(--text-2);">Buffer stok untuk menutupi ketidakpastian prediksi demand</div></div>
+        <div><span style="color:var(--teal);font-family:var(--mono);">Holt-Winters</span><div style="color:var(--text-2);">Exponential Smoothing dengan komponen tren dan musiman</div></div>
+        <div><span style="color:var(--teal);font-family:var(--mono);">Feature Engineering</span><div style="color:var(--text-2);">Membuat fitur baru dari data mentah untuk meningkatkan performa model ML</div></div>
+        <div><span style="color:var(--teal);font-family:var(--mono);">Lag Feature</span><div style="color:var(--text-2);">Nilai masa lalu yang digunakan sebagai prediktor (lag_1 = bulan lalu)</div></div>
+        <div><span style="color:var(--teal);font-family:var(--mono);">Seasonal Decompose</span><div style="color:var(--text-2);">Memisahkan komponen tren, musiman, dan noise dari data time series</div></div>
+        <div><span style="color:var(--teal);font-family:var(--mono);">Reorder Point</span><div style="color:var(--text-2);">Level stok minimum yang memicu pemesanan ulang = demand × lead time + SS</div></div>
+      </div>
+    </div>
+  </aside>
+
+</div>
+
+<!-- ══ FOOTER ══ -->
+<footer class="footer">
+  <div>AI·UKWMS <span style="color:var(--text-3);">· P-06 Praktik Prediksi Demand &amp; Simulasi Rantai Pasok</span></div>
+  <div><a href="../index.html" style="color:var(--text-3);">← Kembali ke Beranda TI</a></div>
+</footer>
+
+<script>
+  const headings = document.querySelectorAll('.content-main [id]');
+  const tocLinks = document.querySelectorAll('.toc-list a');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(a => {
+          a.classList.remove('active');
+          if (a.getAttribute('href') === '#' + entry.target.id) a.classList.add('active');
+        });
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px' });
+  headings.forEach(h => observer.observe(h));
+
+  const navLinks = document.querySelectorAll('.nav-links a[href^="#"]');
+  window.addEventListener('scroll', () => {
+    let current = '';
+    headings.forEach(h => { if (window.scrollY >= h.offsetTop - 100) current = h.id; });
+    navLinks.forEach(a => {
+      a.classList.remove('active');
+      if (a.getAttribute('href') === '#' + current) a.classList.add('active');
+    });
+  });
+</script>
+</body>
+</html>
