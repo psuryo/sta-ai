@@ -1,0 +1,1114 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>P-06: Praktik Deep Learning — CNN & Analisis Sentimen — Kecerdasan Buatan UKWMS</title>
+<link rel="stylesheet" href="../../css/style.css">
+<style>
+  /* ── Code block ── */
+  .code-block {
+    background: #0d1117;
+    border: 1px solid var(--border);
+    border-radius: var(--r2);
+    padding: var(--s5);
+    font-family: var(--mono);
+    font-size: 12px;
+    line-height: 1.9;
+    overflow-x: auto;
+    margin: var(--s4) 0;
+    color: #c9d1d9;
+  }
+  .code-block .c-comment { color: #8b949e; }
+  .code-block .c-kw      { color: #ff7b72; }
+  .code-block .c-str     { color: #a5d6ff; }
+  .code-block .c-fn      { color: #d2a8ff; }
+  .code-block .c-num     { color: #79c0ff; }
+  .code-block .c-cls     { color: #ffa657; }
+  .code-label {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #161b22;
+    border: 1px solid var(--border);
+    border-bottom: none;
+    border-radius: var(--r2) var(--r2) 0 0;
+    padding: var(--s2) var(--s4);
+    margin-top: var(--s4);
+  }
+  .code-label + .code-block {
+    border-radius: 0 0 var(--r2) var(--r2);
+    margin-top: 0;
+  }
+  .code-label-name  { font-family: var(--mono); font-size: 11px; color: var(--text-3); }
+  .code-label-badge {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--teal);
+    background: var(--teal-glow);
+    border: 1px solid rgba(0,201,177,0.2);
+    padding: 1px 8px;
+    border-radius: 20px;
+  }
+
+  /* ── Output block ── */
+  .output-block {
+    background: #111827;
+    border: 1px solid rgba(0,201,177,0.2);
+    border-left: 3px solid var(--teal);
+    border-radius: 0 var(--r2) var(--r2) 0;
+    padding: var(--s4) var(--s5);
+    font-family: var(--mono);
+    font-size: 12px;
+    color: #9fffed;
+    line-height: 1.8;
+    margin: 0 0 var(--s4) 0;
+    overflow-x: auto;
+    white-space: pre;
+  }
+  .output-label {
+    font-size: 10px;
+    color: var(--teal);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: var(--s2);
+    font-family: var(--mono);
+    opacity: 0.7;
+  }
+
+  /* ── Step flow ── */
+  .step-flow {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    margin: var(--s5) 0;
+    border: 1px solid var(--border);
+    border-radius: var(--r3);
+    overflow: hidden;
+  }
+  .step-row {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--s4);
+    padding: var(--s4) var(--s5);
+    border-bottom: 1px solid var(--border);
+  }
+  .step-row:last-child { border-bottom: none; }
+  .step-num {
+    flex-shrink: 0;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--teal-glow);
+    border: 1px solid rgba(0,201,177,0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--teal);
+    font-weight: 600;
+  }
+  .step-content { flex: 1; }
+  .step-title { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 2px; }
+  .step-desc  { font-size: 12px; color: var(--text-2); line-height: 1.6; }
+
+  /* ── Result card ── */
+  .result-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--s3);
+    margin: var(--s4) 0;
+  }
+  .result-card {
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: var(--r2);
+    padding: var(--s4);
+    text-align: center;
+  }
+  .result-val  { font-family: var(--mono); font-size: 28px; font-weight: 700; line-height: 1; margin-bottom: var(--s2); }
+  .result-name { font-size: 11px; color: var(--text-3); }
+
+  /* ── Comparison table ── */
+  .comp-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    margin: var(--s4) 0;
+  }
+  .comp-table th {
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    padding: var(--s3) var(--s4);
+    text-align: left;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-3);
+    letter-spacing: 1px;
+  }
+  .comp-table td {
+    border: 1px solid var(--border);
+    padding: var(--s3) var(--s4);
+    color: var(--text-2);
+    vertical-align: top;
+    line-height: 1.6;
+  }
+  .comp-table tr:hover td { background: var(--bg-2); }
+
+  /* ── Pipeline vis ── */
+  .pipeline-vis {
+    display: flex;
+    align-items: center;
+    gap: var(--s2);
+    margin: var(--s5) 0;
+    overflow-x: auto;
+    padding: var(--s3) 0;
+    flex-wrap: nowrap;
+  }
+  .pipe-block {
+    flex-shrink: 0;
+    border-radius: var(--r2);
+    padding: var(--s3) var(--s4);
+    text-align: center;
+    min-width: 90px;
+  }
+  .pipe-name  { font-size: 11px; font-weight: 600; color: var(--text); margin-bottom: 2px; }
+  .pipe-size  { font-family: var(--mono); font-size: 10px; color: var(--text-3); }
+  .pipe-arrow { color: var(--text-3); font-size: 16px; flex-shrink: 0; }
+</style>
+</head>
+<body>
+
+<!-- ══ NAV ══ -->
+<nav class="nav">
+  <div class="nav-logo">AI<span>·</span>UKWMS</div>
+  <ul class="nav-links">
+    <li><a href="../index.html">← Beranda</a></li>
+    <li><a href="#tujuan" class="active">Tujuan</a></li>
+    <li><a href="#setup">Setup</a></li>
+    <li><a href="#cnn-mnist">CNN MNIST</a></li>
+    <li><a href="#sentimen">Sentimen</a></li>
+    <li><a href="#evaluasi">Evaluasi</a></li>
+    <li><a href="#perbandingan">Perbandingan</a></li>
+    <li><a href="#tugas">Tugas</a></li>
+  </ul>
+</nav>
+
+<!-- ══ HERO ══ -->
+<header class="sesi-hero">
+  <div style="max-width:1100px;margin:0 auto;">
+    <div class="sesi-breadcrumb">
+      <a href="../index.html">Kecerdasan Buatan</a>
+      <span>›</span>
+      <span>Pertemuan 6</span>
+    </div>
+    <div class="sesi-num">PERTEMUAN 06 · PRAKTIK</div>
+    <h1 class="sesi-title">Praktik Deep Learning:<br><em style="color:var(--teal);">CNN & Analisis Sentimen</em></h1>
+    <p style="font-size:15px;color:var(--text-2);max-width:680px;line-height:1.8;">Dari teori ke kode yang berjalan — implementasi CNN untuk klasifikasi gambar digit MNIST, lalu membangun model analisis sentimen untuk ulasan produk e-commerce Bahasa Indonesia menggunakan Keras.</p>
+    <div class="sesi-meta-row">
+      <span class="badge badge-teal">Praktik</span>
+      <span class="badge badge-blue">100 menit</span>
+      <span class="badge badge-amber">CPMK: C2, C3</span>
+    </div>
+  </div>
+</header>
+
+<!-- ══ CONTENT LAYOUT ══ -->
+<div class="content-layout">
+  <main class="content-main">
+
+    <!-- TUJUAN -->
+    <div class="content-block" id="tujuan">
+      <h2>Tujuan Pembelajaran</h2>
+      <p>Setelah mengikuti pertemuan ini, mahasiswa diharapkan mampu:</p>
+      <ol>
+        <li>Memuat dan memproses dataset MNIST menggunakan Keras API bawaan</li>
+        <li>Membangun, melatih, dan mengevaluasi model CNN untuk klasifikasi gambar digit</li>
+        <li>Membandingkan performa MLP vs CNN pada data gambar secara empiris</li>
+        <li>Melakukan preprocessing teks Bahasa Indonesia: tokenisasi, padding, dan embedding</li>
+        <li>Melatih model ANN/LSTM sederhana untuk klasifikasi sentimen ulasan produk</li>
+        <li>Menginterpretasikan metrik evaluasi: accuracy, precision, recall, F1-score, dan confusion matrix</li>
+      </ol>
+
+      <div class="callout info" style="margin-top:var(--s5);">
+        <span class="callout-icon">🔗</span>
+        <div class="callout-body">
+          <p><strong>Lanjutan P-05:</strong> Semua kode di sesi ini membangun di atas konsep yang dijelaskan di P-05 — neuron, layer, fungsi aktivasi, training loop, dan Keras Sequential API. Jika ada yang kurang jelas, kembali ke P-05 dulu sebelum melanjutkan.</p>
+        </div>
+      </div>
+
+      <div class="callout tip" style="margin-top:var(--s4);">
+        <span class="callout-icon">💻</span>
+        <div class="callout-body">
+          <p><strong>Jalankan di Google Colab:</strong> Semua kode di pertemuan ini dirancang untuk berjalan di Google Colab. Tidak perlu instalasi lokal — buka <code>colab.research.google.com</code>, buat notebook baru, dan salin kode setiap blok ke dalam sel. Pastikan runtime menggunakan GPU: <em>Runtime → Change runtime type → T4 GPU</em>.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- SETUP -->
+    <div class="content-block" id="setup">
+      <h2>1. Setup & Import</h2>
+      <p>Mulai dengan mengimpor semua library yang dibutuhkan. Di Google Colab, TensorFlow dan semua dependensi sudah terinstall — tidak perlu <code>pip install</code> tambahan.</p>
+
+      <div class="code-label">
+        <span class="code-label-name">setup.py</span>
+        <span class="code-label-badge">Sel 1</span>
+      </div>
+      <div class="code-block"><span class="c-comment"># ── Import semua library yang dibutuhkan ────────────────────────</span>
+<span class="c-kw">import</span> numpy <span class="c-kw">as</span> np
+<span class="c-kw">import</span> matplotlib.pyplot <span class="c-kw">as</span> plt
+<span class="c-kw">import</span> pandas <span class="c-kw">as</span> pd
+<span class="c-kw">import</span> tensorflow <span class="c-kw">as</span> tf
+<span class="c-kw">from</span> tensorflow <span class="c-kw">import</span> keras
+<span class="c-kw">from</span> tensorflow.keras <span class="c-kw">import</span> layers
+<span class="c-kw">from</span> tensorflow.keras.callbacks <span class="c-kw">import</span> <span class="c-cls">EarlyStopping</span>
+
+<span class="c-comment"># Evaluasi model</span>
+<span class="c-kw">from</span> sklearn.metrics <span class="c-kw">import</span> (
+    classification_report, confusion_matrix, ConfusionMatrixDisplay
+)
+
+<span class="c-fn">print</span>(<span class="c-str">f"TensorFlow version : {tf.__version__}"</span>)
+<span class="c-fn">print</span>(<span class="c-str">f"GPU available      : {len(tf.config.list_physical_devices('GPU')) > 0}"</span>)
+<span class="c-fn">print</span>(<span class="c-str">f"Keras version      : {keras.__version__}"</span>)</div>
+
+      <div class="output-label">Output yang diharapkan</div>
+      <div class="output-block">TensorFlow version : 2.15.0
+GPU available      : True
+Keras version      : 2.15.0</div>
+
+      <div class="callout warn">
+        <span class="callout-icon">⚠️</span>
+        <div class="callout-body">
+          <p>Jika <code>GPU available: False</code>, model tetap bisa berjalan tetapi akan lebih lambat. Untuk CNN MNIST, ini masih oke. Untuk model sentimen dengan data besar, aktifkan GPU lewat <em>Runtime → Change runtime type → T4 GPU</em>.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- BAGIAN 1: CNN MNIST -->
+    <div class="content-block" id="cnn-mnist">
+      <h2>2. CNN untuk Klasifikasi Digit MNIST</h2>
+      <p>MNIST adalah dataset 70.000 gambar tulisan tangan digit 0–9 (28×28 piksel, grayscale). Ini adalah "Hello World"-nya deep learning — cukup sederhana untuk dipelajari, cukup real untuk menunjukkan kekuatan CNN.</p>
+
+      <h3>2.1 Muat & Eksplorasi Data</h3>
+
+      <div class="code-label">
+        <span class="code-label-name">mnist_load.py</span>
+        <span class="code-label-badge">Sel 2</span>
+      </div>
+      <div class="code-block"><span class="c-comment"># ── Muat MNIST (built-in Keras, tidak perlu download manual) ────</span>
+(X_train_raw, y_train), (X_test_raw, y_test) = keras.datasets.mnist.<span class="c-fn">load_data</span>()
+
+<span class="c-fn">print</span>(<span class="c-str">"=== Dimensi Data ==="</span>)
+<span class="c-fn">print</span>(<span class="c-str">f"X_train : {X_train_raw.shape}"</span>)   <span class="c-comment"># (60000, 28, 28)</span>
+<span class="c-fn">print</span>(<span class="c-str">f"y_train : {y_train.shape}"</span>)    <span class="c-comment"># (60000,)</span>
+<span class="c-fn">print</span>(<span class="c-str">f"X_test  : {X_test_raw.shape}"</span>)    <span class="c-comment"># (10000, 28, 28)</span>
+<span class="c-fn">print</span>(<span class="c-str">f"y_test  : {y_test.shape}"</span>)     <span class="c-comment"># (10000,)</span>
+<span class="c-fn">print</span>(<span class="c-str">f"Nilai piksel: min={X_train_raw.min()}, max={X_train_raw.max()}"</span>)
+<span class="c-fn">print</span>(<span class="c-str">f"Kelas unik  : {np.unique(y_train)}"</span>)
+
+<span class="c-comment"># ── Visualisasi 10 contoh ────────────────────────────────────────</span>
+fig, axes = plt.<span class="c-fn">subplots</span>(<span class="c-num">2</span>, <span class="c-num">5</span>, figsize=(<span class="c-num">12</span>, <span class="c-num">5</span>))
+<span class="c-kw">for</span> i, ax <span class="c-kw">in</span> <span class="c-fn">enumerate</span>(axes.<span class="c-fn">flat</span>()):
+    ax.<span class="c-fn">imshow</span>(X_train_raw[i], cmap=<span class="c-str">'gray'</span>)
+    ax.<span class="c-fn">set_title</span>(<span class="c-str">f"Label: {y_train[i]}"</span>, fontsize=<span class="c-num">10</span>)
+    ax.<span class="c-fn">axis</span>(<span class="c-str">'off'</span>)
+plt.<span class="c-fn">suptitle</span>(<span class="c-str">"10 Sampel MNIST"</span>, fontsize=<span class="c-num">13</span>)
+plt.<span class="c-fn">tight_layout</span>()
+plt.<span class="c-fn">show</span>()</div>
+
+      <h3 style="margin-top:var(--s5);">2.2 Preprocessing</h3>
+      <p>CNN mengharapkan input 4D: <code>(batch, height, width, channels)</code>. Kita juga perlu menormalisasi nilai piksel dari 0–255 menjadi 0–1.</p>
+
+      <div class="code-label">
+        <span class="code-label-name">mnist_preprocess.py</span>
+        <span class="code-label-badge">Sel 3</span>
+      </div>
+      <div class="code-block"><span class="c-comment"># ── Normalisasi + reshape untuk CNN ─────────────────────────────</span>
+<span class="c-comment"># Normalisasi: bagi 255 agar nilai piksel menjadi float 0–1</span>
+X_train = X_train_raw.<span class="c-fn">astype</span>(<span class="c-str">'float32'</span>) / <span class="c-num">255.0</span>
+X_test  = X_test_raw.<span class="c-fn">astype</span>(<span class="c-str">'float32'</span>)  / <span class="c-num">255.0</span>
+
+<span class="c-comment"># Tambah dimensi channel: (N, 28, 28) → (N, 28, 28, 1)</span>
+X_train = X_train[..., np.newaxis]   <span class="c-comment"># atau: np.expand_dims(X_train, -1)</span>
+X_test  = X_test[..., np.newaxis]
+
+<span class="c-fn">print</span>(<span class="c-str">f"Shape setelah reshape: {X_train.shape}"</span>)  <span class="c-comment"># (60000, 28, 28, 1)</span>
+<span class="c-fn">print</span>(<span class="c-str">f"Nilai piksel: min={X_train.min():.2f}, max={X_train.max():.2f}"</span>)
+
+<span class="c-comment"># ── Untuk MLP perlu flatten ke 1D ────────────────────────────────</span>
+X_train_flat = X_train.<span class="c-fn">reshape</span>(-<span class="c-num">1</span>, <span class="c-num">28</span>*<span class="c-num">28</span>)   <span class="c-comment"># (60000, 784)</span>
+X_test_flat  = X_test.<span class="c-fn">reshape</span>(-<span class="c-num">1</span>, <span class="c-num">28</span>*<span class="c-num">28</span>)</div>
+
+      <h3 style="margin-top:var(--s5);">2.3 Bangun Model MLP (Baseline)</h3>
+      <p>Kita mulai dengan MLP sederhana sebagai baseline sebelum CNN — untuk melihat seberapa besar improvement yang CNN berikan.</p>
+
+      <div class="code-label">
+        <span class="code-label-name">mlp_baseline.py</span>
+        <span class="code-label-badge">Sel 4</span>
+      </div>
+      <div class="code-block"><span class="c-comment"># ── Model MLP baseline ──────────────────────────────────────────</span>
+mlp_model = keras.<span class="c-cls">Sequential</span>([
+    layers.<span class="c-cls">Dense</span>(<span class="c-num">256</span>, activation=<span class="c-str">'relu'</span>, input_shape=(<span class="c-num">784</span>,)),
+    layers.<span class="c-cls">Dropout</span>(<span class="c-num">0.3</span>),
+    layers.<span class="c-cls">Dense</span>(<span class="c-num">128</span>, activation=<span class="c-str">'relu'</span>),
+    layers.<span class="c-cls">Dropout</span>(<span class="c-num">0.2</span>),
+    layers.<span class="c-cls">Dense</span>(<span class="c-num">10</span>, activation=<span class="c-str">'softmax'</span>)   <span class="c-comment"># 10 kelas digit</span>
+], name=<span class="c-str">"MLP_Baseline"</span>)
+
+mlp_model.<span class="c-fn">compile</span>(
+    optimizer=<span class="c-str">'adam'</span>,
+    loss=<span class="c-str">'sparse_categorical_crossentropy'</span>,
+    metrics=[<span class="c-str">'accuracy'</span>]
+)
+
+mlp_model.<span class="c-fn">summary</span>()
+
+<span class="c-comment"># ── Training ─────────────────────────────────────────────────────</span>
+early_stop = <span class="c-cls">EarlyStopping</span>(monitor=<span class="c-str">'val_loss'</span>, patience=<span class="c-num">3</span>,
+                            restore_best_weights=<span class="c-kw">True</span>)
+
+history_mlp = mlp_model.<span class="c-fn">fit</span>(
+    X_train_flat, y_train,
+    epochs=<span class="c-num">20</span>,
+    batch_size=<span class="c-num">64</span>,
+    validation_split=<span class="c-num">0.15</span>,
+    callbacks=[early_stop],
+    verbose=<span class="c-num">1</span>
+)
+
+loss_mlp, acc_mlp = mlp_model.<span class="c-fn">evaluate</span>(X_test_flat, y_test, verbose=<span class="c-num">0</span>)
+<span class="c-fn">print</span>(<span class="c-str">f"\nMLP  → Test accuracy: {acc_mlp:.4f}"</span>)</div>
+
+      <div class="output-label">Output yang diharapkan</div>
+      <div class="output-block">Epoch 1/20 — loss: 0.2481 — accuracy: 0.9267 — val_accuracy: 0.9698
+...
+Epoch 8/20 — loss: 0.0411 — accuracy: 0.9872 — val_accuracy: 0.9804
+
+MLP  → Test accuracy: 0.9787</div>
+
+      <h3 style="margin-top:var(--s5);">2.4 Bangun Model CNN</h3>
+      <p>Sekarang kita bangun CNN. Perbedaan utama: menggunakan <code>Conv2D</code> dan <code>MaxPooling2D</code> untuk mengekstrak fitur spasial sebelum lapisan Dense.</p>
+
+      <!-- CNN Architecture Visual -->
+      <div class="pipeline-vis">
+        <div class="pipe-block" style="background:var(--blue-dim);border:1px solid rgba(74,142,245,0.3);">
+          <div style="font-size:22px;margin-bottom:3px;">🖼️</div>
+          <div class="pipe-name">Input</div>
+          <div class="pipe-size">28×28×1</div>
+        </div>
+        <div class="pipe-arrow">→</div>
+        <div class="pipe-block" style="background:var(--teal-glow);border:1px solid rgba(0,201,177,0.3);">
+          <div class="pipe-name">Conv2D</div>
+          <div class="pipe-size">32 filter, 3×3</div>
+          <div style="font-size:10px;color:var(--teal);margin-top:2px;">ReLU</div>
+        </div>
+        <div class="pipe-arrow">→</div>
+        <div class="pipe-block" style="background:var(--bg-2);border:1px solid var(--border);">
+          <div class="pipe-name">MaxPool</div>
+          <div class="pipe-size">2×2 → 13×13</div>
+        </div>
+        <div class="pipe-arrow">→</div>
+        <div class="pipe-block" style="background:var(--teal-glow);border:1px solid rgba(0,201,177,0.3);">
+          <div class="pipe-name">Conv2D</div>
+          <div class="pipe-size">64 filter, 3×3</div>
+          <div style="font-size:10px;color:var(--teal);margin-top:2px;">ReLU</div>
+        </div>
+        <div class="pipe-arrow">→</div>
+        <div class="pipe-block" style="background:var(--bg-2);border:1px solid var(--border);">
+          <div class="pipe-name">MaxPool</div>
+          <div class="pipe-size">2×2 → 5×5</div>
+        </div>
+        <div class="pipe-arrow">→</div>
+        <div class="pipe-block" style="background:var(--bg-2);border:1px solid var(--border);">
+          <div class="pipe-name">Flatten</div>
+          <div class="pipe-size">1600</div>
+        </div>
+        <div class="pipe-arrow">→</div>
+        <div class="pipe-block" style="background:var(--blue-dim);border:1px solid rgba(74,142,245,0.3);">
+          <div class="pipe-name">Dense</div>
+          <div class="pipe-size">128 + Drop</div>
+        </div>
+        <div class="pipe-arrow">→</div>
+        <div class="pipe-block" style="background:var(--amber-dim);border:1px solid rgba(245,166,35,0.3);">
+          <div class="pipe-name">Output</div>
+          <div class="pipe-size">10 (Softmax)</div>
+        </div>
+      </div>
+
+      <div class="code-label">
+        <span class="code-label-name">cnn_model.py</span>
+        <span class="code-label-badge">Sel 5</span>
+      </div>
+      <div class="code-block"><span class="c-comment"># ── Model CNN ───────────────────────────────────────────────────</span>
+cnn_model = keras.<span class="c-cls">Sequential</span>([
+    <span class="c-comment"># Blok konvolusi 1</span>
+    layers.<span class="c-cls">Conv2D</span>(<span class="c-num">32</span>, (<span class="c-num">3</span>,<span class="c-num">3</span>), activation=<span class="c-str">'relu'</span>,
+                  input_shape=(<span class="c-num">28</span>, <span class="c-num">28</span>, <span class="c-num">1</span>), padding=<span class="c-str">'same'</span>),
+    layers.<span class="c-cls">MaxPooling2D</span>((<span class="c-num">2</span>, <span class="c-num">2</span>)),
+
+    <span class="c-comment"># Blok konvolusi 2</span>
+    layers.<span class="c-cls">Conv2D</span>(<span class="c-num">64</span>, (<span class="c-num">3</span>,<span class="c-num">3</span>), activation=<span class="c-str">'relu'</span>, padding=<span class="c-str">'same'</span>),
+    layers.<span class="c-cls">MaxPooling2D</span>((<span class="c-num">2</span>, <span class="c-num">2</span>)),
+
+    <span class="c-comment"># Flatten + Dense head</span>
+    layers.<span class="c-cls">Flatten</span>(),
+    layers.<span class="c-cls">Dense</span>(<span class="c-num">128</span>, activation=<span class="c-str">'relu'</span>),
+    layers.<span class="c-cls">Dropout</span>(<span class="c-num">0.4</span>),
+    layers.<span class="c-cls">Dense</span>(<span class="c-num">10</span>, activation=<span class="c-str">'softmax'</span>)
+], name=<span class="c-str">"CNN_MNIST"</span>)
+
+cnn_model.<span class="c-fn">compile</span>(
+    optimizer=keras.optimizers.<span class="c-cls">Adam</span>(learning_rate=<span class="c-num">0.001</span>),
+    loss=<span class="c-str">'sparse_categorical_crossentropy'</span>,
+    metrics=[<span class="c-str">'accuracy'</span>]
+)
+
+cnn_model.<span class="c-fn">summary</span>()
+
+<span class="c-comment"># ── Training ─────────────────────────────────────────────────────</span>
+history_cnn = cnn_model.<span class="c-fn">fit</span>(
+    X_train, y_train,
+    epochs=<span class="c-num">15</span>,
+    batch_size=<span class="c-num">64</span>,
+    validation_split=<span class="c-num">0.15</span>,
+    callbacks=[<span class="c-cls">EarlyStopping</span>(monitor=<span class="c-str">'val_loss'</span>,
+                              patience=<span class="c-num">3</span>,
+                              restore_best_weights=<span class="c-kw">True</span>)],
+    verbose=<span class="c-num">1</span>
+)
+
+loss_cnn, acc_cnn = cnn_model.<span class="c-fn">evaluate</span>(X_test, y_test, verbose=<span class="c-num">0</span>)
+<span class="c-fn">print</span>(<span class="c-str">f"\nCNN  → Test accuracy: {acc_cnn:.4f}"</span>)
+<span class="c-fn">print</span>(<span class="c-str">f"MLP  → Test accuracy: {acc_mlp:.4f}"</span>)
+<span class="c-fn">print</span>(<span class="c-str">f"Improvement: +{(acc_cnn - acc_mlp)*100:.2f}%"</span>)</div>
+
+      <div class="output-label">Output yang diharapkan</div>
+      <div class="output-block">Epoch 1/15 — loss: 0.1893 — accuracy: 0.9421 — val_accuracy: 0.9876
+...
+Epoch 10/15 — loss: 0.0102 — accuracy: 0.9968 — val_accuracy: 0.9921
+
+CNN  → Test accuracy: 0.9923
+MLP  → Test accuracy: 0.9787
+Improvement: +1.36%</div>
+
+      <div class="callout info">
+        <span class="callout-icon">💡</span>
+        <div class="callout-body">
+          <p><strong>Mengapa CNN lebih baik?</strong> MLP "meratakan" gambar menjadi 784 angka dan kehilangan semua informasi posisi piksel. CNN mempertahankan struktur spasial 2D — mendeteksi pola di mana pun letaknya di gambar. Untuk MNIST yang sederhana, selisihnya kecil. Untuk gambar kompleks (foto wajah, objek), selisihnya bisa sangat besar.</p>
+        </div>
+      </div>
+
+      <h3 style="margin-top:var(--s5);">2.5 Visualisasi Hasil Prediksi</h3>
+
+      <div class="code-label">
+        <span class="code-label-name">visualize_predictions.py</span>
+        <span class="code-label-badge">Sel 6</span>
+      </div>
+      <div class="code-block"><span class="c-comment"># ── Prediksi dan visualisasi ─────────────────────────────────────</span>
+y_pred_proba = cnn_model.<span class="c-fn">predict</span>(X_test, verbose=<span class="c-num">0</span>)
+y_pred       = np.<span class="c-fn">argmax</span>(y_pred_proba, axis=<span class="c-num">1</span>)
+
+<span class="c-comment"># Cari prediksi yang salah</span>
+wrong_idx = np.<span class="c-fn">where</span>(y_pred != y_test)[<span class="c-num">0</span>]
+<span class="c-fn">print</span>(<span class="c-str">f"Total salah prediksi: {len(wrong_idx)} dari {len(y_test)} ({len(wrong_idx)/len(y_test)*100:.2f}%)"</span>)
+
+<span class="c-comment"># Visualisasi 10 kesalahan pertama</span>
+fig, axes = plt.<span class="c-fn">subplots</span>(<span class="c-num">2</span>, <span class="c-num">5</span>, figsize=(<span class="c-num">14</span>, <span class="c-num">6</span>))
+<span class="c-kw">for</span> i, ax <span class="c-kw">in</span> <span class="c-fn">enumerate</span>(axes.<span class="c-fn">flat</span>()):
+    idx = wrong_idx[i]
+    ax.<span class="c-fn">imshow</span>(X_test[idx, :, :, <span class="c-num">0</span>], cmap=<span class="c-str">'gray'</span>)
+    ax.<span class="c-fn">set_title</span>(
+        <span class="c-str">f"True: {y_test[idx]}\nPred: {y_pred[idx]}"</span>,
+        color=<span class="c-str">'red'</span>, fontsize=<span class="c-num">9</span>
+    )
+    ax.<span class="c-fn">axis</span>(<span class="c-str">'off'</span>)
+plt.<span class="c-fn">suptitle</span>(<span class="c-str">"Prediksi Salah CNN"</span>, fontsize=<span class="c-num">13</span>)
+plt.<span class="c-fn">tight_layout</span>()
+plt.<span class="c-fn">show</span>()</div>
+    </div>
+
+    <!-- BAGIAN 2: ANALISIS SENTIMEN -->
+    <div class="content-block" id="sentimen">
+      <h2>3. Analisis Sentimen Ulasan Produk</h2>
+      <p>Sekarang kita pindah ke NLP — mengklasifikasikan ulasan produk e-commerce Bahasa Indonesia sebagai positif atau negatif menggunakan jaringan neural berbasis teks.</p>
+
+      <h3>3.1 Pipeline Analisis Sentimen</h3>
+      <div class="step-flow">
+        <div class="step-row">
+          <div class="step-num">1</div>
+          <div class="step-content">
+            <div class="step-title">Muat Data</div>
+            <div class="step-desc">Baca <code>review_produk.csv</code> dari Edlink, eksplorasi distribusi label, cek sampel teks.</div>
+          </div>
+        </div>
+        <div class="step-row">
+          <div class="step-num">2</div>
+          <div class="step-content">
+            <div class="step-title">Text Cleaning</div>
+            <div class="step-desc">Lowercase, hapus tanda baca, angka, dan karakter non-alfanumerik. Opsional: stopword removal Bahasa Indonesia.</div>
+          </div>
+        </div>
+        <div class="step-row">
+          <div class="step-num">3</div>
+          <div class="step-content">
+            <div class="step-title">Tokenisasi & Encoding</div>
+            <div class="step-desc">Keras <code>Tokenizer</code>: ubah teks menjadi urutan integer berdasarkan frekuensi kata. Tentukan vocabulary size.</div>
+          </div>
+        </div>
+        <div class="step-row">
+          <div class="step-num">4</div>
+          <div class="step-content">
+            <div class="step-title">Padding</div>
+            <div class="step-desc"><code>pad_sequences</code>: samakan panjang semua urutan dengan padding 0 di kiri/kanan hingga <code>maxlen</code> yang ditentukan.</div>
+          </div>
+        </div>
+        <div class="step-row">
+          <div class="step-num">5</div>
+          <div class="step-content">
+            <div class="step-title">Bangun & Latih Model</div>
+            <div class="step-desc">Embedding layer → GlobalAveragePooling (atau LSTM) → Dense → Sigmoid output. Compile dengan binary crossentropy.</div>
+          </div>
+        </div>
+        <div class="step-row">
+          <div class="step-num">6</div>
+          <div class="step-content">
+            <div class="step-title">Evaluasi</div>
+            <div class="step-desc">Classification report (precision, recall, F1) dan confusion matrix. Uji dengan ulasan baru yang ditulis sendiri.</div>
+          </div>
+        </div>
+      </div>
+
+      <h3>3.2 Muat & Eksplorasi Data</h3>
+
+      <div class="code-label">
+        <span class="code-label-name">sentiment_load.py</span>
+        <span class="code-label-badge">Sel 7</span>
+      </div>
+      <div class="code-block"><span class="c-comment"># ── Muat dataset ─────────────────────────────────────────────────</span>
+<span class="c-comment"># Upload review_produk.csv dari Edlink, lalu jalankan sel ini</span>
+<span class="c-kw">from</span> google.colab <span class="c-kw">import</span> files
+uploaded = files.<span class="c-fn">upload</span>()   <span class="c-comment"># pilih review_produk.csv</span>
+
+df = pd.<span class="c-fn">read_csv</span>(<span class="c-str">'review_produk.csv'</span>)
+<span class="c-fn">print</span>(df.<span class="c-fn">head</span>(<span class="c-num">5</span>))
+<span class="c-fn">print</span>(<span class="c-str">f"\nShape    : {df.shape}"</span>)
+<span class="c-fn">print</span>(<span class="c-str">f"Kolom    : {df.columns.tolist()}"</span>)
+<span class="c-fn">print</span>(<span class="c-str">f"Label    :\n{df['label'].value_counts()}"</span>)
+<span class="c-fn">print</span>(<span class="c-str">f"Null     : {df.isnull().sum().sum()}"</span>)
+
+<span class="c-comment"># Cek panjang teks</span>
+df[<span class="c-str">'panjang'</span>] = df[<span class="c-str">'teks'</span>].<span class="c-fn">apply</span>(<span class="c-kw">lambda</span> x: <span class="c-fn">len</span>(<span class="c-fn">str</span>(x).<span class="c-fn">split</span>()))
+<span class="c-fn">print</span>(<span class="c-str">f"\nPanjang teks (kata):\n{df['panjang'].describe()}"</span>)</div>
+
+      <div class="output-label">Output yang diharapkan</div>
+      <div class="output-block">   id                                   teks  label
+0   1  Produk bagus banget, pengiriman cepat...      1
+1   2    Kecewa berat, barang tidak sesuai foto      0
+...
+
+Shape    : (15000, 3)
+Kolom    : ['id', 'teks', 'label']
+Label    :
+1    8200
+0    6800
+Name: label, dtype: int64
+Null     : 0
+
+Panjang teks (kata):
+count    15000.00
+mean        22.47
+max        148.00</div>
+
+      <h3 style="margin-top:var(--s5);">3.3 Text Preprocessing</h3>
+
+      <div class="code-label">
+        <span class="code-label-name">text_preprocess.py</span>
+        <span class="code-label-badge">Sel 8</span>
+      </div>
+      <div class="code-block"><span class="c-kw">import</span> re
+<span class="c-kw">from</span> sklearn.model_selection <span class="c-kw">import</span> train_test_split
+<span class="c-kw">from</span> tensorflow.keras.preprocessing.text <span class="c-kw">import</span> <span class="c-cls">Tokenizer</span>
+<span class="c-kw">from</span> tensorflow.keras.preprocessing.sequence <span class="c-kw">import</span> pad_sequences
+
+<span class="c-comment"># ── Cleaning ─────────────────────────────────────────────────────</span>
+<span class="c-kw">def</span> <span class="c-fn">clean_text</span>(teks):
+    teks = <span class="c-fn">str</span>(teks).<span class="c-fn">lower</span>()                    <span class="c-comment"># lowercase</span>
+    teks = re.<span class="c-fn">sub</span>(<span class="c-str">r'[^a-z\s]'</span>, <span class="c-str">''</span>, teks)       <span class="c-comment"># hapus non-huruf</span>
+    teks = re.<span class="c-fn">sub</span>(<span class="c-str">r'\s+'</span>, <span class="c-str">' '</span>, teks).<span class="c-fn">strip</span>()  <span class="c-comment"># rapikan spasi</span>
+    <span class="c-kw">return</span> teks
+
+df[<span class="c-str">'teks_bersih'</span>] = df[<span class="c-str">'teks'</span>].<span class="c-fn">apply</span>(clean_text)
+
+<span class="c-comment"># ── Konfigurasi tokenisasi ────────────────────────────────────────</span>
+VOCAB_SIZE  = <span class="c-num">10000</span>   <span class="c-comment"># ukuran kosakata maksimal</span>
+MAX_LEN     = <span class="c-num">60</span>      <span class="c-comment"># panjang urutan (kata) setelah padding</span>
+EMBED_DIM   = <span class="c-num">64</span>      <span class="c-comment"># dimensi embedding vector</span>
+
+<span class="c-comment"># ── Train/test split ─────────────────────────────────────────────</span>
+X = df[<span class="c-str">'teks_bersih'</span>].<span class="c-fn">values</span>
+y = df[<span class="c-str">'label'</span>].<span class="c-fn">values</span>
+
+X_tr, X_te, y_tr, y_te = <span class="c-fn">train_test_split</span>(
+    X, y, test_size=<span class="c-num">0.2</span>, random_state=<span class="c-num">42</span>, stratify=y
+)
+
+<span class="c-comment"># ── Tokenizer: fit hanya pada data training ───────────────────────</span>
+tokenizer = <span class="c-cls">Tokenizer</span>(num_words=VOCAB_SIZE, oov_token=<span class="c-str">'&lt;OOV&gt;'</span>)
+tokenizer.<span class="c-fn">fit_on_texts</span>(X_tr)
+
+<span class="c-comment"># Konversi teks → sequence integer</span>
+X_tr_seq = tokenizer.<span class="c-fn">texts_to_sequences</span>(X_tr)
+X_te_seq = tokenizer.<span class="c-fn">texts_to_sequences</span>(X_te)
+
+<span class="c-comment"># Padding ke panjang seragam</span>
+X_tr_pad = <span class="c-fn">pad_sequences</span>(X_tr_seq, maxlen=MAX_LEN, padding=<span class="c-str">'post'</span>)
+X_te_pad = <span class="c-fn">pad_sequences</span>(X_te_seq, maxlen=MAX_LEN, padding=<span class="c-str">'post'</span>)
+
+<span class="c-fn">print</span>(<span class="c-str">f"X_tr_pad shape: {X_tr_pad.shape}"</span>)   <span class="c-comment"># (12000, 60)</span>
+<span class="c-fn">print</span>(<span class="c-str">f"Vocab size    : {len(tokenizer.word_index)}"</span>)
+<span class="c-fn">print</span>(<span class="c-str">"Contoh sequence:"</span>, X_tr_seq[<span class="c-num">0</span>][:<span class="c-num">10</span>])</div>
+
+      <h3 style="margin-top:var(--s5);">3.4 Model Sentimen — Embedding + GlobalAveragePooling</h3>
+      <p>Kita bangun model paling sederhana dulu: Embedding layer untuk representasi kata, lalu GlobalAveragePooling untuk merangkum seluruh kalimat menjadi satu vektor.</p>
+
+      <div class="code-label">
+        <span class="code-label-name">sentiment_model_v1.py</span>
+        <span class="code-label-badge">Sel 9</span>
+      </div>
+      <div class="code-block"><span class="c-comment"># ── Model V1: Embedding + GAP ────────────────────────────────────</span>
+sent_model = keras.<span class="c-cls">Sequential</span>([
+    <span class="c-comment"># Embedding: ubah integer → dense vector</span>
+    layers.<span class="c-cls">Embedding</span>(
+        input_dim=VOCAB_SIZE,
+        output_dim=EMBED_DIM,
+        input_length=MAX_LEN
+    ),
+    <span class="c-comment"># GlobalAveragePooling: rata-rata semua embedding kata di kalimat</span>
+    layers.<span class="c-cls">GlobalAveragePooling1D</span>(),
+
+    <span class="c-comment"># Klasifikasi head</span>
+    layers.<span class="c-cls">Dense</span>(<span class="c-num">64</span>, activation=<span class="c-str">'relu'</span>),
+    layers.<span class="c-cls">Dropout</span>(<span class="c-num">0.4</span>),
+    layers.<span class="c-cls">Dense</span>(<span class="c-num">1</span>, activation=<span class="c-str">'sigmoid'</span>)   <span class="c-comment"># output biner</span>
+], name=<span class="c-str">"Sentimen_GAP"</span>)
+
+sent_model.<span class="c-fn">compile</span>(
+    optimizer=<span class="c-str">'adam'</span>,
+    loss=<span class="c-str">'binary_crossentropy'</span>,
+    metrics=[<span class="c-str">'accuracy'</span>]
+)
+
+sent_model.<span class="c-fn">summary</span>()
+
+<span class="c-comment"># ── Training ─────────────────────────────────────────────────────</span>
+history_sent = sent_model.<span class="c-fn">fit</span>(
+    X_tr_pad, y_tr,
+    epochs=<span class="c-num">20</span>,
+    batch_size=<span class="c-num">64</span>,
+    validation_split=<span class="c-num">0.15</span>,
+    callbacks=[<span class="c-cls">EarlyStopping</span>(monitor=<span class="c-str">'val_loss'</span>,
+                              patience=<span class="c-num">4</span>,
+                              restore_best_weights=<span class="c-kw">True</span>)],
+    verbose=<span class="c-num">1</span>
+)
+
+loss_s, acc_s = sent_model.<span class="c-fn">evaluate</span>(X_te_pad, y_te, verbose=<span class="c-num">0</span>)
+<span class="c-fn">print</span>(<span class="c-str">f"\nSentimen GAP → Test accuracy: {acc_s:.4f}"</span>)</div>
+
+      <div class="output-label">Output yang diharapkan</div>
+      <div class="output-block">Epoch 1/20 — loss: 0.5821 — accuracy: 0.7023 — val_accuracy: 0.8134
+...
+Epoch 11/20 — loss: 0.1243 — accuracy: 0.9567 — val_accuracy: 0.8920
+
+Sentimen GAP → Test accuracy: 0.8876</div>
+
+      <h3 style="margin-top:var(--s5);">3.5 Model Sentimen — LSTM (Opsional / Bonus)</h3>
+      <p>LSTM mempertimbangkan urutan kata — "tidak bagus" berbeda dari "bagus tidak". Untuk sentimen yang mengandung negasi dan konteks, LSTM biasanya lebih baik dari GAP.</p>
+
+      <div class="code-label">
+        <span class="code-label-name">sentiment_model_v2_lstm.py</span>
+        <span class="code-label-badge">Sel 10</span>
+      </div>
+      <div class="code-block"><span class="c-comment"># ── Model V2: Embedding + LSTM ───────────────────────────────────</span>
+lstm_model = keras.<span class="c-cls">Sequential</span>([
+    layers.<span class="c-cls">Embedding</span>(VOCAB_SIZE, EMBED_DIM, input_length=MAX_LEN),
+    layers.<span class="c-cls">Bidirectional</span>(layers.<span class="c-cls">LSTM</span>(<span class="c-num">64</span>, dropout=<span class="c-num">0.3</span>)),
+    layers.<span class="c-cls">Dense</span>(<span class="c-num">32</span>, activation=<span class="c-str">'relu'</span>),
+    layers.<span class="c-cls">Dense</span>(<span class="c-num">1</span>,  activation=<span class="c-str">'sigmoid'</span>)
+], name=<span class="c-str">"Sentimen_BiLSTM"</span>)
+
+lstm_model.<span class="c-fn">compile</span>(
+    optimizer=keras.optimizers.<span class="c-cls">Adam</span>(<span class="c-num">0.001</span>),
+    loss=<span class="c-str">'binary_crossentropy'</span>,
+    metrics=[<span class="c-str">'accuracy'</span>]
+)
+
+history_lstm = lstm_model.<span class="c-fn">fit</span>(
+    X_tr_pad, y_tr,
+    epochs=<span class="c-num">15</span>,
+    batch_size=<span class="c-num">64</span>,
+    validation_split=<span class="c-num">0.15</span>,
+    callbacks=[<span class="c-cls">EarlyStopping</span>(monitor=<span class="c-str">'val_loss'</span>,
+                              patience=<span class="c-num">3</span>,
+                              restore_best_weights=<span class="c-kw">True</span>)],
+    verbose=<span class="c-num">1</span>
+)
+
+loss_lstm, acc_lstm = lstm_model.<span class="c-fn">evaluate</span>(X_te_pad, y_te, verbose=<span class="c-num">0</span>)
+<span class="c-fn">print</span>(<span class="c-str">f"\nSentimen BiLSTM → Test accuracy: {acc_lstm:.4f}"</span>)</div>
+    </div>
+
+    <!-- EVALUASI -->
+    <div class="content-block" id="evaluasi">
+      <h2>4. Evaluasi Model yang Benar</h2>
+      <p>Accuracy saja tidak cukup — terutama untuk dataset yang tidak seimbang. Kita perlu melihat precision, recall, dan F1-score per kelas.</p>
+
+      <h3>4.1 Classification Report</h3>
+
+      <div class="code-label">
+        <span class="code-label-name">evaluation.py</span>
+        <span class="code-label-badge">Sel 11</span>
+      </div>
+      <div class="code-block"><span class="c-comment"># ── Prediksi ─────────────────────────────────────────────────────</span>
+y_pred_prob = sent_model.<span class="c-fn">predict</span>(X_te_pad, verbose=<span class="c-num">0</span>)
+y_pred      = (y_pred_prob > <span class="c-num">0.5</span>).<span class="c-fn">astype</span>(<span class="c-str">'int'</span>).<span class="c-fn">flatten</span>()
+
+<span class="c-comment"># ── Classification Report ─────────────────────────────────────────</span>
+<span class="c-fn">print</span>(<span class="c-fn">classification_report</span>(
+    y_te, y_pred,
+    target_names=[<span class="c-str">'Negatif (0)'</span>, <span class="c-str">'Positif (1)'</span>]
+))
+
+<span class="c-comment"># ── Confusion Matrix ──────────────────────────────────────────────</span>
+cm = <span class="c-fn">confusion_matrix</span>(y_te, y_pred)
+disp = <span class="c-cls">ConfusionMatrixDisplay</span>(confusion_matrix=cm,
+                               display_labels=[<span class="c-str">'Negatif'</span>, <span class="c-str">'Positif'</span>])
+disp.<span class="c-fn">plot</span>(cmap=<span class="c-str">'Blues'</span>)
+plt.<span class="c-fn">title</span>(<span class="c-str">"Confusion Matrix — Model Sentimen"</span>)
+plt.<span class="c-fn">show</span>()</div>
+
+      <div class="output-label">Output yang diharapkan</div>
+      <div class="output-block">              precision    recall  f1-score   support
+
+ Negatif (0)       0.87      0.84      0.85      1360
+ Positif (1)       0.90      0.92      0.91      1640
+
+    accuracy                           0.89      3000
+   macro avg       0.88      0.88      0.88      3000
+weighted avg       0.89      0.89      0.89      3000</div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:var(--s4);margin:var(--s5) 0;">
+        <div style="background:var(--bg-2);border:1px solid var(--border);border-radius:var(--r3);padding:var(--s5);">
+          <div style="font-family:var(--mono);font-size:11px;color:var(--teal);text-transform:uppercase;letter-spacing:1px;margin-bottom:var(--s3);">Precision</div>
+          <div style="font-size:13px;color:var(--text-2);line-height:1.7;">Dari semua yang diprediksi positif, berapa % yang benar-benar positif? Tinggi = sedikit false positive. Penting jika cost salah label positif tinggi.</div>
+        </div>
+        <div style="background:var(--bg-2);border:1px solid var(--border);border-radius:var(--r3);padding:var(--s5);">
+          <div style="font-family:var(--mono);font-size:11px;color:var(--blue);text-transform:uppercase;letter-spacing:1px;margin-bottom:var(--s3);">Recall</div>
+          <div style="font-size:13px;color:var(--text-2);line-height:1.7;">Dari semua yang benar-benar positif, berapa % yang berhasil dideteksi? Tinggi = sedikit false negative. Penting jika melewatkan kasus positif sangat merugikan.</div>
+        </div>
+        <div style="background:var(--bg-2);border:1px solid var(--border);border-radius:var(--r3);padding:var(--s5);">
+          <div style="font-family:var(--mono);font-size:11px;color:var(--amber);text-transform:uppercase;letter-spacing:1px;margin-bottom:var(--s3);">F1-Score</div>
+          <div style="font-size:13px;color:var(--text-2);line-height:1.7;">Harmonic mean dari precision dan recall. Metrik terbaik untuk dataset tidak seimbang. Gunakan ini sebagai primary metric, bukan accuracy.</div>
+        </div>
+      </div>
+
+      <h3>4.2 Uji dengan Ulasan Baru</h3>
+
+      <div class="code-label">
+        <span class="code-label-name">inference.py</span>
+        <span class="code-label-badge">Sel 12</span>
+      </div>
+      <div class="code-block"><span class="c-kw">def</span> <span class="c-fn">prediksi_sentimen</span>(teks, model, tokenizer, maxlen):
+    teks_bersih = <span class="c-fn">clean_text</span>(teks)
+    seq    = tokenizer.<span class="c-fn">texts_to_sequences</span>([teks_bersih])
+    padded = <span class="c-fn">pad_sequences</span>(seq, maxlen=maxlen, padding=<span class="c-str">'post'</span>)
+    prob   = model.<span class="c-fn">predict</span>(padded, verbose=<span class="c-num">0</span>)[<span class="c-num">0</span>][<span class="c-num">0</span>]
+    label  = <span class="c-str">"Positif 😊"</span> <span class="c-kw">if</span> prob > <span class="c-num">0.5</span> <span class="c-kw">else</span> <span class="c-str">"Negatif 😞"</span>
+    <span class="c-kw">return</span> <span class="c-str">f"[{label}] (confidence: {prob:.3f})\nTeks: {teks}"</span>
+
+<span class="c-comment"># Uji dengan ulasan buatan sendiri</span>
+ulasan_uji = [
+    <span class="c-str">"Produk berkualitas tinggi, pengiriman cepat, packing aman!"</span>,
+    <span class="c-str">"Kecewa banget, barang datang rusak dan customer service tidak responsif"</span>,
+    <span class="c-str">"Lumayan sih, tapi harganya kemahalan untuk kualitas segitu"</span>,
+    <span class="c-str">"Tidak sesuai deskripsi sama sekali, mau return tapi ribet"</span>,
+]
+
+<span class="c-kw">for</span> ulasan <span class="c-kw">in</span> ulasan_uji:
+    <span class="c-fn">print</span>(<span class="c-fn">prediksi_sentimen</span>(ulasan, sent_model, tokenizer, MAX_LEN))
+    <span class="c-fn">print</span>(<span class="c-str">"-"</span> * <span class="c-num">60</span>)</div>
+
+      <div class="output-label">Output yang diharapkan</div>
+      <div class="output-block">[Positif 😊] (confidence: 0.967)
+Teks: Produk berkualitas tinggi, pengiriman cepat, packing aman!
+------------------------------------------------------------
+[Negatif 😞] (confidence: 0.043)
+Teks: Kecewa banget, barang datang rusak dan customer service tidak responsif
+------------------------------------------------------------
+[Negatif 😞] (confidence: 0.381)
+Teks: Lumayan sih, tapi harganya kemahalan untuk kualitas segitu
+------------------------------------------------------------
+[Negatif 😞] (confidence: 0.089)
+Teks: Tidak sesuai deskripsi sama sekali, mau return tapi ribet</div>
+    </div>
+
+    <!-- PERBANDINGAN -->
+    <div class="content-block" id="perbandingan">
+      <h2>5. Rekap & Perbandingan Semua Model</h2>
+      <p>Setelah melatih semua model, kita bandingkan hasil secara side-by-side.</p>
+
+      <div class="code-label">
+        <span class="code-label-name">final_comparison.py</span>
+        <span class="code-label-badge">Sel 13</span>
+      </div>
+      <div class="code-block"><span class="c-comment"># ── Ringkasan semua model ────────────────────────────────────────</span>
+hasil = {
+    <span class="c-str">"Model"</span>: [
+        <span class="c-str">"MLP (MNIST)"</span>, <span class="c-str">"CNN (MNIST)"</span>,
+        <span class="c-str">"GAP Sentimen"</span>, <span class="c-str">"BiLSTM Sentimen"</span>
+    ],
+    <span class="c-str">"Task"</span>: [
+        <span class="c-str">"Klasifikasi gambar"</span>, <span class="c-str">"Klasifikasi gambar"</span>,
+        <span class="c-str">"Analisis sentimen"</span>, <span class="c-str">"Analisis sentimen"</span>
+    ],
+    <span class="c-str">"Test Accuracy"</span>: [
+        <span class="c-str">f"{acc_mlp:.4f}"</span>, <span class="c-str">f"{acc_cnn:.4f}"</span>,
+        <span class="c-str">f"{acc_s:.4f}"</span>,   <span class="c-str">f"{acc_lstm:.4f}"</span>
+    ],
+}
+
+df_hasil = pd.<span class="c-cls">DataFrame</span>(hasil)
+<span class="c-fn">print</span>(df_hasil.<span class="c-fn">to_string</span>(index=<span class="c-kw">False</span>))</div>
+
+      <table class="comp-table">
+        <thead>
+          <tr>
+            <th>Model</th>
+            <th>Arsitektur Kunci</th>
+            <th>Test Accuracy (estimasi)</th>
+            <th>Catatan</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>MLP (MNIST)</strong></td>
+            <td>Dense 256→128→10</td>
+            <td style="font-family:var(--mono);color:var(--blue);">~97.9%</td>
+            <td>Baseline — baik tapi tidak optimal untuk gambar</td>
+          </tr>
+          <tr>
+            <td><strong>CNN (MNIST)</strong></td>
+            <td>Conv32→Conv64→Dense128→10</td>
+            <td style="font-family:var(--mono);color:var(--teal);">~99.2%</td>
+            <td>+1.3% vs MLP. Lebih efisien parameter untuk gambar</td>
+          </tr>
+          <tr>
+            <td><strong>GAP Sentimen</strong></td>
+            <td>Emb64→GAP→Dense64→1</td>
+            <td style="font-family:var(--mono);color:var(--blue);">~88–90%</td>
+            <td>Cepat, ringan, cukup baik untuk sentimen sederhana</td>
+          </tr>
+          <tr>
+            <td><strong>BiLSTM Sentimen</strong></td>
+            <td>Emb64→BiLSTM64→Dense32→1</td>
+            <td style="font-family:var(--mono);color:var(--teal);">~90–92%</td>
+            <td>Lebih lambat training, tapi menangani konteks lebih baik</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="callout info">
+        <span class="callout-icon">🔍</span>
+        <div class="callout-body">
+          <p><strong>Pelajaran utama dari perbandingan ini:</strong> Arsitektur yang tepat untuk data yang tepat selalu menang. CNN unggul di gambar karena mengeksploitasi struktur spasial yang MLP abaikan. LSTM menangkap urutan yang GAP lewatkan. Tidak ada satu arsitektur yang "terbaik" untuk semua masalah.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- RINGKASAN & TUGAS -->
+    <div class="content-block" id="ringkasan">
+      <h2>Ringkasan Pertemuan Ini</h2>
+      <div style="background:var(--bg-2);border:1px solid var(--border);border-radius:var(--r3);padding:var(--s5);">
+        <ul>
+          <li>Dataset MNIST dimuat langsung via <code>keras.datasets.mnist.load_data()</code> — tidak perlu download manual. Preprocessing kritis: normalisasi 0–1 dan reshape ke <code>(N, 28, 28, 1)</code> untuk CNN</li>
+          <li>CNN mengalahkan MLP di MNIST (~99.2% vs ~97.9%) karena mempertahankan struktur spasial gambar melalui Conv2D + MaxPooling</li>
+          <li>Pipeline NLP: <strong>cleaning → tokenizer.fit_on_texts → texts_to_sequences → pad_sequences</strong>. Tokenizer hanya di-fit pada data training untuk menghindari data leakage</li>
+          <li>Model Embedding+GAP adalah baseline yang cepat dan ringan untuk teks; LSTM/BiLSTM lebih kuat untuk konteks dan negasi</li>
+          <li>Untuk klasifikasi biner sentimen: gunakan <code>sigmoid</code> output + <code>binary_crossentropy</code> loss. Threshold 0.5 bisa disesuaikan berdasarkan kebutuhan bisnis</li>
+          <li>Selalu lihat <strong>classification report</strong> (precision/recall/F1) bukan hanya accuracy — terutama pada dataset yang tidak seimbang</li>
+        </ul>
+      </div>
+
+      <!-- TASK BOX -->
+      <div class="task-box" id="tugas">
+        <div class="task-box-title">📋 Tugas Pertemuan Ini</div>
+        <p style="font-size:13px;color:var(--text-2);margin-bottom:var(--s4);">Kumpulkan sebagai Jupyter Notebook (.ipynb) melalui <strong>Edlink → Pertemuan 6</strong> sebelum pertemuan ke-7. Pastikan semua sel sudah dijalankan dan output terlihat.</p>
+        <ol style="font-size:14px;color:var(--text);line-height:2.1;">
+          <li><strong>CNN MNIST Lengkap:</strong> Jalankan seluruh pipeline CNN dari Sel 2–6. Tampilkan: (a) model summary, (b) loss & accuracy curve training vs validation, (c) confusion matrix pada test set, (d) perbandingan accuracy MLP vs CNN. Tulis analisis: berapa parameter CNN vs MLP? Mana yang lebih efisien?</li>
+          <li><strong>Eksplorasi Arsitektur CNN:</strong> Modifikasi CNN dengan menambahkan satu blok Conv2D+MaxPool ketiga. Bandingkan: apakah lebih dalam menghasilkan accuracy lebih tinggi? Perhatikan juga waktu training. Catat temuanmu dalam satu paragraf.</li>
+          <li><strong>Analisis Sentimen Lengkap:</strong> Latih model GAP Sentimen (Sel 7–12) dengan dataset <code>review_produk.csv</code>. Tampilkan: (a) distribusi label data, (b) training history, (c) classification report dan confusion matrix, (d) hasil prediksi minimal 5 ulasan yang kamu tulis sendiri.</li>
+          <li><strong>Analisis Kesalahan:</strong> Dari prediksi salah model sentimen, pilih 3 contoh ulasan yang salah diklasifikasikan. Tulis hipotesis mengapa model salah — apakah ada kata ambigu, sarkasme, atau konteks yang sulit?</li>
+          <li><em>Bonus:</em> Implementasikan model BiLSTM dari Sel 10. Bandingkan accuracy dan F1-score dengan model GAP. Buat juga fungsi sederhana yang menerima input ulasan dari user (input()) dan mencetak prediksi sentimen secara real-time.</li>
+        </ol>
+      </div>
+
+      <!-- READING BOX -->
+      <div class="reading-box">
+        <div class="reading-box-title">📖 Persiapan Pertemuan Ke-7 (Review UTS)</div>
+        <div class="reading-item">
+          <span class="reading-icon">📋</span>
+          <div class="reading-label">
+            <strong>Rekap Mandiri P-01 s/d P-06</strong>
+            Buat ringkasan satu halaman untuk setiap pertemuan: apa masalah yang diangkat, solusi AI yang digunakan, dan trade-off utama. Ini adalah persiapan terbaik untuk UTS karena memaksamu memproses ulang semua konsep.
+          </div>
+        </div>
+        <div class="reading-item">
+          <span class="reading-icon">📗</span>
+          <div class="reading-label">
+            <strong>Géron — Hands-On ML, Review Chapter 1–3 & 10–14</strong>
+            Fokus pada bagian "When to use what" di setiap bab — pemilihan algoritma dan justifikasi adalah topik UTS yang sering muncul.
+          </div>
+        </div>
+        <div class="reading-item">
+          <span class="reading-icon">📝</span>
+          <div class="reading-label">
+            <strong>Latihan Soal Studi Kasus</strong>
+            Latih diri menjawab pertanyaan seperti: "Diberikan dataset X dengan karakteristik Y, algoritma mana yang tepat dan mengapa?" — format UTS Blok 1 umumnya seperti ini.
+          </div>
+        </div>
+        <div class="reading-item">
+          <span class="reading-icon">🔗</span>
+          <div class="reading-label">
+            <strong>Kisi-kisi UTS di Edlink → Pertemuan 7</strong>
+            Kisi-kisi resmi akan dirilis bersamaan dengan materi review P-07. Pastikan sudah diunduh sebelum sesi review dimulai.
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ── ASIDE ── -->
+  <aside class="content-aside">
+    <!-- TOC -->
+    <div class="toc">
+      <div class="toc-title">Isi Halaman</div>
+      <ul class="toc-list">
+        <li><a href="#tujuan" class="active">Tujuan Pembelajaran</a></li>
+        <li><a href="#setup">1. Setup & Import</a></li>
+        <li><a href="#cnn-mnist">2. CNN untuk MNIST</a></li>
+        <li><a href="#sentimen">3. Analisis Sentimen</a></li>
+        <li><a href="#evaluasi">4. Evaluasi Model</a></li>
+        <li><a href="#perbandingan">5. Perbandingan Semua Model</a></li>
+        <li><a href="#ringkasan">Ringkasan & Tugas</a></li>
+      </ul>
+    </div>
+
+    <!-- Sesi nav -->
+    <div class="sesi-nav-aside">
+      <div class="sesi-nav-title">Navigasi Sesi</div>
+      <a href="sesi-05.html" class="sesi-nav-btn">
+        <span>←</span>
+        <span>P-05: Deep Learning & Neural Network</span>
+      </a>
+      <a href="../index.html" class="sesi-nav-btn" style="margin-top:var(--s2);">
+        <span>🏠</span>
+        <span>Kembali ke Beranda</span>
+      </a>
+      <div style="font-size:12px;color:var(--text-3);margin-top:var(--s4);padding:var(--s3) 0;border-top:1px solid var(--border);">Sesi berikutnya:</div>
+      <a href="#" class="sesi-nav-btn" style="opacity:0.5;pointer-events:none;">
+        <span>→</span>
+        <span>P-07: Review & Persiapan UTS</span>
+      </a>
+    </div>
+
+    <!-- Info box -->
+    <div style="background:var(--bg-2);border:1px solid var(--border);border-radius:var(--r3);padding:var(--s5);margin-top:var(--s4);">
+      <div style="font-family:var(--mono);font-size:10px;color:var(--text-3);letter-spacing:2px;text-transform:uppercase;margin-bottom:var(--s3);">Info Pertemuan</div>
+      <div style="display:flex;flex-direction:column;gap:var(--s3);">
+        <div>
+          <div style="font-size:11px;color:var(--text-3);">Tipe</div>
+          <div style="font-size:13px;color:var(--text);">Praktik Terbimbing</div>
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--text-3);">Durasi</div>
+          <div style="font-size:13px;color:var(--text);">100 menit</div>
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--text-3);">CPMK</div>
+          <div style="font-size:13px;color:var(--text);">C2 (ML), C3 (Deep Learning & LLM)</div>
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--text-3);">Tools</div>
+          <div style="font-size:13px;color:var(--text);">TensorFlow 2.x · Keras · Google Colab</div>
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--text-3);">Dataset</div>
+          <div style="font-size:13px;color:var(--text);">MNIST (built-in) · review_produk.csv</div>
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--text-3);">Referensi</div>
+          <div style="font-size:13px;color:var(--text);">Géron Ch. 14, MIT 6.S191</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick ref -->
+    <div style="background:var(--bg-2);border:1px solid var(--border);border-radius:var(--r3);padding:var(--s5);margin-top:var(--s4);">
+      <div style="font-family:var(--mono);font-size:10px;color:var(--text-3);letter-spacing:2px;text-transform:uppercase;margin-bottom:var(--s4);">Keras Quick Ref</div>
+      <div style="display:flex;flex-direction:column;gap:var(--s3);font-size:12px;color:var(--text-2);">
+        <div><span style="color:var(--teal);font-family:var(--mono);">Conv2D(n, k)</span> → konvolusi n filter ukuran k×k</div>
+        <div><span style="color:var(--teal);font-family:var(--mono);">MaxPooling2D(p)</span> → downsampling p×p</div>
+        <div><span style="color:var(--blue);font-family:var(--mono);">Embedding(v, d)</span> → vocab v, dim d</div>
+        <div><span style="color:var(--blue);font-family:var(--mono);">GlobalAveragePooling1D()</span> → rata-rata sequence</div>
+        <div><span style="color:var(--amber);font-family:var(--mono);">Bidirectional(LSTM(n))</span> → BiLSTM n unit</div>
+      </div>
+      <div style="margin-top:var(--s4);padding-top:var(--s4);border-top:1px solid var(--border);">
+        <div style="font-family:var(--mono);font-size:10px;color:var(--text-3);letter-spacing:2px;text-transform:uppercase;margin-bottom:var(--s3);">Shapes to Remember</div>
+        <div style="display:flex;flex-direction:column;gap:var(--s3);font-size:12px;color:var(--text-2);">
+          <div>CNN input: <span style="color:var(--teal);font-family:var(--mono);">(N, H, W, C)</span></div>
+          <div>Setelah Flatten: <span style="color:var(--teal);font-family:var(--mono);">(N, H×W×C)</span></div>
+          <div>NLP input: <span style="color:var(--blue);font-family:var(--mono);">(N, maxlen)</span></div>
+          <div>Setelah Emb: <span style="color:var(--blue);font-family:var(--mono);">(N, maxlen, dim)</span></div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+</div>
+
+<!-- ══ FOOTER ══ -->
+<footer class="footer">
+  <div>AI·UKWMS <span style="color:var(--text-3);">· P-06 Praktik Deep Learning — CNN & Analisis Sentimen</span></div>
+  <div><a href="../index.html" style="color:var(--text-3);">← Kembali ke Beranda</a></div>
+</footer>
+
+<script>
+  const headings = document.querySelectorAll('.content-main [id]');
+  const tocLinks = document.querySelectorAll('.toc-list a');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(a => {
+          a.classList.remove('active');
+          if (a.getAttribute('href') === '#' + entry.target.id) a.classList.add('active');
+        });
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px' });
+  headings.forEach(h => observer.observe(h));
+
+  const navLinks = document.querySelectorAll('.nav-links a[href^="#"]');
+  window.addEventListener('scroll', () => {
+    let current = '';
+    headings.forEach(h => { if (window.scrollY >= h.offsetTop - 100) current = h.id; });
+    navLinks.forEach(a => {
+      a.classList.remove('active');
+      if (a.getAttribute('href') === '#' + current) a.classList.add('active');
+    });
+  });
+</script>
+</body>
+</html>
