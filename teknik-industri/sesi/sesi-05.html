@@ -766,11 +766,35 @@
       <!-- TASK BOX -->
       <div class="task-box" id="tugas">
         <div class="task-box-title">📋 Tugas Pertemuan Ini</div>
-        <p style="font-size:13px;color:var(--text-2);margin-bottom:var(--s4);">Kumpulkan sebagai dokumen PDF atau presentasi singkat (max 6 slide) melalui <strong>Google Classroom → Pertemuan 5</strong> sebelum pertemuan ke-6.</p>
+        <p style="font-size:13px;color:var(--text-2);margin-bottom:var(--s4);">Kumpulkan melalui <strong>Google Classroom → Pertemuan 5</strong> sebelum pertemuan ke-6. Format: <strong>Google Colab notebook</strong> (sharing "Anyone with the link can view") <em>atau</em> file Excel + screenshot hasil, dilampiri narasi singkat PDF max 2 halaman.</p>
         <ol style="font-size:14px;color:var(--text);line-height:2.1;">
-          <li><strong>Analisis Studi Kasus Lokal:</strong> Pilih satu perusahaan manufaktur atau distribusi Indonesia yang sudah mengimplementasikan AI (cari berita di Kontan, SWA, atau laporan tahunan perusahaan). Jelaskan: (a) masalah bisnis yang diatasi, (b) solusi AI yang dipilih, (c) hasil yang dilaporkan, (d) pelajaran yang bisa diambil. Minimal 400 kata.</li>
-          <li><strong>AI Readiness Audit:</strong> Bayangkan sebuah perusahaan manufaktur menengah Indonesia yang Anda kenal (bisa fiktif tapi realistis). Nilai kesiapannya menggunakan 4 dimensi yang dipelajari hari ini (Data, People, Process, Value Readiness). Beri skor 1–5 per dimensi dengan justifikasi. Tentukan satu use case AI yang paling feasible untuk perusahaan tersebut dalam 12 bulan ke depan.</li>
-          <li><em>Bonus:</em> Bandingkan akurasi Moving Average vs Exponential Smoothing vs ARIMA pada dataset penjualan publik (misalnya data retail dari Kaggle). Hitung MAPE masing-masing dan sajikan dalam tabel perbandingan. Tidak perlu Python — bisa menggunakan Excel.</li>
+          <li>
+            <strong>Perbandingan Metode Forecasting: Konvensional vs ML</strong><br>
+            <span style="font-size:13px;color:var(--text-2);line-height:1.8;display:block;margin-top:4px;">
+              Unduh salah satu dataset time series penjualan dari Kaggle — misalnya
+              <em>"Store Sales – Time Series Forecasting"</em> atau <em>"Superstore Sales Dataset"</em>.
+              Pilih satu produk atau kategori, lalu bandingkan empat metode berikut pada periode uji yang sama:
+            </span>
+            <ul style="font-size:13px;color:var(--text-2);line-height:2;margin-top:var(--s2);padding-left:var(--s5);">
+              <li>Moving Average (window 3 bulan)</li>
+              <li>Exponential Smoothing (Holt-Winters)</li>
+              <li>ARIMA</li>
+              <li>Satu metode ML — boleh Random Forest, XGBoost, atau LSTM (boleh pakai bantuan ChatGPT/Colab AI untuk bagian kode)</li>
+            </ul>
+            <span style="font-size:13px;color:var(--text-2);line-height:1.8;display:block;margin-top:var(--s2);">
+              Sajikan hasil dalam <strong>tabel perbandingan</strong> yang memuat: MAPE, MAE, dan penilaian kualitatif kompleksitas implementasi (Rendah / Sedang / Tinggi).
+              Tutup dengan narasi 150–200 kata: <em>kapan metode konvensional sudah cukup, dan kapan investasi ke ML benar-benar worth it dari perspektif supply chain?</em>
+            </span>
+          </li>
+          <li>
+            <strong>Interpretasi untuk Pengambil Keputusan</strong><br>
+            <span style="font-size:13px;color:var(--text-2);line-height:1.8;display:block;margin-top:4px;">
+              Berdasarkan hasil perbandingan di atas, tulis rekomendasi singkat (max 1 halaman) kepada manajer supply chain yang tidak berlatar belakang teknis. Jelaskan: (a) metode mana yang direkomendasikan dan mengapa, (b) apa yang perlu disiapkan perusahaan untuk menerapkannya, (c) risiko apa yang harus diantisipasi jika prediksi meleset.
+            </span>
+          </li>
+          <li>
+            <em>Bonus:</em> Tambahkan visualisasi overlay semua prediksi vs nilai aktual dalam satu grafik. Beri komentar pada bulan mana prediksi paling meleset dan apa dugaan penyebabnya.
+          </li>
         </ol>
       </div>
 
