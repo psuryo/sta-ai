@@ -310,7 +310,7 @@ Keras version      : 2.15.0</div>
 
 <span class="c-comment"># ── Visualisasi 10 contoh ────────────────────────────────────────</span>
 fig, axes = plt.<span class="c-fn">subplots</span>(<span class="c-num">2</span>, <span class="c-num">5</span>, figsize=(<span class="c-num">12</span>, <span class="c-num">5</span>))
-<span class="c-kw">for</span> i, ax <span class="c-kw">in</span> <span class="c-fn">enumerate</span>(axes.<span class="c-fn">flat</span>()):
+<span class="c-kw">for</span> i, ax <span class="c-kw">in</span> <span class="c-fn">enumerate</span>(axes.<span class="c-attr">flat</span>):
     ax.<span class="c-fn">imshow</span>(X_train_raw[i], cmap=<span class="c-str">'gray'</span>)
     ax.<span class="c-fn">set_title</span>(<span class="c-str">f"Label: {y_train[i]}"</span>, fontsize=<span class="c-num">10</span>)
     ax.<span class="c-fn">axis</span>(<span class="c-str">'off'</span>)
@@ -516,7 +516,7 @@ wrong_idx = np.<span class="c-fn">where</span>(y_pred != y_test)[<span class="c-
 
 <span class="c-comment"># Visualisasi 10 kesalahan pertama</span>
 fig, axes = plt.<span class="c-fn">subplots</span>(<span class="c-num">2</span>, <span class="c-num">5</span>, figsize=(<span class="c-num">14</span>, <span class="c-num">6</span>))
-<span class="c-kw">for</span> i, ax <span class="c-kw">in</span> <span class="c-fn">enumerate</span>(axes.<span class="c-fn">flat</span>()):
+<span class="c-kw">for</span> i, ax <span class="c-kw">in</span> <span class="c-fn">enumerate</span>(axes.<span class="c-attr">flat</span>):
     idx = wrong_idx[i]
     ax.<span class="c-fn">imshow</span>(X_test[idx, :, :, <span class="c-num">0</span>], cmap=<span class="c-str">'gray'</span>)
     ax.<span class="c-fn">set_title</span>(
