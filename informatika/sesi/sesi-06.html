@@ -540,7 +540,7 @@ plt.<span class="c-fn">show</span>()</code></pre></div>
           <div class="step-num">1</div>
           <div class="step-content">
             <div class="step-title">Muat Data</div>
-            <div class="step-desc">Baca <code>review_produk.csv</code> dari Edlink, eksplorasi distribusi label, cek sampel teks.</div>
+            <div class="step-desc">Muat dataset ulasan Tokopedia dari Hugging Face, buat label dari rating, eksplorasi distribusi label, cek sampel teks.</div>
           </div>
         </div>
         <div class="step-row">
@@ -587,11 +587,17 @@ plt.<span class="c-fn">show</span>()</code></pre></div>
         <span class="code-label-badge">Sel 7</span>
       </div>
       <div class="code-block"><pre><code><span class="c-comment"># ── Muat dataset ─────────────────────────────────────────────────</span>
-<span class="c-comment"># Upload review_produk.csv dari Edlink, lalu jalankan sel ini</span>
-<span class="c-kw">from</span> google.colab <span class="c-kw">import</span> files
-uploaded = files.<span class="c-fn">upload</span>()   <span class="c-comment"># pilih review_produk.csv</span>
+<span class="c-comment"># Dataset ulasan produk Tokopedia dari Hugging Face</span>
+<span class="c-kw">from</span> datasets <span class="c-kw">import</span> load_dataset
 
-df = pd.<span class="c-fn">read_csv</span>(<span class="c-str">'review_produk.csv'</span>)
+dataset = <span class="c-fn">load_dataset</span>(<span class="c-str">"farhamu/tokopedia-product-reviews-2019"</span>)
+df = dataset[<span class="c-str">'train'</span>].<span class="c-fn">to_pandas</span>()
+
+<span class="c-comment"># Buat label: rating 4-5 = positif (1), rating 1-2 = negatif (0)</span>
+df = df[df[<span class="c-str">'rating'</span>] != <span class="c-num">3</span>].<span class="c-fn">copy</span>()
+df[<span class="c-str">'label'</span>] = (df[<span class="c-str">'rating'</span>] >= <span class="c-num">4</span>).<span class="c-fn">astype</span>(<span class="c-fn">int</span>)
+df = df.<span class="c-fn">rename</span>(columns={<span class="c-str">'text'</span>: <span class="c-str">'teks'</span>})[[<span class="c-str">'teks'</span>, <span class="c-str">'label'</span>]].<span class="c-fn">reset_index</span>(drop=<span class="c-kw">True</span>)
+
 <span class="c-fn">print</span>(df.<span class="c-fn">head</span>(<span class="c-num">5</span>))
 <span class="c-fn">print</span>(<span class="c-str">f"\nShape    : {df.shape}"</span>)
 <span class="c-fn">print</span>(<span class="c-str">f"Kolom    : {df.columns.tolist()}"</span>)
@@ -603,16 +609,16 @@ df[<span class="c-str">'panjang'</span>] = df[<span class="c-str">'teks'</span>]
 <span class="c-fn">print</span>(<span class="c-str">f"\nPanjang teks (kata):\n{df['panjang'].describe()}"</span>)</code></pre></div>
 
       <div class="output-label">Output yang diharapkan</div>
-      <div class="output-block">   id                                   teks  label
-0   1  Produk bagus banget, pengiriman cepat...      1
-1   2    Kecewa berat, barang tidak sesuai foto      0
+      <div class="output-block">                                                teks  label
+0             Barang sesuai pesanan dan cepat sampai      1
+1                       Kualitas bagus, harga sesuai      1
 ...
 
-Shape    : (15000, 3)
-Kolom    : ['id', 'teks', 'label']
+Shape    : (37412, 2)
+Kolom    : ['teks', 'label']
 Label    :
-1    8200
-0    6800
+1    33521
+0     3891
 Name: label, dtype: int64
 Null     : 0
 
@@ -948,7 +954,7 @@ df_hasil = pd.<span class="c-cls">DataFrame</span>(hasil)
         <ol style="font-size:14px;color:var(--text);line-height:2.1;">
           <li><strong>CNN MNIST Lengkap:</strong> Jalankan seluruh pipeline CNN dari Sel 2–6. Tampilkan: (a) model summary, (b) loss & accuracy curve training vs validation, (c) confusion matrix pada test set, (d) perbandingan accuracy MLP vs CNN. Tulis analisis: berapa parameter CNN vs MLP? Mana yang lebih efisien?</li>
           <li><strong>Eksplorasi Arsitektur CNN:</strong> Modifikasi CNN dengan menambahkan satu blok Conv2D+MaxPool ketiga. Bandingkan: apakah lebih dalam menghasilkan accuracy lebih tinggi? Perhatikan juga waktu training. Catat temuanmu dalam satu paragraf.</li>
-          <li><strong>Analisis Sentimen Lengkap:</strong> Latih model GAP Sentimen (Sel 7–12) dengan dataset <code>review_produk.csv</code>. Tampilkan: (a) distribusi label data, (b) training history, (c) classification report dan confusion matrix, (d) hasil prediksi minimal 5 ulasan yang kamu tulis sendiri.</li>
+          <li><strong>Analisis Sentimen Lengkap:</strong> Latih model GAP Sentimen (Sel 7–12) dengan dataset ulasan Tokopedia dari Hugging Face. Tampilkan: (a) distribusi label data, (b) training history, (c) classification report dan confusion matrix, (d) hasil prediksi minimal 5 ulasan yang kamu tulis sendiri.</li>
           <li><strong>Analisis Kesalahan:</strong> Dari prediksi salah model sentimen, pilih 3 contoh ulasan yang salah diklasifikasikan. Tulis hipotesis mengapa model salah — apakah ada kata ambigu, sarkasme, atau konteks yang sulit?</li>
           <li><em>Bonus:</em> Implementasikan model BiLSTM dari Sel 10. Bandingkan accuracy dan F1-score dengan model GAP. Buat juga fungsi sederhana yang menerima input ulasan dari user (input()) dan mencetak prediksi sentimen secara real-time.</li>
         </ol>
@@ -1046,7 +1052,7 @@ df_hasil = pd.<span class="c-cls">DataFrame</span>(hasil)
         </div>
         <div>
           <div style="font-size:11px;color:var(--text-3);">Dataset</div>
-          <div style="font-size:13px;color:var(--text);">MNIST (built-in) · review_produk.csv</div>
+          <div style="font-size:13px;color:var(--text);">MNIST (built-in) · Tokopedia Reviews (HuggingFace)</div>
         </div>
         <div>
           <div style="font-size:11px;color:var(--text-3);">Referensi</div>
