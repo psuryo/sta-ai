@@ -586,7 +586,7 @@ plt.<span class="c-fn">show</span>()</code></pre></div>
         <span class="code-label-name">sentiment_load.py</span>
         <span class="code-label-badge">Sel 7</span>
       </div>
-      <div class="code-block"><span class="c-comment"># ── Muat dataset ─────────────────────────────────────────────────</span>
+      <div class="code-block"><pre><code><span class="c-comment"># ── Muat dataset ─────────────────────────────────────────────────</span>
 <span class="c-comment"># Upload review_produk.csv dari Edlink, lalu jalankan sel ini</span>
 <span class="c-kw">from</span> google.colab <span class="c-kw">import</span> files
 uploaded = files.<span class="c-fn">upload</span>()   <span class="c-comment"># pilih review_produk.csv</span>
@@ -600,7 +600,7 @@ df = pd.<span class="c-fn">read_csv</span>(<span class="c-str">'review_produk.cs
 
 <span class="c-comment"># Cek panjang teks</span>
 df[<span class="c-str">'panjang'</span>] = df[<span class="c-str">'teks'</span>].<span class="c-fn">apply</span>(<span class="c-kw">lambda</span> x: <span class="c-fn">len</span>(<span class="c-fn">str</span>(x).<span class="c-fn">split</span>()))
-<span class="c-fn">print</span>(<span class="c-str">f"\nPanjang teks (kata):\n{df['panjang'].describe()}"</span>)</div>
+<span class="c-fn">print</span>(<span class="c-str">f"\nPanjang teks (kata):\n{df['panjang'].describe()}"</span>)</code></pre></div>
 
       <div class="output-label">Output yang diharapkan</div>
       <div class="output-block">   id                                   teks  label
