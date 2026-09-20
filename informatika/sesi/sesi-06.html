@@ -255,7 +255,7 @@
         <span class="code-label-name">setup.py</span>
         <span class="code-label-badge">Sel 1</span>
       </div>
-      <div class="code-block"><span class="c-comment"># ── Import semua library yang dibutuhkan ────────────────────────</span>
+      <div class="code-block"><pre><code><span class="c-comment"># ── Import semua library yang dibutuhkan ────────────────────────</span>
 <span class="c-kw">import</span> numpy <span class="c-kw">as</span> np
 <span class="c-kw">import</span> matplotlib.pyplot <span class="c-kw">as</span> plt
 <span class="c-kw">import</span> pandas <span class="c-kw">as</span> pd
@@ -271,7 +271,7 @@
 
 <span class="c-fn">print</span>(<span class="c-str">f"TensorFlow version : {tf.__version__}"</span>)
 <span class="c-fn">print</span>(<span class="c-str">f"GPU available      : {len(tf.config.list_physical_devices('GPU')) > 0}"</span>)
-<span class="c-fn">print</span>(<span class="c-str">f"Keras version      : {keras.__version__}"</span>)</div>
+<span class="c-fn">print</span>(<span class="c-str">f"Keras version      : {keras.__version__}"</span>)</code></pre></div>
 
       <div class="output-label">Output yang diharapkan</div>
       <div class="output-block">TensorFlow version : 2.15.0
@@ -297,7 +297,7 @@ Keras version      : 2.15.0</div>
         <span class="code-label-name">mnist_load.py</span>
         <span class="code-label-badge">Sel 2</span>
       </div>
-      <div class="code-block"><span class="c-comment"># ── Muat MNIST (built-in Keras, tidak perlu download manual) ────</span>
+      <div class="code-block"><pre><code><span class="c-comment"># ── Muat MNIST (built-in Keras, tidak perlu download manual) ────</span>
 (X_train_raw, y_train), (X_test_raw, y_test) = keras.datasets.mnist.<span class="c-fn">load_data</span>()
 
 <span class="c-fn">print</span>(<span class="c-str">"=== Dimensi Data ==="</span>)
@@ -316,7 +316,7 @@ fig, axes = plt.<span class="c-fn">subplots</span>(<span class="c-num">2</span>,
     ax.<span class="c-fn">axis</span>(<span class="c-str">'off'</span>)
 plt.<span class="c-fn">suptitle</span>(<span class="c-str">"10 Sampel MNIST"</span>, fontsize=<span class="c-num">13</span>)
 plt.<span class="c-fn">tight_layout</span>()
-plt.<span class="c-fn">show</span>()</div>
+plt.<span class="c-fn">show</span>()</code></pre></div>
 
       <h3 style="margin-top:var(--s5);">2.2 Preprocessing</h3>
       <p>CNN mengharapkan input 4D: <code>(batch, height, width, channels)</code>. Kita juga perlu menormalisasi nilai piksel dari 0–255 menjadi 0–1.</p>
@@ -325,7 +325,7 @@ plt.<span class="c-fn">show</span>()</div>
         <span class="code-label-name">mnist_preprocess.py</span>
         <span class="code-label-badge">Sel 3</span>
       </div>
-      <div class="code-block"><span class="c-comment"># ── Normalisasi + reshape untuk CNN ─────────────────────────────</span>
+      <div class="code-block"><pre><code><span class="c-comment"># ── Normalisasi + reshape untuk CNN ─────────────────────────────</span>
 <span class="c-comment"># Normalisasi: bagi 255 agar nilai piksel menjadi float 0–1</span>
 X_train = X_train_raw.<span class="c-fn">astype</span>(<span class="c-str">'float32'</span>) / <span class="c-num">255.0</span>
 X_test  = X_test_raw.<span class="c-fn">astype</span>(<span class="c-str">'float32'</span>)  / <span class="c-num">255.0</span>
@@ -339,7 +339,7 @@ X_test  = X_test[..., np.newaxis]
 
 <span class="c-comment"># ── Untuk MLP perlu flatten ke 1D ────────────────────────────────</span>
 X_train_flat = X_train.<span class="c-fn">reshape</span>(-<span class="c-num">1</span>, <span class="c-num">28</span>*<span class="c-num">28</span>)   <span class="c-comment"># (60000, 784)</span>
-X_test_flat  = X_test.<span class="c-fn">reshape</span>(-<span class="c-num">1</span>, <span class="c-num">28</span>*<span class="c-num">28</span>)</div>
+X_test_flat  = X_test.<span class="c-fn">reshape</span>(-<span class="c-num">1</span>, <span class="c-num">28</span>*<span class="c-num">28</span>)</code></pre></div>
 
       <h3 style="margin-top:var(--s5);">2.3 Bangun Model MLP (Baseline)</h3>
       <p>Kita mulai dengan MLP sederhana sebagai baseline sebelum CNN — untuk melihat seberapa besar improvement yang CNN berikan.</p>
@@ -348,7 +348,7 @@ X_test_flat  = X_test.<span class="c-fn">reshape</span>(-<span class="c-num">1</
         <span class="code-label-name">mlp_baseline.py</span>
         <span class="code-label-badge">Sel 4</span>
       </div>
-      <div class="code-block"><span class="c-comment"># ── Model MLP baseline ──────────────────────────────────────────</span>
+      <div class="code-block"><pre><code><span class="c-comment"># ── Model MLP baseline ──────────────────────────────────────────</span>
 mlp_model = keras.<span class="c-cls">Sequential</span>([
     layers.<span class="c-cls">Dense</span>(<span class="c-num">256</span>, activation=<span class="c-str">'relu'</span>, input_shape=(<span class="c-num">784</span>,)),
     layers.<span class="c-cls">Dropout</span>(<span class="c-num">0.3</span>),
@@ -379,7 +379,7 @@ history_mlp = mlp_model.<span class="c-fn">fit</span>(
 )
 
 loss_mlp, acc_mlp = mlp_model.<span class="c-fn">evaluate</span>(X_test_flat, y_test, verbose=<span class="c-num">0</span>)
-<span class="c-fn">print</span>(<span class="c-str">f"\nMLP  → Test accuracy: {acc_mlp:.4f}"</span>)</div>
+<span class="c-fn">print</span>(<span class="c-str">f"\nMLP  → Test accuracy: {acc_mlp:.4f}"</span>)</code></pre></div>
 
       <div class="output-label">Output yang diharapkan</div>
       <div class="output-block">Epoch 1/20 — loss: 0.2481 — accuracy: 0.9267 — val_accuracy: 0.9698
@@ -441,7 +441,7 @@ MLP  → Test accuracy: 0.9787</div>
         <span class="code-label-name">cnn_model.py</span>
         <span class="code-label-badge">Sel 5</span>
       </div>
-      <div class="code-block"><span class="c-comment"># ── Model CNN ───────────────────────────────────────────────────</span>
+      <div class="code-block"><pre><code><span class="c-comment"># ── Model CNN ───────────────────────────────────────────────────</span>
 cnn_model = keras.<span class="c-cls">Sequential</span>([
     <span class="c-comment"># Blok konvolusi 1</span>
     layers.<span class="c-cls">Conv2D</span>(<span class="c-num">32</span>, (<span class="c-num">3</span>,<span class="c-num">3</span>), activation=<span class="c-str">'relu'</span>,
@@ -482,7 +482,7 @@ history_cnn = cnn_model.<span class="c-fn">fit</span>(
 loss_cnn, acc_cnn = cnn_model.<span class="c-fn">evaluate</span>(X_test, y_test, verbose=<span class="c-num">0</span>)
 <span class="c-fn">print</span>(<span class="c-str">f"\nCNN  → Test accuracy: {acc_cnn:.4f}"</span>)
 <span class="c-fn">print</span>(<span class="c-str">f"MLP  → Test accuracy: {acc_mlp:.4f}"</span>)
-<span class="c-fn">print</span>(<span class="c-str">f"Improvement: +{(acc_cnn - acc_mlp)*100:.2f}%"</span>)</div>
+<span class="c-fn">print</span>(<span class="c-str">f"Improvement: +{(acc_cnn - acc_mlp)*100:.2f}%"</span>)</code></pre></div>
 
       <div class="output-label">Output yang diharapkan</div>
       <div class="output-block">Epoch 1/15 — loss: 0.1893 — accuracy: 0.9421 — val_accuracy: 0.9876
@@ -506,7 +506,7 @@ Improvement: +1.36%</div>
         <span class="code-label-name">visualize_predictions.py</span>
         <span class="code-label-badge">Sel 6</span>
       </div>
-      <div class="code-block"><span class="c-comment"># ── Prediksi dan visualisasi ─────────────────────────────────────</span>
+      <div class="code-block"><pre><code><span class="c-comment"># ── Prediksi dan visualisasi ─────────────────────────────────────</span>
 y_pred_proba = cnn_model.<span class="c-fn">predict</span>(X_test, verbose=<span class="c-num">0</span>)
 y_pred       = np.<span class="c-fn">argmax</span>(y_pred_proba, axis=<span class="c-num">1</span>)
 
@@ -526,7 +526,7 @@ fig, axes = plt.<span class="c-fn">subplots</span>(<span class="c-num">2</span>,
     ax.<span class="c-fn">axis</span>(<span class="c-str">'off'</span>)
 plt.<span class="c-fn">suptitle</span>(<span class="c-str">"Prediksi Salah CNN"</span>, fontsize=<span class="c-num">13</span>)
 plt.<span class="c-fn">tight_layout</span>()
-plt.<span class="c-fn">show</span>()</div>
+plt.<span class="c-fn">show</span>()</code></pre></div>
     </div>
 
     <!-- BAGIAN 2: ANALISIS SENTIMEN -->
@@ -627,7 +627,7 @@ max        148.00</div>
         <span class="code-label-name">text_preprocess.py</span>
         <span class="code-label-badge">Sel 8</span>
       </div>
-      <div class="code-block"><span class="c-kw">import</span> re
+      <div class="code-block"><pre><code><span class="c-kw">import</span> re
 <span class="c-kw">from</span> sklearn.model_selection <span class="c-kw">import</span> train_test_split
 <span class="c-kw">from</span> tensorflow.keras.preprocessing.text <span class="c-kw">import</span> <span class="c-cls">Tokenizer</span>
 <span class="c-kw">from</span> tensorflow.keras.preprocessing.sequence <span class="c-kw">import</span> pad_sequences
@@ -668,7 +668,7 @@ X_te_pad = <span class="c-fn">pad_sequences</span>(X_te_seq, maxlen=MAX_LEN, pad
 
 <span class="c-fn">print</span>(<span class="c-str">f"X_tr_pad shape: {X_tr_pad.shape}"</span>)   <span class="c-comment"># (12000, 60)</span>
 <span class="c-fn">print</span>(<span class="c-str">f"Vocab size    : {len(tokenizer.word_index)}"</span>)
-<span class="c-fn">print</span>(<span class="c-str">"Contoh sequence:"</span>, X_tr_seq[<span class="c-num">0</span>][:<span class="c-num">10</span>])</div>
+<span class="c-fn">print</span>(<span class="c-str">"Contoh sequence:"</span>, X_tr_seq[<span class="c-num">0</span>][:<span class="c-num">10</span>])</code></pre></div>
 
       <h3 style="margin-top:var(--s5);">3.4 Model Sentimen — Embedding + GlobalAveragePooling</h3>
       <p>Kita bangun model paling sederhana dulu: Embedding layer untuk representasi kata, lalu GlobalAveragePooling untuk merangkum seluruh kalimat menjadi satu vektor.</p>
@@ -677,7 +677,7 @@ X_te_pad = <span class="c-fn">pad_sequences</span>(X_te_seq, maxlen=MAX_LEN, pad
         <span class="code-label-name">sentiment_model_v1.py</span>
         <span class="code-label-badge">Sel 9</span>
       </div>
-      <div class="code-block"><span class="c-comment"># ── Model V1: Embedding + GAP ────────────────────────────────────</span>
+      <div class="code-block"><pre><code><span class="c-comment"># ── Model V1: Embedding + GAP ────────────────────────────────────</span>
 sent_model = keras.<span class="c-cls">Sequential</span>([
     <span class="c-comment"># Embedding: ubah integer → dense vector</span>
     layers.<span class="c-cls">Embedding</span>(
@@ -715,7 +715,7 @@ history_sent = sent_model.<span class="c-fn">fit</span>(
 )
 
 loss_s, acc_s = sent_model.<span class="c-fn">evaluate</span>(X_te_pad, y_te, verbose=<span class="c-num">0</span>)
-<span class="c-fn">print</span>(<span class="c-str">f"\nSentimen GAP → Test accuracy: {acc_s:.4f}"</span>)</div>
+<span class="c-fn">print</span>(<span class="c-str">f"\nSentimen GAP → Test accuracy: {acc_s:.4f}"</span>)</code></pre></div>
 
       <div class="output-label">Output yang diharapkan</div>
       <div class="output-block">Epoch 1/20 — loss: 0.5821 — accuracy: 0.7023 — val_accuracy: 0.8134
@@ -731,7 +731,7 @@ Sentimen GAP → Test accuracy: 0.8876</div>
         <span class="code-label-name">sentiment_model_v2_lstm.py</span>
         <span class="code-label-badge">Sel 10</span>
       </div>
-      <div class="code-block"><span class="c-comment"># ── Model V2: Embedding + LSTM ───────────────────────────────────</span>
+      <div class="code-block"><pre><code><span class="c-comment"># ── Model V2: Embedding + LSTM ───────────────────────────────────</span>
 lstm_model = keras.<span class="c-cls">Sequential</span>([
     layers.<span class="c-cls">Embedding</span>(VOCAB_SIZE, EMBED_DIM, input_length=MAX_LEN),
     layers.<span class="c-cls">Bidirectional</span>(layers.<span class="c-cls">LSTM</span>(<span class="c-num">64</span>, dropout=<span class="c-num">0.3</span>)),
@@ -757,7 +757,7 @@ history_lstm = lstm_model.<span class="c-fn">fit</span>(
 )
 
 loss_lstm, acc_lstm = lstm_model.<span class="c-fn">evaluate</span>(X_te_pad, y_te, verbose=<span class="c-num">0</span>)
-<span class="c-fn">print</span>(<span class="c-str">f"\nSentimen BiLSTM → Test accuracy: {acc_lstm:.4f}"</span>)</div>
+<span class="c-fn">print</span>(<span class="c-str">f"\nSentimen BiLSTM → Test accuracy: {acc_lstm:.4f}"</span>)</code></pre></div>
     </div>
 
     <!-- EVALUASI -->
@@ -771,7 +771,7 @@ loss_lstm, acc_lstm = lstm_model.<span class="c-fn">evaluate</span>(X_te_pad, y_
         <span class="code-label-name">evaluation.py</span>
         <span class="code-label-badge">Sel 11</span>
       </div>
-      <div class="code-block"><span class="c-comment"># ── Prediksi ─────────────────────────────────────────────────────</span>
+      <div class="code-block"><pre><code><span class="c-comment"># ── Prediksi ─────────────────────────────────────────────────────</span>
 y_pred_prob = sent_model.<span class="c-fn">predict</span>(X_te_pad, verbose=<span class="c-num">0</span>)
 y_pred      = (y_pred_prob > <span class="c-num">0.5</span>).<span class="c-fn">astype</span>(<span class="c-str">'int'</span>).<span class="c-fn">flatten</span>()
 
@@ -787,7 +787,7 @@ disp = <span class="c-cls">ConfusionMatrixDisplay</span>(confusion_matrix=cm,
                                display_labels=[<span class="c-str">'Negatif'</span>, <span class="c-str">'Positif'</span>])
 disp.<span class="c-fn">plot</span>(cmap=<span class="c-str">'Blues'</span>)
 plt.<span class="c-fn">title</span>(<span class="c-str">"Confusion Matrix — Model Sentimen"</span>)
-plt.<span class="c-fn">show</span>()</div>
+plt.<span class="c-fn">show</span>()</code></pre></div>
 
       <div class="output-label">Output yang diharapkan</div>
       <div class="output-block">              precision    recall  f1-score   support
@@ -820,7 +820,7 @@ weighted avg       0.89      0.89      0.89      3000</div>
         <span class="code-label-name">inference.py</span>
         <span class="code-label-badge">Sel 12</span>
       </div>
-      <div class="code-block"><span class="c-kw">def</span> <span class="c-fn">prediksi_sentimen</span>(teks, model, tokenizer, maxlen):
+      <div class="code-block"><pre><code><span class="c-kw">def</span> <span class="c-fn">prediksi_sentimen</span>(teks, model, tokenizer, maxlen):
     teks_bersih = <span class="c-fn">clean_text</span>(teks)
     seq    = tokenizer.<span class="c-fn">texts_to_sequences</span>([teks_bersih])
     padded = <span class="c-fn">pad_sequences</span>(seq, maxlen=maxlen, padding=<span class="c-str">'post'</span>)
@@ -838,7 +838,7 @@ ulasan_uji = [
 
 <span class="c-kw">for</span> ulasan <span class="c-kw">in</span> ulasan_uji:
     <span class="c-fn">print</span>(<span class="c-fn">prediksi_sentimen</span>(ulasan, sent_model, tokenizer, MAX_LEN))
-    <span class="c-fn">print</span>(<span class="c-str">"-"</span> * <span class="c-num">60</span>)</div>
+    <span class="c-fn">print</span>(<span class="c-str">"-"</span> * <span class="c-num">60</span>)</code></pre></div>
 
       <div class="output-label">Output yang diharapkan</div>
       <div class="output-block">[Positif 😊] (confidence: 0.967)
@@ -863,7 +863,7 @@ Teks: Tidak sesuai deskripsi sama sekali, mau return tapi ribet</div>
         <span class="code-label-name">final_comparison.py</span>
         <span class="code-label-badge">Sel 13</span>
       </div>
-      <div class="code-block"><span class="c-comment"># ── Ringkasan semua model ────────────────────────────────────────</span>
+      <div class="code-block"><pre><code><span class="c-comment"># ── Ringkasan semua model ────────────────────────────────────────</span>
 hasil = {
     <span class="c-str">"Model"</span>: [
         <span class="c-str">"MLP (MNIST)"</span>, <span class="c-str">"CNN (MNIST)"</span>,
@@ -880,7 +880,7 @@ hasil = {
 }
 
 df_hasil = pd.<span class="c-cls">DataFrame</span>(hasil)
-<span class="c-fn">print</span>(df_hasil.<span class="c-fn">to_string</span>(index=<span class="c-kw">False</span>))</div>
+<span class="c-fn">print</span>(df_hasil.<span class="c-fn">to_string</span>(index=<span class="c-kw">False</span>))</code></pre></div>
 
       <table class="comp-table">
         <thead>
