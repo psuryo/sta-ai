@@ -1,0 +1,1034 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>P-07: Review & Persiapan UTS — Teknik Industri UKWMS</title>
+<link rel="stylesheet" href="../../css/style.css">
+<style>
+  /* ── Review cards ── */
+  .review-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: var(--s4);
+    margin: var(--s5) 0;
+  }
+  .review-card {
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: var(--r3);
+    padding: var(--s5);
+    position: relative;
+    overflow: hidden;
+  }
+  .review-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+  }
+  .review-card.blue::before   { background: var(--blue); }
+  .review-card.teal::before   { background: var(--teal); }
+  .review-card.amber::before  { background: var(--amber); }
+  .review-card.purple::before { background: var(--purple); }
+  .review-card-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: var(--s3);
+  }
+  .review-card.blue   .review-card-label { color: var(--blue); }
+  .review-card.teal   .review-card-label { color: var(--teal); }
+  .review-card.amber  .review-card-label { color: var(--amber); }
+  .review-card.purple .review-card-label { color: var(--purple); }
+  .review-card h4 {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: var(--s3);
+  }
+  .review-card ul {
+    padding-left: var(--s5);
+    font-size: 13px;
+    color: var(--text-2);
+    line-height: 1.9;
+  }
+
+  /* ── Quiz box ── */
+  .quiz-box {
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: var(--r3);
+    margin: var(--s5) 0;
+    overflow: hidden;
+  }
+  .quiz-header {
+    padding: var(--s4) var(--s5);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: flex-start;
+    gap: var(--s3);
+  }
+  .quiz-num {
+    font-family: var(--mono);
+    font-size: 11px;
+    background: var(--blue-dim);
+    color: var(--blue);
+    border: 1px solid rgba(74,142,245,0.25);
+    border-radius: var(--r1);
+    padding: 2px 8px;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .quiz-q {
+    font-size: 14px;
+    color: var(--text);
+    font-weight: 500;
+    line-height: 1.6;
+  }
+  .quiz-options {
+    padding: var(--s4) var(--s5);
+    display: flex;
+    flex-direction: column;
+    gap: var(--s2);
+  }
+  .quiz-opt {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--s3);
+    padding: var(--s3) var(--s4);
+    border: 1px solid var(--border);
+    border-radius: var(--r2);
+    font-size: 13px;
+    color: var(--text-2);
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+    user-select: none;
+    line-height: 1.6;
+  }
+  .quiz-opt:hover { border-color: var(--blue); background: var(--blue-dim); }
+  .quiz-opt.correct { border-color: var(--teal); background: var(--teal-glow); color: var(--teal); }
+  .quiz-opt.wrong   { border-color: var(--red);  background: rgba(240,96,96,0.07); color: var(--red); }
+  .quiz-opt .opt-letter {
+    font-family: var(--mono);
+    font-size: 11px;
+    flex-shrink: 0;
+    color: var(--text-3);
+    width: 18px;
+    padding-top: 2px;
+  }
+  .quiz-opt.correct .opt-letter { color: var(--teal); }
+  .quiz-opt.wrong   .opt-letter { color: var(--red); }
+  .quiz-explanation {
+    margin: 0;
+    padding: var(--s3) var(--s5) var(--s4);
+    font-size: 12px;
+    color: var(--text-2);
+    line-height: 1.7;
+    border-top: 1px solid var(--border);
+    display: none;
+    background: var(--bg);
+  }
+  .quiz-explanation.show { display: block; }
+  .quiz-explanation strong { color: var(--blue); }
+
+  /* ── Studi kasus (essay) ── */
+  .kasus-box {
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--amber);
+    border-radius: 0 var(--r2) var(--r2) 0;
+    padding: var(--s5);
+    margin: var(--s4) 0;
+  }
+  .kasus-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--amber);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: var(--s3);
+  }
+  .kasus-q {
+    font-size: 14px;
+    color: var(--text);
+    margin-bottom: var(--s3);
+    font-weight: 500;
+    line-height: 1.7;
+  }
+  .kasus-hint {
+    font-size: 12px;
+    color: var(--text-3);
+    line-height: 1.7;
+    padding-top: var(--s3);
+    border-top: 1px solid var(--border);
+  }
+
+  /* ── Kisi-kisi table ── */
+  .kisi-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    margin: var(--s4) 0;
+  }
+  .kisi-table th {
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    padding: var(--s3) var(--s4);
+    text-align: left;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-3);
+    letter-spacing: 1px;
+  }
+  .kisi-table td {
+    border: 1px solid var(--border);
+    padding: var(--s3) var(--s4);
+    color: var(--text-2);
+    vertical-align: top;
+    line-height: 1.6;
+  }
+  .kisi-table tr:hover td { background: var(--bg-2); }
+
+  /* ── Score tracker ── */
+  .stat-trio {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--s4);
+    margin: var(--s5) 0;
+  }
+  .stat-card {
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: var(--r3);
+    padding: var(--s5);
+    text-align: center;
+  }
+  .stat-num {
+    font-family: var(--mono);
+    font-size: 36px;
+    font-weight: 700;
+    line-height: 1;
+    margin-bottom: var(--s2);
+  }
+  .stat-label { font-size: 12px; color: var(--text-2); }
+
+  /* ── Decision table ── */
+  .decision-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    margin: var(--s4) 0;
+  }
+  .decision-table th {
+    background: var(--blue-dim);
+    border: 1px solid var(--border);
+    padding: var(--s3) var(--s4);
+    text-align: left;
+    font-size: 12px;
+    color: var(--blue);
+    font-weight: 600;
+  }
+  .decision-table td {
+    border: 1px solid var(--border);
+    padding: var(--s3) var(--s4);
+    color: var(--text-2);
+    line-height: 1.6;
+    vertical-align: top;
+  }
+  .decision-table tr:nth-child(even) td { background: rgba(74,142,245,0.03); }
+</style>
+</head>
+<body>
+
+<!-- ══ NAV ══ -->
+<nav class="nav">
+  <div class="nav-logo">AI<span>·</span>UKWMS</div>
+  <ul class="nav-links">
+    <li><a href="../index.html">← Beranda</a></li>
+    <li><a href="#tujuan" class="active">Tujuan</a></li>
+    <li><a href="#rekap">Rekap P1–P6</a></li>
+    <li><a href="#latihan">Latihan Soal</a></li>
+    <li><a href="#studi-kasus">Studi Kasus</a></li>
+    <li><a href="#kisi">Kisi-kisi UTS</a></li>
+    <li><a href="#tips">Tips UTS</a></li>
+  </ul>
+</nav>
+
+<!-- ══ HERO ══ -->
+<header class="sesi-hero">
+  <div style="max-width:1100px;margin:0 auto;">
+    <div class="sesi-breadcrumb">
+      <a href="../index.html">Kecerdasan Buatan · Teknik Industri</a>
+      <span>›</span>
+      <span>Pertemuan 7</span>
+    </div>
+    <div class="sesi-num" style="color:var(--blue);">PERTEMUAN 07 · REVIEW</div>
+    <h1 class="sesi-title">Review &<br><em style="color:var(--amber);">Persiapan UTS</em></h1>
+    <p style="font-size:15px;color:var(--text-2);max-width:720px;line-height:1.8;">Rekap menyeluruh P-01 s/d P-06 — dari pengantar AI, konsep ML, data industri, hingga AI untuk supply chain dan prediksi demand. Latihan soal bergaya UTS dan kisi-kisi resmi.</p>
+    <div class="sesi-meta-row">
+      <span class="badge badge-blue">S1 Teknik Industri</span>
+      <span class="badge badge-amber">Review</span>
+      <span class="badge" style="color:var(--teal);border-color:rgba(0,201,177,0.3);background:var(--teal-dim);">100 menit</span>
+      <span class="badge" style="background:rgba(240,96,96,0.1);color:var(--red);border:1px solid rgba(240,96,96,0.2);">UTS setelah sesi ini</span>
+    </div>
+  </div>
+</header>
+
+<!-- ══ CONTENT LAYOUT ══ -->
+<div class="content-layout">
+  <main class="content-main">
+
+    <!-- TUJUAN -->
+    <div class="content-block" id="tujuan">
+      <h2>Tujuan Sesi Review</h2>
+      <p>Sesi ini mengintegrasikan semua konsep Blok 1 ke dalam konteks pengambilan keputusan industri. Setelah sesi ini, mahasiswa diharapkan mampu:</p>
+      <ol>
+        <li>Menjelaskan konsep AI, ML, dan perbedaannya menggunakan contoh kasus manufaktur atau logistik</li>
+        <li>Memilih pendekatan AI yang tepat untuk masalah operasional industri berdasarkan karakteristik datanya</li>
+        <li>Menginterpretasikan output model ML (confusion matrix, RMSE, MAPE) dalam bahasa bisnis yang dapat digunakan manajemen</li>
+        <li>Menganalisis data operasional yang kotor dan menentukan langkah pembersihan yang diperlukan</li>
+        <li>Mengevaluasi dampak bisnis dari prediksi demand yang akurat vs yang tidak akurat terhadap rantai pasok</li>
+      </ol>
+
+      <div class="callout warn" style="margin-top:var(--s5);">
+        <span class="callout-icon">📝</span>
+        <div class="callout-body">
+          <p><strong>UTS berlangsung setelah pertemuan ini.</strong> Format: 20 soal pilihan ganda (40 poin) + 3 studi kasus analisis (60 poin). Durasi 90 menit. Kisi-kisi lengkap ada di akhir halaman ini.</p>
+        </div>
+      </div>
+
+      <div class="callout info" style="margin-top:var(--s4);">
+        <span class="callout-icon">💡</span>
+        <div class="callout-body">
+          <p><strong>Perspektif TI berbeda dari IF:</strong> Ujian ini menguji kemampuan Anda sebagai <em>pengguna dan evaluator</em> AI — bukan pembuat model. Soal fokus pada: "kapan AI tepat?", "apa artinya output ini untuk bisnis?", dan "apa risiko jika keputusan salah?"</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- REKAP P1–P6 -->
+    <div class="content-block" id="rekap">
+      <h2>1. Rekap Cepat P-01 s/d P-06</h2>
+      <p>Kartu ringkasan berikut merangkum poin-poin kunci dari setiap pertemuan — khususnya yang sering muncul di soal UTS.</p>
+
+      <div class="review-grid">
+
+        <div class="review-card blue">
+          <div class="review-card-label">P-01 · Teori</div>
+          <h4>Pengantar AI & Lanskap Industri</h4>
+          <ul>
+            <li>AI = sistem yang meniru kemampuan kognitif manusia; ML = AI yang belajar dari data</li>
+            <li>Narrow AI (spesifik) vs General AI (belum ada) vs Super AI (fiksi)</li>
+            <li>3 gelombang AI industri: automasi fisik, automasi kognitif, autonomi</li>
+            <li>McKinsey 2024: 70% perusahaan global gunakan AI — manufaktur & logistik terdepan</li>
+            <li>Dampak TI: predictive maintenance (−40% downtime), demand forecasting (−30% overstock), QC visual (10× lebih cepat dari inspeksi manual)</li>
+            <li>Risiko: bias data, black-box, ketergantungan vendor, K3</li>
+          </ul>
+        </div>
+
+        <div class="review-card teal">
+          <div class="review-card-label">P-02 · Teori</div>
+          <h4>Konsep ML untuk Industri</h4>
+          <ul>
+            <li><strong style="color:var(--text)">Supervised:</strong> ada label historis → prediksi/klasifikasi (churn, cacat, harga)</li>
+            <li><strong style="color:var(--text)">Unsupervised:</strong> tanpa label → segmentasi, anomali, pola tersembunyi</li>
+            <li><strong style="color:var(--text)">Reinforcement:</strong> belajar dari coba-salah → robot, scheduling otomatis</li>
+            <li>Overfitting: model "hafal" data training, gagal di data nyata baru</li>
+            <li>Garbage in, garbage out: kualitas data → kualitas model</li>
+            <li>Algoritma kunci TI: Random Forest, XGBoost (prediksi), K-Means (segmentasi), ARIMA/Prophet (time series)</li>
+          </ul>
+        </div>
+
+        <div class="review-card amber">
+          <div class="review-card-label">P-03 · Praktik</div>
+          <h4>Praktik ML: Klasifikasi & Prediksi di Colab</h4>
+          <ul>
+            <li>Pipeline Colab: muat CSV → EDA → bersihkan → latih model → evaluasi</li>
+            <li>Prediksi kegagalan mesin: fitur = sensor suhu, getaran, jam operasi</li>
+            <li>Churn pelanggan: fitur = frekuensi beli, RFM, keluhan</li>
+            <li>Confusion matrix: TP (benar deteksi rusak), FP (alarm palsu), FN (mesin rusak tak terdeteksi)</li>
+            <li>Precision vs Recall: untuk mesin kritis → maksimalkan Recall (FN sangat mahal)</li>
+            <li>Feature importance: menunjukkan variabel mana paling berpengaruh → informasi perbaikan proses</li>
+          </ul>
+        </div>
+
+        <div class="review-card blue">
+          <div class="review-card-label">P-04 · Praktik</div>
+          <h4>Data Industri: Pembersihan & Visualisasi</h4>
+          <ul>
+            <li>Data industri sering kotor: duplikat, missing value, outlier, format tidak konsisten</li>
+            <li>Missing value: hapus baris (jika <5%), isi rata-rata/median, atau gunakan domain knowledge</li>
+            <li>Outlier: bisa kesalahan input atau kejadian nyata (breakdown) — selalu cek konteks</li>
+            <li>Power BI: visualisasi OEE, tren produksi, distribusi cacat per lini</li>
+            <li>EDA kunci: distribusi (histogram), korelasi (heatmap), tren waktu (line chart)</li>
+            <li>Dashboard KPI: lead time, fill rate, defect rate, MTBF — AI butuh data ini bersih</li>
+          </ul>
+        </div>
+
+        <div class="review-card amber">
+          <div class="review-card-label">P-05 · Teori</div>
+          <h4>AI untuk Optimasi Produksi & Supply Chain</h4>
+          <ul>
+            <li>Predictive Maintenance: dari "reaktif" → "prediktif" → penghematan hingga 40% biaya perawatan</li>
+            <li>Demand Forecasting: ARIMA (klasik), Prophet (musiman), ML (banyak fitur)</li>
+            <li>Inventory Optimization: EOQ berbasis AI, safety stock dinamis, reorder point otomatis</li>
+            <li>Production Scheduling: AI menyelesaikan masalah NP-hard dalam hitungan detik</li>
+            <li>Studi kasus Toyota: Just-in-Time + AI → 0 overstock; Unilever: AI hemat $200M/tahun biaya supply chain</li>
+            <li>Peringatan: AI bukan solusi satu-untuk-semua; perlu integrasi sistem (ERP, MES, IoT)</li>
+          </ul>
+        </div>
+
+        <div class="review-card purple">
+          <div class="review-card-label">P-06 · Praktik</div>
+          <h4>Praktik: Prediksi Demand & Simulasi Rantai Pasok</h4>
+          <ul>
+            <li>Dataset penjualan bulanan: pola musiman, tren, promosi, efek hari libur</li>
+            <li>MAPE (Mean Absolute Percentage Error): ukuran akurasi forecast; <10% = baik untuk industri</li>
+            <li>RMSE: seberapa besar error rata-rata dalam satuan asli (unit/Rp)</li>
+            <li>Simulasi: jika forecast terlalu tinggi → overstock (modal tertahan); terlalu rendah → stockout (lost sales)</li>
+            <li>Biaya kesalahan: stockout biasanya 3× lebih mahal dari overstock di FMCG</li>
+            <li>Safety stock: buffer = Z × σ_demand × √lead_time — AI membantu kalkulasi dinamis</li>
+          </ul>
+        </div>
+
+      </div>
+
+      <!-- Framework pengambilan keputusan -->
+      <h3 style="margin-top:var(--s6);">Framework: Kapan AI Tepat untuk Masalah Industri?</h3>
+      <p style="font-size:13px;color:var(--text-2);margin-bottom:var(--s4);">Gunakan tabel ini untuk menjawab soal studi kasus — pertanyaan "algoritma mana yang tepat" selalu dimulai dari karakteristik masalah.</p>
+
+      <table class="decision-table">
+        <thead>
+          <tr>
+            <th>Masalah</th>
+            <th>Jenis ML</th>
+            <th>Contoh Algoritma</th>
+            <th>Metrik Evaluasi</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong style="color:var(--text)">Prediksi nilai numerik</strong><br><span style="font-size:11px;">harga, demand, lead time</span></td>
+            <td>Supervised — Regresi</td>
+            <td>Linear Regression, XGBoost, Prophet</td>
+            <td>RMSE, MAE, MAPE</td>
+          </tr>
+          <tr>
+            <td><strong style="color:var(--text)">Klasifikasi / deteksi</strong><br><span style="font-size:11px;">cacat/tidak, gagal/normal, fraud/bukan</span></td>
+            <td>Supervised — Klasifikasi</td>
+            <td>Random Forest, SVM, XGBoost</td>
+            <td>Precision, Recall, F1-score</td>
+          </tr>
+          <tr>
+            <td><strong style="color:var(--text)">Segmentasi pelanggan / produk</strong><br><span style="font-size:11px;">tanpa label, pola tersembunyi</span></td>
+            <td>Unsupervised — Klasterisasi</td>
+            <td>K-Means, DBSCAN</td>
+            <td>Silhouette Score, interpretasi bisnis</td>
+          </tr>
+          <tr>
+            <td><strong style="color:var(--text)">Prediksi deret waktu</strong><br><span style="font-size:11px;">penjualan mingguan, konsumsi energi, MTBF</span></td>
+            <td>Time Series Forecasting</td>
+            <td>ARIMA, Prophet, LSTM</td>
+            <td>MAPE, RMSE per horizon</td>
+          </tr>
+          <tr>
+            <td><strong style="color:var(--text)">Deteksi anomali</strong><br><span style="font-size:11px;">sensor menyimpang, transaksi aneh</span></td>
+            <td>Unsupervised / Semi-supervised</td>
+            <td>Isolation Forest, Autoencoder</td>
+            <td>Precision@K, AUC-ROC</td>
+          </tr>
+          <tr>
+            <td><strong style="color:var(--text)">Inspeksi visual</strong><br><span style="font-size:11px;">cacat permukaan, penghitungan produk</span></td>
+            <td>Computer Vision (Deep Learning)</td>
+            <td>CNN, YOLO, EfficientDet</td>
+            <td>Accuracy, IoU, precision per kelas cacat</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- LATIHAN PILIHAN GANDA -->
+    <div class="content-block" id="latihan">
+      <h2>2. Latihan Soal Pilihan Ganda</h2>
+      <p>Soal-soal berikut mencerminkan format dan tingkat kesulitan UTS. Fokusnya adalah analisis dan interpretasi — bukan hafalan definisi. Klik opsi untuk memeriksa jawaban.</p>
+
+      <!-- Q1 -->
+      <div class="quiz-box">
+        <div class="quiz-header">
+          <span class="quiz-num">No. 1</span>
+          <span class="quiz-q">Pabrik elektronik ingin mengurangi downtime mesin yang tidak terjadwal. Data yang tersedia: log sensor suhu, getaran, arus listrik (setiap 5 menit), dan catatan historis kapan mesin pernah rusak. Pendekatan AI apa yang paling tepat?</span>
+        </div>
+        <div class="quiz-options" data-correct="B">
+          <div class="quiz-opt" data-val="A"><span class="opt-letter">A</span>Unsupervised learning untuk mengelompokkan mesin berdasarkan kemiripan pola sensornya</div>
+          <div class="quiz-opt" data-val="B"><span class="opt-letter">B</span>Supervised learning — klasifikasi untuk memprediksi apakah mesin akan gagal dalam 24–72 jam ke depan</div>
+          <div class="quiz-opt" data-val="C"><span class="opt-letter">C</span>Reinforcement learning agar mesin bisa belajar sendiri kapan harus berhenti beroperasi</div>
+          <div class="quiz-opt" data-val="D"><span class="opt-letter">D</span>Time series forecasting untuk memprediksi jadwal produksi minggu depan</div>
+        </div>
+        <div class="quiz-explanation">
+          <strong>Jawaban: B.</strong> Kita punya data historis berlabel (kapan mesin pernah rusak = label). Ini klasik supervised learning — klasifikasi biner: "akan gagal" vs "aman". Output model berupa probabilitas kegagalan dalam window waktu tertentu, sehingga tim maintenance bisa menjadwalkan perbaikan preventif sebelum mesin benar-benar berhenti. Pilihan A tidak optimal karena kita sudah punya label historis — sayang jika tidak digunakan.
+        </div>
+      </div>
+
+      <!-- Q2 -->
+      <div class="quiz-box">
+        <div class="quiz-header">
+          <span class="quiz-num">No. 2</span>
+          <span class="quiz-q">Model prediksi kerusakan mesin menghasilkan: Precision = 0.70, Recall = 0.95. Dalam konteks pabrik dengan biaya perbaikan darurat Rp 50 juta/kejadian dan biaya inspeksi preventif Rp 5 juta/kejadian, bagaimana sebaiknya menginterpretasikan hasil ini?</span>
+        </div>
+        <div class="quiz-options" data-correct="C">
+          <div class="quiz-opt" data-val="A"><span class="opt-letter">A</span>Model buruk karena Precision hanya 70% — terlalu banyak alarm palsu yang mengganggu produksi</div>
+          <div class="quiz-opt" data-val="B"><span class="opt-letter">B</span>Model harus ditingkatkan hingga Precision dan Recall keduanya di atas 90% sebelum bisa dipakai</div>
+          <div class="quiz-opt" data-val="C"><span class="opt-letter">C</span>Model sudah sangat baik untuk konteks ini — Recall 95% artinya hampir tidak ada kerusakan yang terlewat, dan 30% alarm palsu masih ekonomis dibanding biaya perbaikan darurat</div>
+          <div class="quiz-opt" data-val="D"><span class="opt-letter">D</span>Precision dan Recall tidak relevan untuk maintenance — gunakan RMSE saja</div>
+        </div>
+        <div class="quiz-explanation">
+          <strong>Jawaban: C.</strong> Dalam predictive maintenance, False Negative (mesin rusak tapi tidak terdeteksi) jauh lebih mahal dari False Positive (alarm palsu → inspeksi tidak perlu). Recall 95% berarti 95% kerusakan nyata berhasil dideteksi — hanya 5% yang lolos (FN). Dari 10 alarm yang dihasilkan model, 7 benar-benar akan rusak (Precision 70%) dan 3 adalah alarm palsu. Biaya 3 inspeksi sia-sia = 3 × Rp 5 juta = Rp 15 juta, vs potensi menghindari kerusakan darurat = Rp 50 juta+. Secara ekonomis sangat layak.
+        </div>
+      </div>
+
+      <!-- Q3 -->
+      <div class="quiz-box">
+        <div class="quiz-header">
+          <span class="quiz-num">No. 3</span>
+          <span class="quiz-q">Seorang manajer logistik menerima laporan: "Model demand forecasting kami menghasilkan MAPE = 8%." Apa yang seharusnya direkomendasikan selanjutnya?</span>
+        </div>
+        <div class="quiz-options" data-correct="A">
+          <div class="quiz-opt" data-val="A"><span class="opt-letter">A</span>Model ini sudah baik untuk standar industri (MAPE <10%). Lanjutkan ke tahap implementasi: integrasikan dengan sistem ERP untuk kalkulasi safety stock otomatis</div>
+          <div class="quiz-opt" data-val="B"><span class="opt-letter">B</span>MAPE 8% terlalu tinggi — model perlu diperbaiki hingga 0% sebelum bisa digunakan untuk keputusan stok</div>
+          <div class="quiz-opt" data-val="C"><span class="opt-letter">C</span>MAPE tidak relevan untuk demand forecasting — gunakan saja R² sebagai metrik utama</div>
+          <div class="quiz-opt" data-val="D"><span class="opt-letter">D</span>Butuh setidaknya 1 tahun data tambahan sebelum model layak dievaluasi</div>
+        </div>
+        <div class="quiz-explanation">
+          <strong>Jawaban: A.</strong> MAPE (Mean Absolute Percentage Error) adalah metrik standar demand forecasting. Benchmarknya: MAPE < 10% = sangat baik, 10–20% = dapat diterima, > 20% = perlu perbaikan. MAPE 8% artinya rata-rata error prediksi hanya 8% dari nilai aktual — cukup untuk pengambilan keputusan stok. Langkah logis berikutnya adalah implementasi, bukan terus memperbaiki model. Model yang 100% akurat tidak mungkin ada — yang terpenting adalah apakah error-nya dalam batas yang bisa diterima untuk keputusan bisnis.
+        </div>
+      </div>
+
+      <!-- Q4 -->
+      <div class="quiz-box">
+        <div class="quiz-header">
+          <span class="quiz-num">No. 4</span>
+          <span class="quiz-q">Dataset produksi selama 2 tahun memiliki 15% missing value pada kolom "suhu_oven", yang merupakan fitur paling penting untuk prediksi kualitas produk. Strategi terbaik untuk menangani missing value ini adalah?</span>
+        </div>
+        <div class="quiz-options" data-correct="D">
+          <div class="quiz-opt" data-val="A"><span class="opt-letter">A</span>Hapus semua baris dengan missing value — lebih aman menggunakan data yang lengkap saja</div>
+          <div class="quiz-opt" data-val="B"><span class="opt-letter">B</span>Isi dengan nilai 0, karena suhu nol adalah default yang netral</div>
+          <div class="quiz-opt" data-val="C"><span class="opt-letter">C</span>Isi dengan rata-rata seluruh kolom tanpa mempertimbangkan konteks</div>
+          <div class="quiz-opt" data-val="D"><span class="opt-letter">D</span>Isi dengan rata-rata atau median berdasarkan shift/operator/hari yang sama, dan dokumentasikan asumsi imputation-nya</div>
+        </div>
+        <div class="quiz-explanation">
+          <strong>Jawaban: D.</strong> Mengisi missing value dengan rata-rata global pada fitur kritis seperti suhu bisa misleading — suhu oven bisa sangat berbeda antar shift atau produk. Imputasi berbasis konteks (rata-rata shift yang sama, atau rata-rata produk yang sama) jauh lebih akurat. Menghapus 15% data (Jawaban A) membuang banyak informasi berharga. Mengisi dengan 0 (Jawaban B) sangat salah secara domain — suhu 0°C tidak mungkin terjadi di oven produksi dan akan merusak model. Selalu dokumentasikan metode imputasi agar bisa diaudit.
+        </div>
+      </div>
+
+      <!-- Q5 -->
+      <div class="quiz-box">
+        <div class="quiz-header">
+          <span class="quiz-num">No. 5</span>
+          <span class="quiz-q">Perusahaan ritel ingin mengelompokkan 50.000 produk SKU berdasarkan pola penjualan — tanpa mengetahui terlebih dahulu berapa kelompok yang ada. Pendekatan mana yang paling tepat?</span>
+        </div>
+        <div class="quiz-options" data-correct="B">
+          <div class="quiz-opt" data-val="B"><span class="opt-letter">B</span>Gunakan K-Means; tentukan k optimal dengan Elbow Method (plot inertia vs k), pilih titik siku, lalu interpretasikan setiap klaster secara bisnis</div>
+          <div class="quiz-opt" data-val="A"><span class="opt-letter">A</span>Gunakan klasifikasi supervised dengan label "fast-moving" dan "slow-moving" yang sudah ditentukan manajemen</div>
+          <div class="quiz-opt" data-val="C"><span class="opt-letter">C</span>Gunakan regresi linear untuk memprediksi penjualan setiap SKU bulan depan</div>
+          <div class="quiz-opt" data-val="D"><span class="opt-letter">D</span>Tidak perlu AI — cukup gunakan kategori ABC analysis yang sudah ada (A = fast, B = medium, C = slow)</div>
+        </div>
+        <div class="quiz-explanation">
+          <strong>Jawaban: B.</strong> Tanpa label yang sudah diketahui, kita menggunakan unsupervised learning. K-Means adalah pilihan standar untuk klasterisasi, tetapi membutuhkan k ditentukan terlebih dahulu. Elbow Method membantu menemukan k optimal secara empiris. Pilihan D (ABC analysis) bisa jadi baseline, tapi terbatas pada satu dimensi (volume penjualan). K-Means bisa mempertimbangkan banyak dimensi sekaligus: volume penjualan, margin, seasonality, lead time — menghasilkan segmentasi yang lebih kaya untuk keputusan inventory.
+        </div>
+      </div>
+
+      <!-- Q6 -->
+      <div class="quiz-box">
+        <div class="quiz-header">
+          <span class="quiz-num">No. 6</span>
+          <span class="quiz-q">Seorang engineer menyajikan model prediksi kualitas produk kepada direktur produksi dengan akurasi 94%. Direktur bertanya: "Dari 100 produk cacat yang sebenarnya ada, berapa yang berhasil model Anda tangkap?" Metrik apa yang menjawab pertanyaan direktur tersebut?</span>
+        </div>
+        <div class="quiz-options" data-correct="C">
+          <div class="quiz-opt" data-val="A"><span class="opt-letter">A</span>Accuracy — karena 94% sudah termasuk semua kasus yang benar</div>
+          <div class="quiz-opt" data-val="B"><span class="opt-letter">B</span>Precision — persentase prediksi "cacat" yang benar-benar cacat</div>
+          <div class="quiz-opt" data-val="C"><span class="opt-letter">C</span>Recall — persentase produk cacat nyata yang berhasil dideteksi model</div>
+          <div class="quiz-opt" data-val="D"><span class="opt-letter">D</span>RMSE — ukuran rata-rata error prediksi dalam satuan yang sama</div>
+        </div>
+        <div class="quiz-explanation">
+          <strong>Jawaban: C.</strong> Recall = TP / (TP + FN) = "dari semua yang benar-benar positif (cacat), berapa % yang berhasil terdeteksi?" Ini persis yang ditanyakan direktur. Accuracy yang tinggi (94%) bisa menyesatkan jika dataset tidak seimbang — misalnya hanya 2% produk cacat, model yang selalu prediksi "tidak cacat" sudah dapat accuracy 98%, tapi Recall-nya 0%. Dalam QC, False Negative (cacat lolos ke pelanggan) adalah risiko terbesar — makanya Recall adalah metrik kritis.
+        </div>
+      </div>
+
+      <!-- Q7 -->
+      <div class="quiz-box">
+        <div class="quiz-header">
+          <span class="quiz-num">No. 7</span>
+          <span class="quiz-q">Sebuah pabrik minuman menerapkan model demand forecasting, dan model menghasilkan prediksi demand 10% lebih rendah dari aktual secara konsisten (underprediction). Apa dampak operasional yang paling mungkin terjadi?</span>
+        </div>
+        <div class="quiz-options" data-correct="A">
+          <div class="quiz-opt" data-val="A"><span class="opt-letter">A</span>Stok tidak cukup memenuhi permintaan (stockout), lost sales, dan pelanggan beralih ke kompetitor</div>
+          <div class="quiz-opt" data-val="B"><span class="opt-letter">B</span>Overstock, modal tertahan di gudang, risiko kadaluarsa produk</div>
+          <div class="quiz-opt" data-val="C"><span class="opt-letter">C</span>Tidak ada dampak signifikan — error 10% masih dalam toleransi industri</div>
+          <div class="quiz-opt" data-val="D"><span class="opt-letter">D</span>Kapasitas produksi berlebih dan shift kerja tidak efisien</div>
+        </div>
+        <div class="quiz-explanation">
+          <strong>Jawaban: A.</strong> Underprediction (forecast < aktual) → perusahaan memproduksi/memesan lebih sedikit dari yang dibutuhkan → stok habis sebelum permintaan terpenuhi (stockout). Untuk FMCG seperti minuman, ini sangat berbahaya: pelanggan tidak menunggu — mereka langsung beli produk kompetitor. Lost sales langsung berdampak ke revenue. Sebaliknya, overprediction (forecast > aktual) → overstock (Jawaban B). Keduanya adalah trade-off klasik yang dikelola dengan safety stock dinamis.
+        </div>
+      </div>
+
+      <!-- Q8 -->
+      <div class="quiz-box">
+        <div class="quiz-header">
+          <span class="quiz-num">No. 8</span>
+          <span class="quiz-q">Model ML yang dilatih pada data produksi tahun 2022–2024 tiba-tiba performanya turun drastis di tahun 2025 meskipun tidak ada perubahan kode. Fenomena ini disebut apa, dan solusinya adalah?</span>
+        </div>
+        <div class="quiz-options" data-correct="D">
+          <div class="quiz-opt" data-val="A"><span class="opt-letter">A</span>Overfitting — solusinya retrain dengan data yang lebih sedikit</div>
+          <div class="quiz-opt" data-val="B"><span class="opt-letter">B</span>Underfitting — model terlalu sederhana, tambahkan lebih banyak fitur</div>
+          <div class="quiz-opt" data-val="C"><span class="opt-letter">C</span>Data leakage — pisahkan kembali data training dan test set</div>
+          <div class="quiz-opt" data-val="D"><span class="opt-letter">D</span>Concept drift / model drift — distribusi data nyata berubah dari saat training; solusi: retrain berkala dengan data terbaru</div>
+        </div>
+        <div class="quiz-explanation">
+          <strong>Jawaban: D.</strong> Concept drift terjadi ketika pola di data produksi nyata berubah dari waktu ke waktu — bisa karena perubahan perilaku pelanggan, kondisi mesin yang berbeda, perubahan supplier, atau faktor eksternal (pandemi, regulasi baru). Model yang tidak di-update akan terus memprediksi berdasarkan pola lama yang tidak lagi relevan. Solusinya: (1) monitoring performa model secara berkala, (2) retrain dengan data terbaru (misalnya setiap kuartal), (3) automated retraining pipeline jika budget memungkinkan.
+        </div>
+      </div>
+
+    </div>
+
+    <!-- STUDI KASUS ANALISIS -->
+    <div class="content-block" id="studi-kasus">
+      <h2>3. Latihan Studi Kasus Analisis</h2>
+      <p>UTS Teknik Industri menekankan kemampuan analisis dan rekomendasi — bukan kode. Latihan berikut mencerminkan 3 soal esai di UTS. Kerjakan dulu sendiri sebelum melihat panduan di bawah.</p>
+
+      <div class="callout info">
+        <span class="callout-icon">📋</span>
+        <div class="callout-body">
+          <p><strong>Struktur jawaban studi kasus yang dinilai tinggi:</strong> (1) Identifikasi jenis masalah + data yang dibutuhkan. (2) Rekomendasi solusi AI beserta justifikasinya. (3) Metrik evaluasi yang tepat. (4) Risiko dan mitigasi. (5) Langkah implementasi realistis. Jawaban yang hanya menyebut nama algoritma tanpa konteks akan mendapat nilai rendah.</p>
+        </div>
+      </div>
+
+      <div class="kasus-box">
+        <div class="kasus-label">Studi Kasus 1 — Manufaktur</div>
+        <div class="kasus-q">PT Maju Makmur memproduksi ban kendaraan dan mengalami tingkat cacat 3.2% per bulan — di atas standar industri 1.5%. Inspeksi saat ini dilakukan manual oleh operator di akhir lini produksi: operator memeriksa secara visual dan meraba permukaan ban. Proses ini memakan waktu 12 detik per ban dan miss rate (cacat lolos) mencapai 15%. Data tersedia: foto 80.000 ban berlabel (cacat/tidak beserta jenis cacat: gelembung udara, sobekan, asimetri), data sensor tekanan, suhu vulkanisasi, dan komposisi karet per batch. Sebagai konsultan TI yang disewa perusahaan, rancang solusi AI end-to-end untuk masalah ini.</div>
+        <div class="kasus-hint">Panduan: ini melibatkan dua lapisan solusi — inspeksi visual (Computer Vision) dan deteksi dini dari proses (ML berbasis sensor). Untuk QC dengan 80.000 foto berlabel, apa pendekatan DL yang tepat? Bagaimana mengintegrasikan kedua model? Apa KPI keberhasilan yang bisa dilaporkan ke manajemen?</div>
+      </div>
+
+      <div class="kasus-box">
+        <div class="kasus-label">Studi Kasus 2 — Supply Chain & Logistik</div>
+        <div class="kasus-q">Distributor FMCG dengan 200 SKU dan 50 titik distribusi di Jawa Timur menghadapi masalah: overstock rata-rata Rp 4,2 miliar/bulan (terutama produk musiman) dan stockout di 12% SKU (terutama produk promosi yang sering terlambat diantisipasi). Sistem forecasting saat ini: rata-rata 3 bulan terakhir, diupdate manual oleh tim planning setiap Senin. Data tersedia: histori penjualan 3 tahun per SKU per toko, kalender promosi, data hari libur nasional dan regional, dan data cuaca historis. Rancang sistem demand forecasting berbasis AI untuk menggantikan sistem manual ini.</div>
+        <div class="kasus-hint">Panduan: ini klasik time series forecasting dengan multiple fitur (fitur musiman, promosi, cuaca). Pikirkan: Prophet (Facebook) cocok untuk data dengan efek hari libur dan musiman kuat. Bagaimana menghitung ROI implementasi? Apa risiko jika model di-deploy tanpa fase validasi?</div>
+      </div>
+
+      <div class="kasus-box">
+        <div class="kasus-label">Studi Kasus 3 — Evaluasi & Keputusan Bisnis</div>
+        <div class="kasus-q">Direktur Operasional PT Tekno Nusa ingin mengadopsi AI untuk perbaikan proses dan meminta Anda membuat rekomendasi. Perusahaan mempunyai 3 opsi: (A) beli solusi AI siap pakai dari vendor (biaya lisensi Rp 800 juta/tahun, implementasi 3 bulan), (B) gunakan AutoML Google (Rp 150 juta/tahun, tim internal perlu 1 minggu pelatihan), (C) bangun model custom dengan tim IT internal (capex Rp 500 juta, waktu 8 bulan). Konteks: tim IT terdiri dari 3 orang dengan pengalaman Python dasar; masalah utama adalah prediksi permintaan untuk 40 SKU; data historis 2 tahun tersedia dan bersih. Buat analisis komparatif dan rekomendasikan opsi terbaik beserta alasannya.</div>
+        <div class="kasus-hint">Panduan: ini soal make-or-buy decision untuk AI — sangat relevan untuk karir TI. Pertimbangkan: kompleksitas masalah (40 SKU = tidak terlalu kompleks), kapabilitas tim, time-to-value (kapan manfaat mulai terasa), total cost of ownership (bukan hanya lisensi), dan risiko vendor lock-in vs risiko pembangunan internal yang molor.</div>
+      </div>
+    </div>
+
+    <!-- KISI-KISI UTS -->
+    <div class="content-block" id="kisi">
+      <h2>4. Kisi-kisi UTS Resmi</h2>
+      <p>UTS mencakup materi P-01 s/d P-06. Format: 20 soal pilihan ganda + 3 studi kasus analisis.</p>
+
+      <div class="stat-trio">
+        <div class="stat-card">
+          <div class="stat-num" style="color:var(--blue);">20</div>
+          <div class="stat-label">Soal Pilihan Ganda<br><span style="color:var(--text-3);">2 poin/soal = 40 poin</span></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num" style="color:var(--amber);">3</div>
+          <div class="stat-label">Studi Kasus Analisis<br><span style="color:var(--text-3);">20 poin/soal = 60 poin</span></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num" style="color:var(--teal);">90</div>
+          <div class="stat-label">Menit Durasi<br><span style="color:var(--text-3);">Tidak boleh open book</span></div>
+        </div>
+      </div>
+
+      <h3 style="margin-top:var(--s5);">Distribusi Topik — Pilihan Ganda</h3>
+      <table class="kisi-table">
+        <thead>
+          <tr>
+            <th>Topik</th>
+            <th>Sesi</th>
+            <th>Jumlah Soal</th>
+            <th>Tipe Soal</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Konsep AI, taksonomi, dampak industri manufaktur & logistik</td>
+            <td style="font-family:var(--mono)">P-01</td>
+            <td style="font-family:var(--mono)">3</td>
+            <td>Pemahaman konsep, studi kasus mini</td>
+          </tr>
+          <tr>
+            <td>Supervised vs unsupervised, pemilihan algoritma, overfitting</td>
+            <td style="font-family:var(--mono)">P-02</td>
+            <td style="font-family:var(--mono)">4</td>
+            <td>Pilih pendekatan berdasarkan kasus</td>
+          </tr>
+          <tr>
+            <td>Interpretasi confusion matrix, precision/recall dalam konteks industri</td>
+            <td style="font-family:var(--mono)">P-03</td>
+            <td style="font-family:var(--mono)">4</td>
+            <td>Analisis output model, implikasi bisnis</td>
+          </tr>
+          <tr>
+            <td>Data cleaning, missing value, outlier, visualisasi EDA</td>
+            <td style="font-family:var(--mono)">P-04</td>
+            <td style="font-family:var(--mono)">3</td>
+            <td>Identifikasi masalah data, strategi pembersihan</td>
+          </tr>
+          <tr>
+            <td>Predictive maintenance, optimasi supply chain, studi kasus Toyota/Unilever</td>
+            <td style="font-family:var(--mono)">P-05</td>
+            <td style="font-family:var(--mono)">3</td>
+            <td>Aplikasi AI ke skenario industri</td>
+          </tr>
+          <tr>
+            <td>MAPE, RMSE, dampak over/underprediction, safety stock</td>
+            <td style="font-family:var(--mono)">P-06</td>
+            <td style="font-family:var(--mono)">3</td>
+            <td>Evaluasi forecast, keputusan stok</td>
+          </tr>
+          <tr style="background:rgba(74,142,245,0.04);">
+            <td><strong style="color:var(--text)">Total</strong></td>
+            <td></td>
+            <td style="font-family:var(--mono);color:var(--blue);font-weight:600">20</td>
+            <td style="color:var(--blue)">40 poin</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3 style="margin-top:var(--s6);">Distribusi Topik — Studi Kasus</h3>
+      <table class="kisi-table">
+        <thead>
+          <tr>
+            <th>Soal</th>
+            <th>Tema</th>
+            <th>CPMK</th>
+            <th>Poin</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="font-family:var(--mono)">SK-1</td>
+            <td><strong style="color:var(--text)">Rancangan solusi AI</strong> — diberikan skenario masalah operasional industri, rancang solusi AI end-to-end: identifikasi masalah, data yang dibutuhkan, algoritma yang sesuai, KPI keberhasilan</td>
+            <td style="font-family:var(--mono)">C2, C4</td>
+            <td style="font-family:var(--mono);color:var(--blue)">20</td>
+          </tr>
+          <tr>
+            <td style="font-family:var(--mono)">SK-2</td>
+            <td><strong style="color:var(--text)">Interpretasi hasil & rekomendasi</strong> — diberikan output model (tabel confusion matrix, grafik forecast vs aktual), interpretasikan dan buat rekomendasi tindak lanjut operasional</td>
+            <td style="font-family:var(--mono)">C3, C5</td>
+            <td style="font-family:var(--mono);color:var(--blue)">20</td>
+          </tr>
+          <tr>
+            <td style="font-family:var(--mono)">SK-3</td>
+            <td><strong style="color:var(--text)">Evaluasi & keputusan adopsi AI</strong> — diberikan 2–3 opsi solusi AI (beli vs buat vs AutoML), analisis trade-off dan rekomendasikan pilihan terbaik untuk konteks perusahaan yang diberikan</td>
+            <td style="font-family:var(--mono)">C5, C6</td>
+            <td style="font-family:var(--mono);color:var(--blue)">20</td>
+          </tr>
+          <tr style="background:rgba(74,142,245,0.04);">
+            <td><strong style="color:var(--text)">Total</strong></td>
+            <td></td>
+            <td></td>
+            <td style="font-family:var(--mono);color:var(--blue);font-weight:600">60 poin</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="callout warn" style="margin-top:var(--s5);">
+        <span class="callout-icon">⚠️</span>
+        <div class="callout-body">
+          <p><strong>Yang TIDAK diujikan di UTS:</strong> Penulisan kode Python, derivasi rumus matematis, instalasi library, detail parameter model (epoch, learning rate, dll), nama-nama layer neural network. UTS TI menguji kemampuan analisis dan keputusan bisnis berbasis AI — bukan kemampuan pemrograman.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- TIPS UTS -->
+    <div class="content-block" id="tips">
+      <h2>5. Strategi & Tips Menghadapi UTS</h2>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--s5);margin-bottom:var(--s5);">
+        <div>
+          <h3 style="font-size:15px;color:var(--blue);margin-bottom:var(--s4);">Pilihan Ganda — Mindset yang Benar</h3>
+          <div style="display:flex;flex-direction:column;gap:var(--s3);">
+            <div style="display:flex;gap:var(--s3);align-items:flex-start;">
+              <span style="color:var(--blue);flex-shrink:0;margin-top:2px;">→</span>
+              <span style="font-size:13px;color:var(--text-2);line-height:1.6;">Baca soal dari sudut pandang <em>manajer operasional</em> — apa yang masuk akal secara bisnis?</span>
+            </div>
+            <div style="display:flex;gap:var(--s3);align-items:flex-start;">
+              <span style="color:var(--blue);flex-shrink:0;margin-top:2px;">→</span>
+              <span style="font-size:13px;color:var(--text-2);line-height:1.6;">Soal "data ada label atau tidak?" → tentukan supervised vs unsupervised dulu, baru pilih algoritma.</span>
+            </div>
+            <div style="display:flex;gap:var(--s3);align-items:flex-start;">
+              <span style="color:var(--blue);flex-shrink:0;margin-top:2px;">→</span>
+              <span style="font-size:13px;color:var(--text-2);line-height:1.6;">Soal metrik: tanya dulu "apa konsekuensi false negative?" → jika mahal, prioritaskan Recall.</span>
+            </div>
+            <div style="display:flex;gap:var(--s3);align-items:flex-start;">
+              <span style="color:var(--blue);flex-shrink:0;margin-top:2px;">→</span>
+              <span style="font-size:13px;color:var(--text-2);line-height:1.6;">Waspada jawaban "extreme" (MAPE 0%, accuracy harus 100%) — tidak realistis dalam praktik industri.</span>
+            </div>
+          </div>
+        </div>
+        <div>
+          <h3 style="font-size:15px;color:var(--amber);margin-bottom:var(--s4);">Studi Kasus — Struktur Jawaban</h3>
+          <div style="display:flex;flex-direction:column;gap:var(--s3);">
+            <div style="display:flex;gap:var(--s3);align-items:flex-start;">
+              <span style="color:var(--amber);flex-shrink:0;margin-top:2px;">1.</span>
+              <span style="font-size:13px;color:var(--text-2);line-height:1.6;"><strong style="color:var(--text)">Identifikasi:</strong> Apa masalah intinya? Data apa yang ada? Data apa yang masih kurang?</span>
+            </div>
+            <div style="display:flex;gap:var(--s3);align-items:flex-start;">
+              <span style="color:var(--amber);flex-shrink:0;margin-top:2px;">2.</span>
+              <span style="font-size:13px;color:var(--text-2);line-height:1.6;"><strong style="color:var(--text)">Solusi:</strong> Algoritma + alasan (jangan hanya menyebut nama). Sebutkan asumsi yang dibuat.</span>
+            </div>
+            <div style="display:flex;gap:var(--s3);align-items:flex-start;">
+              <span style="color:var(--amber);flex-shrink:0;margin-top:2px;">3.</span>
+              <span style="font-size:13px;color:var(--text-2);line-height:1.6;"><strong style="color:var(--text)">Evaluasi:</strong> KPI keberhasilan yang terukur (MAPE target, penghematan Rp, % penurunan downtime).</span>
+            </div>
+            <div style="display:flex;gap:var(--s3);align-items:flex-start;">
+              <span style="color:var(--amber);flex-shrink:0;margin-top:2px;">4.</span>
+              <span style="font-size:13px;color:var(--text-2);line-height:1.6;"><strong style="color:var(--text)">Risiko:</strong> Satu risiko utama + cara mitigasinya — ini menunjukkan pemikiran kritis.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tabel konsep wajib hafal -->
+      <div style="background:var(--bg-2);border:1px solid var(--border);border-radius:var(--r3);padding:var(--s5);margin-top:var(--s5);">
+        <div style="font-family:var(--mono);font-size:10px;color:var(--text-3);letter-spacing:2px;text-transform:uppercase;margin-bottom:var(--s4);">Konsep Kunci yang Wajib Dipahami (Bukan Hafal!)</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--s5);font-size:13px;color:var(--text-2);">
+          <div>
+            <div style="color:var(--text);font-weight:600;margin-bottom:var(--s3);">Metrik & Artinya untuk Industri</div>
+            <div style="line-height:2.1;">
+              • <strong style="color:var(--text)">MAPE &lt;10%</strong> = forecast demand sangat baik<br>
+              • <strong style="color:var(--text)">Recall tinggi</strong> = sedikit cacat/kerusakan lolos<br>
+              • <strong style="color:var(--text)">Precision tinggi</strong> = sedikit alarm palsu<br>
+              • <strong style="color:var(--text)">F1-score</strong> = keseimbangan precision & recall<br>
+              • <strong style="color:var(--text)">RMSE</strong> = error rata-rata dalam satuan asli
+            </div>
+          </div>
+          <div>
+            <div style="color:var(--text);font-weight:600;margin-bottom:var(--s3);">Pemilihan Pendekatan</div>
+            <div style="line-height:2.1;">
+              • Ada label historis → Supervised<br>
+              • Tanpa label, cari pola → Unsupervised<br>
+              • Data urutan waktu → Time Series<br>
+              • Gambar/video → Computer Vision<br>
+              • Masalah sederhana + data bersih → AutoML dulu
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Checklist -->
+      <div class="task-box" style="margin-top:var(--s6);" id="checklist">
+        <div class="task-box-title">📋 Checklist Persiapan UTS — Teknik Industri</div>
+        <p style="font-size:13px;color:var(--text-2);margin-bottom:var(--s4);">Selesaikan semua item ini <strong>sebelum hari UTS</strong> untuk persiapan optimal.</p>
+        <ol style="font-size:14px;color:var(--text);line-height:2.3;">
+          <li><strong>Kerjakan semua 8 soal pilihan ganda di halaman ini</strong> dan baca setiap penjelasan — terutama untuk soal yang Anda jawab salah.</li>
+          <li><strong>Tulis jawaban sendiri untuk minimal 1 studi kasus</strong> menggunakan struktur 4-poin: Identifikasi → Solusi → Evaluasi → Risiko.</li>
+          <li><strong>Buat tabel "kapan pakai apa"</strong> di kertas A4 — tulis tangan: masalah industri → jenis ML → contoh algoritma → metrik. Proses menulis membantu retensi.</li>
+          <li><strong>Review praktikum P-03 dan P-06</strong> — bukan kodingnya, tapi interpretasi output: confusion matrix P-03 dan tabel MAPE P-06. Bisakah Anda menjelaskan artinya ke orang non-teknis?</li>
+          <li><strong>Latih satu kasus "make-or-buy AI"</strong> untuk konteks perusahaan fiksi Anda sendiri — ini adalah tipe soal SK-3 yang paling sering keluar.</li>
+        </ol>
+      </div>
+
+      <div class="reading-box">
+        <div class="reading-box-title">📖 Pratinjau Blok 2 — Setelah UTS</div>
+        <div class="reading-item">
+          <span class="reading-icon">🤖</span>
+          <div class="reading-label">
+            <strong>P-08: LLM & Generative AI untuk Industri</strong>
+            ChatGPT dan Claude bisa otomasi laporan operasional, rangkum SOP ratusan halaman, dan analisis teks feedback pelanggan. Blok 2 dimulai langsung dengan aplikasi yang bisa Anda coba besok di tempat kerja.
+          </div>
+        </div>
+        <div class="reading-item">
+          <span class="reading-icon">🔧</span>
+          <div class="reading-label">
+            <strong>P-09: Prompt Engineering untuk Konteks Industri</strong>
+            Belajar merancang prompt yang efektif untuk: pembuatan laporan shift, analisis tabel produksi, penyusunan SOP, dan ringkasan meeting. Tidak perlu coding — hanya teks yang tepat.
+          </div>
+        </div>
+        <div class="reading-item">
+          <span class="reading-icon">📚</span>
+          <div class="reading-label">
+            <strong>Davenport — The AI Advantage, Ch. 4–5</strong>
+            Tentang cara perusahaan industri mengimplementasikan AI secara strategis. Sangat relevan sebagai referensi analisis proyek UAS Blok 2.
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ── ASIDE ── -->
+  <aside class="content-aside">
+
+    <!-- TOC -->
+    <div class="toc">
+      <div class="toc-title">Isi Halaman</div>
+      <ul class="toc-list">
+        <li><a href="#tujuan" class="active">Tujuan Sesi Review</a></li>
+        <li><a href="#rekap">1. Rekap Cepat P1–P6</a></li>
+        <li><a href="#latihan">2. Latihan Pilihan Ganda</a></li>
+        <li><a href="#studi-kasus">3. Studi Kasus Analisis</a></li>
+        <li><a href="#kisi">4. Kisi-kisi UTS</a></li>
+        <li><a href="#tips">5. Strategi & Tips</a></li>
+      </ul>
+    </div>
+
+    <!-- Sesi nav -->
+    <div class="sesi-nav-aside">
+      <div class="sesi-nav-title">Navigasi Sesi</div>
+      <a href="sesi-06.html" class="sesi-nav-btn">
+        <span>←</span>
+        <span>P-06: Prediksi Demand & Supply Chain</span>
+      </a>
+      <a href="../index.html" class="sesi-nav-btn" style="margin-top:var(--s2);">
+        <span>🏠</span>
+        <span>Kembali ke Beranda TI</span>
+      </a>
+      <div style="margin-top:var(--s4);padding:var(--s4);background:rgba(240,96,96,0.08);border:1px solid rgba(240,96,96,0.2);border-radius:var(--r2);">
+        <div style="font-family:var(--mono);font-size:10px;color:var(--red);letter-spacing:1px;text-transform:uppercase;margin-bottom:var(--s2);">UTS Setelah P-07</div>
+        <div style="font-size:12px;color:var(--text-2);line-height:1.6;">20 PG + 3 studi kasus analisis. Durasi 90 menit. Tidak boleh open book.</div>
+      </div>
+    </div>
+
+    <!-- Score tracker -->
+    <div style="background:var(--bg-2);border:1px solid var(--border);border-radius:var(--r3);padding:var(--s5);margin-top:var(--s4);" id="score-tracker">
+      <div style="font-family:var(--mono);font-size:10px;color:var(--text-3);letter-spacing:2px;text-transform:uppercase;margin-bottom:var(--s4);">Skor Latihan Anda</div>
+      <div style="text-align:center;margin-bottom:var(--s3);">
+        <span id="score-display" style="font-family:var(--mono);font-size:36px;font-weight:700;color:var(--blue);">0</span>
+        <span style="font-family:var(--mono);font-size:18px;color:var(--text-3);"> / 8</span>
+      </div>
+      <div style="font-size:12px;color:var(--text-3);text-align:center;margin-bottom:var(--s3);">soal dijawab benar</div>
+      <div id="score-bar-wrap" style="background:var(--bg-3);border-radius:4px;height:6px;overflow:hidden;">
+        <div id="score-bar" style="height:100%;background:var(--blue);width:0%;transition:width 0.4s var(--ease);border-radius:4px;"></div>
+      </div>
+      <div id="score-msg" style="font-size:12px;color:var(--text-2);text-align:center;margin-top:var(--s3);">Mulai kerjakan soal di atas!</div>
+    </div>
+
+    <!-- Info box -->
+    <div style="background:var(--bg-2);border:1px solid var(--border);border-radius:var(--r3);padding:var(--s5);margin-top:var(--s4);">
+      <div style="font-family:var(--mono);font-size:10px;color:var(--text-3);letter-spacing:2px;text-transform:uppercase;margin-bottom:var(--s3);">Info Pertemuan</div>
+      <div style="display:flex;flex-direction:column;gap:var(--s3);">
+        <div>
+          <div style="font-size:11px;color:var(--text-3);">Program Studi</div>
+          <div style="font-size:13px;color:var(--text);">S1 Teknik Industri</div>
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--text-3);">Tipe</div>
+          <div style="font-size:13px;color:var(--text);">Review & Latihan Soal</div>
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--text-3);">Durasi</div>
+          <div style="font-size:13px;color:var(--text);">100 menit</div>
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--text-3);">CPMK</div>
+          <div style="font-size:13px;color:var(--text);">C1–C5 (rekap semua)</div>
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--text-3);">Format UTS</div>
+          <div style="font-size:13px;color:var(--text);">20 PG + 3 Studi Kasus · 90 menit</div>
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--text-3);">Referensi Utama</div>
+          <div style="font-size:13px;color:var(--text);">Gentsch — AI for Business · Davenport — The AI Advantage</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+</div>
+
+<!-- ══ FOOTER ══ -->
+<footer class="footer">
+  <div>AI·UKWMS <span style="color:var(--text-3);">· P-07 Review & Persiapan UTS · S1 Teknik Industri</span></div>
+  <div><a href="../index.html" style="color:var(--text-3);">← Kembali ke Beranda</a></div>
+</footer>
+
+<script>
+  /* ── Quiz interactivity ── */
+  let correctCount  = 0;
+  const TOTAL       = document.querySelectorAll('.quiz-box').length;
+
+  document.querySelectorAll('.quiz-box').forEach(box => {
+    const correct     = box.querySelector('.quiz-options').dataset.correct;
+    const opts        = box.querySelectorAll('.quiz-opt');
+    const explanation = box.querySelector('.quiz-explanation');
+    let answered      = false;
+
+    opts.forEach(opt => {
+      opt.addEventListener('click', () => {
+        if (answered) return;
+        answered = true;
+
+        opts.forEach(o => {
+          if (o.dataset.val === correct) {
+            o.classList.add('correct');
+          } else if (o.dataset.val === opt.dataset.val && opt.dataset.val !== correct) {
+            o.classList.add('wrong');
+          }
+          o.style.cursor = 'default';
+        });
+
+        if (opt.dataset.val === correct) correctCount++;
+
+        explanation.classList.add('show');
+        updateScore();
+      });
+    });
+  });
+
+  function updateScore() {
+    const pct = Math.round((correctCount / TOTAL) * 100);
+    document.getElementById('score-display').textContent = correctCount;
+    document.getElementById('score-bar').style.width     = pct + '%';
+
+    const bar = document.getElementById('score-bar');
+    if      (pct >= 88) { bar.style.background = 'var(--teal)'; }
+    else if (pct >= 63) { bar.style.background = 'var(--blue)'; }
+    else if (pct >= 38) { bar.style.background = 'var(--amber)'; }
+    else                { bar.style.background = 'var(--red)'; }
+
+    const msgs = [
+      [0, 0, 'Mulai kerjakan soal di atas!'],
+      [1, 3, 'Terus semangat — review kembali rekap P1–P6.'],
+      [4, 5, 'Sudah lebih dari separuh! Pelajari penjelasan yang salah.'],
+      [6, 6, 'Bagus! Kuasai studi kasus untuk nilai UTS maksimal.'],
+      [7, 7, 'Hampir sempurna — Anda siap menghadapi UTS!'],
+      [8, 8, '🎯 Skor penuh! Fokus sekarang ke latihan studi kasus.'],
+    ];
+    const entry = msgs.find(([lo, hi]) => correctCount >= lo && correctCount <= hi);
+    document.getElementById('score-msg').textContent = entry ? entry[2] : '';
+  }
+
+  /* ── TOC active tracking ── */
+  const headings = document.querySelectorAll('.content-main [id]');
+  const tocLinks = document.querySelectorAll('.toc-list a');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(a => {
+          a.classList.remove('active');
+          if (a.getAttribute('href') === '#' + entry.target.id) a.classList.add('active');
+        });
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px' });
+  headings.forEach(h => observer.observe(h));
+
+  /* ── Nav scroll active ── */
+  const navLinks = document.querySelectorAll('.nav-links a[href^="#"]');
+  window.addEventListener('scroll', () => {
+    let current = '';
+    headings.forEach(h => { if (window.scrollY >= h.offsetTop - 100) current = h.id; });
+    navLinks.forEach(a => {
+      a.classList.remove('active');
+      if (a.getAttribute('href') === '#' + current) a.classList.add('active');
+    });
+  });
+</script>
+</body>
+</html>
