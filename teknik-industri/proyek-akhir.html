@@ -257,6 +257,7 @@
   <ul class="nav-links">
     <li><a href="index.html">← Beranda TI</a></li>
     <li><a href="#gambaran" class="active">Gambaran</a></li>
+    <li><a href="#batasan" style="color:var(--red);">Batasan</a></li>
     <li><a href="#topik">Pilihan Topik</a></li>
     <li><a href="#laporan">Struktur Laporan</a></li>
     <li><a href="#rubrik">Rubrik</a></li>
@@ -274,12 +275,13 @@
     </div>
     <div class="sesi-num" style="color:#9b7cf4;">PROYEK AKHIR · KELOMPOK</div>
     <h1 class="sesi-title">Analisis & Solusi AI<br><em style="color:#9b7cf4;">untuk Masalah Industri Nyata</em></h1>
-    <p style="font-size:15px;color:var(--text-2);max-width:720px;line-height:1.8;">Proyek kelompok (maks. 3 orang) — pilih satu permasalahan operasional industri nyata, analisis dengan pendekatan AI/ML yang telah dipelajari di P-01 s/d P-07, dan susun laporan lengkap beserta rekomendasi solusi yang dapat ditindaklanjuti oleh manajemen.</p>
+    <p style="font-size:15px;color:var(--text-2);max-width:720px;line-height:1.8;">Proyek kelompok (maks. 3 orang) — topik ditentukan melalui undian (A/B/C/D), pilih sendiri permasalahan operasional industri yang akan dianalisis, terapkan pendekatan AI/ML dari P-01 s/d P-07, dan susun laporan lengkap beserta rekomendasi yang dapat ditindaklanjuti manajemen.</p>
     <div class="sesi-meta-row">
       <span class="badge" style="color:#9b7cf4;border-color:rgba(155,124,244,0.3);background:rgba(155,124,244,0.08);">Proyek Kelompok</span>
       <span class="badge badge-amber">Maks. 3 Anggota</span>
       <span class="badge badge-blue">Laporan + Presentasi</span>
       <span class="badge" style="color:var(--teal);border-color:rgba(0,201,177,0.3);background:var(--teal-dim);">Materi P-01 — P-07</span>
+      <span class="badge" style="color:#9b7cf4;border-color:rgba(155,124,244,0.3);background:rgba(155,124,244,0.08);">🎲 Topik Diundi</span>
     </div>
   </div>
 </header>
@@ -345,7 +347,7 @@
           <span class="kelompok-icon">👥</span>
           <div class="kelompok-body">
             <div class="kelompok-label">Jumlah Anggota: 1–3 Orang</div>
-            <div class="kelompok-detail">Kelompok terdiri dari <strong>maksimal 3 orang</strong>. Boleh mengerjakan sendiri (1 orang) atau berdua (2 orang), namun beban dan kedalaman laporan tetap sama. Satu topik hanya boleh dikerjakan oleh satu kelompok — pendaftaran topik berlaku prinsip <em>first come, first served</em>.</div>
+            <div class="kelompok-detail">Kelompok terdiri dari <strong>maksimal 3 orang</strong>. Boleh mengerjakan sendiri (1 orang) atau berdua (2 orang), namun beban dan kedalaman laporan tetap sama. Setiap kelompok mendapat <strong>satu topik unik</strong> — tidak ada dua kelompok yang mengerjakan topik yang sama.</div>
           </div>
         </div>
         <div class="kelompok-rule">
@@ -379,10 +381,169 @@
       </div>
     </div>
 
+    <!-- ── BATASAN ORIGINALITAS ── -->
+    <div class="content-block" id="batasan">
+      <h2>Batasan Originalitas & Dataset Terlarang</h2>
+      <p>Proyek akhir harus menampilkan analisis dan data yang <strong>benar-benar baru</strong> — bukan pengulangan dataset, skenario, atau studi kasus yang sudah dibahas selama perkuliahan P-01 s/d P-07. Pelanggaran pada bagian ini diperlakukan setara dengan <strong style="color:var(--red)">plagiarisme</strong> dan mengakibatkan nilai 0.</p>
+
+      <!-- A. Dataset terlarang -->
+      <h3 style="margin-top:var(--s5);">A. Dataset yang Dilarang Digunakan</h3>
+      <p>Dataset berikut sudah dipakai sebagai bahan latihan di kelas. Menggunakannya lagi — bahkan jika nama kolom diubah, baris diacak, atau sebagian data dihapus — <strong>tidak akan diterima</strong>.</p>
+
+      <div class="rubrik-wrap">
+        <table class="rubrik-table">
+          <thead>
+            <tr>
+              <th style="width:12%">Sesi</th>
+              <th style="width:35%">Nama Dataset</th>
+              <th style="width:53%">Alasan Dilarang</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="cpmk-ref">P-03</td>
+              <td><strong style="color:var(--text)">AI4I 2020 Predictive Maintenance</strong><br><span style="font-size:11px;color:var(--text-3);font-family:var(--mono);">predictive_maintenance.csv (Kaggle)</span></td>
+              <td>Digunakan sebagai dataset utama latihan klasifikasi di Google Colab. Sudah terdapat ribuan notebook publik — analisis berbasis dataset ini tidak menunjukkan kemampuan baru.</td>
+            </tr>
+            <tr>
+              <td class="cpmk-ref">P-03</td>
+              <td><strong style="color:var(--text)">Telco Customer Churn</strong><br><span style="font-size:11px;color:var(--text-3);font-family:var(--mono);">WA_Fn-UseC_-Telco-Customer-Churn.csv (Kaggle)</span></td>
+              <td>Digunakan sebagai dataset kedua di latihan P-03. Selain sudah sangat populer di Kaggle, konteksnya adalah telekomunikasi — bukan industri manufaktur/supply chain yang relevan untuk TI.</td>
+            </tr>
+            <tr>
+              <td class="cpmk-ref">P-04</td>
+              <td><strong style="color:var(--text)">Data Produksi Mentah (UKWMS)</strong><br><span style="font-size:11px;color:var(--text-3);font-family:var(--mono);">data_produksi_mentah.xlsx (Edlink P-04)</span></td>
+              <td>Dataset kustom yang dibagikan langsung oleh dosen untuk latihan data cleaning. Menggunakannya berarti menganalisis data yang sudah dikerjakan bersama di kelas.</td>
+            </tr>
+            <tr>
+              <td class="cpmk-ref">P-05 (tugas)</td>
+              <td><strong style="color:var(--text)">Store Sales – Time Series Forecasting</strong><br><span style="font-size:11px;color:var(--text-3);font-family:var(--mono)">(Kaggle Competition)</span></td>
+              <td>Direferensikan sebagai bahan tugas individu P-05. Sudah pernah dijelajahi dan diserahkan sebagian mahasiswa — hasilnya tidak lagi merepresentasikan analisis baru.</td>
+            </tr>
+            <tr>
+              <td class="cpmk-ref">P-05 (tugas)</td>
+              <td><strong style="color:var(--text)">Superstore Sales Dataset</strong><br><span style="font-size:11px;color:var(--text-3);font-family:var(--mono)">(Kaggle)</span></td>
+              <td>Sama seperti di atas — direferensikan di tugas P-05 dan merupakan salah satu dataset paling umum di Kaggle dengan ribuan analisis identik yang tersedia publik.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout warning" style="margin-top:var(--s4);">
+        <span class="callout-icon">⚠️</span>
+        <div class="callout-body">
+          <p><strong>Varian dari dataset terlarang juga dilarang:</strong> Mengunduh versi "updated" atau "cleaned version" dari dataset yang sama di Kaggle, atau menggabungkan dua dataset terlarang, tetap termasuk dalam kategori ini. Jika ragu, tanyakan ke dosen sebelum Minggu 1 berakhir.</p>
+        </div>
+      </div>
+
+      <!-- B. Perusahaan fiktif terlarang -->
+      <h3 style="margin-top:var(--s6);">B. Skenario & Perusahaan Fiktif dari Latihan P-02 yang Dilarang</h3>
+      <p>Lima perusahaan fiktif berikut sudah digunakan sebagai studi kasus diskusi di P-02. Tidak boleh dijadikan konteks proyek — bahkan jika skenarionya dimodifikasi atau berganti nama.</p>
+
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:var(--s3);margin:var(--s4) 0;">
+        <div style="padding:var(--s3) var(--s4);background:rgba(240,96,96,0.05);border:1px solid rgba(240,96,96,0.15);border-radius:var(--r2);">
+          <div style="font-family:var(--mono);font-size:10px;color:var(--red);letter-spacing:1px;text-transform:uppercase;margin-bottom:4px;">Dilarang</div>
+          <div style="font-size:13px;font-weight:600;color:var(--text);">PT Sejahtera Tekstil</div>
+          <div style="font-size:12px;color:var(--text-3);margin-top:2px;">12 mesin tenun Surabaya · predictive maintenance · kasus P-02</div>
+        </div>
+        <div style="padding:var(--s3) var(--s4);background:rgba(240,96,96,0.05);border:1px solid rgba(240,96,96,0.15);border-radius:var(--r2);">
+          <div style="font-family:var(--mono);font-size:10px;color:var(--red);letter-spacing:1px;text-transform:uppercase;margin-bottom:4px;">Dilarang</div>
+          <div style="font-size:13px;font-weight:600;color:var(--text);">Koperasi Maju Bersama</div>
+          <div style="font-size:12px;color:var(--text-3);margin-top:2px;">47 gerai minimarket Jawa Timur · segmentasi gerai · kasus P-02</div>
+        </div>
+        <div style="padding:var(--s3) var(--s4);background:rgba(240,96,96,0.05);border:1px solid rgba(240,96,96,0.15);border-radius:var(--r2);">
+          <div style="font-family:var(--mono);font-size:10px;color:var(--red);letter-spacing:1px;text-transform:uppercase;margin-bottom:4px;">Dilarang</div>
+          <div style="font-size:13px;font-weight:600;color:var(--text);">CV Roti Kita</div>
+          <div style="font-size:12px;color:var(--text-3);margin-top:2px;">Pabrik biskuit Malang · quality control visual · kasus P-02</div>
+        </div>
+        <div style="padding:var(--s3) var(--s4);background:rgba(240,96,96,0.05);border:1px solid rgba(240,96,96,0.15);border-radius:var(--r2);">
+          <div style="font-family:var(--mono);font-size:10px;color:var(--red);letter-spacing:1px;text-transform:uppercase;margin-bottom:4px;">Dilarang</div>
+          <div style="font-size:13px;font-weight:600;color:var(--text);">PT Gas Nusantara</div>
+          <div style="font-size:12px;color:var(--text-3);margin-top:2px;">Distribusi LPG 1.200 agen Jawa Timur · route optimization · kasus P-02</div>
+        </div>
+        <div style="padding:var(--s3) var(--s4);background:rgba(240,96,96,0.05);border:1px solid rgba(240,96,96,0.15);border-radius:var(--r2);">
+          <div style="font-family:var(--mono);font-size:10px;color:var(--red);letter-spacing:1px;text-transform:uppercase;margin-bottom:4px;">Dilarang</div>
+          <div style="font-size:13px;font-weight:600;color:var(--text);">RS Husada Prima</div>
+          <div style="font-size:12px;color:var(--text-3);margin-top:2px;">Rumah sakit Surabaya · prediksi no-show pasien · kasus P-02</div>
+        </div>
+      </div>
+
+      <p style="font-size:13px;color:var(--text-2);">Boleh membuat perusahaan fiktif baru dengan sektor yang sama (misal: pabrik tekstil lain), asalkan skenario, data, dan permasalahannya dirancang sendiri dari awal — bukan sekadar mengganti nama.</p>
+
+      <!-- C. Studi kasus kuliah -->
+      <h3 style="margin-top:var(--s6);">C. Studi Kasus Kuliah yang Tidak Boleh Dijadikan "Analisis Proyek"</h3>
+      <p>Studi kasus berikut sudah dianalisis bersama di kelas (P-05). Anda boleh <em>menyebutnya sebagai referensi</em> di Bab 3 (Tinjauan Pustaka), tetapi <strong>tidak boleh menjadikannya subjek utama analisis proyek</strong>.</p>
+
+      <div style="display:flex;flex-wrap:wrap;gap:var(--s3);margin:var(--s4) 0;">
+        <div style="display:flex;gap:var(--s3);align-items:center;padding:var(--s3) var(--s4);background:var(--bg-2);border:1px solid var(--border);border-radius:var(--r2);">
+          <span style="font-size:18px;">🚗</span>
+          <div>
+            <div style="font-size:13px;font-weight:600;color:var(--text);">Toyota Production System</div>
+            <div style="font-size:11px;color:var(--text-3);">Studi kasus P-05 · Jidoka, JIT, Kanban</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:var(--s3);align-items:center;padding:var(--s3) var(--s4);background:var(--bg-2);border:1px solid var(--border);border-radius:var(--r2);">
+          <span style="font-size:18px;">🧴</span>
+          <div>
+            <div style="font-size:13px;font-weight:600;color:var(--text);">Unilever Demand Forecasting</div>
+            <div style="font-size:11px;color:var(--text-3);">Studi kasus P-05 · forecast puluhan ribu SKU</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:var(--s3);align-items:center;padding:var(--s3) var(--s4);background:var(--bg-2);border:1px solid var(--border);border-radius:var(--r2);">
+          <span style="font-size:18px;">📦</span>
+          <div>
+            <div style="font-size:13px;font-weight:600;color:var(--text);">Amazon Fulfillment & Logistik</div>
+            <div style="font-size:11px;color:var(--text-3);">Studi kasus P-05 · warehouse AI, last-mile</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- D. Batasan kode -->
+      <h3 style="margin-top:var(--s6);">D. Batasan Penggunaan Kode dari Kelas</h3>
+      <div style="background:var(--bg-2);border:1px solid var(--border);border-radius:var(--r3);padding:var(--s5);">
+        <div class="kelompok-rule" style="padding-top:0;">
+          <span class="kelompok-icon">✅</span>
+          <div class="kelompok-body">
+            <div class="kelompok-label">Boleh: Jadikan Notebook P-03 sebagai Template Struktur</div>
+            <div class="kelompok-detail">Boleh mengikuti alur umum notebook P-03 (import → EDA → split → train → evaluate) sebagai kerangka kerja. Ini wajar dan diperbolehkan.</div>
+          </div>
+        </div>
+        <div class="kelompok-rule">
+          <span class="kelompok-icon">✅</span>
+          <div class="kelompok-body">
+            <div class="kelompok-label">Boleh: Pakai Fungsi/Library yang Sama</div>
+            <div class="kelompok-detail">Menggunakan <code style="font-size:12px;background:var(--bg-1);padding:1px 5px;border-radius:3px;">sklearn</code>, <code style="font-size:12px;background:var(--bg-1);padding:1px 5px;border-radius:3px;">pandas</code>, <code style="font-size:12px;background:var(--bg-1);padding:1px 5px;border-radius:3px;">seaborn</code> yang sudah diajarkan tetap diperbolehkan dan dianjurkan.</div>
+          </div>
+        </div>
+        <div class="kelompok-rule">
+          <span class="kelompok-icon">🚫</span>
+          <div class="kelompok-body">
+            <div class="kelompok-label">Dilarang: Copy-Paste Kode Notebook P-03/P-04 Tanpa Adaptasi</div>
+            <div class="kelompok-detail">Blok kode yang identik atau hampir identik dengan notebook yang dibagikan di kelas — termasuk komentar, nama variabel, dan urutan langkah — tidak akan mendapat nilai pada komponen L4 (Implementasi). Seluruh preprocessing, pemilihan fitur, dan interpretasi harus disesuaikan untuk dataset dan konteks industri Anda sendiri.</div>
+          </div>
+        </div>
+        <div class="kelompok-rule" style="padding-bottom:0;border-bottom:none;">
+          <span class="kelompok-icon">🚫</span>
+          <div class="kelompok-body">
+            <div class="kelompok-label">Dilarang: Menggunakan Notebook Publik dari Kaggle Tanpa Atribusi & Adaptasi Signifikan</div>
+            <div class="kelompok-detail">Jika mengambil inspirasi dari notebook publik Kaggle, wajib: (1) cantumkan sumber di Daftar Pustaka, (2) tunjukkan modifikasi yang dilakukan untuk dataset Anda, dan (3) pastikan interpretasi hasil ditulis sendiri dalam konteks industri yang dipilih — bukan sekadar hasil copy hasil analisis orang lain.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- ── PILIHAN TOPIK ── -->
     <div class="content-block" id="topik">
-      <h2>Pilihan Topik Proyek</h2>
-      <p>Pilih <strong>satu topik</strong> dari empat domain berikut. Setiap topik menawarkan arah fokus yang berbeda — sesuaikan dengan minat kelompok, ketersediaan data, dan relevansi dengan pengalaman industri anggota.</p>
+      <h2>Topik Proyek</h2>
+
+      <div class="callout info" style="margin-bottom:var(--s5);">
+        <span class="callout-icon">🎲</span>
+        <div class="callout-body">
+          <p><strong>Topik ditentukan melalui undian.</strong> Setiap kelompok akan mendapat satu topik (A, B, C, atau D) secara acak — tidak ada kelompok yang mengerjakan topik yang sama. Pelajari semua topik sebelum pengundian agar kelompok siap bekerja dengan topik apapun yang diterima.</p>
+        </div>
+      </div>
+
+      <p>Empat domain berikut mewakili area penerapan AI/ML yang berbeda di industri. Meski topik ditentukan oleh undian, pilihan <strong>perusahaan, dataset, dan sudut analisis</strong> tetap sepenuhnya ditentukan oleh kelompok Anda.</p>
 
       <div class="topik-grid">
 
@@ -455,7 +616,7 @@
       <div class="callout warning" style="margin-top:var(--s4);">
         <span class="callout-icon">⚠️</span>
         <div class="callout-body">
-          <p><strong>Topik Tidak Layak:</strong> Topik yang terlalu umum ("AI untuk semua masalah industri"), topik tanpa data konkret, atau topik yang sudah dikerjakan oleh kelompok lain tidak akan diterima. Diskusikan topik dengan dosen sebelum mulai mengerjakan.</p>
+          <p><strong>Domain Proyek Sudah Ditentukan oleh Undian</strong> — yang perlu Anda tentukan sendiri adalah: (1) perusahaan atau industri spesifik yang dianalisis, (2) dataset yang digunakan, dan (3) sudut masalah yang difokuskan. Skenario tanpa data konkret, atau skenario yang berbasis dataset/kasus yang sudah dipakai di kelas (lihat <a href="#batasan" style="color:var(--amber);">Batasan Originalitas</a>), tidak akan diterima. Diskusikan rencana skenario dan data dengan dosen sebelum Minggu 1 berakhir.</p>
         </div>
       </div>
     </div>
@@ -914,6 +1075,7 @@
       <ul class="toc-list">
         <li><a href="#gambaran" class="active">Gambaran Umum</a></li>
         <li><a href="#kelompok">Ketentuan Kelompok</a></li>
+        <li><a href="#batasan" style="color:var(--red);">Batasan Originalitas</a></li>
         <li><a href="#topik">Pilihan Topik</a></li>
         <li><a href="#materi">Koneksi ke Materi</a></li>
         <li><a href="#laporan">Struktur Laporan</a></li>
@@ -946,7 +1108,7 @@
 
     <!-- Topik quick ref -->
     <div style="margin-top:var(--s4);background:var(--bg-2);border:1px solid var(--border);border-radius:var(--r2);padding:var(--s4) var(--s5);">
-      <div style="font-family:var(--mono);font-size:10px;color:var(--text-3);letter-spacing:2px;text-transform:uppercase;margin-bottom:var(--s3);">4 Pilihan Topik</div>
+      <div style="font-family:var(--mono);font-size:10px;color:var(--text-3);letter-spacing:2px;text-transform:uppercase;margin-bottom:var(--s3);">4 Topik · Diundi</div>
       <div style="display:flex;flex-direction:column;gap:var(--s2);">
         <div style="display:flex;gap:var(--s2);align-items:center;">
           <span style="font-family:var(--mono);font-size:10px;color:var(--blue);font-weight:700;">A</span>
