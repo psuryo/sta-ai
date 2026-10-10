@@ -1,0 +1,1006 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Proyek Akhir — Analisis & Solusi AI untuk Industri · Teknik Industri UKWMS</title>
+<link rel="stylesheet" href="../css/style.css">
+<style>
+  /* ── Topik cards ── */
+  .topik-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: var(--s4);
+    margin: var(--s5) 0;
+  }
+  .topik-card {
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: var(--r3);
+    padding: var(--s5);
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.2s;
+  }
+  .topik-card:hover { border-color: var(--blue); }
+  .topik-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+  }
+  .topik-card.blue::before   { background: var(--blue); }
+  .topik-card.teal::before   { background: var(--teal); }
+  .topik-card.amber::before  { background: var(--amber); }
+  .topik-card.purple::before { background: #9b7cf4; }
+  .topik-icon { font-size: 28px; margin-bottom: var(--s3); }
+  .topik-num {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  .topik-card.blue   .topik-num { color: var(--blue); }
+  .topik-card.teal   .topik-num { color: var(--teal); }
+  .topik-card.amber  .topik-num { color: var(--amber); }
+  .topik-card.purple .topik-num { color: #9b7cf4; }
+  .topik-title { font-size: 15px; font-weight: 700; color: var(--text); margin-bottom: var(--s2); }
+  .topik-desc  { font-size: 13px; color: var(--text-2); line-height: 1.7; margin-bottom: var(--s3); }
+  .topik-tags  { display: flex; gap: var(--s2); flex-wrap: wrap; }
+
+  /* ── Laporan struktur ── */
+  .laporan-step {
+    display: flex;
+    gap: var(--s4);
+    align-items: flex-start;
+    padding: var(--s4) 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .laporan-step:last-child { border-bottom: none; }
+  .laporan-num {
+    flex-shrink: 0;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--mono);
+    font-size: 12px;
+    font-weight: 700;
+    margin-top: 2px;
+  }
+  .laporan-num.blue   { background: var(--blue-dim); color: var(--blue); }
+  .laporan-num.teal   { background: rgba(0,201,177,0.1); color: var(--teal); }
+  .laporan-num.amber  { background: rgba(245,166,35,0.1); color: var(--amber); }
+  .laporan-num.purple { background: rgba(155,124,244,0.1); color: #9b7cf4; }
+  .laporan-body { flex: 1; }
+  .laporan-title { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+  .laporan-desc  { font-size: 13px; color: var(--text-2); line-height: 1.7; }
+  .laporan-hint  { font-size: 12px; color: var(--text-3); margin-top: 6px; font-family: var(--mono); }
+  .laporan-pages {
+    flex-shrink: 0;
+    font-family: var(--mono);
+    font-size: 11px;
+    padding: 3px 8px;
+    border-radius: 12px;
+    background: var(--bg-1);
+    border: 1px solid var(--border);
+    color: var(--text-3);
+    white-space: nowrap;
+    margin-top: 4px;
+  }
+
+  /* ── Rubrik table ── */
+  .rubrik-wrap {
+    overflow-x: auto;
+    margin: var(--s4) 0;
+  }
+  .rubrik-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+  .rubrik-table th {
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    padding: var(--s3) var(--s4);
+    text-align: left;
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--text-3);
+    white-space: nowrap;
+  }
+  .rubrik-table td {
+    border: 1px solid var(--border);
+    padding: var(--s3) var(--s4);
+    color: var(--text-2);
+    line-height: 1.6;
+    vertical-align: top;
+  }
+  .rubrik-table tr:nth-child(even) td { background: rgba(74,142,245,0.02); }
+  .rubrik-table .bobot { color: var(--blue); font-weight: 700; font-family: var(--mono); }
+  .rubrik-table .cpmk-ref { color: var(--teal); font-family: var(--mono); font-size: 11px; }
+
+  /* ── Timeline ── */
+  .timeline {
+    position: relative;
+    padding-left: var(--s7);
+    margin: var(--s5) 0;
+  }
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 15px;
+    top: 0; bottom: 0;
+    width: 2px;
+    background: var(--border);
+  }
+  .timeline-item {
+    position: relative;
+    margin-bottom: var(--s5);
+  }
+  .timeline-dot {
+    position: absolute;
+    left: calc(-1 * var(--s7) + 9px);
+    top: 4px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: 2px solid var(--bg-1);
+  }
+  .timeline-dot.blue   { background: var(--blue); }
+  .timeline-dot.teal   { background: var(--teal); }
+  .timeline-dot.amber  { background: var(--amber); }
+  .timeline-dot.red    { background: var(--red); }
+  .timeline-dot.purple { background: #9b7cf4; }
+  .timeline-week {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-3);
+    margin-bottom: 4px;
+  }
+  .timeline-title { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+  .timeline-desc  { font-size: 13px; color: var(--text-2); line-height: 1.7; }
+  .timeline-deliverable {
+    display: inline-block;
+    margin-top: var(--s2);
+    padding: 3px 10px;
+    background: rgba(245,166,35,0.1);
+    border: 1px solid rgba(245,166,35,0.2);
+    border-radius: 12px;
+    font-size: 11px;
+    color: var(--amber);
+    font-family: var(--mono);
+  }
+
+  /* ── Sesi coverage ── */
+  .sesi-link-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: var(--s3);
+    margin: var(--s4) 0;
+  }
+  .sesi-link-card {
+    display: flex;
+    gap: var(--s3);
+    align-items: flex-start;
+    padding: var(--s3) var(--s4);
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: var(--r2);
+    text-decoration: none;
+    transition: border-color 0.15s;
+  }
+  .sesi-link-card:hover { border-color: var(--blue); }
+  .sesi-link-num {
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 700;
+    padding: 3px 7px;
+    border-radius: var(--r1);
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .sesi-link-body { flex: 1; }
+  .sesi-link-title { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 2px; }
+  .sesi-link-rel   { font-size: 11px; color: var(--text-3); line-height: 1.5; }
+
+  /* ── Kelompok box ── */
+  .kelompok-rule {
+    display: flex;
+    gap: var(--s4);
+    align-items: flex-start;
+    padding: var(--s4) 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .kelompok-rule:last-child { border-bottom: none; }
+  .kelompok-icon { font-size: 22px; flex-shrink: 0; }
+  .kelompok-body { flex: 1; }
+  .kelompok-label { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+  .kelompok-detail { font-size: 13px; color: var(--text-2); line-height: 1.7; }
+
+  /* ── Stat trio (for summary) ── */
+  .stat-trio {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--s3);
+    margin: var(--s4) 0;
+  }
+  .stat-card {
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: var(--r2);
+    padding: var(--s4) var(--s5);
+    text-align: center;
+  }
+  .stat-big {
+    font-family: var(--mono);
+    font-size: 36px;
+    font-weight: 700;
+    line-height: 1;
+    margin-bottom: var(--s2);
+  }
+  .stat-label { font-size: 12px; color: var(--text-2); line-height: 1.5; }
+</style>
+</head>
+<body>
+
+<!-- ══ NAV ══ -->
+<nav class="nav">
+  <div class="nav-logo">AI<span>·</span>UKWMS</div>
+  <ul class="nav-links">
+    <li><a href="index.html">← Beranda TI</a></li>
+    <li><a href="#gambaran" class="active">Gambaran</a></li>
+    <li><a href="#topik">Pilihan Topik</a></li>
+    <li><a href="#laporan">Struktur Laporan</a></li>
+    <li><a href="#rubrik">Rubrik</a></li>
+    <li><a href="#timeline">Timeline</a></li>
+  </ul>
+</nav>
+
+<!-- ══ HERO ══ -->
+<header class="sesi-hero" style="background: linear-gradient(135deg, rgba(155,124,244,0.08) 0%, transparent 60%);">
+  <div style="max-width:1100px;margin:0 auto;">
+    <div class="sesi-breadcrumb">
+      <a href="index.html">Kecerdasan Buatan — Teknik Industri</a>
+      <span>›</span>
+      <span>Proyek Akhir</span>
+    </div>
+    <div class="sesi-num" style="color:#9b7cf4;">PROYEK AKHIR · KELOMPOK</div>
+    <h1 class="sesi-title">Analisis & Solusi AI<br><em style="color:#9b7cf4;">untuk Masalah Industri Nyata</em></h1>
+    <p style="font-size:15px;color:var(--text-2);max-width:720px;line-height:1.8;">Proyek kelompok (maks. 3 orang) — pilih satu permasalahan operasional industri nyata, analisis dengan pendekatan AI/ML yang telah dipelajari di P-01 s/d P-07, dan susun laporan lengkap beserta rekomendasi solusi yang dapat ditindaklanjuti oleh manajemen.</p>
+    <div class="sesi-meta-row">
+      <span class="badge" style="color:#9b7cf4;border-color:rgba(155,124,244,0.3);background:rgba(155,124,244,0.08);">Proyek Kelompok</span>
+      <span class="badge badge-amber">Maks. 3 Anggota</span>
+      <span class="badge badge-blue">Laporan + Presentasi</span>
+      <span class="badge" style="color:var(--teal);border-color:rgba(0,201,177,0.3);background:var(--teal-dim);">Materi P-01 — P-07</span>
+    </div>
+  </div>
+</header>
+
+<!-- ══ CONTENT LAYOUT ══ -->
+<div class="content-layout">
+  <main class="content-main">
+
+    <!-- ── GAMBARAN UMUM ── -->
+    <div class="content-block" id="gambaran">
+      <h2>Gambaran Umum Proyek</h2>
+      <p>Proyek akhir ini adalah puncak dari seluruh pembelajaran Blok 1 (P-01 s/d P-07). Kelompok Anda diminta untuk <strong>mengidentifikasi masalah operasional industri yang nyata atau realistis</strong>, lalu menyusun analisis mendalam beserta solusi berbasis AI/ML yang bisa diimplementasikan.</p>
+
+      <div class="callout info" style="margin:var(--s5) 0;">
+        <span class="callout-icon">🎯</span>
+        <div class="callout-body">
+          <p><strong>Esensi Proyek:</strong> Bukan tentang membangun AI yang canggih — melainkan tentang <em>berpikir seperti insinyur industri yang memahami AI</em>: apa masalahnya, data apa yang dibutuhkan, pendekatan ML mana yang paling tepat, dan apa dampak bisnisnya bagi perusahaan.</p>
+        </div>
+      </div>
+
+      <div class="stat-trio">
+        <div class="stat-card">
+          <div class="stat-big" style="color:#9b7cf4;">3</div>
+          <div class="stat-label">Anggota Maks.<br><span style="color:var(--text-3);">Bisa 1–3 orang</span></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-big" style="color:var(--blue);">20–30</div>
+          <div class="stat-label">Halaman Laporan<br><span style="color:var(--text-3);">Tidak termasuk lampiran</span></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-big" style="color:var(--amber);">15</div>
+          <div class="stat-label">Menit Presentasi<br><span style="color:var(--text-3);">+ 10 menit tanya jawab</span></div>
+        </div>
+      </div>
+
+      <h3 style="margin-top:var(--s5);">Capaian Pembelajaran yang Dinilai</h3>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--s3);margin:var(--s4) 0;">
+        <div style="display:flex;gap:var(--s3);padding:var(--s3) var(--s4);background:var(--blue-dim);border:1px solid rgba(74,142,245,0.15);border-radius:var(--r2);">
+          <span style="color:var(--blue);font-family:var(--mono);font-size:11px;font-weight:700;flex-shrink:0;">C3</span>
+          <span style="font-size:13px;color:var(--text-2);">Menganalisis data industri untuk mendukung pengambilan keputusan berbasis data</span>
+        </div>
+        <div style="display:flex;gap:var(--s3);padding:var(--s3) var(--s4);background:var(--blue-dim);border:1px solid rgba(74,142,245,0.15);border-radius:var(--r2);">
+          <span style="color:var(--blue);font-family:var(--mono);font-size:11px;font-weight:700;flex-shrink:0;">C4</span>
+          <span style="font-size:13px;color:var(--text-2);">Merancang solusi AI untuk masalah supply chain, maintenance, quality control, atau demand forecasting</span>
+        </div>
+        <div style="display:flex;gap:var(--s3);padding:var(--s3) var(--s4);background:var(--blue-dim);border:1px solid rgba(74,142,245,0.15);border-radius:var(--r2);">
+          <span style="color:var(--blue);font-family:var(--mono);font-size:11px;font-weight:700;flex-shrink:0;">C5</span>
+          <span style="font-size:13px;color:var(--text-2);">Membandingkan dan memilih solusi AI yang tepat berdasarkan kebutuhan dan konteks organisasi</span>
+        </div>
+        <div style="display:flex;gap:var(--s3);padding:var(--s3) var(--s4);background:var(--blue-dim);border:1px solid rgba(74,142,245,0.15);border-radius:var(--r2);">
+          <span style="color:var(--blue);font-family:var(--mono);font-size:11px;font-weight:700;flex-shrink:0;">C6</span>
+          <span style="font-size:13px;color:var(--text-2);">Menyusun laporan dan mempresentasikan rekomendasi AI kepada manajemen secara terstruktur</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── KETENTUAN KELOMPOK ── -->
+    <div class="content-block" id="kelompok">
+      <h2>Ketentuan Kelompok & Pemilihan Topik</h2>
+
+      <div style="background:var(--bg-2);border:1px solid var(--border);border-radius:var(--r3);padding:var(--s5);margin:var(--s5) 0;">
+        <div class="kelompok-rule">
+          <span class="kelompok-icon">👥</span>
+          <div class="kelompok-body">
+            <div class="kelompok-label">Jumlah Anggota: 1–3 Orang</div>
+            <div class="kelompok-detail">Kelompok terdiri dari <strong>maksimal 3 orang</strong>. Boleh mengerjakan sendiri (1 orang) atau berdua (2 orang), namun beban dan kedalaman laporan tetap sama. Satu topik hanya boleh dikerjakan oleh satu kelompok — pendaftaran topik berlaku prinsip <em>first come, first served</em>.</div>
+          </div>
+        </div>
+        <div class="kelompok-rule">
+          <span class="kelompok-icon">🏭</span>
+          <div class="kelompok-body">
+            <div class="kelompok-label">Konteks Industri: Nyata atau Realistis</div>
+            <div class="kelompok-detail">Perusahaan yang dianalisis boleh berupa: (a) perusahaan nyata yang salah satu anggota memiliki akses ke datanya, (b) perusahaan nyata berbasis data publik (laporan tahunan, dataset Kaggle, BPS), atau (c) perusahaan fiktif yang dirancang realistis dengan skenario dan data yang dibuat sendiri secara masuk akal. Cantumkan jelas mana yang dipilih di halaman pertama laporan.</div>
+          </div>
+        </div>
+        <div class="kelompok-rule">
+          <span class="kelompok-icon">📊</span>
+          <div class="kelompok-body">
+            <div class="kelompok-label">Data: Wajib Menyertakan Setidaknya Satu Dataset</div>
+            <div class="kelompok-detail">Setiap laporan wajib menyertakan minimal satu dataset yang dianalisis — bisa berupa data produksi, penjualan, sensor mesin, atau data operasional lainnya. Dataset minimal memiliki 100 baris dan 5 kolom. Sertakan sebagai lampiran (file CSV atau Excel) dan tampilkan visualisasinya di dalam laporan.</div>
+          </div>
+        </div>
+        <div class="kelompok-rule">
+          <span class="kelompok-icon">🔧</span>
+          <div class="kelompok-body">
+            <div class="kelompok-label">Tools: Gunakan Minimal Satu Tool dari Perkuliahan</div>
+            <div class="kelompok-detail">Laporan harus menunjukkan penggunaan setidaknya satu tool yang dipelajari: Google Colab (analisis data atau model sederhana), Power BI / Looker Studio (visualisasi dan dashboard), atau AutoML (percobaan model). Sertakan tangkapan layar (screenshot) atau output nyata dari tool di dalam laporan atau lampiran.</div>
+          </div>
+        </div>
+        <div class="kelompok-rule">
+          <span class="kelompok-icon">⚖️</span>
+          <div class="kelompok-body">
+            <div class="kelompok-label">Pembagian Kerja: Wajib Dicantumkan</div>
+            <div class="kelompok-detail">Di halaman belakang laporan, cantumkan tabel pembagian kerja yang jelas: siapa mengerjakan bagian apa, kontribusi dalam persentase (%), dan tanda tangan masing-masing anggota. Nilai kelompok dapat disesuaikan berdasarkan bukti kontribusi yang tidak merata.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── PILIHAN TOPIK ── -->
+    <div class="content-block" id="topik">
+      <h2>Pilihan Topik Proyek</h2>
+      <p>Pilih <strong>satu topik</strong> dari empat domain berikut. Setiap topik menawarkan arah fokus yang berbeda — sesuaikan dengan minat kelompok, ketersediaan data, dan relevansi dengan pengalaman industri anggota.</p>
+
+      <div class="topik-grid">
+
+        <!-- Topik A -->
+        <div class="topik-card blue">
+          <div class="topik-icon">🔧</div>
+          <div class="topik-num">Topik A</div>
+          <div class="topik-title">Predictive Maintenance & Quality Control</div>
+          <div class="topik-desc">Analisis data sensor mesin atau data kualitas produksi untuk memprediksi kegagalan mesin atau mendeteksi produk cacat sebelum sampai ke konsumen. Gunakan pendekatan klasifikasi (supervised learning).</div>
+          <div class="topik-tags">
+            <span class="badge badge-blue">Klasifikasi</span>
+            <span class="badge" style="color:var(--teal);border-color:rgba(0,201,177,0.3);background:var(--teal-dim);">Sensor/IoT</span>
+            <span class="badge badge-amber">P-02, P-03</span>
+          </div>
+          <div style="margin-top:var(--s3);font-size:12px;color:var(--text-3);font-family:var(--mono);">
+            Contoh: prediksi kerusakan pompa, deteksi cacat visual produk FMCG, kontrol kualitas PCB
+          </div>
+        </div>
+
+        <!-- Topik B -->
+        <div class="topik-card teal">
+          <div class="topik-icon">📦</div>
+          <div class="topik-num">Topik B</div>
+          <div class="topik-title">Demand Forecasting & Manajemen Inventori</div>
+          <div class="topik-desc">Bangun model prediksi permintaan (time series) untuk membantu keputusan stok, pemesanan, dan manajemen rantai pasok. Evaluasi dampak prediksi terhadap biaya inventory dan service level.</div>
+          <div class="topik-tags">
+            <span class="badge" style="color:var(--teal);border-color:rgba(0,201,177,0.3);background:var(--teal-dim);">Time Series</span>
+            <span class="badge badge-blue">Regresi</span>
+            <span class="badge badge-amber">P-05, P-06</span>
+          </div>
+          <div style="margin-top:var(--s3);font-size:12px;color:var(--text-3);font-family:var(--mono);">
+            Contoh: forecast demand toko ritel, prediksi penjualan mingguan distributor, optimasi safety stock
+          </div>
+        </div>
+
+        <!-- Topik C -->
+        <div class="topik-card amber">
+          <div class="topik-icon">🚚</div>
+          <div class="topik-num">Topik C</div>
+          <div class="topik-title">Optimasi Rantai Pasok & Distribusi</div>
+          <div class="topik-desc">Analisis efisiensi rantai pasok: identifikasi bottleneck, pola keterlambatan pengiriman, atau performa supplier. Gunakan eksplorasi data dan klasterisasi untuk segmentasi supplier atau rute distribusi.</div>
+          <div class="topik-tags">
+            <span class="badge badge-amber">Klasterisasi</span>
+            <span class="badge badge-blue">EDA</span>
+            <span class="badge" style="color:var(--teal);border-color:rgba(0,201,177,0.3);background:var(--teal-dim);">P-04, P-05</span>
+          </div>
+          <div style="margin-top:var(--s3);font-size:12px;color:var(--text-3);font-family:var(--mono);">
+            Contoh: segmentasi supplier, analisis rute distribusi FMCG, pemetaan risiko rantai pasok
+          </div>
+        </div>
+
+        <!-- Topik D -->
+        <div class="topik-card purple">
+          <div class="topik-icon">🏗️</div>
+          <div class="topik-num">Topik D</div>
+          <div class="topik-title">Optimasi Proses Produksi & Efisiensi Operasional</div>
+          <div class="topik-desc">Analisis data produksi (OEE, downtime, cycle time) untuk mengidentifikasi inefisiensi dan merancang solusi AI yang meningkatkan efisiensi lini produksi atau shift kerja.</div>
+          <div class="topik-tags">
+            <span class="badge" style="color:#9b7cf4;border-color:rgba(155,124,244,0.3);background:rgba(155,124,244,0.08);">Regresi</span>
+            <span class="badge badge-blue">Visualisasi</span>
+            <span class="badge badge-amber">P-01, P-04, P-05</span>
+          </div>
+          <div style="margin-top:var(--s3);font-size:12px;color:var(--text-3);font-family:var(--mono);">
+            Contoh: analisis OEE pabrik, prediksi cycle time, identifikasi bottleneck antrean produksi
+          </div>
+        </div>
+
+      </div>
+
+      <div class="callout warning" style="margin-top:var(--s4);">
+        <span class="callout-icon">⚠️</span>
+        <div class="callout-body">
+          <p><strong>Topik Tidak Layak:</strong> Topik yang terlalu umum ("AI untuk semua masalah industri"), topik tanpa data konkret, atau topik yang sudah dikerjakan oleh kelompok lain tidak akan diterima. Diskusikan topik dengan dosen sebelum mulai mengerjakan.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── KONEKSI KE MATERI ── -->
+    <div class="content-block" id="materi">
+      <h2>Koneksi ke Materi Perkuliahan</h2>
+      <p>Laporan proyek Anda harus secara eksplisit mengaitkan analisis dengan materi yang telah dipelajari. Gunakan konsep, framework, dan terminologi dari sesi-sesi berikut:</p>
+
+      <div class="sesi-link-grid">
+        <a href="sesi/sesi-01.html" class="sesi-link-card">
+          <span class="sesi-link-num badge badge-blue">P-01</span>
+          <div class="sesi-link-body">
+            <div class="sesi-link-title">Pengantar AI & Lanskap Industri</div>
+            <div class="sesi-link-rel">Gunakan untuk: justifikasi urgensi AI di sektor industri yang dipilih; identifikasi cabang AI yang relevan (ML, CV, dsb.)</div>
+          </div>
+        </a>
+        <a href="sesi/sesi-02.html" class="sesi-link-card">
+          <span class="sesi-link-num badge badge-blue">P-02</span>
+          <div class="sesi-link-body">
+            <div class="sesi-link-title">Konsep ML untuk Industri</div>
+            <div class="sesi-link-rel">Gunakan untuk: memilih paradigma ML yang tepat (supervised / unsupervised) dan menjelaskan alasannya</div>
+          </div>
+        </a>
+        <a href="sesi/sesi-03.html" class="sesi-link-card">
+          <span class="sesi-link-num badge badge-blue">P-03</span>
+          <div class="sesi-link-body">
+            <div class="sesi-link-title">Praktik ML: Klasifikasi & Prediksi</div>
+            <div class="sesi-link-rel">Gunakan untuk: menjalankan dan menginterpretasi model klasifikasi / prediksi di Google Colab; membaca confusion matrix, akurasi, dan F1-score</div>
+          </div>
+        </a>
+        <a href="sesi/sesi-04.html" class="sesi-link-card">
+          <span class="sesi-link-num badge badge-blue">P-04</span>
+          <div class="sesi-link-body">
+            <div class="sesi-link-title">Data Industri: Pembersihan & Visualisasi</div>
+            <div class="sesi-link-rel">Gunakan untuk: dokumentasi proses data cleaning; pembuatan visualisasi EDA di Power BI atau Looker Studio</div>
+          </div>
+        </a>
+        <a href="sesi/sesi-05.html" class="sesi-link-card">
+          <span class="sesi-link-num badge badge-blue">P-05</span>
+          <div class="sesi-link-body">
+            <div class="sesi-link-title">AI untuk Optimasi Produksi & Supply Chain</div>
+            <div class="sesi-link-rel">Gunakan untuk: kerangka analisis AI di supply chain atau lantai produksi; referensi studi kasus benchmark</div>
+          </div>
+        </a>
+        <a href="sesi/sesi-06.html" class="sesi-link-card">
+          <span class="sesi-link-num badge badge-blue">P-06</span>
+          <div class="sesi-link-body">
+            <div class="sesi-link-title">Prediksi Demand & Simulasi Rantai Pasok</div>
+            <div class="sesi-link-rel">Gunakan untuk: membangun model forecasting (Moving Average, Prophet); menghitung MAE, RMSE, MAPE; simulasi dampak stok</div>
+          </div>
+        </a>
+        <a href="sesi/sesi-07.html" class="sesi-link-card">
+          <span class="sesi-link-num badge badge-amber">P-07</span>
+          <div class="sesi-link-body">
+            <div class="sesi-link-title">Review: Integrasi Konsep P1–P6</div>
+            <div class="sesi-link-rel">Gunakan untuk: sintesis akhir analisis dan rekomendasi; gunakan framework decision-table untuk memilih solusi</div>
+          </div>
+        </a>
+      </div>
+    </div>
+
+    <!-- ── STRUKTUR LAPORAN ── -->
+    <div class="content-block" id="laporan">
+      <h2>Struktur Laporan</h2>
+      <p>Laporan disusun dengan struktur berikut. Ikuti urutan ini — penilai akan mengikuti alur yang sama saat membaca. Total panjang laporan <strong>20–30 halaman</strong> (tidak termasuk lampiran), spasi 1.5, font Times New Roman 12pt atau Arial 11pt, margin normal.</p>
+
+      <div style="background:var(--bg-2);border:1px solid var(--border);border-radius:var(--r3);padding:var(--s5);margin:var(--s5) 0;">
+
+        <div class="laporan-step">
+          <div class="laporan-num blue">0</div>
+          <div class="laporan-body">
+            <div class="laporan-title">Halaman Sampul & Identitas</div>
+            <div class="laporan-desc">Judul proyek, nama dan NIM anggota kelompok, program studi, nama dosen, semester/tahun ajaran, logo UKWMS.</div>
+          </div>
+          <div class="laporan-pages">1 hal.</div>
+        </div>
+
+        <div class="laporan-step">
+          <div class="laporan-num blue">1</div>
+          <div class="laporan-body">
+            <div class="laporan-title">Ringkasan Eksekutif <em style="font-weight:400;color:var(--text-3)">(Executive Summary)</em></div>
+            <div class="laporan-desc">Uraian singkat seluruh proyek: perusahaan/industri yang dianalisis, masalah yang diidentifikasi, solusi AI yang diusulkan, dan dampak bisnis yang diharapkan. Ditulis setelah seluruh laporan selesai.</div>
+            <div class="laporan-hint">Tip: tulis bagian ini terakhir. Maksimal 1 halaman, bisa dibaca tanpa membaca isi lengkap laporan.</div>
+          </div>
+          <div class="laporan-pages">1 hal.</div>
+        </div>
+
+        <div class="laporan-step">
+          <div class="laporan-num blue">2</div>
+          <div class="laporan-body">
+            <div class="laporan-title">Pendahuluan & Profil Industri</div>
+            <div class="laporan-desc">
+              <strong>2.1 Latar Belakang:</strong> Mengapa topik ini dipilih? Apa tantangan operasional yang dihadapi industri sejenis?<br>
+              <strong>2.2 Profil Perusahaan/Industri:</strong> Gambaran singkat perusahaan atau skenario industri — sektor, skala, proses utama.<br>
+              <strong>2.3 Rumusan Masalah:</strong> Tulis dalam 2–3 pertanyaan spesifik yang akan dijawab proyek ini.<br>
+              <strong>2.4 Tujuan Proyek:</strong> Tujuan yang terukur, selaraskan dengan CPMK (C3, C4, C5, C6).
+            </div>
+          </div>
+          <div class="laporan-pages">3–4 hal.</div>
+        </div>
+
+        <div class="laporan-step">
+          <div class="laporan-num teal">3</div>
+          <div class="laporan-body">
+            <div class="laporan-title">Tinjauan Pustaka & Referensi Materi Kuliah</div>
+            <div class="laporan-desc">
+              <strong>3.1 Konsep AI/ML yang Relevan:</strong> Jelaskan paradigma ML yang digunakan (supervised/unsupervised) mengacu ke konsep P-02.<br>
+              <strong>3.2 Penerapan AI di Sektor Ini:</strong> Minimal 2 referensi studi kasus nyata (dari kuliah P-05 atau literatur eksternal).<br>
+              <strong>3.3 Tools yang Digunakan:</strong> Jelaskan singkat kenapa tools ini dipilih (Power BI, Google Colab, dll.).
+            </div>
+          </div>
+          <div class="laporan-pages">3–4 hal.</div>
+        </div>
+
+        <div class="laporan-step">
+          <div class="laporan-num teal">4</div>
+          <div class="laporan-body">
+            <div class="laporan-title">Data & Metodologi</div>
+            <div class="laporan-desc">
+              <strong>4.1 Sumber Data:</strong> Asal data, cara perolehan, periode waktu.<br>
+              <strong>4.2 Deskripsi Dataset:</strong> Jumlah baris, kolom, tipe variabel — tampilkan tabel ringkasan.<br>
+              <strong>4.3 Proses Data Cleaning:</strong> Dokumentasikan masalah data yang ditemukan (missing value, outlier, format tidak konsisten) dan cara penanganannya (mengacu ke P-04).<br>
+              <strong>4.4 Metodologi Analisis:</strong> Diagram alir atau narasi langkah-langkah analisis dari data mentah ke rekomendasi.
+            </div>
+            <div class="laporan-hint">Wajib: tampilkan tabel "data sebelum vs sesudah cleaning" minimal untuk 1 masalah data.</div>
+          </div>
+          <div class="laporan-pages">4–5 hal.</div>
+        </div>
+
+        <div class="laporan-step">
+          <div class="laporan-num amber">5</div>
+          <div class="laporan-body">
+            <div class="laporan-title">Analisis Eksplorasi Data (EDA)</div>
+            <div class="laporan-desc">
+              <strong>5.1 Statistik Deskriptif:</strong> Mean, median, distribusi variabel kunci — dalam konteks industri.<br>
+              <strong>5.2 Visualisasi Data:</strong> Minimal 3 visualisasi bermakna (bukan sekadar chart default). Setiap chart wajib disertai interpretasi 2–3 kalimat: "Grafik ini menunjukkan bahwa..."<br>
+              <strong>5.3 Temuan dari EDA:</strong> Pola, anomali, atau insight menarik yang ditemukan sebelum pemodelan.
+            </div>
+            <div class="laporan-hint">Gunakan Power BI, Looker Studio, atau matplotlib/seaborn di Colab. Screenshot output wajib ada.</div>
+          </div>
+          <div class="laporan-pages">4–5 hal.</div>
+        </div>
+
+        <div class="laporan-step">
+          <div class="laporan-num amber">6</div>
+          <div class="laporan-body">
+            <div class="laporan-title">Implementasi & Hasil Model AI/ML</div>
+            <div class="laporan-desc">
+              <strong>6.1 Pemilihan Model:</strong> Mengapa model ini dipilih? Bandingkan minimal 2 alternatif pendekatan.<br>
+              <strong>6.2 Proses Training/Fitting:</strong> Ringkasan langkah di Google Colab (sertakan link Colab atau lampirkan kode).<br>
+              <strong>6.3 Evaluasi Model:</strong> Tampilkan metrik evaluasi yang relevan — akurasi / MAE / RMSE / MAPE sesuai jenis masalah. Jelaskan artinya dalam konteks bisnis industri.<br>
+              <strong>6.4 Interpretasi Hasil:</strong> Apa yang model "temukan"? Faktor apa yang paling berpengaruh?
+            </div>
+            <div class="laporan-hint">Jika tidak menggunakan model ML, bagian ini dapat diganti dengan analisis kuantitatif mendalam (simulasi stok, analisis sensitivitas, dsb.).</div>
+          </div>
+          <div class="laporan-pages">4–5 hal.</div>
+        </div>
+
+        <div class="laporan-step">
+          <div class="laporan-num purple">7</div>
+          <div class="laporan-body">
+            <div class="laporan-title">Analisis Dampak Bisnis & Kelayakan Implementasi</div>
+            <div class="laporan-desc">
+              <strong>7.1 Dampak yang Diharapkan:</strong> Perkiraan penghematan biaya, peningkatan efisiensi, atau penurunan risiko — gunakan estimasi kuantitatif bila memungkinkan.<br>
+              <strong>7.2 Persyaratan Implementasi:</strong> Data apa yang perlu dikumpulkan? Tools apa yang dibutuhkan? Siapa yang perlu dilibatkan?<br>
+              <strong>7.3 Risiko & Keterbatasan:</strong> Apa yang bisa salah? Keterbatasan data atau model yang perlu diperhatikan.<br>
+              <strong>7.4 Perbandingan Alternatif Solusi:</strong> Buat tabel sederhana: solusi AI vs. solusi konvensional — biaya, waktu, akurasi, risiko.
+            </div>
+          </div>
+          <div class="laporan-pages">3–4 hal.</div>
+        </div>
+
+        <div class="laporan-step">
+          <div class="laporan-num purple">8</div>
+          <div class="laporan-body">
+            <div class="laporan-title">Rekomendasi & Rencana Implementasi</div>
+            <div class="laporan-desc">
+              <strong>8.1 Rekomendasi Utama:</strong> 3–5 rekomendasi konkret yang dapat ditindaklanjuti manajemen — ditulis dengan bahasa non-teknis.<br>
+              <strong>8.2 Roadmap Implementasi:</strong> Timeline 3–6 bulan: apa yang dilakukan di setiap fase (persiapan data, pilot, evaluasi, rollout).<br>
+              <strong>8.3 Indikator Keberhasilan (KPI):</strong> Bagaimana mengukur bahwa implementasi berhasil?
+            </div>
+          </div>
+          <div class="laporan-pages">2–3 hal.</div>
+        </div>
+
+        <div class="laporan-step">
+          <div class="laporan-num blue">9</div>
+          <div class="laporan-body">
+            <div class="laporan-title">Kesimpulan</div>
+            <div class="laporan-desc">Jawab kembali rumusan masalah di bagian 2.3 secara singkat. Apa yang berhasil, apa keterbatasannya, dan apa yang bisa dikembangkan di masa depan.</div>
+          </div>
+          <div class="laporan-pages">1–2 hal.</div>
+        </div>
+
+        <div class="laporan-step">
+          <div class="laporan-num blue">10</div>
+          <div class="laporan-body">
+            <div class="laporan-title">Daftar Pustaka & Pembagian Kerja</div>
+            <div class="laporan-desc">
+              <strong>Daftar Pustaka:</strong> Minimal 5 referensi (jurnal, buku, atau sumber terpercaya). Format APA atau IEEE.<br>
+              <strong>Tabel Pembagian Kerja:</strong> Nama anggota — bagian yang dikerjakan — persentase kontribusi — tanda tangan.
+            </div>
+          </div>
+          <div class="laporan-pages">1–2 hal.</div>
+        </div>
+
+        <div class="laporan-step" style="border-bottom:none;">
+          <div class="laporan-num" style="background:rgba(245,166,35,0.1);color:var(--amber);">+</div>
+          <div class="laporan-body">
+            <div class="laporan-title">Lampiran</div>
+            <div class="laporan-desc">Dataset asli (file CSV/Excel), kode Google Colab lengkap, dashboard Power BI (screenshot atau link), dan dokumen pendukung lainnya. Lampiran tidak dihitung dalam batas 20–30 halaman.</div>
+          </div>
+          <div class="laporan-pages">Tidak terbatas</div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ── RUBRIK PENILAIAN ── -->
+    <div class="content-block" id="rubrik">
+      <h2>Rubrik Penilaian</h2>
+      <p>Total nilai proyek: <strong>100 poin</strong>, terbagi antara laporan tertulis (75%) dan presentasi (25%).</p>
+
+      <h3 style="margin-top:var(--s5);">A. Laporan Tertulis (75 poin)</h3>
+      <div class="rubrik-wrap">
+        <table class="rubrik-table">
+          <thead>
+            <tr>
+              <th style="width:5%">#</th>
+              <th style="width:28%">Komponen</th>
+              <th style="width:8%">Bobot</th>
+              <th style="width:10%">CPMK</th>
+              <th style="width:49%">Kriteria Penilaian</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="font-family:var(--mono);font-size:11px">L1</td>
+              <td><strong style="color:var(--text)">Identifikasi & Perumusan Masalah</strong></td>
+              <td class="bobot">15 poin</td>
+              <td class="cpmk-ref">C3, C4</td>
+              <td>
+                <strong style="color:var(--teal)">14–15:</strong> Masalah spesifik, terukur, relevan dengan industri nyata; rumusan masalah tajam dan didukung data.<br>
+                <strong style="color:var(--blue)">10–13:</strong> Masalah jelas tapi kurang spesifik atau tidak didukung cukup data.<br>
+                <strong style="color:var(--amber)">6–9:</strong> Masalah terlalu umum atau tidak relevan dengan konteks industri.<br>
+                <strong style="color:var(--red)">0–5:</strong> Masalah tidak jelas atau tidak ada rumusan masalah.
+              </td>
+            </tr>
+            <tr>
+              <td style="font-family:var(--mono);font-size:11px">L2</td>
+              <td><strong style="color:var(--text)">Kualitas Data & Proses Cleaning</strong></td>
+              <td class="bobot">15 poin</td>
+              <td class="cpmk-ref">C3</td>
+              <td>
+                <strong style="color:var(--teal)">14–15:</strong> Dataset relevan, terdokumentasi dengan baik; proses cleaning sistematis dan didokumentasikan lengkap (sebelum-sesudah).<br>
+                <strong style="color:var(--blue)">10–13:</strong> Dataset ada tapi dokumentasi cleaning kurang detail.<br>
+                <strong style="color:var(--amber)">6–9:</strong> Dataset ada tapi cleaning minimal atau tidak didokumentasikan.<br>
+                <strong style="color:var(--red)">0–5:</strong> Tidak ada dataset nyata atau data tidak relevan.
+              </td>
+            </tr>
+            <tr>
+              <td style="font-family:var(--mono);font-size:11px">L3</td>
+              <td><strong style="color:var(--text)">Analisis & Visualisasi Data (EDA)</strong></td>
+              <td class="bobot">15 poin</td>
+              <td class="cpmk-ref">C3</td>
+              <td>
+                <strong style="color:var(--teal)">14–15:</strong> Minimal 3 visualisasi bermakna, setiap chart disertai interpretasi kontekstual yang tajam; temuan EDA mengarah ke rumusan solusi.<br>
+                <strong style="color:var(--blue)">10–13:</strong> Visualisasi ada tapi interpretasi kurang mendalam.<br>
+                <strong style="color:var(--amber)">6–9:</strong> Chart ada tapi tidak bermakna atau tidak diinterpretasikan.<br>
+                <strong style="color:var(--red)">0–5:</strong> Tidak ada visualisasi bermakna.
+              </td>
+            </tr>
+            <tr>
+              <td style="font-family:var(--mono);font-size:11px">L4</td>
+              <td><strong style="color:var(--text)">Pemilihan & Implementasi Solusi AI/ML</strong></td>
+              <td class="bobot">15 poin</td>
+              <td class="cpmk-ref">C4, C5</td>
+              <td>
+                <strong style="color:var(--teal)">14–15:</strong> Pilihan model/pendekatan tepat, alasan pemilihan logis, dibandingkan dengan alternatif; output tools (Colab/Power BI) ditampilkan.<br>
+                <strong style="color:var(--blue)">10–13:</strong> Implementasi ada tapi perbandingan alternatif kurang atau justifikasi lemah.<br>
+                <strong style="color:var(--amber)">6–9:</strong> Tools digunakan tapi hasilnya tidak diinterpretasikan dengan baik.<br>
+                <strong style="color:var(--red)">0–5:</strong> Tidak ada implementasi tools atau pemodelan.
+              </td>
+            </tr>
+            <tr>
+              <td style="font-family:var(--mono);font-size:11px">L5</td>
+              <td><strong style="color:var(--text)">Analisis Dampak & Rekomendasi</strong></td>
+              <td class="bobot">15 poin</td>
+              <td class="cpmk-ref">C5, C6</td>
+              <td>
+                <strong style="color:var(--teal)">14–15:</strong> Rekomendasi konkret, terukur, realistis; dampak bisnis diestimasi secara kuantitatif; roadmap jelas dengan KPI.<br>
+                <strong style="color:var(--blue)">10–13:</strong> Rekomendasi ada tapi kurang spesifik atau dampaknya tidak dikuantifikasi.<br>
+                <strong style="color:var(--amber)">6–9:</strong> Rekomendasi generik atau tidak berdasarkan hasil analisis.<br>
+                <strong style="color:var(--red)">0–5:</strong> Tidak ada rekomendasi atau tidak relevan.
+              </td>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr>
+              <td colspan="2" style="text-align:right;font-weight:600;color:var(--text);">Total Laporan</td>
+              <td class="bobot" style="color:var(--blue);font-size:16px;">75</td>
+              <td colspan="2"></td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+
+      <h3 style="margin-top:var(--s6);">B. Presentasi (25 poin)</h3>
+      <div class="rubrik-wrap">
+        <table class="rubrik-table">
+          <thead>
+            <tr>
+              <th style="width:5%">#</th>
+              <th style="width:28%">Komponen</th>
+              <th style="width:8%">Bobot</th>
+              <th style="width:10%">CPMK</th>
+              <th style="width:49%">Kriteria Penilaian</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="font-family:var(--mono);font-size:11px">P1</td>
+              <td><strong style="color:var(--text)">Kejelasan Penyampaian</strong></td>
+              <td class="bobot">10 poin</td>
+              <td class="cpmk-ref">C6</td>
+              <td>Mampu menjelaskan masalah, solusi, dan dampak dengan bahasa yang bisa dipahami oleh "manajemen non-teknis". Presentasi terstruktur, tidak sekadar membacakan laporan.</td>
+            </tr>
+            <tr>
+              <td style="font-family:var(--mono);font-size:11px">P2</td>
+              <td><strong style="color:var(--text)">Kualitas Slide & Demo</strong></td>
+              <td class="bobot">8 poin</td>
+              <td class="cpmk-ref">C6</td>
+              <td>Slide ringkas, visual bermakna, tidak terlalu banyak teks. Demo tools (dashboard atau Colab) ditampilkan secara live atau melalui recording yang jelas.</td>
+            </tr>
+            <tr>
+              <td style="font-family:var(--mono);font-size:11px">P3</td>
+              <td><strong style="color:var(--text)">Penguasaan Materi (Tanya Jawab)</strong></td>
+              <td class="bobot">7 poin</td>
+              <td class="cpmk-ref">C4, C5</td>
+              <td>Mampu menjawab pertanyaan dosen dengan argumentasi yang didasarkan pada analisis data, bukan hanya hafalan. Setiap anggota wajib bisa menjawab setidaknya satu pertanyaan.</td>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr>
+              <td colspan="2" style="text-align:right;font-weight:600;color:var(--text);">Total Presentasi</td>
+              <td class="bobot" style="color:var(--blue);font-size:16px;">25</td>
+              <td colspan="2"></td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+
+      <div style="margin-top:var(--s5);padding:var(--s4) var(--s5);background:var(--bg-2);border:1px solid var(--border);border-radius:var(--r2);">
+        <div style="font-family:var(--mono);font-size:10px;color:var(--text-3);letter-spacing:2px;text-transform:uppercase;margin-bottom:var(--s3);">Catatan Penting</div>
+        <ul style="font-size:13px;color:var(--text-2);line-height:2;padding-left:var(--s5);">
+          <li>Plagiarisme (laporan identik antar kelompok atau copy-paste tanpa atribusi) mengakibatkan nilai <strong style="color:var(--red)">0</strong> untuk seluruh kelompok.</li>
+          <li>Laporan yang menggunakan AI generatif (ChatGPT, dll.) harus mencantumkan pernyataan penggunaan dan memastikan seluruh analisis data benar-benar dilakukan sendiri.</li>
+          <li>Keterlambatan pengumpulan dikenai penalti <strong style="color:var(--amber)">5 poin/hari</strong> kerja.</li>
+          <li>Nilai individu dapat berbeda dari nilai kelompok jika terdapat bukti kontribusi yang sangat tidak merata.</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- ── TIMELINE ── -->
+    <div class="content-block" id="timeline">
+      <h2>Timeline Pengerjaan</h2>
+      <p>Proyek dikerjakan selama <strong>4 minggu</strong> sejak pengumuman resmi. Ikuti tahapan di bawah untuk memastikan tidak ada bagian yang dikerjakan terburu-buru.</p>
+
+      <div class="timeline">
+
+        <div class="timeline-item">
+          <div class="timeline-dot blue"></div>
+          <div class="timeline-week">Minggu 1</div>
+          <div class="timeline-title">Pembentukan Kelompok & Penetapan Topik</div>
+          <div class="timeline-desc">Tentukan anggota kelompok, diskusikan topik yang diminati, dan daftarkan topik ke dosen. Mulai identifikasi sumber data yang akan digunakan. Buat draft rumusan masalah (2–3 pertanyaan).</div>
+          <span class="timeline-deliverable">Deliverable: Form pendaftaran kelompok + judul tentatif</span>
+        </div>
+
+        <div class="timeline-item">
+          <div class="timeline-dot teal"></div>
+          <div class="timeline-week">Minggu 2</div>
+          <div class="timeline-title">Pengumpulan Data & Analisis Awal</div>
+          <div class="timeline-desc">Kumpulkan dan bersihkan dataset. Lakukan EDA awal — cari pola dan anomali. Selesaikan Bab 2 (Pendahuluan), Bab 3 (Tinjauan Pustaka), dan Bab 4 (Data & Metodologi). Konsultasikan progress ke dosen jika ada kebuntuan.</div>
+          <span class="timeline-deliverable">Deliverable: Draft Bab 2–4 + dataset terlampir</span>
+        </div>
+
+        <div class="timeline-item">
+          <div class="timeline-dot amber"></div>
+          <div class="timeline-week">Minggu 3</div>
+          <div class="timeline-title">Implementasi Model & Penulisan Analisis</div>
+          <div class="timeline-desc">Jalankan model di Google Colab atau bangun dashboard Power BI. Tulis Bab 5 (EDA), Bab 6 (Implementasi Model), dan Bab 7 (Dampak Bisnis). Siapkan bahan presentasi awal.</div>
+          <span class="timeline-deliverable">Deliverable: Draft Bab 5–7 + output tools (screenshot/link)</span>
+        </div>
+
+        <div class="timeline-item">
+          <div class="timeline-dot purple"></div>
+          <div class="timeline-week">Minggu 4</div>
+          <div class="timeline-title">Finalisasi Laporan & Persiapan Presentasi</div>
+          <div class="timeline-desc">Lengkapi Bab 8 (Rekomendasi), Bab 9 (Kesimpulan), Daftar Pustaka, dan Ringkasan Eksekutif. Finalisasi slide presentasi dan latihan. Lakukan peer review antar anggota kelompok sebelum dikumpulkan.</div>
+          <span class="timeline-deliverable">Deliverable: Laporan final + slide presentasi</span>
+        </div>
+
+        <div class="timeline-item">
+          <div class="timeline-dot red"></div>
+          <div class="timeline-week">Pekan UAS</div>
+          <div class="timeline-title">Pengumpulan Laporan & Presentasi</div>
+          <div class="timeline-desc">Kumpulkan laporan PDF + lampiran (Google Drive atau LMS UKWMS) sesuai jadwal yang ditetapkan. Presentasi dilakukan di kelas dengan durasi 15 menit + 10 menit tanya jawab per kelompok.</div>
+          <span class="timeline-deliverable" style="background:rgba(240,96,96,0.1);border-color:rgba(240,96,96,0.2);color:var(--red);">Deadline: hari pertama UAS</span>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ── CHECKLIST ── -->
+    <div class="content-block" id="checklist">
+      <h2>Checklist Sebelum Mengumpulkan</h2>
+      <p>Periksa semua item berikut sebelum submit. Laporan yang melewatkan item wajib akan mengalami pengurangan poin.</p>
+
+      <div class="task-box">
+        <div class="task-box-title">✅ Checklist Laporan Final</div>
+        <ol style="font-size:14px;color:var(--text);line-height:2.5;">
+          <li>Halaman sampul lengkap: judul, nama + NIM semua anggota, program studi, dosen, tahun ajaran</li>
+          <li>Ringkasan Eksekutif: maksimal 1 halaman, bisa dipahami tanpa membaca seluruh isi</li>
+          <li>Rumusan masalah: minimal 2 pertanyaan spesifik dan terukur di Bab 2.3</li>
+          <li>Dataset terlampir sebagai file CSV atau Excel (minimal 100 baris, 5 kolom)</li>
+          <li>Tabel "sebelum vs sesudah data cleaning" untuk minimal 1 masalah data</li>
+          <li>Minimal 3 visualisasi bermakna, masing-masing disertai interpretasi 2–3 kalimat</li>
+          <li>Screenshot atau link output tools (Google Colab / Power BI / Looker Studio)</li>
+          <li>Perbandingan minimal 2 alternatif solusi / pendekatan AI dalam tabel</li>
+          <li>Rekomendasi bisnis: minimal 3 poin konkret, tidak hanya teoritis</li>
+          <li>Roadmap implementasi dengan timeline 3–6 bulan dan KPI yang jelas</li>
+          <li>Daftar pustaka: minimal 5 referensi dengan format konsisten (APA / IEEE)</li>
+          <li>Tabel pembagian kerja dengan persentase kontribusi dan tanda tangan semua anggota</li>
+          <li>File laporan dalam format PDF, ukuran file di bawah 20 MB</li>
+          <li>Tidak ada halaman yang kosong atau placeholder "lorem ipsum"</li>
+        </ol>
+      </div>
+
+      <div class="callout success" style="margin-top:var(--s5);">
+        <span class="callout-icon">💡</span>
+        <div class="callout-body">
+          <p><strong>Tips dari Alumni:</strong> Kelompok yang mendapat nilai tertinggi biasanya bukan yang modelnya paling akurat — melainkan yang paling jelas menjelaskan <em>mengapa</em> mereka memilih pendekatan tertentu, dan bagaimana hasilnya bisa langsung berguna bagi manajer di lapangan.</p>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ── ASIDE ── -->
+  <aside class="content-aside">
+
+    <!-- TOC -->
+    <div class="toc">
+      <div class="toc-title">Isi Halaman</div>
+      <ul class="toc-list">
+        <li><a href="#gambaran" class="active">Gambaran Umum</a></li>
+        <li><a href="#kelompok">Ketentuan Kelompok</a></li>
+        <li><a href="#topik">Pilihan Topik</a></li>
+        <li><a href="#materi">Koneksi ke Materi</a></li>
+        <li><a href="#laporan">Struktur Laporan</a></li>
+        <li><a href="#rubrik">Rubrik Penilaian</a></li>
+        <li><a href="#timeline">Timeline</a></li>
+        <li><a href="#checklist">Checklist Submit</a></li>
+      </ul>
+    </div>
+
+    <!-- Info box -->
+    <div style="background:rgba(155,124,244,0.06);border:1px solid rgba(155,124,244,0.2);border-radius:var(--r2);padding:var(--s4) var(--s5);">
+      <div style="font-family:var(--mono);font-size:10px;color:#9b7cf4;letter-spacing:2px;text-transform:uppercase;margin-bottom:var(--s3);">Bobot Nilai</div>
+      <div style="font-size:22px;font-weight:700;font-family:var(--mono);color:#9b7cf4;margin-bottom:var(--s2);">35%</div>
+      <div style="font-size:12px;color:var(--text-2);line-height:1.7;">dari total nilai akhir mata kuliah — setara dengan UAS Studi Kasus (lihat silabus)</div>
+      <div style="margin-top:var(--s4);display:flex;flex-direction:column;gap:var(--s2);">
+        <div style="display:flex;justify-content:space-between;font-size:12px;">
+          <span style="color:var(--text-2);">Laporan</span>
+          <span style="font-family:var(--mono);color:var(--text);">75 poin</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:12px;">
+          <span style="color:var(--text-2);">Presentasi</span>
+          <span style="font-family:var(--mono);color:var(--text);">25 poin</span>
+        </div>
+        <div style="border-top:1px solid var(--border);padding-top:var(--s2);display:flex;justify-content:space-between;font-size:13px;font-weight:600;">
+          <span style="color:var(--text);">Total</span>
+          <span style="font-family:var(--mono);color:#9b7cf4;">100 poin</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Topik quick ref -->
+    <div style="margin-top:var(--s4);background:var(--bg-2);border:1px solid var(--border);border-radius:var(--r2);padding:var(--s4) var(--s5);">
+      <div style="font-family:var(--mono);font-size:10px;color:var(--text-3);letter-spacing:2px;text-transform:uppercase;margin-bottom:var(--s3);">4 Pilihan Topik</div>
+      <div style="display:flex;flex-direction:column;gap:var(--s2);">
+        <div style="display:flex;gap:var(--s2);align-items:center;">
+          <span style="font-family:var(--mono);font-size:10px;color:var(--blue);font-weight:700;">A</span>
+          <span style="font-size:12px;color:var(--text-2);">Predictive Maintenance & QC</span>
+        </div>
+        <div style="display:flex;gap:var(--s2);align-items:center;">
+          <span style="font-family:var(--mono);font-size:10px;color:var(--teal);font-weight:700;">B</span>
+          <span style="font-size:12px;color:var(--text-2);">Demand Forecasting & Inventori</span>
+        </div>
+        <div style="display:flex;gap:var(--s2);align-items:center;">
+          <span style="font-family:var(--mono);font-size:10px;color:var(--amber);font-weight:700;">C</span>
+          <span style="font-size:12px;color:var(--text-2);">Optimasi Rantai Pasok</span>
+        </div>
+        <div style="display:flex;gap:var(--s2);align-items:center;">
+          <span style="font-family:var(--mono);font-size:10px;color:#9b7cf4;font-weight:700;">D</span>
+          <span style="font-size:12px;color:var(--text-2);">Optimasi Proses Produksi</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sesi nav -->
+    <div class="sesi-nav-aside" style="margin-top:var(--s4);">
+      <div class="sesi-nav-title">Sesi Terkait</div>
+      <a href="sesi/sesi-03.html" class="sesi-nav-btn">
+        <span>📓</span>
+        <span>P-03: Praktik Google Colab</span>
+      </a>
+      <a href="sesi/sesi-04.html" class="sesi-nav-btn" style="margin-top:var(--s2);">
+        <span>🧹</span>
+        <span>P-04: Data Cleaning & Visualisasi</span>
+      </a>
+      <a href="sesi/sesi-06.html" class="sesi-nav-btn" style="margin-top:var(--s2);">
+        <span>📈</span>
+        <span>P-06: Demand Forecasting</span>
+      </a>
+      <a href="index.html" class="sesi-nav-btn" style="margin-top:var(--s4);">
+        <span>🏠</span>
+        <span>Kembali ke Beranda TI</span>
+      </a>
+    </div>
+
+  </aside>
+</div>
+
+<!-- ══ FOOTER ══ -->
+<footer style="border-top:1px solid var(--border);padding:var(--s6) var(--s7);margin-top:var(--s7);">
+  <div style="max-width:1100px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:var(--s4);">
+    <div>
+      <div style="font-family:var(--mono);font-size:12px;color:var(--text-3);">AI · UKWMS · S1 Teknik Industri</div>
+      <div style="font-size:13px;color:var(--text-2);margin-top:2px;">Kecerdasan Buatan untuk Industri · Philipus Suryo Subandoro</div>
+    </div>
+    <a href="index.html" style="font-size:13px;color:var(--blue);text-decoration:none;">← Kembali ke Beranda TI</a>
+  </div>
+</footer>
+
+</body>
+</html>
