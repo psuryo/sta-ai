@@ -170,12 +170,7 @@ N=87+13+22+378=500
 
 **Accuracy**
 
-\[
-Accuracy=\frac{TP+TT}{N}
-=\frac{87+378}{500}
-=\frac{465}{500}=0{,}93
-\]
-
+\[ \text{Accuracy} = \frac{\text{TP} + \text{TN}}{N} = \frac{87 + 378}{500} = \frac{465}{500} = 0.93 \]
 Hasil: **93,00%**.
 
 **Precision kelas Kanker**
