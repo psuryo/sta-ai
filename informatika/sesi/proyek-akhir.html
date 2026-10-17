@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Proyek Akhir AI — Kecerdasan Buatan UKWMS</title>
+<link rel="stylesheet" href="../../css/style.css">
+<style>
+  /* ── Review card grid (dipakai ulang dari P-07) ── */
+  .review-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:var(--s4); margin:var(--s5) 0; }
+  .review-card { background:var(--bg-2); border:1px solid var(--border); border-radius:var(--r3); padding:var(--s5); position:relative; overflow:hidden; }
+  .review-card::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; }
+  .review-card.teal::before { background:var(--teal); }
+  .review-card.blue::before { background:var(--blue); }
+  .review-card.amber::before { background:var(--amber); }
+  .review-card.purple::before { background:var(--purple); }
+  .review-card.red::before { background:var(--red); }
+  .review-card-label { font-family:var(--mono); font-size:10px; letter-spacing:2px; text-transform:uppercase; margin-bottom:var(--s3); }
+  .review-card.teal .review-card-label { color:var(--teal); }
+  .review-card.blue .review-card-label { color:var(--blue); }
+  .review-card.amber .review-card-label { color:var(--amber); }
+  .review-card.purple .review-card-label { color:var(--purple); }
+  .review-card.red .review-card-label { color:var(--red); }
+  .review-card h4 { font-size:14px; font-weight:600; color:var(--text); margin-bottom:var(--s3); }
+  .review-card ul { padding-left:var(--s5); font-size:13px; color:var(--text-2); line-height:1.9; }
+
+  /* ── Tabel ── */
+  .kisi-table { width:100%; border-collapse:collapse; font-size:13px; margin:var(--s4) 0; }
+  .kisi-table th { background:var(--bg-2); border:1px solid var(--border); padding:var(--s3) var(--s4); text-align:left; font-family:var(--mono); font-size:11px; color:var(--text-3); letter-spacing:1px; }
+  .kisi-table td { border:1px solid var(--border); padding:var(--s3) var(--s4); color:var(--text-2); vertical-align:top; line-height:1.6; }
+  .kisi-table tr:hover td { background:var(--bg-2); }
+  .table-scroll { overflow-x:auto; }
+  .weight-bar { display:flex; align-items:center; gap:var(--s3); }
+  .weight-fill { height:6px; border-radius:3px; background:var(--teal); flex-shrink:0; }
+  .weight-num { font-family:var(--mono); font-size:12px; color:var(--teal); white-space:nowrap; }
+
+  /* ── Kartu proyek (accordion) ── */
+  .proj-filter { display:flex; flex-wrap:wrap; gap:var(--s2); margin:var(--s4) 0; }
+  .proj-chip { font-family:var(--mono); font-size:11px; padding:4px 12px; border:1px solid var(--border); border-radius:999px; background:var(--bg-2); color:var(--text-2); cursor:pointer; user-select:none; transition:border-color .2s, color .2s; }
+  .proj-chip:hover { border-color:var(--teal); color:var(--teal); }
+  .proj-chip.active { border-color:var(--teal); color:var(--teal); background:var(--teal-glow); }
+  .proj-card { background:var(--bg-2); border:1px solid var(--border); border-left:3px solid var(--border); border-radius:var(--r2); margin-bottom:var(--s3); overflow:hidden; }
+  .proj-card.teal { border-left-color:var(--teal); }
+  .proj-card.blue { border-left-color:var(--blue); }
+  .proj-card.amber { border-left-color:var(--amber); }
+  .proj-card.purple { border-left-color:var(--purple); }
+  .proj-card.red { border-left-color:var(--red); }
+  .proj-card summary { list-style:none; display:flex; align-items:center; gap:var(--s4); padding:var(--s4) var(--s5); cursor:pointer; }
+  .proj-card summary::-webkit-details-marker { display:none; }
+  .proj-card summary:hover { background:var(--bg-3); }
+  .proj-no { font-family:var(--mono); font-size:12px; color:var(--text-3); flex-shrink:0; }
+  .proj-head { flex:1; display:flex; flex-direction:column; gap:2px; }
+  .proj-title { font-size:14px; font-weight:600; color:var(--text); }
+  .proj-dom { font-family:var(--mono); font-size:10px; letter-spacing:1px; text-transform:uppercase; }
+  .proj-dom.teal { color:var(--teal); } .proj-dom.blue { color:var(--blue); } .proj-dom.amber { color:var(--amber); } .proj-dom.purple { color:var(--purple); } .proj-dom.red { color:var(--red); }
+  .proj-arrow { color:var(--text-3); transition:transform .2s; }
+  .proj-card[open] .proj-arrow { transform:rotate(180deg); }
+  .proj-body { padding:var(--s4) var(--s5) var(--s5); border-top:1px solid var(--border); font-size:13px; color:var(--text-2); line-height:1.8; }
+  .proj-body p { margin:0 0 var(--s3); }
+  .proj-body ul { padding-left:var(--s5); margin:0 0 var(--s3); }
+  .proj-label { font-family:var(--mono); font-size:10px; letter-spacing:2px; text-transform:uppercase; color:var(--text-3); margin:var(--s4) 0 var(--s2); }
+  .proj-label:first-child { margin-top:0; }
+  .proj-tags code { margin-right:4px; display:inline-block; margin-bottom:4px; }
+
+  /* ── Stat strip ── */
+  .stat-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:var(--s4); margin:var(--s5) 0; }
+  .stat-card { background:var(--bg-2); border:1px solid var(--border); border-radius:var(--r3); padding:var(--s5); text-align:center; }
+  .stat-num { font-family:var(--mono); font-size:30px; font-weight:700; line-height:1; margin-bottom:var(--s2); }
+  .stat-label { font-size:12px; color:var(--text-2); }
+  @media (max-width:700px) { .stat-grid { grid-template-columns:repeat(2,1fr); } }
+</style>
+</head>
+<body>
+
+<!-- ══ NAV ══ -->
+<nav class="nav">
+  <div class="nav-logo">AI<span>·</span>UKWMS</div>
+  <ul class="nav-links">
+    <li><a href="../index.html">← Beranda</a></li>
+    <li><a href="#tujuan" class="active">Tujuan</a></li>
+    <li><a href="#gambaran">Gambaran</a></li>
+    <li><a href="#proyek">11 Proyek</a></li>
+    <li><a href="#laporan">Laporan</a></li>
+    <li><a href="#panduan">Panduan Bab</a></li>
+    <li><a href="#rubrik">Rubrik</a></li>
+    <li><a href="#timeline">Timeline</a></li>
+    <li><a href="#ketentuan">Ketentuan</a></li>
+  </ul>
+</nav>
+
+<!-- ══ HERO ══ -->
+<header class="sesi-hero">
+  <div style="max-width:1100px;margin:0 auto;">
+    <div class="sesi-breadcrumb">
+      <a href="../index.html">Kecerdasan Buatan</a>
+      <span>›</span>
+      <a href="sesi-08.html">Pertemuan 8</a>
+      <span>›</span>
+      <span>Proyek Akhir</span>
+    </div>
+    <div class="sesi-num">PROYEK AKHIR · UAS</div>
+    <h1 class="sesi-title">Proyek Akhir<br><em style="color:var(--purple);">Aplikasi AI</em></h1>
+    <p style="font-size:15px;color:var(--text-2);max-width:700px;line-height:1.8;">Panduan lengkap proyek UAS: 11 topik proyek AI setara tingkat kesulitan, pembagian peran kelompok, format laporan ilmiah, rubrik penilaian, timeline, dan ketentuan integritas akademik.</p>
+    <div class="sesi-meta-row">
+      <span class="badge" style="background:rgba(155,124,244,0.1);color:var(--purple);border:1px solid rgba(155,124,244,0.2);">Proyek</span>
+      <span class="badge badge-teal">11 kelompok × 4 mahasiswa</span>
+      <span class="badge badge-amber">Bobot UAS 35%</span>
+    </div>
+  </div>
+</header>
+
+<!-- ══ CONTENT LAYOUT ══ -->
+<div class="content-layout">
+  <main class="content-main">
+
+    <!-- TUJUAN -->
+    <div class="content-block" id="tujuan">
+      <h2>Tujuan</h2>
+      <p>Halaman ini memperkenalkan proyek akhir sebagai penutup mata kuliah. Setelah membaca panduan ini, mahasiswa diharapkan mampu:</p>
+      <ol>
+        <li>Memahami ruang lingkup, bobot penilaian, dan timeline proyek UAS</li>
+        <li>Membandingkan 11 topik proyek (domain, teknik ML, dataset) dan mempersiapkan preferensi topik kelompok</li>
+        <li>Membagi peran dalam kelompok (Data Engineer, ML Engineer, App Developer, Research Writer)</li>
+        <li>Menyusun laporan ilmiah sesuai struktur dan format yang ditetapkan</li>
+        <li>Memahami kebijakan penggunaan AI dan integritas akademik dalam pengerjaan proyek</li>
+      </ol>
+
+      <div class="callout warn" style="margin-top:var(--s5);">
+        <span class="callout-icon">📌</span>
+        <div class="callout-body">
+          <p><strong>Topik per kelompok diumumkan dosen pada Pertemuan 13.</strong> Gunakan halaman ini untuk mempelajari semua topik karena tiap kelompok mendapat satu topik, dan sesi tanya jawab individual pada UAS dapat mencakup bagian mana pun dari proyek.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- GAMBARAN UMUM -->
+    <div class="content-block" id="gambaran">
+      <h2>1. Gambaran Umum</h2>
+      <p>Setiap kelompok membangun sebuah <strong>aplikasi AI fungsional</strong> yang menyelesaikan masalah nyata menggunakan teknik Machine Learning yang telah dipelajari dalam mata kuliah ini. Proyek dikerjakan selama Pertemuan 13 dan 14 sebagai workshop terbimbing, lalu dipresentasikan pada sesi UAS.</p>
+
+      <div class="stat-grid">
+        <div class="stat-card"><div class="stat-num" style="color:var(--teal);">11</div><div class="stat-label">Kelompok @ 4 mahasiswa</div></div>
+        <div class="stat-card"><div class="stat-num" style="color:var(--amber);">35%</div><div class="stat-label">Bobot nilai akhir</div></div>
+        <div class="stat-card"><div class="stat-num" style="color:var(--purple);">★★★☆☆</div><div class="stat-label">Kesulitan semua proyek setara</div></div>
+        <div class="stat-card"><div class="stat-num" style="color:var(--blue);">H-3</div><div class="stat-label">Pengumpulan sebelum UAS</div></div>
+      </div>
+
+      <p>Semua proyek dirancang pada tingkat kesulitan yang <strong>setara</strong> — cukup menantang untuk menunjukkan kompetensi teknis, namun realistis diselesaikan oleh 4 mahasiswa dalam satu semester. Perbedaan antar proyek hanya pada domain dan teknik ML yang digunakan.</p>
+
+      <h3 style="margin-top:var(--s6);">Pembagian Peran dalam Kelompok</h3>
+      <div class="review-grid">
+
+        <div class="review-card teal">
+          <div class="review-card-label">Peran 1</div>
+          <h4>Data Engineer</h4>
+          <ul><li>Pengumpulan, pembersihan, dan preprocessing dataset. Eksplorasi data (EDA).</li><li><strong style="color:var(--text)">Deliverable:</strong> Notebook EDA + dataset bersih</li></ul>
+        </div>
+
+        <div class="review-card blue">
+          <div class="review-card-label">Peran 2</div>
+          <h4>ML Engineer</h4>
+          <ul><li>Implementasi, pelatihan, dan evaluasi model. Eksperimen hyperparameter.</li><li><strong style="color:var(--text)">Deliverable:</strong> Notebook training + hasil evaluasi</li></ul>
+        </div>
+
+        <div class="review-card amber">
+          <div class="review-card-label">Peran 3</div>
+          <h4>App Developer</h4>
+          <ul><li>Membangun antarmuka aplikasi. Integrasi model ke aplikasi.</li><li><strong style="color:var(--text)">Deliverable:</strong> Aplikasi yang bisa di-demo</li></ul>
+        </div>
+
+        <div class="review-card purple">
+          <div class="review-card-label">Peran 4</div>
+          <h4>Research Writer</h4>
+          <ul><li>Koordinasi penulisan laporan, tinjauan pustaka, manajemen referensi.</li><li><strong style="color:var(--text)">Deliverable:</strong> Draft laporan lengkap</li></ul>
+        </div>
+      </div>
+
+      <div class="callout info">
+        <span class="callout-icon">💡</span>
+        <div class="callout-body">
+          <p><strong>Setiap anggota harus memahami keseluruhan proyek.</strong> Sesi tanya jawab individual pada UAS dapat mencakup bagian mana saja — tidak hanya bagian yang dikerjakan sendiri.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 11 PROYEK -->
+    <div class="content-block" id="proyek">
+      <h2>2. Deskripsi 11 Proyek</h2>
+      <p>Klik judul proyek untuk melihat deskripsi aplikasi, stack, dataset, scope, kontribusi ilmiah, dan alasan tingkat kesulitannya. Gunakan filter domain untuk membandingkan.</p>
+
+      <div class="proj-filter" id="proj-filter">
+        <span class="proj-chip active" data-f="all">Semua</span>
+        <span class="proj-chip" data-f="Natural Language">NLP</span>
+        <span class="proj-chip" data-f="Computer Vision">Computer Vision</span>
+        <span class="proj-chip" data-f="Tabular">Tabular ML</span>
+        <span class="proj-chip" data-f="Generative">Generative AI</span>
+        <span class="proj-chip" data-f="Recommender">Recommender</span>
+        <span class="proj-chip" data-f="Unsupervised">Unsupervised</span>
+      </div>
+
+      <div id="proj-list">
+
+      <details class="proj-card teal" id="proyek-1">
+        <summary>
+          <span class="proj-no">P01</span>
+          <span class="proj-head"><span class="proj-title">Deteksi Hoaks Berbahasa Indonesia</span><span class="proj-dom teal">Natural Language Processing · ★★★☆☆</span></span>
+          <span class="proj-arrow">▾</span>
+        </summary>
+        <div class="proj-body">
+          <div class="proj-label">Deskripsi Aplikasi</div><p>Aplikasi web yang menerima teks berita/artikel dan mengklasifikasikannya sebagai hoaks atau bukan. Dilengkapi visualisasi top-10 kata paling berpengaruh per prediksi (explainability sederhana dengan SHAP).</p>
+          <div class="proj-label">Stack Teknologi</div><p class="proj-tags"><code>Python</code> <code>Scikit-learn (TF-IDF + Logistic Regression / SVM)</code> <code>SHAP</code> <code>Streamlit</code></p>
+          <div class="proj-label">Dataset</div><p>IDHoax dataset (GitHub) + sampel turnbackhoax.id (~3.000 artikel, sudah terlabel)</p>
+          <div class="proj-label">Scope &amp; Pembatasan</div><ul><li>Klasifikasi biner: hoaks / bukan hoaks</li><li>Dua algoritma dibandingkan: SVM vs Logistic Regression</li><li>Explainability: SHAP values (top-10 kata per prediksi)</li><li>Evaluasi: accuracy, precision, recall, F1 per kelas</li></ul>
+          <div class="proj-label">Kontribusi Ilmiah</div><p>Perbandingan SVM vs Logistic Regression untuk deteksi hoaks Bahasa Indonesia; analisis fitur linguistik paling prediktif; evaluasi pada dua subdomain berita (kesehatan vs politik).</p>
+          <div class="proj-label">Mengapa ★★★☆☆?</div><p>Dataset tersedia bersih tanpa scraping kompleks. Dua algoritma sudah matang dan terdokumentasi. Explainability cukup dengan SHAP tanpa pipeline tambahan.</p>
+        </div>
+      </details>
+
+      <details class="proj-card red" id="proyek-2">
+        <summary>
+          <span class="proj-no">P02</span>
+          <span class="proj-head"><span class="proj-title">Sistem Rekomendasi Film Content-Based</span><span class="proj-dom red">Recommender System · ★★★☆☆</span></span>
+          <span class="proj-arrow">▾</span>
+        </summary>
+        <div class="proj-body">
+          <div class="proj-label">Deskripsi Aplikasi</div><p>Aplikasi rekomendasi film berdasarkan kemiripan konten (genre, sutradara, aktor, sinopsis). Pengguna memasukkan judul film favorit dan sistem menampilkan 10 film paling mirip beserta alasannya.</p>
+          <div class="proj-label">Stack Teknologi</div><p class="proj-tags"><code>Python</code> <code>Scikit-learn (TF-IDF, Cosine Similarity)</code> <code>Pandas</code> <code>Streamlit</code> <code>TMDb API (poster)</code></p>
+          <div class="proj-label">Dataset</div><p>MovieLens Latest Small (100k ratings) + metadata dari TMDb API</p>
+          <div class="proj-label">Scope &amp; Pembatasan</div><ul><li>Content-based filtering murni (tanpa collaborative filtering)</li><li>Fitur: genre, sinopsis (TF-IDF), metadata dasar</li><li>Evaluasi: precision@k dan user study sederhana (5 responden)</li><li>Tidak perlu menangani cold-start problem</li></ul>
+          <div class="proj-label">Kontribusi Ilmiah</div><p>Analisis pengaruh bobot fitur (genre saja vs genre+sinopsis vs semua fitur) terhadap relevansi rekomendasi; evaluasi kombinasi metrik otomatis dan penilaian pengguna.</p>
+          <div class="proj-label">Mengapa ★★★☆☆?</div><p>MovieLens sangat bersih dan kecil. Cosine similarity tidak memerlukan training kompleks. Precision@k mudah diimplementasikan.</p>
+        </div>
+      </details>
+
+      <details class="proj-card blue" id="proyek-3">
+        <summary>
+          <span class="proj-no">P03</span>
+          <span class="proj-head"><span class="proj-title">Deteksi Penyakit Daun Padi dari Foto</span><span class="proj-dom blue">Computer Vision · ★★★☆☆</span></span>
+          <span class="proj-arrow">▾</span>
+        </summary>
+        <div class="proj-body">
+          <div class="proj-label">Deskripsi Aplikasi</div><p>Aplikasi mobile-friendly yang menerima foto daun padi dan mendiagnosis penyakit (blast, brown spot, bacterial blight, leaf smut) dengan CNN transfer learning. Cocok diakses dari smartphone petani di lapangan.</p>
+          <div class="proj-label">Stack Teknologi</div><p class="proj-tags"><code>Python</code> <code>TensorFlow/Keras</code> <code>Transfer Learning (MobileNetV2)</code> <code>Streamlit (mobile-responsive)</code></p>
+          <div class="proj-label">Dataset</div><p>Rice Leaf Disease dataset dari Kaggle (~3.000 foto, 4 kelas, sudah bersih dan terlabel)</p>
+          <div class="proj-label">Scope &amp; Pembatasan</div><ul><li>Klasifikasi 4 kelas penyakit daun padi</li><li>Satu arsitektur: MobileNetV2 pretrained ImageNet, fine-tuned</li><li>Augmentasi standar: flip, rotate, zoom</li><li>Evaluasi: accuracy, F1 per kelas, confusion matrix</li></ul>
+          <div class="proj-label">Kontribusi Ilmiah</div><p>Evaluasi MobileNetV2 untuk deteksi penyakit padi; analisis dampak augmentasi terhadap performa; diskusi kelayakan deployment di perangkat mobile dengan resource terbatas.</p>
+          <div class="proj-label">Mengapa ★★★☆☆?</div><p>Dataset bersih di Kaggle. Transfer learning MobileNetV2 sangat terdokumentasi. Satu arsitektur yang dievaluasi mendalam lebih baik daripada banyak arsitektur yang dangkal.</p>
+        </div>
+      </details>
+
+      <details class="proj-card purple" id="proyek-4">
+        <summary>
+          <span class="proj-no">P04</span>
+          <span class="proj-head"><span class="proj-title">Chatbot Tanya Jawab Akademik Berbasis RAG</span><span class="proj-dom purple">Generative AI · RAG · ★★★☆☆</span></span>
+          <span class="proj-arrow">▾</span>
+        </summary>
+        <div class="proj-body">
+          <div class="proj-label">Deskripsi Aplikasi</div><p>Chatbot yang menjawab pertanyaan mahasiswa tentang peraturan akademik, prosedur administrasi, dan kurikulum berdasarkan dokumen PDF resmi institusi. RAG menjaga jawaban tetap berakar pada dokumen, bukan halusinasi LLM.</p>
+          <div class="proj-label">Stack Teknologi</div><p class="proj-tags"><code>Python</code> <code>LangChain</code> <code>ChromaDB</code> <code>OpenAI / Claude API</code> <code>Streamlit</code></p>
+          <div class="proj-label">Dataset</div><p>Dokumen akademik institusi (PDF): buku pedoman, peraturan akademik, FAQ (5–10 dokumen)</p>
+          <div class="proj-label">Scope &amp; Pembatasan</div><ul><li>Pipeline RAG standar: PDF loader → text splitter → embedding → ChromaDB → retrieval → generation</li><li>Evaluasi: 30 pertanyaan uji manual (relevansi &amp; kebenaran jawaban)</li><li>Tidak perlu training model — konfigurasi pipeline dan evaluasi kualitatif</li></ul>
+          <div class="proj-label">Kontribusi Ilmiah</div><p>Evaluasi dampak ukuran chunk (500 vs 1.000 vs 1.500 karakter); perbandingan RAG vs LLM murni pada 30 pertanyaan uji; analisis tipe pertanyaan tersulit.</p>
+          <div class="proj-label">Mengapa ★★★☆☆?</div><p>Pipeline LangChain + ChromaDB sudah sangat terdokumentasi. Dataset mudah didapat. Tidak perlu training model.</p>
+        </div>
+      </details>
+
+      <details class="proj-card amber" id="proyek-5">
+        <summary>
+          <span class="proj-no">P05</span>
+          <span class="proj-head"><span class="proj-title">Prediksi Harga Properti di Surabaya</span><span class="proj-dom amber">Tabular Machine Learning · ★★★☆☆</span></span>
+          <span class="proj-arrow">▾</span>
+        </summary>
+        <div class="proj-body">
+          <div class="proj-label">Deskripsi Aplikasi</div><p>Aplikasi yang memprediksi harga jual properti di Surabaya berdasarkan kecamatan, luas tanah, luas bangunan, jumlah kamar tidur, jumlah kamar mandi, dan garasi. Dilengkapi peta interaktif distribusi harga per kecamatan.</p>
+          <div class="proj-label">Stack Teknologi</div><p class="proj-tags"><code>Python</code> <code>Scikit-learn (Random Forest, XGBoost)</code> <code>Pandas</code> <code>Plotly</code> <code>Streamlit</code></p>
+          <div class="proj-label">Dataset</div><p>Scraping listing satu platform (99.co atau Rumah123) untuk Surabaya, target 2.000–3.000 listing; scraping dilakukan sekali dan data disimpan statis</p>
+          <div class="proj-label">Scope &amp; Pembatasan</div><ul><li>Dua model dibandingkan: Random Forest vs XGBoost</li><li>6 fitur numerik/kategorikal</li><li>Evaluasi: RMSE, MAE, R², feature importance</li><li>Preprocessing standar: encoding kecamatan, handling outlier harga</li></ul>
+          <div class="proj-label">Kontribusi Ilmiah</div><p>Perbandingan Random Forest vs XGBoost untuk harga properti Surabaya; analisis feature importance; pemetaan distribusi harga per kecamatan sebagai insight bisnis.</p>
+          <div class="proj-label">Mengapa ★★★☆☆?</div><p>Scraping halaman statis relatif mudah. Dua algoritma matang. Fitur sedikit dan maknanya jelas. Evaluasi regresi standar.</p>
+        </div>
+      </details>
+
+      <details class="proj-card teal" id="proyek-6">
+        <summary>
+          <span class="proj-no">P06</span>
+          <span class="proj-head"><span class="proj-title">Analisis Sentimen Ulasan Produk Lokal E-commerce</span><span class="proj-dom teal">Natural Language Processing · ★★★☆☆</span></span>
+          <span class="proj-arrow">▾</span>
+        </summary>
+        <div class="proj-body">
+          <div class="proj-label">Deskripsi Aplikasi</div><p>Sistem yang mengklasifikasikan ulasan produk UMKM ke sentimen positif, netral, atau negatif. Dashboard per produk: distribusi sentimen, tren per bulan, dan word cloud.</p>
+          <div class="proj-label">Stack Teknologi</div><p class="proj-tags"><code>Python</code> <code>Scikit-learn (TF-IDF + Naive Bayes / SVM)</code> <code>PySastrawi</code> <code>WordCloud</code> <code>Plotly</code> <code>Streamlit</code></p>
+          <div class="proj-label">Dataset</div><p>Scraping ulasan satu kategori produk di Tokopedia atau Shopee (~3.000 ulasan); pelabelan manual 1.000 ulasan oleh anggota tim</p>
+          <div class="proj-label">Scope &amp; Pembatasan</div><ul><li>Klasifikasi 3 kelas: positif / netral / negatif</li><li>Dua model dibandingkan: Naive Bayes vs SVM</li><li>Preprocessing: tokenisasi, stopword removal, stemming (PySastrawi)</li><li>Dashboard: distribusi sentimen, tren, word cloud per kelas</li></ul>
+          <div class="proj-label">Kontribusi Ilmiah</div><p>Evaluasi Naive Bayes vs SVM untuk ulasan Bahasa Indonesia non-formal; pengaruh stemming terhadap akurasi; kata paling diskriminatif per kelas sentimen.</p>
+          <div class="proj-label">Mengapa ★★★☆☆?</div><p>Scraping ulasan relatif mudah. Dua algoritma cocok untuk teks pendek. PySastrawi tersedia. Pelabelan 1.000 data realistis (250 per orang).</p>
+        </div>
+      </details>
+
+      <details class="proj-card blue" id="proyek-7">
+        <summary>
+          <span class="proj-no">P07</span>
+          <span class="proj-head"><span class="proj-title">Klasifikasi Sampah dari Gambar</span><span class="proj-dom blue">Computer Vision · ★★★☆☆</span></span>
+          <span class="proj-arrow">▾</span>
+        </summary>
+        <div class="proj-body">
+          <div class="proj-label">Deskripsi Aplikasi</div><p>Aplikasi yang mengklasifikasikan foto sampah ke 6 kategori (organik, plastik, kertas, logam, kaca, residu) dengan CNN transfer learning, dapat diakses dari browser di berbagai perangkat.</p>
+          <div class="proj-label">Stack Teknologi</div><p class="proj-tags"><code>Python</code> <code>TensorFlow/Keras</code> <code>Transfer Learning (EfficientNetB0)</code> <code>Streamlit</code></p>
+          <div class="proj-label">Dataset</div><p>TrashNet (2.527 foto, 6 kelas, GitHub) + minimal 200 foto tambahan per kelas yang diambil sendiri untuk konteks lokal Indonesia</p>
+          <div class="proj-label">Scope &amp; Pembatasan</div><ul><li>Klasifikasi 6 kelas sampah</li><li>Satu arsitektur: EfficientNetB0 pretrained ImageNet, fine-tuned</li><li>Augmentasi standar</li><li>Evaluasi: accuracy, F1 per kelas, confusion matrix; diskusi kelas yang paling sering salah</li></ul>
+          <div class="proj-label">Kontribusi Ilmiah</div><p>Evaluasi EfficientNetB0 dengan konteks lokal Indonesia; dampak penambahan data lokal terhadap baseline TrashNet; pasangan kelas yang paling sering tertukar.</p>
+          <div class="proj-label">Mengapa ★★★☆☆?</div><p>TrashNet lengkap dan bersih. EfficientNetB0 ringan dan terdokumentasi. 200 foto per kelas realistis (50 per orang per kelas).</p>
+        </div>
+      </details>
+
+      <details class="proj-card amber" id="proyek-8">
+        <summary>
+          <span class="proj-no">P08</span>
+          <span class="proj-head"><span class="proj-title">Prediksi Performa Akademik Mahasiswa</span><span class="proj-dom amber">Tabular Machine Learning · ★★★☆☆</span></span>
+          <span class="proj-arrow">▾</span>
+        </summary>
+        <div class="proj-body">
+          <div class="proj-label">Deskripsi Aplikasi</div><p>Sistem yang memprediksi IPK akhir semester dari data awal semester, dilengkapi visualisasi faktor paling berpengaruh dengan SHAP sehingga dosen pembimbing akademik memahami alasan prediksi.</p>
+          <div class="proj-label">Stack Teknologi</div><p class="proj-tags"><code>Python</code> <code>Scikit-learn (Decision Tree, Random Forest)</code> <code>SHAP</code> <code>Pandas</code> <code>Streamlit</code></p>
+          <div class="proj-label">Dataset</div><p>UCI Student Performance (649 data) atau Students&#x27; Dropout and Academic Success (4.424 data) — publik, tanpa data sensitif internal</p>
+          <div class="proj-label">Scope &amp; Pembatasan</div><ul><li>Dua model dibandingkan: Decision Tree vs Random Forest</li><li>Evaluasi: RMSE, MAE, R²</li><li>Feature importance dengan SHAP (bar plot)</li><li>Antarmuka: input satu mahasiswa → prediksi IPK + penjelasan faktor</li></ul>
+          <div class="proj-label">Kontribusi Ilmiah</div><p>Perbandingan Decision Tree vs Random Forest untuk performa akademik; analisis SHAP untuk faktor paling berpengaruh; diskusi implikasi etis sistem prediksi di pendidikan.</p>
+          <div class="proj-label">Mengapa ★★★☆☆?</div><p>Dataset publik dan bersih. Kedua model mudah diimplementasikan. SHAP untuk keduanya sangat terdokumentasi. Tidak ada isu privasi.</p>
+        </div>
+      </details>
+
+      <details class="proj-card purple" id="proyek-9">
+        <summary>
+          <span class="proj-no">P09</span>
+          <span class="proj-head"><span class="proj-title">Generator Soal Ujian Otomatis dari Materi PDF</span><span class="proj-dom purple">Generative AI · Prompt Engineering · ★★★☆☆</span></span>
+          <span class="proj-arrow">▾</span>
+        </summary>
+        <div class="proj-body">
+          <div class="proj-label">Deskripsi Aplikasi</div><p>Aplikasi yang menerima upload PDF materi kuliah dan menghasilkan soal pilihan ganda beserta kunci jawaban dan penjelasan menggunakan LLM. Dosen mengatur jumlah soal, tingkat kesulitan, dan cakupan halaman.</p>
+          <div class="proj-label">Stack Teknologi</div><p class="proj-tags"><code>Python</code> <code>PyPDF2 / pdfplumber</code> <code>OpenAI / Claude API</code> <code>LangChain (text splitting)</code> <code>Streamlit</code></p>
+          <div class="proj-label">Dataset</div><p>Tanpa dataset training. Evaluasi: 5 dokumen materi dari 5 mata kuliah; 3 evaluator (dosen) menilai dengan rubrik standar</p>
+          <div class="proj-label">Scope &amp; Pembatasan</div><ul><li>Tiga strategi prompting dibandingkan: zero-shot, few-shot (3 contoh), chain-of-thought</li><li>Evaluasi: kebenaran konten, kejelasan bahasa, tingkat kognitif Bloom (C1–C4)</li><li>Minimal 150 soal dievaluasi (50 per strategi)</li></ul>
+          <div class="proj-label">Kontribusi Ilmiah</div><p>Perbandingan tiga strategi prompting terhadap kualitas soal; evaluasi distribusi tingkat kognitif Bloom pada soal AI-generated vs soal buatan dosen.</p>
+          <div class="proj-label">Mengapa ★★★☆☆?</div><p>Tidak butuh training — hanya integrasi API dan text splitting. Tiga strategi prompting terdokumentasi. Rubrik jelas membatasi kompleksitas.</p>
+        </div>
+      </details>
+
+      <details class="proj-card red" id="proyek-10">
+        <summary>
+          <span class="proj-no">P10</span>
+          <span class="proj-head"><span class="proj-title">Deteksi Anomali Transaksi Keuangan</span><span class="proj-dom red">Unsupervised Machine Learning · ★★★☆☆</span></span>
+          <span class="proj-arrow">▾</span>
+        </summary>
+        <div class="proj-body">
+          <div class="proj-label">Deskripsi Aplikasi</div><p>Sistem yang menganalisis transaksi keuangan untuk mendeteksi anomali yang berpotensi fraud. Dashboard interaktif menampilkan transaksi mencurigakan, skor anomali, dan fitur penyebabnya.</p>
+          <div class="proj-label">Stack Teknologi</div><p class="proj-tags"><code>Python</code> <code>Scikit-learn (Isolation Forest, Local Outlier Factor)</code> <code>Pandas</code> <code>Plotly</code> <code>Streamlit</code></p>
+          <div class="proj-label">Dataset</div><p>Credit Card Fraud Detection (Kaggle) — 284.807 transaksi, publik, teranonimasi dengan PCA</p>
+          <div class="proj-label">Scope &amp; Pembatasan</div><ul><li>Dua algoritma dibandingkan: Isolation Forest vs LOF</li><li>Evaluasi: precision, recall, F1 untuk kelas fraud</li><li>Analisis trade-off berbagai threshold</li><li>Dashboard: scatter plot skor anomali + tabel transaksi mencurigakan</li></ul>
+          <div class="proj-label">Kontribusi Ilmiah</div><p>Perbandingan Isolation Forest vs LOF untuk deteksi fraud; sensitivitas threshold terhadap trade-off precision-recall; tantangan imbalanced class pada anomaly detection.</p>
+          <div class="proj-label">Mengapa ★★★☆☆?</div><p>Dataset bersih dan publik. Dua algoritma unsupervised matang di Scikit-learn. Evaluasi standar tanpa pipeline kompleks.</p>
+        </div>
+      </details>
+
+      <details class="proj-card blue" id="proyek-11">
+        <summary>
+          <span class="proj-no">P11</span>
+          <span class="proj-head"><span class="proj-title">Klasifikasi Ekspresi Wajah dari Gambar</span><span class="proj-dom blue">Computer Vision · ★★★☆☆</span></span>
+          <span class="proj-arrow">▾</span>
+        </summary>
+        <div class="proj-body">
+          <div class="proj-label">Deskripsi Aplikasi</div><p>Aplikasi yang mengklasifikasikan ekspresi wajah ke 7 ekspresi dasar (marah, jijik, takut, senang, netral, sedih, terkejut). Deteksi wajah otomatis sehingga pengguna cukup upload foto tanpa crop manual.</p>
+          <div class="proj-label">Stack Teknologi</div><p class="proj-tags"><code>Python</code> <code>TensorFlow/Keras</code> <code>Transfer Learning (VGG16)</code> <code>OpenCV (Haar Cascade)</code> <code>Streamlit</code></p>
+          <div class="proj-label">Dataset</div><p>FER2013 (35.887 gambar wajah, 7 kelas, Kaggle)</p>
+          <div class="proj-label">Scope &amp; Pembatasan</div><ul><li>Klasifikasi 7 kelas ekspresi dasar</li><li>Satu arsitektur: VGG16 pretrained, fine-tuned pada FER2013</li><li>Preprocessing: deteksi &amp; crop wajah dengan Haar Cascade</li><li>Evaluasi: accuracy, F1 per kelas, confusion matrix</li></ul>
+          <div class="proj-label">Kontribusi Ilmiah</div><p>Evaluasi VGG16 fine-tuned untuk ekspresi wajah; analisis ekspresi yang paling sering tertukar; tantangan FER2013 (kualitas rendah, label noise).</p>
+          <div class="proj-label">Mengapa ★★★☆☆?</div><p>FER2013 bersih di Kaggle. Fine-tuning VGG16 sangat terdokumentasi. Haar Cascade built-in di OpenCV.</p>
+        </div>
+      </details>
+      </div>
+
+      <h3 style="margin-top:var(--s6);">Ringkasan 11 Proyek</h3>
+      <div class="table-scroll">
+      <table class="kisi-table">
+        <thead><tr><th>NO</th><th>JUDUL PROYEK</th><th>DOMAIN</th><th>TEKNIK UTAMA</th><th>DATASET</th></tr></thead>
+        <tbody>
+<tr><td>1</td><td>Deteksi Hoaks Bahasa Indonesia</td><td>NLP</td><td>TF-IDF, SVM, Logistic Regression</td><td>IDHoax dataset</td></tr>
+<tr><td>2</td><td>Rekomendasi Film Content-Based</td><td>Recommender System</td><td>TF-IDF, Cosine Similarity</td><td>MovieLens Small</td></tr>
+<tr><td>3</td><td>Deteksi Penyakit Daun Padi</td><td>Computer Vision</td><td>CNN, MobileNetV2</td><td>Rice Leaf Disease (Kaggle)</td></tr>
+<tr><td>4</td><td>Chatbot Akademik RAG</td><td>Generative AI</td><td>RAG, LangChain, ChromaDB</td><td>Dokumen PDF institusi</td></tr>
+<tr><td>5</td><td>Prediksi Harga Properti Surabaya</td><td>Tabular ML</td><td>Random Forest, XGBoost</td><td>Scraping 99.co / Rumah123</td></tr>
+<tr><td>6</td><td>Sentimen Ulasan Produk E-commerce</td><td>NLP</td><td>TF-IDF, Naive Bayes, SVM</td><td>Scraping Tokopedia / Shopee</td></tr>
+<tr><td>7</td><td>Klasifikasi Sampah dari Gambar</td><td>Computer Vision</td><td>CNN, EfficientNetB0</td><td>TrashNet + foto lokal</td></tr>
+<tr><td>8</td><td>Prediksi Performa Akademik</td><td>Tabular ML</td><td>Decision Tree, Random Forest, SHAP</td><td>UCI Student Performance</td></tr>
+<tr><td>9</td><td>Generator Soal dari PDF</td><td>Generative AI</td><td>Prompt Engineering, LLM API</td><td>Dokumen materi kuliah</td></tr>
+<tr><td>10</td><td>Deteksi Anomali Transaksi Keuangan</td><td>Unsupervised ML</td><td>Isolation Forest, LOF</td><td>Credit Card Fraud (Kaggle)</td></tr>
+<tr><td>11</td><td>Klasifikasi Ekspresi Wajah</td><td>Computer Vision</td><td>CNN, VGG16, OpenCV</td><td>FER2013 (Kaggle)</td></tr>
+        </tbody>
+      </table>
+      </div>
+    </div>
+
+    <!-- FORMAT LAPORAN -->
+    <div class="content-block" id="laporan">
+      <h2>3. Format Laporan</h2>
+      <p>Laporan mengikuti <strong>format umum penulisan jurnal ilmiah</strong> di bidang ilmu komputer.</p>
+
+      <h3>Struktur Laporan</h3>
+      <div class="table-scroll">
+      <table class="kisi-table">
+        <thead><tr><th>BAGIAN</th><th>ISI &amp; PANDUAN</th></tr></thead>
+        <tbody>
+<tr><td><strong style="color:var(--text)">Halaman Judul</strong></td><td>Judul (maks. 15 kata), nama &amp; NIM anggota, program studi, universitas, tahun</td></tr>
+<tr><td><strong style="color:var(--text)">Abstrak (IND + ENG)</strong></td><td>250 kata; latar belakang, metode, dataset, hasil utama, kesimpulan. Kata kunci 4–6 kata.</td></tr>
+<tr><td><strong style="color:var(--text)">BAB 1 — Pendahuluan</strong></td><td>1.1 Latar Belakang · 1.2 Rumusan Masalah · 1.3 Tujuan · 1.4 Batasan · 1.5 Manfaat (~800 kata)</td></tr>
+<tr><td><strong style="color:var(--text)">BAB 2 — Tinjauan Pustaka</strong></td><td>2.1 Kajian Terdahulu (tabel perbandingan) · 2.2 Landasan Teori · 2.3 Posisi Penelitian (~1.200 kata)</td></tr>
+<tr><td><strong style="color:var(--text)">BAB 3 — Metodologi</strong></td><td>3.1 Desain Penelitian (flowchart) · 3.2 Dataset · 3.3 Preprocessing · 3.4 Implementasi Model · 3.5 Skema Evaluasi · 3.6 Lingkungan Pengembangan (~1.500 kata)</td></tr>
+<tr><td><strong style="color:var(--text)">BAB 4 — Hasil &amp; Pembahasan</strong></td><td>4.1 Hasil Preprocessing · 4.2 Hasil Training · 4.3 Evaluasi Model · 4.4 Tampilan Aplikasi · 4.5 Pembahasan · 4.6 Keterbatasan (~2.000 kata)</td></tr>
+<tr><td><strong style="color:var(--text)">BAB 5 — Kesimpulan &amp; Saran</strong></td><td>5.1 Kesimpulan (jawab rumusan masalah + angka konkret) · 5.2 Saran (~400 kata)</td></tr>
+<tr><td><strong style="color:var(--text)">Daftar Pustaka</strong></td><td>Min. 20 referensi, APA 7th ed. Min. 15 dari jurnal terindeks. 70% dari 5 tahun terakhir.</td></tr>
+<tr><td><strong style="color:var(--text)">Lampiran</strong></td><td>A: Kode inti · B: Screenshot tambahan · C: Tabel pembagian tugas anggota &amp; penggunaan tools AI</td></tr>
+        </tbody>
+      </table>
+      </div>
+
+      <h3 style="margin-top:var(--s6);">Ketentuan Format</h3>
+      <div class="table-scroll">
+      <table class="kisi-table">
+        <thead><tr><th>ASPEK</th><th>KETENTUAN</th></tr></thead>
+        <tbody>
+<tr><td><strong style="color:var(--text)">Font</strong></td><td>Times New Roman 12pt untuk isi; 10pt untuk tabel dan kode</td></tr>
+<tr><td><strong style="color:var(--text)">Spasi</strong></td><td>1,5 untuk isi utama; 1 untuk tabel, kode, dan abstrak</td></tr>
+<tr><td><strong style="color:var(--text)">Margin</strong></td><td>4 cm kiri · 3 cm atas · 3 cm kanan · 3 cm bawah</td></tr>
+<tr><td><strong style="color:var(--text)">Panjang laporan</strong></td><td>30–50 halaman tidak termasuk lampiran</td></tr>
+<tr><td><strong style="color:var(--text)">Bahasa</strong></td><td>Indonesia baku; abstrak juga dalam Bahasa Inggris</td></tr>
+<tr><td><strong style="color:var(--text)">Gambar &amp; Tabel</strong></td><td>Setiap gambar dan tabel harus dirujuk dalam teks sebelum ditampilkan</td></tr>
+<tr><td><strong style="color:var(--text)">Kode Program</strong></td><td>Font monospace; hanya bagian inti, bukan seluruh kode</td></tr>
+<tr><td><strong style="color:var(--text)">Sitasi</strong></td><td>APA 7th Edition; gunakan Mendeley atau Zotero</td></tr>
+<tr><td><strong style="color:var(--text)">File pengumpulan</strong></td><td>Satu PDF; nama: <code>ProyekAI_[NomorKelompok]_[JudulSingkat].pdf</code></td></tr>
+        </tbody>
+      </table>
+      </div>
+    </div>
+
+    <!-- PANDUAN PER BAB -->
+    <div class="content-block" id="panduan">
+      <h2>4. Panduan Penulisan Per Bab</h2>
+      <p>Gunakan panduan ini sebagai checklist saat menulis. Penilai akan memeriksa konsistensi antar bab: rumusan masalah (Bab 1) → research gap (Bab 2) → evaluasi (Bab 4) → kesimpulan (Bab 5).</p>
+
+      <div class="review-card teal" style="margin-bottom:var(--s4);">
+        <div class="review-card-label">Panduan Penulisan</div>
+        <h4>BAB 1 · Pendahuluan (~800 kata)</h4>
+        <ul style="list-style:none;padding-left:0;">
+          <li style="margin-bottom:var(--s3);"><strong style="color:var(--text)">1.1 Latar Belakang</strong><br>Mulai dari konteks masalah yang luas, perkecil ke masalah spesifik. Sertakan data/fakta pendukung urgensi. Akhiri dengan transisi ke solusi AI. Hindari kalimat umum seperti <em>"Di era digital ini..."</em>.</li>
+          <li style="margin-bottom:var(--s3);"><strong style="color:var(--text)">1.2 Rumusan Masalah</strong><br>2–3 pertanyaan penelitian yang spesifik dan terukur. Contoh: <em>"Algoritma mana antara Random Forest dan XGBoost yang memberikan RMSE lebih rendah dalam prediksi harga properti di Surabaya?"</em></li>
+          <li style="margin-bottom:var(--s3);"><strong style="color:var(--text)">1.3 Tujuan</strong><br>Harus 1:1 dengan rumusan masalah. Mulai dengan kata kerja aktif: <em>Membandingkan, Menganalisis, Membangun</em>.</li>
+          <li style="margin-bottom:var(--s3);"><strong style="color:var(--text)">1.4 Batasan</strong><br>Nyatakan secara eksplisit apa yang <strong>tidak</strong> dicakup. Contoh: <em>"Dataset dibatasi pada listing properti di 5 kecamatan Surabaya Pusat periode Jan–Mar 2025."</em></li>
+          <li style="margin-bottom:var(--s3);"><strong style="color:var(--text)">1.5 Manfaat</strong><br>Bedakan manfaat teoritis (kontribusi pada ilmu pengetahuan) dan manfaat praktis (siapa yang menggunakan hasilnya dan bagaimana).</li>
+        </ul>
+      </div>
+      <div class="review-card blue" style="margin-bottom:var(--s4);">
+        <div class="review-card-label">Panduan Penulisan</div>
+        <h4>BAB 2 · Tinjauan Pustaka (~1.200 kata)</h4>
+        <ul style="list-style:none;padding-left:0;">
+          <li style="margin-bottom:var(--s3);"><strong style="color:var(--text)">2.1 Kajian Terdahulu</strong><br>Minimal 8 paper dari 2020–2025 (Google Scholar, Semantic Scholar, IEEE Xplore). Buat tabel: Penulis/Tahun · Metode · Dataset · Hasil Utama · Kelemahan/Gap. Tunjukkan pola dan perkembangan, bukan sekadar merangkum satu per satu.</li>
+          <li style="margin-bottom:var(--s3);"><strong style="color:var(--text)">2.2 Landasan Teori</strong><br>Jelaskan algoritma secara konseptual dan matematis secukupnya, fokus pada aspek yang relevan dengan implementasi. Sertakan formula kunci beserta penjelasan variabelnya.</li>
+          <li style="margin-bottom:var(--s3);"><strong style="color:var(--text)">2.3 Posisi Penelitian</strong><br>Bagian terpenting Bab 2: apa yang sudah dilakukan peneliti sebelumnya, apa <em>research gap</em>-nya, dan bagaimana penelitian ini mengisinya — terhubung langsung ke rumusan masalah.</li>
+        </ul>
+      </div>
+      <div class="review-card amber" style="margin-bottom:var(--s4);">
+        <div class="review-card-label">Panduan Penulisan</div>
+        <h4>BAB 3 · Metodologi (~1.500 kata)</h4>
+        <ul style="list-style:none;padding-left:0;">
+          <li style="margin-bottom:var(--s3);"><strong style="color:var(--text)">3.1 Desain Penelitian</strong><br>Flowchart alur penelitian dari pengumpulan data hingga evaluasi (draw.io, Lucidchart, atau PowerPoint); setiap kotak diberi penjelasan teks.</li>
+          <li style="margin-bottom:var(--s3);"><strong style="color:var(--text)">3.2 Dataset</strong><br>Sumber, cara pengumpulan, jumlah total, distribusi kelas (dengan visualisasi), masalah kualitas data, dan statistik deskriptif (mean, std, min, max).</li>
+          <li style="margin-bottom:var(--s3);"><strong style="color:var(--text)">3.3 Preprocessing</strong><br>Langkah berurutan beserta alasannya; tunjukkan statistik sebelum dan sesudah setiap langkah utama.</li>
+          <li style="margin-bottom:var(--s3);"><strong style="color:var(--text)">3.4 Implementasi Model</strong><br>Arsitektur, hyperparameter, dan alasan pemilihan. Deep learning: tabel layer-by-layer. ML klasik: hyperparameter awal dan hasil tuning.</li>
+          <li style="margin-bottom:var(--s3);"><strong style="color:var(--text)">3.5 Skema Evaluasi</strong><br>Metrik evaluasi dan alasan kesesuaiannya; train-test split dan penggunaan cross-validation.</li>
+          <li style="margin-bottom:var(--s3);"><strong style="color:var(--text)">3.6 Lingkungan Pengembangan</strong><br>Tabel spesifikasi: OS, RAM, GPU, versi Python, versi library utama, platform (Colab/lokal) — penting untuk reprodusibilitas.</li>
+        </ul>
+      </div>
+      <div class="review-card purple" style="margin-bottom:var(--s4);">
+        <div class="review-card-label">Panduan Penulisan</div>
+        <h4>BAB 4 · Hasil &amp; Pembahasan (~2.000 kata)</h4>
+        <ul style="list-style:none;padding-left:0;">
+          <li style="margin-bottom:var(--s3);"><strong style="color:var(--text)">4.1 Hasil Preprocessing</strong><br>Statistik deskriptif dan visualisasi distribusi sebelum/sesudah preprocessing; jelaskan keputusan penting.</li>
+          <li style="margin-bottom:var(--s3);"><strong style="color:var(--text)">4.2 Hasil Pelatihan</strong><br>Untuk model iteratif: learning curve (training vs validation). Identifikasi overfitting dan cara mengatasinya.</li>
+          <li style="margin-bottom:var(--s3);"><strong style="color:var(--text)">4.3 Evaluasi Model</strong><br>Semua metrik dalam tabel rapi. Klasifikasi: confusion matrix + precision/recall/F1 per kelas. Regresi: RMSE, MAE, R² pada train dan test. Dua model dibandingkan dalam satu tabel.</li>
+          <li style="margin-bottom:var(--s3);"><strong style="color:var(--text)">4.4 Tampilan Aplikasi</strong><br>Screenshot tiap fitur utama dengan caption deskriptif, user flow 3–5 langkah, contoh input dan output nyata.</li>
+          <li style="margin-bottom:var(--s3);"><strong style="color:var(--text)">4.5 Pembahasan</strong><br>Bukan pengulangan hasil, melainkan <strong>interpretasi</strong>: mengapa model bekerja baik/buruk, apa yang tak terduga, bagaimana dibandingkan paper di Bab 2, apa implikasi praktisnya.</li>
+          <li style="margin-bottom:var(--s3);"><strong style="color:var(--text)">4.6 Keterbatasan</strong><br>Jujur tentang kelemahan sistem — keterbatasan yang diakui menunjukkan kematangan ilmiah.</li>
+        </ul>
+      </div>
+      <div class="review-card red" style="margin-bottom:var(--s4);">
+        <div class="review-card-label">Panduan Penulisan</div>
+        <h4>BAB 5 · Kesimpulan &amp; Saran (~400 kata)</h4>
+        <ul style="list-style:none;padding-left:0;">
+          <li style="margin-bottom:var(--s3);"><strong style="color:var(--text)">5.1 Kesimpulan</strong><br>Jawab setiap rumusan masalah dengan angka konkret.<br>❌ <em>"Model kami memberikan hasil yang baik."</em><br>✅ <em>"Random Forest menghasilkan RMSE Rp 74.200 pada test set, lebih rendah 15% dibanding baseline Linear Regression."</em></li>
+          <li style="margin-bottom:var(--s3);"><strong style="color:var(--text)">5.2 Saran</strong><br>2–3 saran spesifik dan realistis, bukan sekadar "menambah data".<br>✅ <em>"Mengumpulkan data properti dari 5 kota besar Indonesia untuk model yang lebih general, dengan target RMSE di bawah Rp 50.000."</em></li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- RUBRIK -->
+    <div class="content-block" id="rubrik">
+      <h2>5. Rubrik Penilaian UAS</h2>
+      <p>Total nilai proyek UAS = <strong>100 poin</strong>, menyumbang <strong>35% nilai akhir</strong> mata kuliah.</p>
+      <div class="table-scroll">
+      <table class="kisi-table">
+        <thead><tr><th>KOMPONEN</th><th>SUB-KOMPONEN</th><th>BOBOT</th><th>KRITERIA A / B / C / D</th></tr></thead>
+        <tbody>
+<tr><td><strong style="color:var(--text)">Aplikasi (40%)</strong></td><td>Fungsionalitas — tidak ada bug kritis saat demo</td><td><div class="weight-bar"><div class="weight-fill" style="width:60px;"></div><span class="weight-num">15%</span></div></td><td>A: sempurna · B: bug minor · C: bug signifikan · D: tidak berjalan</td></tr>
+<tr><td></td><td>Kualitas model — memenuhi atau melampaui baseline</td><td><div class="weight-bar"><div class="weight-fill" style="width:60px;"></div><span class="weight-num">15%</span></div></td><td>A: &gt;10% di atas baseline · B: memenuhi · C: 5–10% di bawah · D: &gt;10% di bawah</td></tr>
+<tr><td></td><td>Antarmuka — kemudahan penggunaan dan tampilan</td><td><div class="weight-bar"><div class="weight-fill" style="width:40px;"></div><span class="weight-num">10%</span></div></td><td>A: intuitif, responsif, rapi · B: fungsional · C: sulit digunakan · D: tidak ada UI</td></tr>
+<tr><td><strong style="color:var(--text)">Laporan (30%)</strong></td><td>Tinjauan pustaka &amp; identifikasi research gap</td><td><div class="weight-bar"><div class="weight-fill" style="width:40px;"></div><span class="weight-num">10%</span></div></td><td>A: &gt;10 paper, gap jelas · B: 8–10 paper · C: &lt;8 paper · D: tidak ada kajian</td></tr>
+<tr><td></td><td>Kedalaman metodologi &amp; reprodusibilitas</td><td><div class="weight-bar"><div class="weight-fill" style="width:40px;"></div><span class="weight-num">10%</span></div></td><td>A: sangat detail · B: cukup detail · C: kurang detail · D: tidak jelas</td></tr>
+<tr><td></td><td>Kualitas analisis hasil &amp; pembahasan</td><td><div class="weight-bar"><div class="weight-fill" style="width:40px;"></div><span class="weight-num">10%</span></div></td><td>A: mendalam, terhubung ke literatur · B: cukup · C: hanya deskripsi angka · D: tidak ada</td></tr>
+<tr><td><strong style="color:var(--text)">Presentasi (20%)</strong></td><td>Kejelasan &amp; penguasaan materi tim</td><td><div class="weight-bar"><div class="weight-fill" style="width:40px;"></div><span class="weight-num">10%</span></div></td><td>A: sangat jelas, semua aktif · B: jelas · C: kurang jelas · D: buruk</td></tr>
+<tr><td></td><td>Kelancaran demo live aplikasi</td><td><div class="weight-bar"><div class="weight-fill" style="width:40px;"></div><span class="weight-num">10%</span></div></td><td>A: lancar dan menyeluruh · B: kendala kecil · C: tidak lengkap · D: gagal</td></tr>
+<tr><td><strong style="color:var(--text)">Individual (10%)</strong></td><td>Tanya jawab — pemahaman seluruh proyek</td><td><div class="weight-bar"><div class="weight-fill" style="width:40px;"></div><span class="weight-num">10%</span></div></td><td>A: memahami semua aspek · B: bagian sendiri + garis besar · C: bagian sendiri saja · D: tidak bisa menjawab</td></tr>
+        </tbody>
+      </table>
+      </div>
+    </div>
+
+    <!-- TIMELINE -->
+    <div class="content-block" id="timeline">
+      <h2>6. Timeline Pengerjaan</h2>
+      <div class="table-scroll">
+      <table class="kisi-table">
+        <thead><tr><th>FASE</th><th>WAKTU</th><th>KEGIATAN</th><th>DELIVERABLE</th></tr></thead>
+        <tbody>
+<tr><td><strong style="color:var(--text)">Persiapan</strong></td><td style="white-space:nowrap;">P1 – P12 (mandiri)</td><td>Pelajari materi kuliah, observasi masalah di sekitar, eksplorasi dataset.</td><td>—</td></tr>
+<tr><td><strong style="color:var(--text)">Kickoff</strong></td><td style="white-space:nowrap;">P13 (Workshop 1)</td><td>Pengumuman topik. Presentasi proposal 5 menit/kelompok. Feedback dosen.</td><td>Proposal singkat (1 hal.) + rencana kerja</td></tr>
+<tr><td><strong style="color:var(--text)">Development</strong></td><td style="white-space:nowrap;">P13 – P14 (mandiri)</td><td>Kumpulkan data, bangun model, bangun aplikasi, tulis laporan secara paralel.</td><td>Progress update via grup kelas</td></tr>
+<tr><td><strong style="color:var(--text)">Workshop 2</strong></td><td style="white-space:nowrap;">P14 (Workshop 2)</td><td>Dry-run presentasi (10 menit/kelompok). Feedback teknis. Finalisasi laporan.</td><td>Draft laporan 80% selesai</td></tr>
+<tr><td><strong style="color:var(--text)">Pengumpulan</strong></td><td style="white-space:nowrap;">H-3 sebelum UAS</td><td>Kumpulkan PDF laporan + link GitHub + link demo (Streamlit Cloud / HF Spaces).</td><td>PDF + link repo + link demo</td></tr>
+<tr><td><strong style="color:var(--text)">Presentasi UAS</strong></td><td style="white-space:nowrap;">Jadwal UAS</td><td>Presentasi 25 menit + demo 5 menit + tanya jawab individual 10 menit/kelompok.</td><td>Slide + demo live</td></tr>
+        </tbody>
+      </table>
+      </div>
+    </div>
+
+    <!-- KETENTUAN -->
+    <div class="content-block" id="ketentuan">
+      <h2>7. Ketentuan Teknis &amp; Integritas Akademik</h2>
+
+      <div class="review-grid">
+        <div class="review-card teal">
+          <div class="review-card-label">Teknis</div>
+          <h4>Ketentuan Aplikasi</h4>
+          <ul>
+            <li>Aplikasi bisa dijalankan siapa pun — sertakan <code>requirements.txt</code> dan petunjuk instalasi di <code>README.md</code></li>
+            <li>Seluruh kode di repository GitHub/GitLab; link disertakan dalam laporan</li>
+            <li>Demo live saat presentasi; siapkan backup (video/screenshot) jika koneksi bermasalah</li>
+            <li>Tidak boleh memakai API berbayar yang biayanya ditanggung institusi tanpa persetujuan dosen</li>
+          </ul>
+        </div>
+        <div class="review-card blue">
+          <div class="review-card-label">Kebijakan AI</div>
+          <h4>Penggunaan Tools AI Diperbolehkan</h4>
+          <ul>
+            <li>Berlaku untuk ChatGPT, Claude, GitHub Copilot, dll.</li>
+            <li>Kode hasil AI wajib dipahami dan bisa dijelaskan oleh anggota kelompok</li>
+            <li>Laporan tidak boleh sepenuhnya ditulis AI — analisis, interpretasi, dan argumentasi harus pemikiran asli kelompok</li>
+            <li>Cantumkan di Lampiran C: tools AI apa yang dipakai dan untuk bagian mana</li>
+          </ul>
+        </div>
+        <div class="review-card red">
+          <div class="review-card-label">Integritas</div>
+          <h4>Integritas Akademik</h4>
+          <ul>
+            <li>Plagiarisme (kode/teks kelompok lain tanpa atribusi) = <strong style="color:var(--red)">nilai 0</strong> untuk seluruh kelompok</li>
+            <li>Laporan melewati pengecekan similarity sebelum dikumpulkan (target &lt; 25%)</li>
+            <li>Dataset harus berlisensi yang memperbolehkan penggunaan akademik — cantumkan sumber dan lisensi dalam laporan</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Tugas/Persiapan -->
+      <div class="task-box" style="margin-top:var(--s6);" id="persiapan">
+        <div class="task-box-title">📋 Persiapan Menuju Pertemuan 13</div>
+        <p style="font-size:13px;color:var(--text-2);margin-bottom:var(--s4);">Lakukan hal berikut <strong>sebelum Workshop Proyek UAS — Sesi 1</strong>.</p>
+        <ol style="font-size:14px;color:var(--text);line-height:2.3;">
+          <li><strong>Baca seluruh 11 deskripsi proyek</strong> dan catat minimal 3 topik yang paling menarik bagi kelompokmu.</li>
+          <li><strong>Bentuk kelompok 4 orang</strong> dan diskusikan pembagian peran (Data Engineer, ML Engineer, App Developer, Research Writer).</li>
+          <li><strong>Eksplorasi dataset</strong> dari topik pilihan — pastikan tersedia, berlisensi akademik, dan bisa diunduh.</li>
+          <li><strong>Siapkan proposal singkat 1 halaman</strong> dan rencana kerja untuk presentasi 5 menit di Pertemuan 13.</li>
+          <li><strong>Buat repository GitHub kelompok</strong> dan akun yang dibutuhkan (Kaggle, OpenAI/Anthropic bila topik Generative AI).</li>
+        </ol>
+      </div>
+
+      <div class="reading-box">
+        <div class="reading-box-title">📖 Materi Pendukung Selama Blok 2</div>
+        <div class="reading-item">
+          <span class="reading-icon">🔧</span>
+          <div class="reading-label">
+            <strong>Referensi teknis tiap domain</strong>
+            NLP (TF-IDF, sentimen), Computer Vision (transfer learning), Tabular ML (Random Forest, XGBoost), dan Generative AI (RAG, prompt engineering) — materi P-03 hingga P-06 serta P-09 hingga P-12 menjadi fondasi proyek.
+          </div>
+        </div>
+        <div class="reading-item">
+          <span class="reading-icon">📝</span>
+          <div class="reading-label">
+            <strong>Penulisan ilmiah &amp; manajemen referensi</strong>
+            Gunakan Google Scholar, Semantic Scholar, atau IEEE Xplore untuk kajian pustaka; Mendeley atau Zotero untuk sitasi APA 7th Edition.
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ── ASIDE ── -->
+  <aside class="content-aside">
+    <!-- TOC -->
+    <div class="toc">
+      <div class="toc-title">Isi Halaman</div>
+      <ul class="toc-list">
+        <li><a href="#tujuan" class="active">Tujuan</a></li>
+        <li><a href="#gambaran">1. Gambaran Umum</a></li>
+        <li><a href="#proyek">2. Deskripsi 11 Proyek</a></li>
+        <li><a href="#laporan">3. Format Laporan</a></li>
+        <li><a href="#panduan">4. Panduan Per Bab</a></li>
+        <li><a href="#rubrik">5. Rubrik Penilaian</a></li>
+        <li><a href="#timeline">6. Timeline</a></li>
+        <li><a href="#ketentuan">7. Ketentuan &amp; Integritas</a></li>
+      </ul>
+    </div>
+
+    <!-- Sesi nav -->
+    <div class="sesi-nav-aside">
+      <div class="sesi-nav-title">Navigasi</div>
+      <a href="sesi-08.html" class="sesi-nav-btn">
+        <span>←</span>
+        <span>P-08: LLM &amp; Generative AI</span>
+      </a>
+      <a href="../index.html" class="sesi-nav-btn" style="margin-top:var(--s2);">
+        <span>🏠</span>
+        <span>Kembali ke Beranda</span>
+      </a>
+      <div style="margin-top:var(--s4);padding:var(--s4);background:rgba(155,124,244,0.08);border:1px solid rgba(155,124,244,0.2);border-radius:var(--r2);">
+        <div style="font-family:var(--mono);font-size:10px;color:var(--purple);letter-spacing:1px;text-transform:uppercase;margin-bottom:var(--s2);">Topik Diumumkan P-13</div>
+        <div style="font-size:12px;color:var(--text-2);line-height:1.6;">Pelajari semua topik dan siapkan preferensi kelompok sebelum workshop dimulai.</div>
+      </div>
+    </div>
+
+    <!-- Info box -->
+    <div style="background:var(--bg-2);border:1px solid var(--border);border-radius:var(--r3);padding:var(--s5);margin-top:var(--s4);">
+      <div style="font-family:var(--mono);font-size:10px;color:var(--text-3);letter-spacing:2px;text-transform:uppercase;margin-bottom:var(--s3);">Info Pertemuan</div>
+      <div style="display:flex;flex-direction:column;gap:var(--s3);">
+        <div><div style="font-size:11px;color:var(--text-3);">Tipe</div><div style="font-size:13px;color:var(--text);">Panduan Proyek UAS</div></div>
+        <div><div style="font-size:11px;color:var(--text-3);">Kelompok</div><div style="font-size:13px;color:var(--text);">11 kelompok × 4 mahasiswa (44 mahasiswa)</div></div>
+        <div><div style="font-size:11px;color:var(--text-3);">Bobot</div><div style="font-size:13px;color:var(--text);">35% nilai akhir (UAS)</div></div>
+        <div><div style="font-size:11px;color:var(--text-3);">Pengumpulan</div><div style="font-size:13px;color:var(--text);">H-3 sebelum jadwal UAS</div></div>
+        <div><div style="font-size:11px;color:var(--text-3);">Format Laporan</div><div style="font-size:13px;color:var(--text);">Jurnal ilmiah · 30–50 hal. · APA 7th</div></div>
+        <div><div style="font-size:11px;color:var(--text-3);">Dosen Pengampu</div><div style="font-size:13px;color:var(--text);">Philipus Suryo Subandoro</div></div>
+      </div>
+    </div>
+  </aside>
+
+</div>
+
+<!-- ══ FOOTER ══ -->
+<footer class="footer">
+  <div>AI·UKWMS <span style="color:var(--text-3);">· Proyek Akhir AI</span></div>
+  <div><a href="../index.html" style="color:var(--text-3);">← Kembali ke Beranda</a></div>
+</footer>
+
+<script>
+  /* ── Filter proyek berdasarkan domain ── */
+  const chips = document.querySelectorAll('.proj-chip');
+  const cards = document.querySelectorAll('.proj-card');
+  chips.forEach(chip => {
+    chip.addEventListener('click', () => {
+      chips.forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+      const f = chip.dataset.f;
+      cards.forEach(card => {
+        const dom = card.querySelector('.proj-dom').textContent;
+        card.style.display = (f === 'all' || dom.includes(f)) ? '' : 'none';
+      });
+    });
+  });
+
+  /* ── TOC active tracking ── */
+  const headings = document.querySelectorAll('.content-main > .content-block[id]');
+  const tocLinks = document.querySelectorAll('.toc-list a');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(a => {
+          a.classList.remove('active');
+          if (a.getAttribute('href') === '#' + entry.target.id) a.classList.add('active');
+        });
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px' });
+  headings.forEach(h => observer.observe(h));
+
+  /* ── Nav scroll active ── */
+  const navLinks = document.querySelectorAll('.nav-links a[href^="#"]');
+  window.addEventListener('scroll', () => {
+    let current = '';
+    headings.forEach(h => { if (window.scrollY >= h.offsetTop - 100) current = h.id; });
+    navLinks.forEach(a => {
+      a.classList.remove('active');
+      if (a.getAttribute('href') === '#' + current) a.classList.add('active');
+    });
+  });
+</script>
+</body>
+</html>
