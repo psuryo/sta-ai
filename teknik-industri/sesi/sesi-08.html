@@ -1,0 +1,956 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>P-08: LLM & Generative AI — Teknik Industri UKWMS</title>
+<link rel="stylesheet" href="../../css/style.css">
+<style>
+  /* ── Table wrapper (scroll di layar kecil) ── */
+  .table-wrap { overflow-x: auto; margin: var(--s4) 0; }
+  .table-wrap .industry-table { margin: 0; min-width: 560px; }
+
+  /* ── Flow steps (cara kerja LLM / RAG) ── */
+  .flow-steps {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: var(--s3);
+    margin: var(--s5) 0;
+  }
+  .flow-step {
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: var(--r2);
+    padding: var(--s4);
+    position: relative;
+  }
+  .flow-step:not(:last-child)::after {
+    content: '→';
+    position: absolute;
+    right: -11px; top: 50%;
+    transform: translateY(-50%);
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--text-3);
+    background: var(--bg);
+    z-index: 1;
+    line-height: 1;
+  }
+  .flow-num {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--teal);
+    margin-bottom: var(--s2);
+  }
+  .flow-title { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+  .flow-desc  { font-size: 12px; color: var(--text-2); line-height: 1.6; }
+
+  /* ── Ilustrasi probabilitas token ── */
+  .prob-box {
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: var(--r3);
+    padding: var(--s5);
+    margin: var(--s5) 0;
+  }
+  .prob-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text-3);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: var(--s3);
+  }
+  .prob-sentence {
+    font-family: var(--serif);
+    font-size: 16px;
+    color: var(--text);
+    margin-bottom: var(--s4);
+    line-height: 1.7;
+  }
+  .prob-sentence .blank {
+    display: inline-block;
+    min-width: 64px;
+    border-bottom: 2px solid var(--amber);
+    color: var(--amber);
+    text-align: center;
+    font-style: italic;
+  }
+  .prob-row {
+    display: grid;
+    grid-template-columns: 90px 1fr 48px;
+    gap: var(--s3);
+    align-items: center;
+    margin-bottom: var(--s2);
+    font-size: 13px;
+  }
+  .prob-word { font-family: var(--mono); color: var(--text); font-size: 12px; }
+  .prob-track { height: 10px; background: var(--bg-3); border-radius: 5px; overflow: hidden; }
+  .prob-fill  { height: 100%; border-radius: 5px; background: var(--blue); }
+  .prob-fill.top { background: var(--teal); }
+  .prob-val { font-family: var(--mono); font-size: 12px; color: var(--text-2); text-align: right; }
+  .prob-note { font-size: 12px; color: var(--text-3); margin-top: var(--s3); line-height: 1.7; }
+
+  /* ── Prompt / output demo ── */
+  .prompt-box {
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: var(--r2);
+    margin: var(--s4) 0;
+    overflow: hidden;
+  }
+  .prompt-head {
+    display: flex; justify-content: space-between; align-items: center; gap: var(--s3);
+    padding: var(--s3) var(--s4);
+    background: var(--bg-3);
+    border-bottom: 1px solid var(--border);
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-3);
+    letter-spacing: 1px;
+  }
+  .prompt-head .tag-mini { color: var(--teal); }
+  .prompt-body {
+    padding: var(--s4) var(--s5);
+    font-size: 13px;
+    color: var(--text-2);
+    line-height: 1.8;
+    white-space: pre-wrap;
+  }
+  .prompt-body strong { color: var(--text); }
+  .prompt-check {
+    padding: var(--s3) var(--s5);
+    border-top: 1px solid var(--border);
+    background: var(--amber-dim);
+    font-size: 12px;
+    color: var(--text-2);
+    line-height: 1.7;
+  }
+  .prompt-check strong { color: var(--amber); }
+
+  /* ── Prompt lemah vs kuat ── */
+  .vs-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--s4);
+    margin: var(--s4) 0;
+  }
+  .vs-card {
+    border-radius: var(--r2);
+    padding: var(--s4) var(--s5);
+    font-size: 13px;
+    line-height: 1.8;
+    color: var(--text-2);
+  }
+  .vs-card.bad  { background: rgba(240,96,96,0.07); border: 1px solid rgba(240,96,96,0.2); }
+  .vs-card.good { background: var(--teal-glow);     border: 1px solid rgba(0,201,177,0.25); }
+  .vs-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: var(--s2);
+  }
+  .vs-card.bad  .vs-label { color: var(--red); }
+  .vs-card.good .vs-label { color: var(--teal); }
+
+  /* ── Risk cards ── */
+  .risk-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: var(--s4);
+    margin: var(--s5) 0;
+  }
+  .risk-card {
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-top: 3px solid var(--red);
+    border-radius: var(--r3);
+    padding: var(--s5);
+  }
+  .risk-card h4 { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: var(--s2); }
+  .risk-card p  { font-size: 13px !important; color: var(--text-2); line-height: 1.7 !important; margin-bottom: var(--s3) !important; }
+  .risk-mit {
+    font-size: 12px;
+    color: var(--text-2);
+    line-height: 1.7;
+    padding-top: var(--s3);
+    border-top: 1px solid var(--border);
+  }
+  .risk-mit strong { color: var(--teal); font-family: var(--mono); font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; display: block; margin-bottom: 2px; }
+
+  /* ── Cek pemahaman (details) ── */
+  .qa-list { display: flex; flex-direction: column; gap: var(--s3); margin: var(--s4) 0; }
+  .qa-item {
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: var(--r2);
+  }
+  .qa-item summary {
+    cursor: pointer;
+    list-style: none;
+    padding: var(--s4) var(--s5);
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text);
+    line-height: 1.6;
+    display: flex; gap: var(--s3); align-items: flex-start;
+  }
+  .qa-item summary::-webkit-details-marker { display: none; }
+  .qa-item summary::before {
+    content: '+';
+    font-family: var(--mono);
+    color: var(--amber);
+    flex-shrink: 0;
+    width: 14px;
+  }
+  .qa-item[open] summary::before { content: '−'; }
+  .qa-item summary:hover { color: var(--teal); }
+  .qa-item summary:focus-visible { outline: 2px solid var(--teal); outline-offset: -2px; border-radius: var(--r2); }
+  .qa-answer {
+    padding: 0 var(--s5) var(--s4) calc(var(--s5) + 14px + var(--s3));
+    font-size: 13px;
+    color: var(--text-2);
+    line-height: 1.8;
+  }
+  .qa-answer strong { color: var(--text); }
+
+  @media (max-width: 900px) {
+    .vs-grid { grid-template-columns: 1fr; }
+    .flow-step:not(:last-child)::after { display: none; }
+    .prob-row { grid-template-columns: 70px 1fr 44px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ══ NAV ══ -->
+<nav class="nav">
+  <div class="nav-logo">AI<span>·</span>UKWMS</div>
+  <ul class="nav-links">
+    <li><a href="../index.html">← Beranda</a></li>
+    <li><a href="#tujuan" class="active">Tujuan</a></li>
+    <li><a href="#konsep">Konsep</a></li>
+    <li><a href="#cara-kerja">Cara Kerja</a></li>
+    <li><a href="#aplikasi">Aplikasi</a></li>
+    <li><a href="#risiko">Risiko</a></li>
+    <li><a href="#demo">Demo</a></li>
+    <li><a href="#tugas">Tugas</a></li>
+  </ul>
+</nav>
+
+<!-- ══ HERO ══ -->
+<header class="sesi-hero">
+  <div style="max-width:1100px;margin:0 auto;">
+    <div class="sesi-breadcrumb">
+      <a href="../index.html">Kecerdasan Buatan · Teknik Industri</a>
+      <span>›</span>
+      <span>Pertemuan 8</span>
+    </div>
+    <div class="sesi-num" style="color:var(--blue);">PERTEMUAN 08 · TEORI</div>
+    <h1 class="sesi-title">LLM &<br><em style="color:var(--teal);">Generative AI</em></h1>
+    <p style="font-size:15px;color:var(--text-2);max-width:720px;line-height:1.8;">Bagaimana ChatGPT, Claude, dan Gemini bekerja, apa yang bisa dan tidak bisa mereka lakukan, serta bagaimana memakainya untuk otomasi laporan, rangkuman SOP, dan analisis data berbasis teks di lingkungan industri.</p>
+    <div class="sesi-meta-row">
+      <span class="badge badge-blue">S1 Teknik Industri</span>
+      <span class="badge badge-blue">Teori</span>
+      <span class="badge badge-amber">Blok 2 · Pembuka</span>
+      <span class="badge" style="color:var(--teal);border-color:rgba(0,201,177,0.3);background:var(--teal-dim);">100 menit</span>
+    </div>
+  </div>
+</header>
+
+<!-- ══ CONTENT LAYOUT ══ -->
+<div class="content-layout">
+  <main class="content-main">
+
+    <!-- TUJUAN -->
+    <div class="content-block" id="tujuan">
+      <h2>Tujuan Pembelajaran</h2>
+      <p>Blok 1 membahas ML yang belajar dari data <em>angka</em>: demand, sensor, label cacat. Sesi ini beralih ke AI yang bekerja dengan <em>bahasa</em>: laporan, SOP, email, keluhan, catatan teknisi. Setelah sesi ini, mahasiswa diharapkan mampu:</p>
+      <ol>
+        <li>Menjelaskan apa itu LLM dan Generative AI, serta membedakannya dari model prediktif yang dibahas di P-02 s/d P-06</li>
+        <li>Menjelaskan alur kerja LLM secara konseptual (token, konteks, prediksi token berikutnya) dan konsekuensinya, yaitu halusinasi dan jawaban yang tidak selalu sama</li>
+        <li>Mengidentifikasi minimal empat aplikasi LLM untuk proses industri: otomasi laporan, rangkuman SOP, analisis teks, dan ekstraksi data dari dokumen</li>
+        <li>Menentukan kapan masalah cocok untuk LLM, kapan untuk ML klasik, dan kapan cukup dengan rumus atau spreadsheet</li>
+        <li>Menilai risiko penggunaan LLM (halusinasi, kerahasiaan data) dan merancang kontrol sederhana</li>
+      </ol>
+
+      <div class="callout tip" style="margin-top:var(--s5);">
+        <span class="callout-icon">💡</span>
+        <div class="callout-body">
+          <p><strong>Perspektif Teknik Industri:</strong> Anda tidak akan melatih LLM. Yang dinilai adalah keputusan Anda: tugas mana yang layak diserahkan ke LLM, data apa yang boleh masuk, dan kontrol apa yang memastikan hasilnya aman dipakai.</p>
+        </div>
+      </div>
+
+      <div class="callout warn">
+        <span class="callout-icon">🧪</span>
+        <div class="callout-body">
+          <p><strong>Siapkan untuk bagian demo:</strong> akun salah satu layanan LLM (ChatGPT, Claude, atau Gemini; versi gratis umumnya cukup). Gunakan <strong>data fiktif</strong> saja. Jangan memasukkan data perusahaan atau data pribadi nyata ke layanan publik.</p>
+        </div>
+      </div>
+
+      <h3 style="margin-top:var(--s6);">Alur Sesi (100 menit)</h3>
+      <div class="timeline" style="margin-top:var(--s4);">
+        <div class="tl-item">
+          <div class="tl-year">0–15 menit</div>
+          <div class="tl-event">Pembuka: Apa yang Sudah Pernah Anda Minta ke AI?</div>
+          <div class="tl-desc">Diskusi singkat pengalaman memakai chatbot, lalu peta perbedaan ML prediktif dan Generative AI.</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-year">15–45 menit</div>
+          <div class="tl-event">Konsep & Cara Kerja LLM</div>
+          <div class="tl-desc">Token, transformer secara konseptual, tahap pelatihan, context window, temperature, dan halusinasi.</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-year">45–70 menit</div>
+          <div class="tl-event">Aplikasi Industri & Pemilihan Pendekatan</div>
+          <div class="tl-desc">Laporan, SOP, analisis teks, ekstraksi dokumen; kapan LLM, kapan ML klasik, kapan rumus.</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-year">70–90 menit</div>
+          <div class="tl-event">Demo & Latihan Verifikasi</div>
+          <div class="tl-desc">Tiga demo dengan data fiktif. Tugas Anda adalah menemukan kesalahan di jawaban AI.</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-year">90–100 menit</div>
+          <div class="tl-event">Cek Pemahaman & Penugasan</div>
+          <div class="tl-desc">Pertanyaan refleksi dan pengantar tugas P-08.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 1. KONSEP -->
+    <div class="content-block" id="konsep">
+      <h2>1. Apa Itu LLM dan Generative AI?</h2>
+      <p><strong style="color:var(--text)">Generative AI</strong> adalah AI yang menghasilkan konten baru (teks, gambar, kode, audio) berdasarkan pola yang dipelajari dari data dalam jumlah besar. <strong style="color:var(--text)">Large Language Model (LLM)</strong> adalah jenis Generative AI yang berfokus pada bahasa. Inilah mesin di balik ChatGPT, Claude, Gemini, dan Copilot.</p>
+
+      <div class="stat-row">
+        <div class="stat-item">
+          <div class="stat-num" style="color:var(--blue);font-size:20px;padding:6px 0;">Token</div>
+          <div class="stat-desc">Potongan teks (kata atau bagian kata) yang menjadi unit proses model</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num" style="color:var(--teal);font-size:20px;padding:6px 0;">Konteks</div>
+          <div class="stat-desc">Batas jumlah teks yang bisa "dilihat" model dalam satu percakapan</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num" style="color:var(--amber);font-size:20px;padding:6px 0;">Temperature</div>
+          <div class="stat-desc">Pengatur seberapa bervariasi jawaban yang dihasilkan</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num" style="color:var(--purple);font-size:20px;padding:6px 0;">RAG</div>
+          <div class="stat-desc">Teknik menghubungkan LLM dengan dokumen milik perusahaan</div>
+        </div>
+      </div>
+
+      <h3 style="margin-top:var(--s6);">ML Prediktif (P-02 s/d P-06) vs LLM</h3>
+      <div class="table-wrap">
+        <table class="industry-table">
+          <thead>
+            <tr><th>Aspek</th><th>ML prediktif (Blok 1)</th><th>LLM / Generative AI</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="sector-name">Data utama</td>
+              <td>Tabel angka terstruktur berlabel (sensor, penjualan, hasil QC)</td>
+              <td>Teks bebas, dokumen, tabel yang ditempel, kadang gambar</td>
+            </tr>
+            <tr>
+              <td class="sector-name">Keluaran</td>
+              <td>Satu angka atau kelas (demand, rusak/normal)</td>
+              <td>Teks baru: ringkasan, draf laporan, jawaban, kode</td>
+            </tr>
+            <tr>
+              <td class="sector-name">Cara dipakai</td>
+              <td>Dilatih khusus untuk satu masalah dengan data perusahaan</td>
+              <td>Model umum yang sudah dilatih; diarahkan lewat instruksi (prompt)</td>
+            </tr>
+            <tr>
+              <td class="sector-name">Cara dievaluasi</td>
+              <td>Metrik jelas: MAPE, RMSE, precision, recall</td>
+              <td>Lebih sulit diukur; sering butuh penilaian manusia dan uji contoh</td>
+            </tr>
+            <tr>
+              <td class="sector-name">Jenis kesalahan</td>
+              <td>Error numerik yang bisa dikuantifikasi</td>
+              <td>Jawaban fasih yang terdengar benar tetapi salah (halusinasi)</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 style="margin-top:var(--s6);">Tiga Tahap Pelatihan LLM</h3>
+      <div class="concept-grid">
+        <div class="concept-card">
+          <div class="concept-card-label" style="color:var(--blue);">Tahap 1</div>
+          <div class="concept-card-title">Pre-training</div>
+          <div class="concept-card-body">Model membaca teks dalam skala sangat besar dan belajar menebak token berikutnya. Dari sinilah model "menguasai" tata bahasa, fakta umum, dan gaya penulisan, tanpa label buatan manusia.</div>
+        </div>
+        <div class="concept-card">
+          <div class="concept-card-label" style="color:var(--teal);">Tahap 2</div>
+          <div class="concept-card-title">Instruction tuning</div>
+          <div class="concept-card-body">Model dilatih ulang dengan contoh pasangan instruksi dan jawaban yang baik, sehingga berperilaku sebagai asisten yang mengikuti perintah, bukan sekadar melanjutkan teks.</div>
+        </div>
+        <div class="concept-card">
+          <div class="concept-card-label" style="color:var(--amber);">Tahap 3</div>
+          <div class="concept-card-title">Alignment (umpan balik manusia)</div>
+          <div class="concept-card-body">Penilaian manusia dipakai untuk mengarahkan model agar jawabannya berguna, sopan, dan menolak permintaan berbahaya.</div>
+        </div>
+        <div class="concept-card">
+          <div class="concept-card-label" style="color:var(--purple);">Opsional</div>
+          <div class="concept-card-title">Fine-tuning / RAG</div>
+          <div class="concept-card-body">Perusahaan dapat menyesuaikan model dengan data sendiri (fine-tuning) atau, lebih umum dan murah, menyambungkannya ke dokumen internal lewat RAG.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. CARA KERJA -->
+    <div class="content-block" id="cara-kerja">
+      <h2>2. Cara Kerja LLM Secara Konseptual</h2>
+      <p>Anda tidak perlu memahami matematikanya. Yang penting adalah satu gagasan: LLM adalah mesin yang sangat pandai menebak <em>potongan teks berikutnya</em> yang paling masuk akal, lalu mengulanginya sampai jawaban selesai.</p>
+
+      <div class="flow-steps">
+        <div class="flow-step">
+          <div class="flow-num">01</div>
+          <div class="flow-title">Tokenisasi</div>
+          <div class="flow-desc">Prompt dipecah menjadi token. Bahasa Indonesia biasanya memakai lebih banyak token per kata daripada bahasa Inggris.</div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">02</div>
+          <div class="flow-title">Embedding</div>
+          <div class="flow-desc">Setiap token diubah menjadi deretan angka yang menangkap maknanya.</div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">03</div>
+          <div class="flow-title">Attention</div>
+          <div class="flow-desc">Model menimbang hubungan antar token dalam konteks, misalnya "dia" merujuk ke mesin yang mana.</div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">04</div>
+          <div class="flow-title">Probabilitas</div>
+          <div class="flow-desc">Model menghitung peluang untuk setiap kemungkinan token berikutnya.</div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">05</div>
+          <div class="flow-title">Pilih & ulangi</div>
+          <div class="flow-desc">Satu token dipilih, ditambahkan ke teks, lalu proses diulang hingga selesai.</div>
+        </div>
+      </div>
+
+      <div class="prob-box">
+        <div class="prob-label">Ilustrasi: menebak token berikutnya</div>
+        <div class="prob-sentence">"Mesin press di lini 2 berhenti karena suhu oli terlalu <span class="blank">…</span>"</div>
+        <div class="prob-row">
+          <span class="prob-word">tinggi</span>
+          <div class="prob-track"><div class="prob-fill top" style="width:72%;"></div></div>
+          <span class="prob-val">72%</span>
+        </div>
+        <div class="prob-row">
+          <span class="prob-word">rendah</span>
+          <div class="prob-track"><div class="prob-fill" style="width:11%;"></div></div>
+          <span class="prob-val">11%</span>
+        </div>
+        <div class="prob-row">
+          <span class="prob-word">panas</span>
+          <div class="prob-track"><div class="prob-fill" style="width:9%;"></div></div>
+          <span class="prob-val">9%</span>
+        </div>
+        <div class="prob-row">
+          <span class="prob-word">lainnya</span>
+          <div class="prob-track"><div class="prob-fill" style="width:8%;"></div></div>
+          <span class="prob-val">8%</span>
+        </div>
+        <div class="prob-note">Angka di atas hanya ilustrasi. <strong style="color:var(--text)">Temperature rendah</strong> membuat model hampir selalu memilih opsi teratas (hasil lebih konsisten). <strong style="color:var(--text)">Temperature tinggi</strong> memberi peluang pada opsi lain (hasil lebih bervariasi dan kreatif).</div>
+      </div>
+
+      <h3>Konsekuensi Praktis bagi Pengguna Industri</h3>
+      <div class="concept-grid">
+        <div class="concept-card">
+          <div class="concept-card-label" style="color:var(--red);">Halusinasi</div>
+          <div class="concept-card-title">Fasih belum tentu benar</div>
+          <div class="concept-card-body">Model mengejar teks yang <em>masuk akal</em>, bukan teks yang <em>terverifikasi</em>. Ia bisa menyebut angka, standar, atau nama pasal yang terdengar meyakinkan tetapi keliru.</div>
+        </div>
+        <div class="concept-card">
+          <div class="concept-card-label" style="color:var(--amber);">Tidak deterministik</div>
+          <div class="concept-card-title">Pertanyaan sama, jawaban bisa beda</div>
+          <div class="concept-card-body">Karena ada unsur pemilihan acak, dua kali bertanya bisa menghasilkan dua jawaban. Ini masalah untuk proses yang menuntut hasil identik dan dapat diaudit.</div>
+        </div>
+        <div class="concept-card">
+          <div class="concept-card-label" style="color:var(--blue);">Context window</div>
+          <div class="concept-card-title">Ingatan terbatas</div>
+          <div class="concept-card-body">Model hanya "melihat" teks di dalam konteks saat ini. Dokumen yang sangat panjang bisa terpotong, dan model tidak otomatis mengingat percakapan lama.</div>
+        </div>
+        <div class="concept-card">
+          <div class="concept-card-label" style="color:var(--teal);">Batas pengetahuan</div>
+          <div class="concept-card-title">Tidak tahu data internal Anda</div>
+          <div class="concept-card-body">Model tidak mengenal SOP, harga, atau kondisi mesin di pabrik Anda kecuali Anda memberikannya (lewat prompt atau RAG). Pengetahuannya juga berhenti pada tanggal tertentu.</div>
+        </div>
+      </div>
+
+      <div class="callout info">
+        <span class="callout-icon">🧠</span>
+        <div class="callout-body">
+          <p><strong>Analogi untuk Teknik Industri:</strong> bayangkan LLM sebagai staf administrasi yang sangat cepat dan fasih menulis, tetapi tidak pernah masuk ke gudang Anda dan tidak mau mengaku "tidak tahu". Hasilnya bagus untuk draf, berbahaya bila dianggap data final.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. LANSKAP -->
+    <div class="content-block" id="lanskap">
+      <h2>3. Lanskap Model dan Layanan</h2>
+      <p>Hal yang perlu dibedakan adalah <strong style="color:var(--text)">model</strong> (otaknya), <strong style="color:var(--text)">aplikasi</strong> (antarmuka obrolan atau add-in Office), dan <strong style="color:var(--text)">API</strong> (cara perusahaan menyambungkan model ke sistemnya sendiri).</p>
+
+      <div class="table-wrap">
+        <table class="industry-table">
+          <thead>
+            <tr><th>Layanan / model</th><th>Pengembang</th><th>Karakter umum</th><th>Catatan untuk industri</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="sector-name">ChatGPT</td>
+              <td>OpenAI</td>
+              <td>Asisten serbaguna; mendukung unggah file dan analisis data</td>
+              <td>Populer di kalangan pekerja kantor; periksa kebijakan data per paket</td>
+            </tr>
+            <tr>
+              <td class="sector-name">Claude</td>
+              <td>Anthropic</td>
+              <td>Sering dipakai untuk dokumen panjang, penulisan, dan analisis teks</td>
+              <td>Cocok untuk rangkuman SOP dan laporan; tersedia lewat aplikasi dan API</td>
+            </tr>
+            <tr>
+              <td class="sector-name">Gemini</td>
+              <td>Google</td>
+              <td>Terintegrasi dengan ekosistem Google (Workspace, Colab)</td>
+              <td>Relevan bila perusahaan sudah memakai Google Workspace</td>
+            </tr>
+            <tr>
+              <td class="sector-name">Microsoft Copilot</td>
+              <td>Microsoft</td>
+              <td>Tertanam di Word, Excel, Outlook, dan Teams</td>
+              <td>Dekat dengan alur kerja kantor; data tetap dalam ekosistem Microsoft</td>
+            </tr>
+            <tr>
+              <td class="sector-name">Model open-weight (mis. Llama)</td>
+              <td>Meta dan komunitas</td>
+              <td>Bobot model dapat diunduh dan dijalankan sendiri</td>
+              <td>Dipilih bila data tidak boleh keluar dari server perusahaan; butuh tim dan perangkat keras</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout warn">
+        <span class="callout-icon">⚠️</span>
+        <div class="callout-body">
+          <p><strong>Fitur, harga, dan kebijakan berubah cepat.</strong> Jangan menghafal perbandingan di atas. Yang perlu dikuasai adalah pertanyaan yang harus diajukan sebelum memilih: apakah input dipakai untuk melatih model? Di mana data disimpan? Berapa biaya per pengguna atau per token? Apakah ada paket perusahaan dengan kontrol akses?</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4. APLIKASI -->
+    <div class="content-block" id="aplikasi">
+      <h2>4. Aplikasi LLM di Lingkungan Industri</h2>
+      <p>Pola yang sama berulang di banyak pabrik dan perusahaan jasa: ada tumpukan teks yang harus dibaca, dirangkum, dikategorikan, atau ditulis ulang oleh manusia. Di situlah LLM paling terasa manfaatnya.</p>
+
+      <div class="table-wrap">
+        <table class="industry-table">
+          <thead>
+            <tr><th>Aplikasi</th><th>Contoh di industri</th><th>Input → Output</th><th>Kontrol wajib</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="sector-name">Otomasi laporan operasional</td>
+              <td>Laporan shift, laporan mingguan produksi, laporan downtime</td>
+              <td>Data tabel + template → draf laporan naratif</td>
+              <td>Periksa ulang semua angka dan perhitungan sebelum dikirim</td>
+            </tr>
+            <tr>
+              <td class="sector-name">Rangkuman & tanya-jawab SOP</td>
+              <td>Operator baru bertanya prosedur higienitas, K3, atau changeover</td>
+              <td>Dokumen SOP + pertanyaan → jawaban dengan rujukan bagian SOP</td>
+              <td>Wajib menampilkan sumber; SOP resmi tetap menjadi acuan</td>
+            </tr>
+            <tr>
+              <td class="sector-name">Analisis teks bebas</td>
+              <td>Keluhan pelanggan, catatan teknisi di work order, laporan near-miss K3</td>
+              <td>Ratusan catatan → kategori, tema berulang, tingkat urgensi</td>
+              <td>Uji pada sampel yang sudah dilabeli manusia</td>
+            </tr>
+            <tr>
+              <td class="sector-name">Ekstraksi dari dokumen</td>
+              <td>Purchase order, invoice, surat jalan, sertifikat pemasok</td>
+              <td>Dokumen (PDF atau foto) → data terstruktur (tabel, JSON)</td>
+              <td>Validasi otomatis (total harus cocok) dan sampel acak diperiksa manusia</td>
+            </tr>
+            <tr>
+              <td class="sector-name">Asisten analisis data</td>
+              <td>Menyusun rumus Excel, query, atau skrip analisis; menjelaskan grafik</td>
+              <td>Pertanyaan bahasa sehari-hari → rumus atau kode yang dijalankan di alat</td>
+              <td>Hitungan dijalankan oleh alat, bukan "dihitung" oleh model</td>
+            </tr>
+            <tr>
+              <td class="sector-name">Dokumentasi & pelatihan</td>
+              <td>Draf SOP baru, materi onboarding, notulen rapat</td>
+              <td>Catatan kasar → dokumen rapi dan konsisten</td>
+              <td>Ditinjau dan disetujui pemilik proses sebelum berlaku</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 style="margin-top:var(--s6);">Studi Mini: Chatbot SOP dengan RAG</h3>
+      <p>Sebuah pabrik makanan memiliki sekitar 400 halaman SOP higienitas dan K3. Operator baru sering bertanya hal yang sama kepada supervisor. Menempelkan semua SOP ke prompt tidak praktis dan sering melampaui batas konteks. Solusi umumnya adalah <strong style="color:var(--text)">Retrieval-Augmented Generation (RAG)</strong>:</p>
+
+      <div class="flow-steps">
+        <div class="flow-step">
+          <div class="flow-num">A</div>
+          <div class="flow-title">Pertanyaan</div>
+          <div class="flow-desc">"Berapa lama sanitasi wajib dilakukan saat changeover lini 2?"</div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">B</div>
+          <div class="flow-title">Cari bagian relevan</div>
+          <div class="flow-desc">Sistem mencari beberapa paragraf SOP yang paling terkait pertanyaan.</div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">C</div>
+          <div class="flow-title">Kirim ke LLM</div>
+          <div class="flow-desc">Pertanyaan dan paragraf terpilih dikirim bersama, dengan perintah menjawab hanya dari teks tersebut.</div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">D</div>
+          <div class="flow-title">Jawaban + sumber</div>
+          <div class="flow-desc">Jawaban disertai rujukan dokumen dan halaman agar mudah diverifikasi.</div>
+        </div>
+      </div>
+
+      <div class="callout tip">
+        <span class="callout-icon">✅</span>
+        <div class="callout-body">
+          <p><strong>Mengapa RAG diminati:</strong> jawaban berpijak pada dokumen perusahaan, dapat ditelusuri ke sumbernya, dan isi SOP bisa diperbarui tanpa melatih ulang model. RAG mengurangi halusinasi, tetapi tidak menghilangkannya.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5. LLM vs ML KLASIK -->
+    <div class="content-block" id="pilihan">
+      <h2>5. LLM, ML Klasik, atau Rumus Biasa?</h2>
+      <p>Ini inti keputusan yang akan sering muncul di UAS. Euforia LLM membuat banyak orang menggunakannya untuk semua hal, padahal alat yang tepat bergantung pada jenis masalah dan data. Gunakan tabel ini bersama framework di P-07.</p>
+
+      <div class="table-wrap">
+        <table class="industry-table">
+          <thead>
+            <tr><th>Tugas</th><th>Pendekatan yang tepat</th><th>Alasan</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="sector-name">Memprediksi demand 40 SKU bulan depan</td>
+              <td>ML time series (P-06)</td>
+              <td>Data numerik historis, hasil dapat diukur dengan MAPE. LLM bukan alat peramalan.</td>
+            </tr>
+            <tr>
+              <td class="sector-name">Mendeteksi cacat permukaan di lini berkecepatan tinggi</td>
+              <td>Computer vision khusus (P-10)</td>
+              <td>Butuh kecepatan, konsistensi, dan akurasi yang terukur per kelas cacat.</td>
+            </tr>
+            <tr>
+              <td class="sector-name">Merangkum 50 laporan shift menjadi satu ringkasan mingguan</td>
+              <td>LLM</td>
+              <td>Teks bebas dalam jumlah banyak; hasil berupa narasi yang ditinjau manusia.</td>
+            </tr>
+            <tr>
+              <td class="sector-name">Mengelompokkan 2.000 keluhan pelanggan ke dalam tema</td>
+              <td>LLM (atau klasterisasi teks)</td>
+              <td>Teks tidak terstruktur; LLM memahami konteks tanpa perlu data berlabel.</td>
+            </tr>
+            <tr>
+              <td class="sector-name">Menghitung safety stock atau EOQ</td>
+              <td>Rumus di spreadsheet atau kode</td>
+              <td>Butuh hasil tepat dan dapat diaudit. LLM boleh membantu menulis rumusnya, tetapi hitungan dijalankan alat.</td>
+            </tr>
+            <tr>
+              <td class="sector-name">Menjawab pertanyaan operator tentang SOP</td>
+              <td>LLM + RAG</td>
+              <td>Jawaban harus berpijak pada dokumen internal dan menyertakan sumber.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout info">
+        <span class="callout-icon">📌</span>
+        <div class="callout-body">
+          <p><strong>Aturan praktis:</strong> bila hasil harus <em>tepat dan dapat diaudit</em> (angka, perhitungan, kepatuhan), gunakan metode deterministik atau ML terukur. Bila hasil berupa <em>bahasa</em> yang akan ditinjau manusia (draf, ringkasan, kategori), LLM biasanya efisien. Bila keduanya, pakai LLM sebagai pengantarmuka dan biarkan alat yang menghitung.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 6. RISIKO -->
+    <div class="content-block" id="risiko">
+      <h2>6. Keterbatasan, Risiko, dan Kontrol</h2>
+      <p>Risiko LLM jarang berupa kegagalan yang jelas. Lebih sering berupa jawaban yang tampak benar sehingga lolos tanpa dicek. Karena itu setiap penerapan perlu kontrol yang direncanakan sejak awal.</p>
+
+      <div class="risk-grid">
+        <div class="risk-card">
+          <h4>Halusinasi</h4>
+          <p>Angka, standar, atau referensi yang dikarang namun terdengar meyakinkan. Contoh: draf laporan yang memuat nilai downtime yang tidak ada di data.</p>
+          <div class="risk-mit"><strong>Kontrol</strong>Verifikasi angka terhadap sumber; minta model mengutip bagian data yang dipakai; tinjauan manusia sebelum dikirim.</div>
+        </div>
+        <div class="risk-card">
+          <h4>Kebocoran data rahasia</h4>
+          <p>Resep produk, harga pemasok, data pelanggan, atau gambar teknik yang ditempel ke layanan publik dapat melanggar kebijakan perusahaan dan hukum.</p>
+          <div class="risk-mit"><strong>Kontrol</strong>Kebijakan penggunaan yang jelas; anonimisasi data; pakai paket perusahaan atau model yang dijalankan sendiri bila perlu.</div>
+        </div>
+        <div class="risk-card">
+          <h4>Hasil tidak konsisten</h4>
+          <p>Dua operator bertanya hal yang sama dan mendapat jawaban berbeda, sehingga menyulitkan standarisasi dan audit.</p>
+          <div class="risk-mit"><strong>Kontrol</strong>Prompt baku (template) yang disepakati; temperature rendah bila tersedia; simpan log prompt dan hasil untuk proses penting.</div>
+        </div>
+        <div class="risk-card">
+          <h4>Bias dan kualitas bahasa lokal</h4>
+          <p>Model bisa kurang akurat pada istilah teknis lokal, singkatan internal, atau dialek, dan dapat mewarisi bias dari data pelatihannya.</p>
+          <div class="risk-mit"><strong>Kontrol</strong>Uji dengan contoh nyata dari perusahaan Anda; sediakan glosarium istilah dalam prompt atau RAG.</div>
+        </div>
+        <div class="risk-card">
+          <h4>Biaya dan ketergantungan vendor</h4>
+          <p>Biaya berbasis penggunaan dapat membengkak, dan alur kerja yang terkunci pada satu penyedia sulit dipindahkan.</p>
+          <div class="risk-mit"><strong>Kontrol</strong>Hitung total biaya kepemilikan (bukan hanya lisensi); rancang agar penyedia model bisa diganti; mulai dari pilot kecil.</div>
+        </div>
+        <div class="risk-card">
+          <h4>Over-reliance</h4>
+          <p>Pengguna makin jarang memeriksa hasil karena sering benar, lalu kesalahan langka lolos ke keputusan penting seperti K3 atau kepatuhan.</p>
+          <div class="risk-mit"><strong>Kontrol</strong>Human-in-the-loop untuk keputusan berisiko; audit sampel berkala; jelaskan batas kemampuan sistem kepada pengguna.</div>
+        </div>
+      </div>
+
+      <div class="callout warn">
+        <span class="callout-icon">⚖️</span>
+        <div class="callout-body">
+          <p><strong>Akan dibahas lebih dalam di P-12:</strong> etika, bias algoritma, UU Pelindungan Data Pribadi, dan kepatuhan industri. Di sesi ini cukup pegang prinsipnya: <em>jangan memasukkan apa yang tidak boleh keluar</em>, dan <em>jangan mengirim apa yang belum diverifikasi</em>.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 7. DEMO -->
+    <div class="content-block" id="demo">
+      <h2>7. Demo dan Latihan Verifikasi</h2>
+      <p>Tiga demo berikut memakai <strong style="color:var(--text)">data fiktif</strong>. Penyusunan prompt yang baik akan didalami di P-09. Di sini fokusnya adalah mengamati hasil dan <em>memeriksanya</em>.</p>
+
+      <h3>Demo A: Merangkum SOP</h3>
+      <div class="prompt-box">
+        <div class="prompt-head"><span>PROMPT</span><span class="tag-mini">Rangkuman dokumen</span></div>
+        <div class="prompt-body">Kamu adalah asisten untuk tim produksi pabrik makanan. Berikut kutipan SOP sanitasi (di bawah). Buat ringkasan maksimal 6 poin untuk operator baru. Tiap poin harus diawali kata kerja perintah dan menyebut nomor bagian SOP asalnya. Jika ada informasi yang tidak ada di teks, tulis "tidak tercantum di SOP", jangan menebak.
+
+[tempel kutipan SOP fiktif di sini]</div>
+        <div class="prompt-check"><strong>Yang diperiksa:</strong> apakah setiap poin benar-benar ada di teks? Apakah ada angka (durasi, suhu, konsentrasi) yang tidak muncul di SOP asli?</div>
+      </div>
+
+      <h3>Demo B: Draf Laporan Shift dari Data</h3>
+      <div class="prompt-box">
+        <div class="prompt-head"><span>PROMPT</span><span class="tag-mini">Otomasi laporan</span></div>
+        <div class="prompt-body">Buat laporan shift 2 (maksimal 150 kata) untuk manajer produksi, dalam bahasa Indonesia formal. Gunakan hanya data berikut:
+
+Lini 3 · Shift 2
+- Target output: 5.000 unit
+- Output aktual: 4.820 unit
+- Reject: 96 unit (gelembung 61, goresan 24, lainnya 11)
+- Downtime: 47 menit (sensor conveyor 32 menit, ganti dies 15 menit)
+
+Sertakan: pencapaian terhadap target (%), defect rate (%), penyebab downtime utama, dan satu saran tindak lanjut.</div>
+        <div class="prompt-check"><strong>Cek sendiri sebelum percaya:</strong> pencapaian = 4.820 ÷ 5.000 ≈ <strong>96,4%</strong>; defect rate = 96 ÷ 4.820 ≈ <strong>2,0%</strong>; total downtime = 32 + 15 = <strong>47 menit</strong>. Apakah angka di laporan AI sama? Apakah "saran tindak lanjut" didukung data, atau hanya tebakan umum?</div>
+      </div>
+
+      <h3>Demo C: Mengelompokkan Keluhan Pelanggan</h3>
+      <div class="prompt-box">
+        <div class="prompt-head"><span>PROMPT</span><span class="tag-mini">Analisis teks</span></div>
+        <div class="prompt-body">Berikut 20 keluhan pelanggan (di bawah). Kelompokkan ke dalam kategori: Kualitas Produk, Pengiriman, Kemasan, Layanan, Lainnya. Hasilkan tabel dengan kolom: nomor keluhan, kategori, tingkat urgensi (Tinggi/Sedang/Rendah), dan alasan satu kalimat. Setelah tabel, tuliskan tiga tema keluhan yang paling sering muncul beserta jumlahnya.
+
+[tempel 20 keluhan fiktif di sini]</div>
+        <div class="prompt-check"><strong>Yang diperiksa:</strong> hitung sendiri jumlah per tema. Apakah total sama dengan 20? Pilih 5 keluhan secara acak dan nilai apakah kategorinya masuk akal menurut Anda.</div>
+      </div>
+
+      <h3 style="margin-top:var(--s6);">Prompt Lemah vs Prompt yang Lebih Baik (pratinjau P-09)</h3>
+      <div class="vs-grid">
+        <div class="vs-card bad">
+          <div class="vs-label">Lemah</div>
+          "Buatkan laporan produksi."
+          <br><span style="font-size:12px;color:var(--text-3);">Tanpa data, tanpa format, tanpa pembaca sasaran. Model akan mengisi kekosongan dengan tebakan.</span>
+        </div>
+        <div class="vs-card good">
+          <div class="vs-label">Lebih baik</div>
+          "Buat laporan shift untuk manajer produksi, maks. 150 kata, hanya dari data di bawah. Jika data tidak ada, tulis 'tidak tersedia'."
+          <br><span style="font-size:12px;color:var(--text-3);">Ada peran, pembaca, batas panjang, sumber data, dan aturan saat data kurang.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 8. CEK PEMAHAMAN + TUGAS -->
+    <div class="content-block" id="tugas">
+      <h2>8. Cek Pemahaman dan Tugas</h2>
+      <p>Coba jawab dulu dalam hati atau di kertas, baru buka jawabannya.</p>
+
+      <div class="qa-list">
+        <details class="qa-item">
+          <summary>Mengapa LLM bisa memberi jawaban yang fasih tetapi salah?</summary>
+          <div class="qa-answer">Karena LLM dilatih untuk menghasilkan token berikutnya yang <strong>paling masuk akal secara statistik</strong>, bukan untuk memverifikasi fakta. Bila informasi yang dibutuhkan tidak ada di data pelatihan atau di prompt, model tetap menghasilkan jawaban yang terdengar wajar (halusinasi). Kontrol: sediakan sumber data, minta rujukan, dan verifikasi.</div>
+        </details>
+        <details class="qa-item">
+          <summary>Seorang supervisor ingin meramal demand 40 SKU dengan cara menempelkan data penjualan ke ChatGPT. Apa komentar Anda?</summary>
+          <div class="qa-answer">Ini kurang tepat sebagai solusi utama. Peramalan demand adalah masalah <strong>time series numerik</strong> yang lebih baik dikerjakan dengan model terukur (Prophet, ARIMA, atau ML) dan dievaluasi dengan MAPE. LLM bisa membantu <em>menulis kode</em> peramalan atau <em>menjelaskan hasilnya</em>, tetapi sebaiknya tidak menjadi mesin prediksinya.</div>
+        </details>
+        <details class="qa-item">
+          <summary>Apa fungsi RAG pada chatbot SOP, dan apa yang tidak bisa dijamin oleh RAG?</summary>
+          <div class="qa-answer">RAG mengambil bagian dokumen yang relevan lalu memberikannya kepada LLM sebagai bahan jawaban, sehingga jawaban <strong>berpijak pada SOP perusahaan</strong> dan dapat ditelusuri ke sumbernya. RAG <strong>tidak menjamin</strong> jawaban 100% benar: pencarian bisa salah mengambil bagian, dan model masih bisa menafsirkan keliru. Verifikasi dan SOP resmi tetap diperlukan.</div>
+        </details>
+        <details class="qa-item">
+          <summary>Sebutkan tiga jenis data yang sebaiknya tidak ditempel ke layanan LLM publik tanpa kebijakan perusahaan.</summary>
+          <div class="qa-answer">Contoh: <strong>data pribadi</strong> pelanggan atau karyawan, <strong>informasi rahasia dagang</strong> (formula, resep, gambar teknik, harga pemasok), dan <strong>data kontrak atau keuangan</strong> yang tidak untuk publik. Alternatifnya adalah anonimisasi, paket perusahaan dengan jaminan data, atau model yang dijalankan di server sendiri.</div>
+        </details>
+      </div>
+
+      <div class="task-box" id="penugasan">
+        <div class="task-box-title">📋 Tugas P-08: Peta Peluang LLM di Satu Proses Industri</div>
+        <p style="font-size:13px;color:var(--text-2);margin-bottom:var(--s4);">Dikerjakan individu. Kumpulkan melalui Google Classroom atau LMS UKWMS sebelum pertemuan P-09.</p>
+        <ol style="font-size:14px;color:var(--text);line-height:2.1;">
+          <li><strong>Pilih satu proses</strong> di industri pilihan Anda (pabrik, gudang, distribusi, jasa) dan identifikasi <strong>tiga tugas berbasis teks</strong> yang dilakukan orang di dalamnya.</li>
+          <li><strong>Uji satu tugas</strong> dengan salah satu layanan LLM memakai <strong>data fiktif</strong>. Lampirkan prompt dan hasilnya (tangkapan layar atau salin teks).</li>
+          <li><strong>Temukan minimal satu kesalahan atau hal yang perlu dikoreksi</strong> pada hasil AI (angka, istilah, asumsi, atau informasi yang dikarang). Jelaskan bagaimana Anda menemukannya.</li>
+          <li><strong>Tulis ringkasan satu halaman:</strong> manfaat yang diharapkan, risiko utama, dan kontrol yang Anda usulkan (siapa yang memeriksa, apa yang diperiksa, data apa yang tidak boleh dimasukkan).</li>
+          <li><strong>Beri keputusan akhir:</strong> apakah tugas ini layak dialihkan ke LLM, layak sebagian dengan tinjauan manusia, atau lebih baik dengan metode lain? Jelaskan alasannya.</li>
+        </ol>
+      </div>
+
+      <div class="reading-box">
+        <div class="reading-box-title">📖 Pratinjau Pertemuan Berikutnya</div>
+        <div class="reading-item">
+          <span class="reading-icon">🔧</span>
+          <div class="reading-label">
+            <strong>P-09: Prompt Engineering untuk Konteks Industri</strong>
+            Teknik menyusun prompt untuk laporan operasional, analisis data tabel, penyusunan SOP, dan ringkasan rapat. Bawa hasil dan kesalahan AI dari tugas P-08 sebagai bahan latihan.
+          </div>
+        </div>
+        <div class="reading-item">
+          <span class="reading-icon">📚</span>
+          <div class="reading-label">
+            <strong>Bacaan: Gentsch — AI for Business &amp; Davenport — The AI Advantage</strong>
+            Perspektif manajerial tentang adopsi AI di perusahaan. Dipakai sebagai kerangka untuk menilai manfaat dan risiko pada tugas P-08 dan proposal UAS.
+          </div>
+        </div>
+        <div class="reading-item">
+          <span class="reading-icon">🌐</span>
+          <div class="reading-label">
+            <strong>Dokumentasi resmi layanan LLM yang Anda pakai</strong>
+            Baca bagian kebijakan data dan privasi layanan yang dipilih. Pertanyaan ini akan sering muncul saat Anda menyusun rekomendasi kepada manajemen.
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ── ASIDE ── -->
+  <aside class="content-aside">
+
+    <!-- TOC -->
+    <div class="toc">
+      <div class="toc-title">Isi Halaman</div>
+      <ul class="toc-list">
+        <li><a href="#tujuan" class="active">Tujuan Pembelajaran</a></li>
+        <li><a href="#konsep">1. Apa Itu LLM?</a></li>
+        <li><a href="#cara-kerja">2. Cara Kerja LLM</a></li>
+        <li><a href="#lanskap">3. Lanskap Model</a></li>
+        <li><a href="#aplikasi">4. Aplikasi Industri</a></li>
+        <li><a href="#pilihan">5. LLM, ML, atau Rumus?</a></li>
+        <li><a href="#risiko">6. Risiko & Kontrol</a></li>
+        <li><a href="#demo">7. Demo & Latihan</a></li>
+        <li><a href="#tugas">8. Cek Pemahaman & Tugas</a></li>
+      </ul>
+    </div>
+
+    <!-- Sesi nav -->
+    <div class="sesi-nav-aside">
+      <div class="sesi-nav-title">Navigasi Sesi</div>
+      <a href="sesi-07.html" class="sesi-nav-btn">
+        <span>←</span>
+        <span>P-07: Review & Persiapan UTS</span>
+      </a>
+      <a href="sesi-09.html" class="sesi-nav-btn">
+        <span>→</span>
+        <span>P-09: Prompt Engineering</span>
+      </a>
+      <a href="../index.html" class="sesi-nav-btn">
+        <span>🏠</span>
+        <span>Kembali ke Beranda TI</span>
+      </a>
+    </div>
+
+    <!-- Info box -->
+    <div style="background:var(--bg-2);border:1px solid var(--border);border-radius:var(--r3);padding:var(--s5);margin-top:var(--s4);">
+      <div style="font-family:var(--mono);font-size:10px;color:var(--text-3);letter-spacing:2px;text-transform:uppercase;margin-bottom:var(--s3);">Info Pertemuan</div>
+      <div style="display:flex;flex-direction:column;gap:var(--s3);">
+        <div>
+          <div style="font-size:11px;color:var(--text-3);">Program Studi</div>
+          <div style="font-size:13px;color:var(--text);">S1 Teknik Industri</div>
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--text-3);">Tipe</div>
+          <div style="font-size:13px;color:var(--text);">Teori + demo</div>
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--text-3);">Durasi</div>
+          <div style="font-size:13px;color:var(--text);">100 menit</div>
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--text-3);">CPMK</div>
+          <div style="font-size:13px;color:var(--text);">C1, C4, C5</div>
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--text-3);">Tools</div>
+          <div style="font-size:13px;color:var(--text);">ChatGPT / Claude / Gemini (akun gratis)</div>
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--text-3);">Referensi Utama</div>
+          <div style="font-size:13px;color:var(--text);">Gentsch — AI for Business · Davenport — The AI Advantage</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+</div>
+
+<!-- ══ FOOTER ══ -->
+<footer class="footer">
+  <div>AI·UKWMS <span style="color:var(--text-3);">· P-08 LLM & Generative AI · S1 Teknik Industri</span></div>
+  <div><a href="../index.html" style="color:var(--text-3);">← Kembali ke Beranda</a></div>
+</footer>
+
+<script>
+  /* ── TOC active tracking ── */
+  const headings = document.querySelectorAll('.content-main [id]');
+  const tocLinks = document.querySelectorAll('.toc-list a');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(a => {
+          a.classList.remove('active');
+          if (a.getAttribute('href') === '#' + entry.target.id) a.classList.add('active');
+        });
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px' });
+  headings.forEach(h => observer.observe(h));
+
+  /* ── Nav scroll active ── */
+  const navLinks = document.querySelectorAll('.nav-links a[href^="#"]');
+  window.addEventListener('scroll', () => {
+    let current = '';
+    headings.forEach(h => { if (window.scrollY >= h.offsetTop - 100) current = h.id; });
+    navLinks.forEach(a => {
+      a.classList.remove('active');
+      if (a.getAttribute('href') === '#' + current) a.classList.add('active');
+    });
+  });
+</script>
+</body>
+</html>
