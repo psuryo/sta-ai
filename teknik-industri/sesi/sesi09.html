@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>P-09: Prompt Engineering untuk Konteks Industri — Teknik Industri UKWMS</title>
+<link rel="stylesheet" href="../../css/style.css">
+<style>
+  /* ── Table wrapper ── */
+  .table-wrap { overflow-x: auto; margin: var(--s4) 0; }
+  .table-wrap .industry-table { margin: 0; min-width: 560px; }
+
+  /* ── Flow steps (komponen prompt) ── */
+  .flow-steps {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: var(--s3);
+    margin: var(--s5) 0;
+  }
+  .flow-step {
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: var(--r2);
+    padding: var(--s4);
+    position: relative;
+  }
+  .flow-num { font-family: var(--mono); font-size: 11px; color: var(--teal); margin-bottom: var(--s2); }
+  .flow-title { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+  .flow-desc { font-size: 12px; color: var(--text-2); line-height: 1.6; }
+
+  /* ── Prompt demo box ── */
+  .prompt-box {
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: var(--r2);
+    margin: var(--s4) 0;
+    overflow: hidden;
+  }
+  .prompt-head {
+    display: flex; justify-content: space-between; align-items: center; gap: var(--s3);
+    padding: var(--s3) var(--s4);
+    background: var(--bg-3);
+    border-bottom: 1px solid var(--border);
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-3);
+    letter-spacing: 1px;
+  }
+  .prompt-head .tag-mini { color: var(--teal); }
+  .prompt-body {
+    padding: var(--s4) var(--s5);
+    font-size: 13px;
+    color: var(--text-2);
+    line-height: 1.8;
+    white-space: pre-wrap;
+  }
+  .prompt-body strong { color: var(--text); }
+  .prompt-check {
+    padding: var(--s3) var(--s5);
+    border-top: 1px solid var(--border);
+    background: var(--amber-dim);
+    font-size: 12px;
+    color: var(--text-2);
+    line-height: 1.7;
+  }
+  .prompt-check strong { color: var(--amber); }
+  .prompt-v2 {
+    padding: var(--s3) var(--s5);
+    border-top: 1px solid var(--border);
+    background: var(--teal-glow);
+    font-size: 12px;
+    color: var(--text-2);
+    line-height: 1.7;
+  }
+  .prompt-v2 strong { color: var(--teal); }
+
+  /* ── Lemah vs baik ── */
+  .vs-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s4); margin: var(--s4) 0; }
+  .vs-card { border-radius: var(--r2); padding: var(--s4) var(--s5); font-size: 13px; line-height: 1.8; color: var(--text-2); }
+  .vs-card.bad  { background: rgba(240,96,96,0.07); border: 1px solid rgba(240,96,96,0.2); }
+  .vs-card.good { background: var(--teal-glow); border: 1px solid rgba(0,201,177,0.25); }
+  .vs-label { font-family: var(--mono); font-size: 10px; letter-spacing: 2px; text-transform: uppercase; margin-bottom: var(--s2); }
+  .vs-card.bad  .vs-label { color: var(--red); }
+  .vs-card.good .vs-label { color: var(--teal); }
+
+  /* ── Data tabel contoh ── */
+  .data-table { width: 100%; border-collapse: collapse; font-size: 12px; margin: var(--s3) 0; }
+  .data-table th {
+    background: var(--bg-3); border: 1px solid var(--border);
+    padding: var(--s2) var(--s4); text-align: left;
+    font-family: var(--mono); font-size: 11px; color: var(--text-3);
+  }
+  .data-table td { border: 1px solid var(--border); padding: var(--s2) var(--s4); color: var(--text-2); font-family: var(--mono); }
+
+  /* ── Rubrik ── */
+  .rubric-table { width: 100%; border-collapse: collapse; font-size: 13px; margin: var(--s4) 0; }
+  .rubric-table th {
+    background: var(--bg-2); border: 1px solid var(--border);
+    padding: var(--s3) var(--s4); text-align: left;
+    font-family: var(--mono); font-size: 11px; color: var(--text-3); letter-spacing: 1px;
+  }
+  .rubric-table td { border: 1px solid var(--border); padding: var(--s3) var(--s4); color: var(--text-2); vertical-align: top; line-height: 1.6; }
+  .rubric-table tr:hover td { background: var(--bg-2); }
+
+  @media (max-width: 900px) { .vs-grid { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+
+<!-- ══ NAV ══ -->
+<nav class="nav">
+  <div class="nav-logo">AI<span>·</span>UKWMS</div>
+  <ul class="nav-links">
+    <li><a href="../index.html">← Beranda</a></li>
+    <li><a href="#tujuan" class="active">Tujuan</a></li>
+    <li><a href="#anatomi">Anatomi</a></li>
+    <li><a href="#teknik">Teknik</a></li>
+    <li><a href="#praktik">Praktik</a></li>
+    <li><a href="#iterasi">Iterasi</a></li>
+    <li><a href="#tugas">Tugas</a></li>
+  </ul>
+</nav>
+
+<!-- ══ HERO ══ -->
+<header class="sesi-hero">
+  <div style="max-width:1100px;margin:0 auto;">
+    <div class="sesi-breadcrumb">
+      <a href="../index.html">Kecerdasan Buatan · Teknik Industri</a>
+      <span>›</span>
+      <span>Pertemuan 9</span>
+    </div>
+    <div class="sesi-num" style="color:var(--teal);">PERTEMUAN 09 · PRAKTIK</div>
+    <h1 class="sesi-title">Prompt Engineering<br><em style="color:var(--teal);">untuk Konteks Industri</em></h1>
+    <p style="font-size:15px;color:var(--text-2);max-width:720px;line-height:1.8;">Menyusun instruksi yang menghasilkan keluaran dapat diandalkan: laporan operasional, analisis data tabel, draf SOP, dan ringkasan rapat. Tanpa coding, hanya teks yang tepat dan kebiasaan memeriksa hasil.</p>
+    <div class="sesi-meta-row">
+      <span class="badge badge-blue">S1 Teknik Industri</span>
+      <span class="badge badge-teal">Praktik</span>
+      <span class="badge badge-amber">Blok 2</span>
+      <span class="badge" style="color:var(--teal);border-color:rgba(0,201,177,0.3);background:var(--teal-dim);">100 menit</span>
+    </div>
+  </div>
+</header>
+
+<!-- ══ CONTENT LAYOUT ══ -->
+<div class="content-layout">
+  <main class="content-main">
+
+    <!-- TUJUAN -->
+    <div class="content-block" id="tujuan">
+      <h2>Tujuan Pembelajaran</h2>
+      <p>Di P-08 Anda melihat bahwa LLM fasih tetapi bisa keliru. Sesi ini mengajarkan cara <em>mengurangi</em> kekeliruan itu lewat cara bertanya. Setelah sesi ini, mahasiswa diharapkan mampu:</p>
+      <ol>
+        <li>Menyusun prompt dengan lima komponen: peran, tugas, konteks, format, dan batasan</li>
+        <li>Menerapkan teknik inti: pemisah data, contoh (few-shot), keluaran terstruktur, dan aturan "jika tidak tahu"</li>
+        <li>Membuat prompt untuk empat kebutuhan industri: laporan operasional, analisis tabel, draf SOP, dan ringkasan rapat</li>
+        <li>Memeriksa keluaran AI terhadap data sumber dan memperbaiki prompt secara iteratif (v1 → v2)</li>
+        <li>Menyusun template prompt yang dapat dipakai ulang oleh tim</li>
+      </ol>
+
+      <div class="callout tip" style="margin-top:var(--s5);">
+        <span class="callout-icon">💡</span>
+        <div class="callout-body">
+          <p><strong>Prompt yang baik itu spesifikasi kerja.</strong> Seperti menugaskan staf baru, makin jelas pembaca sasaran, bahan, format, dan batasannya, makin kecil peluang hasilnya meleset. Latar Teknik Industri Anda (standar kerja, formulir baku, SOP) adalah keunggulan di sini.</p>
+        </div>
+      </div>
+
+      <div class="callout warn">
+        <span class="callout-icon">🧪</span>
+        <div class="callout-body">
+          <p><strong>Siapkan:</strong> akun salah satu layanan LLM dan <strong>hasil tugas P-08</strong> Anda. Semua data dalam latihan adalah fiktif. Tetap jangan memasukkan data rahasia atau data pribadi nyata ke layanan publik.</p>
+        </div>
+      </div>
+
+      <h3 style="margin-top:var(--s6);">Alur Sesi (100 menit)</h3>
+      <div class="timeline" style="margin-top:var(--s4);">
+        <div class="tl-item">
+          <div class="tl-year">0–15 menit</div>
+          <div class="tl-event">Bahas Temuan Tugas P-08</div>
+          <div class="tl-desc">Beberapa mahasiswa menunjukkan kesalahan AI yang mereka temukan; kita lihat apakah prompt yang lebih baik bisa mencegahnya.</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-year">15–35 menit</div>
+          <div class="tl-event">Anatomi Prompt dan Teknik Inti</div>
+          <div class="tl-desc">Lima komponen prompt dan enam teknik yang dipakai berulang.</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-year">35–80 menit</div>
+          <div class="tl-event">Empat Praktik Berpandu</div>
+          <div class="tl-desc">Laporan, analisis tabel, draf SOP, ringkasan rapat. Tiap praktik: jalankan v1, periksa, perbaiki menjadi v2.</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-year">80–95 menit</div>
+          <div class="tl-event">Iterasi dan Perpustakaan Prompt</div>
+          <div class="tl-desc">Membaca gejala masalah dan memperbaikinya; menyusun template untuk tim.</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-year">95–100 menit</div>
+          <div class="tl-event">Penugasan</div>
+          <div class="tl-desc">Pengantar tugas "Prompt Playbook".</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 1. ANATOMI -->
+    <div class="content-block" id="anatomi">
+      <h2>1. Anatomi Prompt yang Baik</h2>
+      <p>Hampir semua prompt industri yang andal memuat lima komponen berikut. Tidak semuanya perlu panjang, tetapi tidak boleh ada yang hilang tanpa disengaja.</p>
+
+      <div class="flow-steps">
+        <div class="flow-step">
+          <div class="flow-num">1 · PERAN</div>
+          <div class="flow-title">Siapa model ini?</div>
+          <div class="flow-desc">"Kamu adalah analis produksi di pabrik makanan." Menentukan sudut pandang dan istilah.</div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">2 · TUGAS</div>
+          <div class="flow-title">Apa yang dikerjakan?</div>
+          <div class="flow-desc">Satu kata kerja yang jelas: rangkum, kelompokkan, susun, hitung, bandingkan.</div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">3 · KONTEKS</div>
+          <div class="flow-title">Untuk siapa dan bahan apa?</div>
+          <div class="flow-desc">Pembaca sasaran, tujuan, dan data sumber yang boleh dipakai.</div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">4 · FORMAT</div>
+          <div class="flow-title">Bentuk keluarannya?</div>
+          <div class="flow-desc">Tabel, poin, jumlah kata, bahasa, urutan bagian, atau format terstruktur.</div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">5 · BATASAN</div>
+          <div class="flow-title">Apa yang tidak boleh?</div>
+          <div class="flow-desc">"Hanya dari data ini", "jangan menebak", "tandai yang perlu konfirmasi".</div>
+        </div>
+      </div>
+
+      <h3>Template Dasar</h3>
+      <div class="prompt-box">
+        <div class="prompt-head"><span>TEMPLATE</span><span class="tag-mini">Dipakai ulang</span></div>
+        <div class="prompt-body"><strong>Peran:</strong> Kamu adalah [peran] di [jenis perusahaan].
+<strong>Tugas:</strong> [kata kerja + hasil yang diinginkan].
+<strong>Konteks:</strong> Pembaca laporan ini adalah [siapa] yang akan memakainya untuk [tujuan].
+<strong>Data:</strong>
+"""
+[tempel data di antara tanda kutip tiga]
+"""
+<strong>Format:</strong> [bentuk, panjang maksimal, bahasa, urutan bagian].
+<strong>Batasan:</strong> Gunakan hanya data di atas. Jika informasi tidak ada, tulis "tidak tersedia". Jangan membuat angka sendiri.</div>
+      </div>
+
+      <h3 style="margin-top:var(--s6);">Lemah vs Lebih Baik</h3>
+      <div class="vs-grid">
+        <div class="vs-card bad">
+          <div class="vs-label">Lemah</div>
+          "Analisis data downtime ini dan beri rekomendasi."
+          <br><span style="font-size:12px;color:var(--text-3);">Tidak jelas metode analisis, pembaca, format, atau batas sumber informasi. Hasilnya rekomendasi umum yang bisa berlaku untuk pabrik mana pun.</span>
+        </div>
+        <div class="vs-card good">
+          <div class="vs-label">Lebih baik</div>
+          "Kamu analis produksi. Dari data downtime di bawah, buat analisis Pareto (urut dari terbesar, persentase dan persentase kumulatif) dalam tabel, lalu tulis maksimal 3 kalimat untuk manajer tentang penyebab yang perlu diprioritaskan. Hanya pakai data yang diberikan."
+          <br><span style="font-size:12px;color:var(--text-3);">Ada peran, metode, format, pembaca, dan batas sumber.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. TEKNIK -->
+    <div class="content-block" id="teknik">
+      <h2>2. Enam Teknik Inti</h2>
+
+      <div class="concept-grid">
+        <div class="concept-card">
+          <div class="concept-card-label" style="color:var(--blue);">Teknik 1</div>
+          <div class="concept-card-title">Pisahkan instruksi dari data</div>
+          <div class="concept-card-body">Apit data dengan tanda kutip tiga atau penanda seperti &lt;data&gt; ... &lt;/data&gt;. Ini mencegah isi dokumen tertukar dengan perintah, dan memudahkan Anda mengganti data tanpa menyentuh instruksi.</div>
+        </div>
+        <div class="concept-card">
+          <div class="concept-card-label" style="color:var(--teal);">Teknik 2</div>
+          <div class="concept-card-title">Beri contoh (few-shot)</div>
+          <div class="concept-card-body">Tunjukkan 1–3 contoh pasangan masukan dan keluaran yang Anda inginkan. Untuk kategorisasi keluhan atau format laporan baku, contoh sering lebih efektif daripada penjelasan panjang.</div>
+        </div>
+        <div class="concept-card">
+          <div class="concept-card-label" style="color:var(--amber);">Teknik 3</div>
+          <div class="concept-card-title">Minta langkah dan perhitungan ditampilkan</div>
+          <div class="concept-card-body">"Tunjukkan rumus dan angka yang dipakai." Perhitungan yang terlihat lebih mudah Anda audit. Untuk hitungan penting, tetap jalankan di spreadsheet atau kode.</div>
+        </div>
+        <div class="concept-card">
+          <div class="concept-card-label" style="color:var(--purple);">Teknik 4</div>
+          <div class="concept-card-title">Tentukan format keluaran</div>
+          <div class="concept-card-body">Tabel dengan kolom tertentu, daftar bernomor, atau format terstruktur seperti CSV/JSON bila hasilnya akan diproses lanjut di Excel atau sistem lain.</div>
+        </div>
+        <div class="concept-card">
+          <div class="concept-card-label" style="color:var(--red);">Teknik 5</div>
+          <div class="concept-card-title">Aturan "jika tidak tahu"</div>
+          <div class="concept-card-body">Beri jalan keluar eksplisit: "Jika tidak ada di data, tulis 'tidak tersedia'." Tanpa aturan ini, model cenderung mengisi kekosongan dengan tebakan yang terdengar wajar.</div>
+        </div>
+        <div class="concept-card">
+          <div class="concept-card-label" style="color:var(--teal);">Teknik 6</div>
+          <div class="concept-card-title">Iterasi dan minta tanya balik</div>
+          <div class="concept-card-body">Prompt pertama jarang sempurna. Perbaiki bertahap, atau tulis: "Sebelum menjawab, ajukan pertanyaan bila ada informasi yang kurang."</div>
+        </div>
+      </div>
+
+      <div class="callout info">
+        <span class="callout-icon">📌</span>
+        <div class="callout-body">
+          <p><strong>Prompt bagus tidak menggantikan verifikasi.</strong> Teknik di atas menurunkan peluang kesalahan, tidak menghapusnya. Untuk setiap praktik di bawah, ada langkah "periksa" yang wajib dikerjakan.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. PRAKTIK -->
+    <div class="content-block" id="praktik">
+      <h2>3. Empat Praktik Berpandu</h2>
+      <p>Untuk tiap praktik: (1) jalankan versi pertama, (2) periksa dengan daftar cek, (3) perbaiki prompt menjadi v2, lalu bandingkan. Catat hasilnya untuk tugas.</p>
+
+      <!-- Praktik 1 -->
+      <h3 style="margin-top:var(--s5);">Praktik 1: Laporan Operasional Mingguan</h3>
+      <div class="prompt-box">
+        <div class="prompt-head"><span>PROMPT v1</span><span class="tag-mini">Laporan operasional</span></div>
+        <div class="prompt-body">Kamu adalah analis produksi di pabrik minuman kemasan. Susun laporan mingguan untuk manajer produksi dalam bahasa Indonesia formal, maksimal 180 kata, dengan bagian: Ringkasan, Pencapaian, Masalah Utama, Tindak Lanjut.
+
+Data:
+"""
+Minggu 42 · Lini 1
+Target: 24.000 botol | Aktual: 22.800 botol
+Reject: 342 botol (kebocoran tutup 205, label miring 98, lainnya 39)
+Downtime: 210 menit (mesin filler 120, pergantian rasa 60, listrik padam 30)
+Catatan supervisor: "Tutup dari pemasok B bermasalah sejak Selasa."
+"""
+
+Batasan: gunakan hanya data di atas. Jika data tidak tersedia, tulis "tidak tersedia". Jangan membuat angka sendiri.</div>
+        <div class="prompt-check"><strong>Periksa:</strong> pencapaian = 22.800 ÷ 24.000 = <strong>95%</strong>; defect rate = 342 ÷ 22.800 = <strong>1,5%</strong>; total downtime = 120 + 60 + 30 = <strong>210 menit</strong>. Apakah laporan menyebut pemasok B? Apakah "tindak lanjut" berasal dari catatan supervisor atau karangan model?</div>
+        <div class="prompt-v2"><strong>Perbaiki → v2:</strong> tambahkan "Tunjukkan perhitungan pencapaian dan defect rate di akhir laporan dalam satu baris" dan "Tindak lanjut hanya boleh berupa usulan yang mengacu pada catatan atau data di atas; beri label (usulan) pada setiap butir".</div>
+      </div>
+
+      <!-- Praktik 2 -->
+      <h3 style="margin-top:var(--s6);">Praktik 2: Analisis Data Tabel (Pareto Downtime)</h3>
+      <p style="font-size:14px;">Gunakan data fiktif berikut (menit downtime satu minggu, semua lini):</p>
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead><tr><th>Penyebab</th><th>Downtime (menit)</th></tr></thead>
+          <tbody>
+            <tr><td>Sensor conveyor</td><td>120</td></tr>
+            <tr><td>Ganti dies</td><td>75</td></tr>
+            <tr><td>Setting mesin</td><td>60</td></tr>
+            <tr><td>Kekurangan material</td><td>45</td></tr>
+            <tr><td>Lainnya</td><td>30</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="prompt-box">
+        <div class="prompt-head"><span>PROMPT v1</span><span class="tag-mini">Analisis tabel</span></div>
+        <div class="prompt-body">Kamu adalah analis produksi. Dari tabel downtime di bawah, buat analisis Pareto: urutkan dari terbesar, hitung persentase dan persentase kumulatif tiap penyebab, sajikan dalam tabel dengan kolom Penyebab | Menit | % | % Kumulatif. Setelah tabel, tulis maksimal 3 kalimat untuk manajer tentang penyebab yang perlu diprioritaskan. Tunjukkan total yang Anda pakai.
+
+Data:
+"""
+[tempel tabel di atas]
+"""</div>
+        <div class="prompt-check"><strong>Periksa:</strong> total = <strong>330 menit</strong>. Persentase: 36,4% / 22,7% / 18,2% / 13,6% / 9,1%. Kumulatif: 36,4% → 59,1% → 77,3% → 90,9% → 100%. Apakah tabel AI sama? Apakah kesimpulannya konsisten dengan angka (dua penyebab teratas menyumbang sekitar 59%)?</div>
+        <div class="prompt-v2"><strong>Perbaiki → v2:</strong> tambahkan "Sebutkan penyebab mana yang masuk kelompok sekitar 80% kumulatif, dan jelaskan satu data tambahan yang perlu dikumpulkan sebelum memutuskan tindakan perbaikan."</div>
+      </div>
+
+      <!-- Praktik 3 -->
+      <h3 style="margin-top:var(--s6);">Praktik 3: Menyusun Draf SOP dari Catatan Kasar</h3>
+      <div class="prompt-box">
+        <div class="prompt-head"><span>PROMPT v1</span><span class="tag-mini">Draf SOP</span></div>
+        <div class="prompt-body">Kamu adalah staf quality assurance di pabrik makanan. Ubah catatan kasar di bawah menjadi draf SOP "Pergantian Produk (Changeover) Lini 2" dengan struktur: Tujuan, Ruang Lingkup, Penanggung Jawab, Alat dan APD, Langkah Kerja (bernomor), Pencatatan.
+
+Aturan penting:
+- Jangan menambah langkah, angka, atau bahan kimia yang tidak ada di catatan.
+- Setiap hal yang kurang jelas ditulis "[PERLU DIKONFIRMASI]" di tempatnya, bukan diisi sendiri.
+- Di akhir, daftarkan semua butir [PERLU DIKONFIRMASI].
+
+Catatan kasar:
+"""
+matikan lini, kosongkan hopper, bersihkan pakai sabun lalu bilas, cek visual sisa produk, operator isi form, supervisor tanda tangan, baru boleh jalan lagi. Pakai sarung tangan dan masker.
+"""</div>
+        <div class="prompt-check"><strong>Periksa:</strong> apakah ada durasi, konsentrasi sabun, atau suhu yang muncul padahal tidak ada di catatan? Apakah butir seperti "lockout/tagout", "jenis sabun", dan "kriteria lolos cek visual" ditandai [PERLU DIKONFIRMASI] dan bukan diisi model? <strong>Draf SOP tetap harus ditinjau dan disahkan pemilik proses dan K3 sebelum berlaku.</strong></div>
+        <div class="prompt-v2"><strong>Perbaiki → v2:</strong> tambahkan "Pisahkan langkah yang ada di catatan dan yang merupakan saran Anda; beri label (saran) pada yang kedua" lalu bandingkan mana yang lebih mudah ditinjau.</div>
+      </div>
+
+      <!-- Praktik 4 -->
+      <h3 style="margin-top:var(--s6);">Praktik 4: Ringkasan Rapat dan Daftar Tindak Lanjut</h3>
+      <div class="prompt-box">
+        <div class="prompt-head"><span>PROMPT v1</span><span class="tag-mini">Ringkasan rapat</span></div>
+        <div class="prompt-body">Kamu adalah notulis rapat produksi. Dari transkrip fiktif di bawah, buat: (1) ringkasan maksimal 4 kalimat, (2) daftar keputusan, (3) tabel tindak lanjut dengan kolom Tindakan | PIC | Tenggat. Jika PIC atau tenggat tidak disebutkan, tulis "belum ditentukan". Jangan menebak nama atau tanggal.
+
+Transkrip:
+"""
+Budi: Sensor conveyor lini 3 sering error. Saya usul ganti sensornya minggu depan.
+Sari: Setuju, tapi stok sensor tinggal satu. Perlu pesan.
+Budi: Oke, Sari tolong cek harga ke pemasok.
+Dewi: Soal tutup botol, kita tunda keputusan ganti pemasok sampai ada hasil uji.
+"""</div>
+        <div class="prompt-check"><strong>Periksa:</strong> apakah ada tanggal atau nama PIC yang dikarang? Tindakan "cek harga ke pemasok" seharusnya ber-PIC Sari dan tenggat "belum ditentukan". Apakah keputusan "tunda ganti pemasok" tercatat sebagai <em>keputusan menunda</em>, bukan keputusan mengganti?</div>
+        <div class="prompt-v2"><strong>Perbaiki → v2:</strong> tambahkan "Pisahkan 'keputusan' (sudah disepakati) dari 'usulan' (belum disepakati)" dan lihat apakah model membedakannya dengan benar.</div>
+      </div>
+    </div>
+
+    <!-- 4. ITERASI -->
+    <div class="content-block" id="iterasi">
+      <h2>4. Membaca Gejala dan Memperbaiki Prompt</h2>
+      <p>Saat hasilnya meleset, jangan langsung menyalahkan model. Cari gejalanya, lalu ubah satu hal pada prompt.</p>
+
+      <div class="table-wrap">
+        <table class="industry-table">
+          <thead>
+            <tr><th>Gejala</th><th>Kemungkinan penyebab</th><th>Perbaikan</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="sector-name">Angka muncul yang tidak ada di data</td>
+              <td>Tidak ada batasan sumber atau aturan "jika tidak tahu"</td>
+              <td>Tambahkan "hanya dari data di atas" dan "tulis 'tidak tersedia' jika tidak ada"</td>
+            </tr>
+            <tr>
+              <td class="sector-name">Hasil terlalu umum, bisa berlaku untuk perusahaan mana pun</td>
+              <td>Konteks kurang (jenis industri, lini, pembaca)</td>
+              <td>Tambahkan konteks spesifik dan pembaca sasaran</td>
+            </tr>
+            <tr>
+              <td class="sector-name">Format berbeda setiap kali dijalankan</td>
+              <td>Format tidak ditentukan</td>
+              <td>Tetapkan struktur eksplisit atau beri satu contoh keluaran</td>
+            </tr>
+            <tr>
+              <td class="sector-name">Hasil terlalu panjang</td>
+              <td>Tidak ada batas panjang</td>
+              <td>Tentukan jumlah kata, kalimat, atau butir maksimal</td>
+            </tr>
+            <tr>
+              <td class="sector-name">Perhitungan salah</td>
+              <td>Model menghitung "dalam kepala"</td>
+              <td>Minta rumus dan langkahnya, atau jalankan hitungan di spreadsheet/kode</td>
+            </tr>
+            <tr>
+              <td class="sector-name">Kategori tidak konsisten</td>
+              <td>Definisi kategori kabur</td>
+              <td>Definisikan tiap kategori dan beri 2–3 contoh (few-shot)</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 style="margin-top:var(--s6);">Perpustakaan Prompt untuk Tim</h3>
+      <p>Prompt yang sudah teruji sebaiknya disimpan sebagai aset tim, bukan hanya di kepala satu orang. Setiap entri minimal memuat:</p>
+      <ul>
+        <li>Nama dan tujuan prompt, serta pemilik (siapa yang merawatnya)</li>
+        <li>Template dengan bagian yang diganti ditandai jelas, misalnya [DATA]</li>
+        <li>Contoh keluaran yang baik dan daftar cek verifikasinya</li>
+        <li>Versi dan catatan perubahan (v1, v2, ...)</li>
+        <li>Larangan: data apa yang <strong>tidak boleh</strong> dimasukkan</li>
+      </ul>
+
+      <div class="callout warn">
+        <span class="callout-icon">🔒</span>
+        <div class="callout-body">
+          <p><strong>Cek sebelum menekan Enter:</strong> adakah nama orang, nomor karyawan, harga pemasok, formula, atau gambar teknik asli di dalam prompt? Jika ya, ganti dengan data fiktif atau anonim (misalnya "Pemasok B", "Operator 1"), atau gunakan layanan yang disetujui perusahaan.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5. TUGAS -->
+    <div class="content-block" id="tugas">
+      <h2>5. Tugas: Prompt Playbook</h2>
+
+      <div class="task-box" id="penugasan">
+        <div class="task-box-title">📋 Tugas P-09: Prompt Playbook Tiga Template</div>
+        <p style="font-size:13px;color:var(--text-2);margin-bottom:var(--s4);">Dikerjakan individu. Kumpulkan melalui Google Classroom atau LMS UKWMS sebelum pertemuan P-10.</p>
+        <ol style="font-size:14px;color:var(--text);line-height:2.1;">
+          <li><strong>Pilih tiga kebutuhan</strong> dari empat praktik di atas (atau tugas berbasis teks dari proses industri pilihan Anda di P-08).</li>
+          <li><strong>Untuk tiap kebutuhan, tulis prompt v1 dan v2</strong> memakai lima komponen (peran, tugas, konteks, format, batasan), dan jalankan keduanya dengan data fiktif.</li>
+          <li><strong>Periksa hasilnya</strong> terhadap data sumber: catat jumlah angka atau klaim yang salah atau tidak berdasar di v1 dan di v2.</li>
+          <li><strong>Tulis daftar cek verifikasi</strong> (3–5 butir) untuk tiap template: apa yang harus diperiksa manusia sebelum hasil dipakai.</li>
+          <li><strong>Tutup dengan satu paragraf refleksi:</strong> teknik mana yang paling berpengaruh dan hal apa yang <em>tidak</em> bisa diperbaiki lewat prompt saja.</li>
+        </ol>
+      </div>
+
+      <h3 style="margin-top:var(--s6);">Rubrik Penilaian</h3>
+      <div class="table-wrap">
+        <table class="rubric-table">
+          <thead>
+            <tr><th>Aspek</th><th>Yang dinilai</th><th>Bobot</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong style="color:var(--text)">Kualitas prompt</strong></td>
+              <td>Lima komponen lengkap, spesifik pada konteks industri, batasan sumber jelas</td>
+              <td style="font-family:var(--mono);color:var(--blue)">30%</td>
+            </tr>
+            <tr>
+              <td><strong style="color:var(--text)">Iterasi v1 → v2</strong></td>
+              <td>Perubahan yang dilakukan masuk akal dan terbukti memperbaiki hasil</td>
+              <td style="font-family:var(--mono);color:var(--blue)">25%</td>
+            </tr>
+            <tr>
+              <td><strong style="color:var(--text)">Verifikasi</strong></td>
+              <td>Pemeriksaan terhadap data sumber teliti; kesalahan AI ditemukan dan dijelaskan</td>
+              <td style="font-family:var(--mono);color:var(--blue)">30%</td>
+            </tr>
+            <tr>
+              <td><strong style="color:var(--text)">Refleksi dan kerapian</strong></td>
+              <td>Refleksi kritis tentang batas prompt; dokumen rapi dan data aman (fiktif/anonim)</td>
+              <td style="font-family:var(--mono);color:var(--blue)">15%</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="reading-box">
+        <div class="reading-box-title">📖 Pratinjau Pertemuan Berikutnya</div>
+        <div class="reading-item">
+          <span class="reading-icon">🏭</span>
+          <div class="reading-label">
+            <strong>P-10: AI untuk Quality Control & Predictive Maintenance</strong>
+            Computer vision untuk inspeksi visual dan data sensor untuk prediksi kerusakan mesin, lengkap dengan studi kasus implementasi nyata. Kembali ke metode prediktif, kali ini untuk gambar dan sensor.
+          </div>
+        </div>
+        <div class="reading-item">
+          <span class="reading-icon">📚</span>
+          <div class="reading-label">
+            <strong>Bacaan: panduan prompting dari layanan LLM yang Anda pakai</strong>
+            Penyedia model umumnya menerbitkan panduan penulisan prompt. Bandingkan dengan lima komponen di halaman ini dan catat apa yang sama dan berbeda.
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ── ASIDE ── -->
+  <aside class="content-aside">
+
+    <div class="toc">
+      <div class="toc-title">Isi Halaman</div>
+      <ul class="toc-list">
+        <li><a href="#tujuan" class="active">Tujuan Pembelajaran</a></li>
+        <li><a href="#anatomi">1. Anatomi Prompt</a></li>
+        <li><a href="#teknik">2. Enam Teknik Inti</a></li>
+        <li><a href="#praktik">3. Empat Praktik</a></li>
+        <li><a href="#iterasi">4. Gejala & Perbaikan</a></li>
+        <li><a href="#tugas">5. Tugas Playbook</a></li>
+      </ul>
+    </div>
+
+    <div class="sesi-nav-aside">
+      <div class="sesi-nav-title">Navigasi Sesi</div>
+      <a href="sesi-08.html" class="sesi-nav-btn">
+        <span>←</span>
+        <span>P-08: LLM & Generative AI</span>
+      </a>
+      <a href="sesi-10.html" class="sesi-nav-btn">
+        <span>→</span>
+        <span>P-10: QC & Predictive Maintenance</span>
+      </a>
+      <a href="../index.html" class="sesi-nav-btn">
+        <span>🏠</span>
+        <span>Kembali ke Beranda TI</span>
+      </a>
+    </div>
+
+    <div style="background:var(--bg-2);border:1px solid var(--border);border-radius:var(--r3);padding:var(--s5);margin-top:var(--s4);">
+      <div style="font-family:var(--mono);font-size:10px;color:var(--text-3);letter-spacing:2px;text-transform:uppercase;margin-bottom:var(--s3);">Info Pertemuan</div>
+      <div style="display:flex;flex-direction:column;gap:var(--s3);">
+        <div>
+          <div style="font-size:11px;color:var(--text-3);">Program Studi</div>
+          <div style="font-size:13px;color:var(--text);">S1 Teknik Industri</div>
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--text-3);">Tipe</div>
+          <div style="font-size:13px;color:var(--text);">Praktik berpandu</div>
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--text-3);">Durasi</div>
+          <div style="font-size:13px;color:var(--text);">100 menit</div>
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--text-3);">CPMK</div>
+          <div style="font-size:13px;color:var(--text);">C3, C4, C6</div>
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--text-3);">Tools</div>
+          <div style="font-size:13px;color:var(--text);">ChatGPT / Claude / Gemini · Excel</div>
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--text-3);">Keluaran</div>
+          <div style="font-size:13px;color:var(--text);">Prompt Playbook (3 template, v1 dan v2)</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+</div>
+
+<!-- ══ FOOTER ══ -->
+<footer class="footer">
+  <div>AI·UKWMS <span style="color:var(--text-3);">· P-09 Prompt Engineering · S1 Teknik Industri</span></div>
+  <div><a href="../index.html" style="color:var(--text-3);">← Kembali ke Beranda</a></div>
+</footer>
+
+<script>
+  /* ── TOC active tracking ── */
+  const headings = document.querySelectorAll('.content-main [id]');
+  const tocLinks = document.querySelectorAll('.toc-list a');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(a => {
+          a.classList.remove('active');
+          if (a.getAttribute('href') === '#' + entry.target.id) a.classList.add('active');
+        });
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px' });
+  headings.forEach(h => observer.observe(h));
+
+  /* ── Nav scroll active ── */
+  const navLinks = document.querySelectorAll('.nav-links a[href^="#"]');
+  window.addEventListener('scroll', () => {
+    let current = '';
+    headings.forEach(h => { if (window.scrollY >= h.offsetTop - 100) current = h.id; });
+    navLinks.forEach(a => {
+      a.classList.remove('active');
+      if (a.getAttribute('href') === '#' + current) a.classList.add('active');
+    });
+  });
+</script>
+</body>
+</html>
