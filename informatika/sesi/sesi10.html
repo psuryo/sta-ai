@@ -1,0 +1,889 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>P-10: RAG Part 1 — Embedding & Vector Database — Kecerdasan Buatan UKWMS</title>
+<link rel="stylesheet" href="../../css/style.css">
+<style>
+  /* ── Cards ── */
+  .review-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:var(--s4); margin:var(--s5) 0; }
+  .review-card { background:var(--bg-2); border:1px solid var(--border); border-radius:var(--r3); padding:var(--s5); position:relative; overflow:hidden; }
+  .review-card::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; }
+  .review-card.teal::before   { background:var(--teal); }
+  .review-card.blue::before   { background:var(--blue); }
+  .review-card.amber::before  { background:var(--amber); }
+  .review-card.purple::before { background:var(--purple); }
+  .review-card.red::before    { background:var(--red); }
+  .review-card-label { font-family:var(--mono); font-size:10px; letter-spacing:2px; text-transform:uppercase; margin-bottom:var(--s3); }
+  .review-card.teal .review-card-label   { color:var(--teal); }
+  .review-card.blue .review-card-label   { color:var(--blue); }
+  .review-card.amber .review-card-label  { color:var(--amber); }
+  .review-card.purple .review-card-label { color:var(--purple); }
+  .review-card.red .review-card-label    { color:var(--red); }
+  .review-card h4 { font-size:14px; font-weight:600; color:var(--text); margin-bottom:var(--s3); }
+  .review-card ul { padding-left:var(--s5); font-size:13px; color:var(--text-2); line-height:1.9; }
+  .review-card p  { font-size:13px; color:var(--text-2); line-height:1.8; margin-bottom:0; }
+
+  /* ── Tabel ── */
+  .kisi-table { width:100%; border-collapse:collapse; font-size:13px; margin:var(--s4) 0; }
+  .kisi-table th { background:var(--bg-2); border:1px solid var(--border); padding:var(--s3) var(--s4); text-align:left; font-family:var(--mono); font-size:11px; color:var(--text-3); letter-spacing:1px; }
+  .kisi-table td { border:1px solid var(--border); padding:var(--s3) var(--s4); color:var(--text-2); vertical-align:top; line-height:1.6; }
+  .kisi-table tr:hover td { background:var(--bg-2); }
+  .table-scroll { overflow-x:auto; }
+
+  /* ── Kode & rumus ── */
+  .content-block code { font-family:var(--mono); font-size:12px; background:var(--bg-3); color:var(--teal); padding:1px 6px; border-radius:var(--r1); }
+  .code-block { background:var(--bg-2); border:1px solid var(--border); border-radius:var(--r2); margin:var(--s4) 0; overflow:hidden; }
+  .code-head { display:flex; justify-content:space-between; align-items:center; padding:var(--s2) var(--s4); border-bottom:1px solid var(--border); background:var(--bg-3); font-family:var(--mono); font-size:11px; color:var(--text-3); letter-spacing:1px; }
+  .code-block pre { margin:0; padding:var(--s4) var(--s5); overflow-x:auto; font-family:var(--mono); font-size:12.5px; line-height:1.75; color:var(--text); white-space:pre; }
+  .code-block pre .c { color:var(--text-3); }
+  .code-block pre .k { color:var(--purple); }
+  .code-block pre .s { color:var(--amber); }
+  .formula { background:var(--bg-2); border:1px solid var(--border); border-radius:var(--r2); padding:var(--s4) var(--s5); margin:var(--s4) 0; font-family:var(--mono); font-size:14px; color:var(--teal); text-align:center; overflow-x:auto; }
+  .formula-note { font-size:12px; color:var(--text-2); line-height:1.8; margin-top:var(--s3); text-align:left; font-family:var(--sans); }
+
+  /* ── Pipeline ── */
+  .pipe-title-row { font-family:var(--mono); font-size:10px; letter-spacing:2px; text-transform:uppercase; margin:var(--s5) 0 var(--s2); }
+  .pipe { display:flex; align-items:stretch; gap:var(--s2); margin:var(--s2) 0 var(--s4); flex-wrap:wrap; }
+  .pipe-step { flex:1 1 120px; background:var(--bg-2); border:1px solid var(--border); border-radius:var(--r2); padding:var(--s4); text-align:center; }
+  .pipe-step .pipe-label { font-family:var(--mono); font-size:10px; letter-spacing:1px; text-transform:uppercase; margin-bottom:var(--s2); }
+  .pipe-step .pipe-title { font-size:13px; font-weight:600; color:var(--text); margin-bottom:var(--s2); }
+  .pipe-step .pipe-sub { font-size:11px; color:var(--text-3); line-height:1.6; }
+  .pipe-step.dim { opacity:.55; border-style:dashed; }
+  .pipe-arrow { display:flex; align-items:center; color:var(--text-3); font-size:18px; }
+  @media (max-width:700px) { .pipe-arrow { display:none; } }
+
+  /* ── Widget umum ── */
+  .builder { background:var(--bg-2); border:1px solid var(--border); border-radius:var(--r3); padding:var(--s5); margin:var(--s5) 0; }
+  .ctl-row { display:flex; align-items:center; gap:var(--s4); margin-bottom:var(--s3); flex-wrap:wrap; }
+  .ctl-row label { font-family:var(--mono); font-size:12px; color:var(--text-2); width:90px; flex-shrink:0; }
+  .ctl-row input[type=range] { flex:1; min-width:140px; accent-color:var(--teal); }
+  .ctl-val { font-family:var(--mono); font-size:14px; color:var(--amber); width:56px; text-align:right; }
+  .chunk-summary { font-size:12px; color:var(--text-2); margin:var(--s3) 0 var(--s4); line-height:1.7; }
+  .chunk-card { border:1px solid var(--border); border-left:3px solid var(--teal); border-radius:var(--r2); background:var(--bg); padding:var(--s3) var(--s4); margin-bottom:var(--s2); }
+  .chunk-card:nth-child(3n+2) { border-left-color:var(--blue); }
+  .chunk-card:nth-child(3n+3) { border-left-color:var(--purple); }
+  .chunk-meta { font-family:var(--mono); font-size:10px; color:var(--text-3); letter-spacing:1px; margin-bottom:var(--s1); }
+  .chunk-text { font-size:12.5px; color:var(--text-2); line-height:1.7; word-break:break-word; }
+  .chunk-text mark { background:rgba(245,166,35,0.22); color:var(--amber); border-radius:2px; padding:0 1px; }
+  .btn-mini { font-family:var(--mono); font-size:11px; padding:4px 10px; border:1px solid var(--border-2); border-radius:var(--r1); background:var(--bg-2); color:var(--text-2); cursor:pointer; transition:border-color .2s,color .2s; }
+  .btn-mini:hover { border-color:var(--teal); color:var(--teal); }
+  .search-input { width:100%; background:var(--bg); border:1px solid var(--border-2); border-radius:var(--r2); color:var(--text); font-family:var(--sans); font-size:14px; padding:var(--s3) var(--s4); }
+  .search-input:focus { outline:none; border-color:var(--teal); }
+  .preset-row { display:flex; gap:var(--s2); flex-wrap:wrap; margin:var(--s3) 0 var(--s4); align-items:center; }
+  .preset-row span { font-size:12px; color:var(--text-3); }
+  .res-card { border:1px solid var(--border); border-radius:var(--r2); background:var(--bg); padding:var(--s3) var(--s4); margin-bottom:var(--s2); }
+  .res-top { display:flex; align-items:center; gap:var(--s3); margin-bottom:var(--s2); }
+  .res-rank { font-family:var(--mono); font-size:11px; color:var(--teal); width:22px; }
+  .res-track { flex:1; height:8px; background:var(--bg-3); border-radius:4px; overflow:hidden; }
+  .res-fill { height:100%; background:var(--teal); border-radius:4px; transition:width .25s var(--ease); }
+  .res-score { font-family:var(--mono); font-size:12px; color:var(--teal); width:48px; text-align:right; }
+  .res-text { font-size:13px; color:var(--text-2); line-height:1.7; }
+  .res-match { font-family:var(--mono); font-size:11px; color:var(--text-3); margin-top:var(--s1); }
+
+  /* ── Quiz ── */
+  .quiz-box { background:var(--bg-2); border:1px solid var(--border); border-radius:var(--r3); margin:var(--s5) 0; overflow:hidden; }
+  .quiz-header { padding:var(--s4) var(--s5); border-bottom:1px solid var(--border); display:flex; align-items:center; gap:var(--s3); }
+  .quiz-num { font-family:var(--mono); font-size:11px; background:var(--teal-dim); color:var(--teal); border:1px solid rgba(0,201,177,0.25); border-radius:var(--r1); padding:2px 8px; flex-shrink:0; }
+  .quiz-q { font-size:14px; color:var(--text); font-weight:500; }
+  .quiz-options { padding:var(--s4) var(--s5); display:flex; flex-direction:column; gap:var(--s2); }
+  .quiz-opt { display:flex; align-items:flex-start; gap:var(--s3); padding:var(--s3) var(--s4); border:1px solid var(--border); border-radius:var(--r2); font-size:13px; color:var(--text-2); cursor:pointer; transition:border-color .2s, background .2s; user-select:none; }
+  .quiz-opt:hover { border-color:var(--teal); background:var(--teal-glow); }
+  .quiz-opt.correct { border-color:var(--teal); background:var(--teal-glow); color:var(--teal); }
+  .quiz-opt.wrong { border-color:var(--red); background:rgba(240,96,96,0.07); color:var(--red); }
+  .quiz-opt .opt-letter { font-family:var(--mono); font-size:11px; flex-shrink:0; color:var(--text-3); width:18px; padding-top:1px; }
+  .quiz-opt.correct .opt-letter { color:var(--teal); }
+  .quiz-opt.wrong .opt-letter { color:var(--red); }
+  .quiz-explanation { margin:0; padding:var(--s3) var(--s5) var(--s4); font-size:12px; color:var(--text-2); line-height:1.7; border-top:1px solid var(--border); display:none; background:var(--bg); }
+  .quiz-explanation.show { display:block; }
+  .quiz-explanation strong { color:var(--teal); }
+
+  /* ── CTA proyek akhir ── */
+  .proyek-cta { display:flex; align-items:center; gap:var(--s5); background:rgba(155,124,244,0.07); border:1px solid rgba(155,124,244,0.25); border-radius:var(--r3); padding:var(--s5) var(--s6); margin:var(--s5) 0; flex-wrap:wrap; }
+  .proyek-cta-text { flex:1 1 320px; }
+  .proyek-cta-label { font-family:var(--mono); font-size:10px; color:var(--purple); letter-spacing:2px; text-transform:uppercase; margin-bottom:var(--s2); }
+  .proyek-cta-title { font-family:var(--serif); font-size:18px; font-weight:600; color:var(--text); margin-bottom:var(--s2); }
+  .proyek-cta-desc { font-size:13px; color:var(--text-2); line-height:1.7; }
+  .proyek-cta-btn { display:inline-flex; align-items:center; gap:var(--s2); padding:var(--s3) var(--s5); background:var(--purple); color:#fff; font-weight:600; font-size:14px; border-radius:var(--r2); transition:transform .2s var(--ease), opacity .2s; white-space:nowrap; }
+  .proyek-cta-btn:hover { transform:translateY(-1px); opacity:.9; text-decoration:none; color:#fff; }
+</style>
+</head>
+<body>
+
+<!-- ══ NAV ══ -->
+<nav class="nav">
+  <div class="nav-logo">AI<span>·</span>UKWMS</div>
+  <ul class="nav-links">
+    <li><a href="../index.html">← Beranda</a></li>
+    <li><a href="#tujuan" class="active">Tujuan</a></li>
+    <li><a href="#mengapa">Mengapa RAG</a></li>
+    <li><a href="#pipeline">Pipeline</a></li>
+    <li><a href="#embedding">Embedding</a></li>
+    <li><a href="#chunking">Chunking</a></li>
+    <li><a href="#vectordb">Vector DB</a></li>
+    <li><a href="#praktik">Praktik</a></li>
+    <li><a href="#evaluasi">Evaluasi</a></li>
+    <li><a href="#latihan">Latihan</a></li>
+  </ul>
+</nav>
+
+<!-- ══ HERO ══ -->
+<header class="sesi-hero">
+  <div style="max-width:1100px;margin:0 auto;">
+    <div class="sesi-breadcrumb">
+      <a href="../index.html">Kecerdasan Buatan</a>
+      <span>›</span>
+      <span>Pertemuan 10</span>
+    </div>
+    <div class="sesi-num">PERTEMUAN 10 · PRAKTIK</div>
+    <h1 class="sesi-title">RAG Part 1:<br><em style="color:var(--blue);">Embedding &amp; Vector Database</em></h1>
+    <p style="font-size:15px;color:var(--text-2);max-width:700px;line-height:1.8;">Membangun separuh pertama sistem RAG: mengubah dokumen menjadi potongan, vektor, lalu indeks yang bisa dicari berdasarkan makna. Bagian generasi jawaban menyusul di P-11.</p>
+    <div class="sesi-meta-row">
+      <span class="badge badge-amber">Praktik</span>
+      <span class="badge badge-blue">100 menit</span>
+      <span class="badge badge-teal">CPMK: C3, C4</span>
+      <span class="badge" style="background:rgba(155,124,244,0.1);color:var(--purple);border:1px solid rgba(155,124,244,0.2);">Fondasi Proyek 4</span>
+    </div>
+  </div>
+</header>
+
+<!-- ══ CONTENT LAYOUT ══ -->
+<div class="content-layout">
+  <main class="content-main">
+
+    <!-- TUJUAN -->
+    <div class="content-block" id="tujuan">
+      <h2>Tujuan Pembelajaran</h2>
+      <p>Di P-08 kita melihat bahwa LLM bisa berhalusinasi dan tidak tahu dokumen internal. Di P-09 kita belajar memanggil LLM dari kode. Hari ini kita membangun komponen yang memberi LLM <em>bahan</em> untuk menjawab. Setelah sesi ini, mahasiswa diharapkan mampu:</p>
+      <ol>
+        <li>Menjelaskan masalah yang diselesaikan RAG dan membandingkannya dengan fine-tuning serta long context</li>
+        <li>Menguraikan dua alur RAG: <em>indexing</em> (offline) dan <em>query</em> (saat pertanyaan datang)</li>
+        <li>Menjelaskan embedding dan cosine similarity sebagai dasar pencarian semantik</li>
+        <li>Memilih ukuran chunk dan overlap dengan mempertimbangkan kompromi presisi dan konteks</li>
+        <li>Membangun indeks dokumen di vector database (ChromaDB) dan melakukan pencarian</li>
+        <li>Mengevaluasi kualitas retrieval secara terukur sebelum menambahkan LLM</li>
+      </ol>
+
+      <div class="callout warn" style="margin-top:var(--s5);">
+        <span class="callout-icon">🛠️</span>
+        <div class="callout-body">
+          <p><strong>Persiapan:</strong> Python 3.9+, 2–3 file PDF berbasis teks (bukan hasil scan) untuk dijadikan bahan uji, dan koneksi internet untuk mengunduh model embedding saat pertama kali dijalankan. Sesi ini <strong>tidak memerlukan API key LLM</strong>, karena embedding dijalankan lokal; akses LLM baru dibutuhkan di P-11.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- MENGAPA RAG -->
+    <div class="content-block" id="mengapa">
+      <h2>1. Mengapa RAG?</h2>
+      <p><strong>RAG</strong> (<em>Retrieval-Augmented Generation</em>) adalah pola di mana sistem lebih dulu <em>mencari</em> potongan dokumen yang relevan, lalu menyertakannya di prompt agar LLM menjawab berdasarkan potongan itu. Ia menjawab tiga keterbatasan LLM dari P-08: halusinasi, pengetahuan yang usang, dan ketidaktahuan terhadap data privat.</p>
+
+      <div class="table-scroll">
+      <table class="kisi-table">
+        <thead><tr><th>PENDEKATAN</th><th>CARA KERJA</th><th>KELEBIHAN</th><th>KETERBATASAN</th></tr></thead>
+        <tbody>
+          <tr><td><strong style="color:var(--text)">RAG</strong></td><td>Cari dokumen relevan, sisipkan ke prompt</td><td>Mudah diperbarui (ganti dokumen), jawaban bisa menyebut sumber, tidak perlu melatih model</td><td>Kualitas bergantung pada retrieval; menambah komponen yang harus dikelola</td></tr>
+          <tr><td><strong style="color:var(--text)">Fine-tuning</strong></td><td>Melatih lanjut model pada data Anda</td><td>Cocok untuk gaya, format, atau perilaku tertentu</td><td>Mahal, sulit diperbarui, kurang cocok untuk menyuntikkan fakta yang sering berubah</td></tr>
+          <tr><td><strong style="color:var(--text)">Long context</strong></td><td>Masukkan seluruh dokumen ke prompt</td><td>Sederhana untuk dokumen pendek</td><td>Biaya token tinggi, terbatas context window, relevansi bisa tenggelam di antara teks panjang</td></tr>
+        </tbody>
+      </table>
+      </div>
+
+      <div class="callout tip">
+        <span class="callout-icon">🎯</span>
+        <div class="callout-body">
+          <p><strong>Kapan RAG tepat?</strong> Saat jawaban harus berakar pada kumpulan dokumen yang besar, sering berubah, atau privat: pedoman akademik, SOP perusahaan, katalog produk, kontrak. Inilah skenario <strong>Proyek 4 (Chatbot Akademik RAG)</strong>.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- PIPELINE -->
+    <div class="content-block" id="pipeline">
+      <h2>2. Dua Alur dalam Sistem RAG</h2>
+      <p>RAG sebenarnya terdiri dari dua alur yang terpisah waktunya. Alur pertama dijalankan sekali (atau saat dokumen berubah); alur kedua dijalankan setiap ada pertanyaan.</p>
+
+      <div class="pipe-title-row" style="color:var(--teal);">Alur A · Indexing (offline) — fokus hari ini</div>
+      <div class="pipe">
+        <div class="pipe-step"><div class="pipe-label" style="color:var(--teal);">A1</div><div class="pipe-title">Load</div><div class="pipe-sub">Baca dokumen (PDF, DOCX, web) menjadi teks</div></div>
+        <div class="pipe-arrow">→</div>
+        <div class="pipe-step"><div class="pipe-label" style="color:var(--blue);">A2</div><div class="pipe-title">Split</div><div class="pipe-sub">Potong teks menjadi chunk berukuran terkelola</div></div>
+        <div class="pipe-arrow">→</div>
+        <div class="pipe-step"><div class="pipe-label" style="color:var(--amber);">A3</div><div class="pipe-title">Embed</div><div class="pipe-sub">Ubah tiap chunk menjadi vektor angka</div></div>
+        <div class="pipe-arrow">→</div>
+        <div class="pipe-step"><div class="pipe-label" style="color:var(--purple);">A4</div><div class="pipe-title">Store</div><div class="pipe-sub">Simpan vektor + teks + metadata di vector database</div></div>
+      </div>
+
+      <div class="pipe-title-row" style="color:var(--text-3);">Alur B · Query (saat pertanyaan datang) — langkah B1–B2 hari ini, B3–B4 di P-11</div>
+      <div class="pipe">
+        <div class="pipe-step"><div class="pipe-label" style="color:var(--teal);">B1</div><div class="pipe-title">Embed pertanyaan</div><div class="pipe-sub">Pakai model embedding yang sama dengan A3</div></div>
+        <div class="pipe-arrow">→</div>
+        <div class="pipe-step"><div class="pipe-label" style="color:var(--blue);">B2</div><div class="pipe-title">Retrieve top-k</div><div class="pipe-sub">Ambil k chunk dengan vektor paling dekat</div></div>
+        <div class="pipe-arrow">→</div>
+        <div class="pipe-step dim"><div class="pipe-label" style="color:var(--amber);">B3 · P-11</div><div class="pipe-title">Susun prompt</div><div class="pipe-sub">Pertanyaan + chunk + instruksi "jawab hanya dari konteks"</div></div>
+        <div class="pipe-arrow">→</div>
+        <div class="pipe-step dim"><div class="pipe-label" style="color:var(--purple);">B4 · P-11</div><div class="pipe-title">Generate</div><div class="pipe-sub">LLM menjawab, idealnya dengan menyebut sumber</div></div>
+      </div>
+
+      <div class="callout warn">
+        <span class="callout-icon">⚠️</span>
+        <div class="callout-body">
+          <p><strong>Aturan emas:</strong> model embedding untuk dokumen (A3) dan untuk pertanyaan (B1) harus <em>sama</em>. Vektor dari model berbeda hidup di "ruang" yang berbeda dan tidak bisa dibandingkan.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- EMBEDDING -->
+    <div class="content-block" id="embedding">
+      <h2>3. Embedding &amp; Pencarian Semantik</h2>
+      <p>Embedding adalah representasi teks sebagai vektor (daftar angka, biasanya ratusan dimensi) yang dilatih agar teks bermakna mirip memiliki vektor yang berdekatan. Dua kalimat yang kata-katanya berbeda tetapi artinya sama, misalnya <em>"cuti akademik"</em> dan <em>"berhenti kuliah sementara"</em>, seharusnya berdekatan di ruang vektor. Ini berbeda dari pencarian kata kunci yang hanya mencocokkan kata persis.</p>
+
+      <h3>Mengukur kedekatan: cosine similarity</h3>
+      <div class="formula">
+        cos(A, B) = (A · B) / (‖A‖ · ‖B‖)
+        <div class="formula-note">
+          Mengukur <strong style="color:var(--text)">sudut</strong> antara dua vektor, bukan panjangnya. Nilai mendekati <strong style="color:var(--text)">1</strong> berarti arahnya hampir sama (sangat mirip); mendekati <strong style="color:var(--text)">0</strong> berarti tidak berhubungan. Banyak vector database juga memakai <em>jarak</em> (distance), di mana nilai <strong style="color:var(--text)">lebih kecil berarti lebih mirip</strong>.
+        </div>
+      </div>
+
+      <h3 style="margin-top:var(--s6);">Coba sendiri: mini search engine</h3>
+      <p>Di bawah ini ada 8 potongan "peraturan akademik" (<strong>contoh fiktif</strong>, bukan peraturan UKWMS). Pencarian ini memakai <strong>TF-IDF + cosine similarity</strong> (berbasis kata) agar bisa dijalankan di browser. Ini bukan embedding neural, tetapi mekanisme top-k dan cosine-nya sama. Coba tiga contoh pencarian dan bandingkan hasilnya.</p>
+
+      <div class="builder">
+        <input class="search-input" id="q-input" type="text" placeholder="Ketik pertanyaan, mis. syarat cuti akademik" autocomplete="off">
+        <div class="preset-row">
+          <span>Coba:</span>
+          <button class="btn-mini" type="button" data-q="syarat cuti akademik">① syarat cuti akademik</button>
+          <button class="btn-mini" type="button" data-q="boleh berhenti kuliah sementara?">② boleh berhenti kuliah sementara?</button>
+          <button class="btn-mini" type="button" data-q="minimal kehadiran agar boleh ujian">③ minimal kehadiran agar boleh ujian</button>
+        </div>
+        <div id="q-results"></div>
+      </div>
+
+      <div class="callout info">
+        <span class="callout-icon">🔍</span>
+        <div class="callout-body">
+          <p><strong>Apa yang terlihat?</strong> Contoh ① menemukan peraturan cuti karena kata <em>cuti</em> dan <em>akademik</em> persis sama. Pada contoh ②, pertanyaannya bermakna sama tetapi tidak berbagi kata kunci dengan peraturan cuti, sehingga yang muncul justru potongan yang kebetulan memuat kata "kuliah" (soal nilai mata kuliah dan biaya kuliah) dengan skor sangat rendah, sementara peraturan cuti tidak masuk tiga teratas. Itulah keterbatasan pencarian berbasis kata. Model embedding neural dilatih menangkap makna sehingga "berhenti kuliah sementara" cenderung dekat dengan "cuti akademik". Meski begitu, hasilnya <em>tidak dijamin</em> sempurna, sehingga retrieval tetap harus dievaluasi (bagian 7).</p>
+        </div>
+      </div>
+
+      <div class="callout tip">
+        <span class="callout-icon">🌐</span>
+        <div class="callout-body">
+          <p><strong>Pilih model embedding sesuai bahasa.</strong> Model embedding bawaan banyak pustaka dilatih terutama pada bahasa Inggris. Untuk dokumen Bahasa Indonesia, gunakan model <em>multilingual</em>. Model embedding yang dijalankan lokal tidak memakai API sehingga tidak ada biaya per token, tetapi membutuhkan unduhan model dan memori yang cukup.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- CHUNKING -->
+    <div class="content-block" id="chunking">
+      <h2>4. Chunking: Memotong Dokumen dengan Bijak</h2>
+      <p>Dokumen tidak dimasukkan utuh ke indeks. Ia dipotong menjadi <em>chunk</em> karena (1) satu vektor untuk dokumen panjang merata-ratakan terlalu banyak topik sehingga kabur, dan (2) hanya potongan relevan yang sebaiknya masuk ke prompt agar hemat token dan fokus.</p>
+
+      <div class="review-grid">
+        <div class="review-card red">
+          <div class="review-card-label">Terlalu kecil</div>
+          <h4>Konteks terpotong</h4>
+          <ul>
+            <li>Kalimat jawaban terpisah dari penjelasannya</li>
+            <li>Retrieval menemukan potongan yang "benar" tetapi tidak cukup untuk menjawab</li>
+          </ul>
+        </div>
+        <div class="review-card amber">
+          <div class="review-card-label">Terlalu besar</div>
+          <h4>Relevansi mengabur</h4>
+          <ul>
+            <li>Satu chunk memuat banyak topik; skor kemiripan jadi kurang tajam</li>
+            <li>Prompt penuh teks tak relevan, biaya naik</li>
+          </ul>
+        </div>
+        <div class="review-card teal">
+          <div class="review-card-label">Overlap</div>
+          <h4>Tumpang tindih sebagian</h4>
+          <ul>
+            <li>Beberapa karakter akhir chunk diulang di awal chunk berikutnya</li>
+            <li>Mengurangi risiko informasi penting terbelah di perbatasan, dengan harga indeks sedikit lebih besar</li>
+          </ul>
+        </div>
+      </div>
+
+      <h3 style="margin-top:var(--s6);">Coba sendiri: ukuran chunk &amp; overlap</h3>
+      <p>Teks contoh di bawah (fiktif) dipotong menurut dua pengaturan. Bagian yang <mark style="background:rgba(245,166,35,0.22);color:var(--amber);padding:0 2px;border-radius:2px;">ditandai</mark> adalah overlap dengan chunk sebelumnya.</p>
+
+      <div class="builder">
+        <div class="ctl-row"><label for="cs">Ukuran chunk</label><input type="range" id="cs" min="80" max="500" step="10" value="200"><span class="ctl-val" id="cs-val">200</span></div>
+        <div class="ctl-row"><label for="co">Overlap</label><input type="range" id="co" min="0" max="100" step="10" value="30"><span class="ctl-val" id="co-val">30</span></div>
+        <div class="chunk-summary" id="chunk-summary"></div>
+        <div id="chunk-list"></div>
+      </div>
+
+      <h3 style="margin-top:var(--s6);">Strategi pemotongan</h3>
+      <div class="table-scroll">
+      <table class="kisi-table">
+        <thead><tr><th>STRATEGI</th><th>CARA KERJA</th><th>CATATAN</th></tr></thead>
+        <tbody>
+          <tr><td><strong style="color:var(--text)">Ukuran tetap (karakter/token)</strong></td><td>Potong tiap N karakter, dengan overlap</td><td>Paling sederhana, tetapi bisa memotong di tengah kalimat atau tabel</td></tr>
+          <tr><td><strong style="color:var(--text)">Rekursif</strong></td><td>Coba pisah di paragraf dulu, lalu kalimat, lalu kata, sampai muat dalam ukuran</td><td>Titik awal yang baik; menjaga batas alami teks</td></tr>
+          <tr><td><strong style="color:var(--text)">Berdasarkan struktur</strong></td><td>Potong per bab, pasal, atau heading</td><td>Cocok untuk dokumen terstruktur seperti peraturan; simpan judul bagian sebagai metadata</td></tr>
+        </tbody>
+      </table>
+      </div>
+
+      <div class="callout info">
+        <span class="callout-icon">🧪</span>
+        <div class="callout-body">
+          <p><strong>Tidak ada ukuran chunk yang selalu benar.</strong> Rentang awal yang sering dipakai adalah beberapa ratus hingga sekitar seribu karakter dengan overlap 10–20%, tetapi angka ini hanya titik awal untuk <em>diuji</em> pada data Anda. Proyek 4 secara khusus meminta perbandingan ukuran chunk 500, 1.000, dan 1.500 karakter.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- VECTOR DB -->
+    <div class="content-block" id="vectordb">
+      <h2>5. Vector Database</h2>
+      <p>Vector database menyimpan vektor beserta teks dan metadata aslinya, dan mampu mencari <em>tetangga terdekat</em> dari sebuah vektor query dengan cepat. Untuk koleksi besar, ia memakai indeks pencarian pendekatan (<em>approximate nearest neighbor</em>) agar tidak perlu membandingkan query dengan semua vektor satu per satu.</p>
+
+      <div class="review-grid">
+        <div class="review-card teal">
+          <div class="review-card-label">Disimpan</div>
+          <h4>Tiga hal per chunk</h4>
+          <ul>
+            <li><strong style="color:var(--text)">Vektor</strong> embedding (untuk pencarian)</li>
+            <li><strong style="color:var(--text)">Dokumen</strong> teks asli chunk (untuk prompt)</li>
+            <li><strong style="color:var(--text)">Metadata</strong> seperti nama file, nomor halaman, bab (untuk sitasi dan filter)</li>
+          </ul>
+        </div>
+        <div class="review-card blue">
+          <div class="review-card-label">Pilihan umum</div>
+          <h4>ChromaDB, FAISS, dan lainnya</h4>
+          <ul>
+            <li><strong style="color:var(--text)">ChromaDB:</strong> mudah dipakai, bisa disimpan lokal; cocok untuk belajar dan proyek kecil</li>
+            <li><strong style="color:var(--text)">FAISS:</strong> pustaka pencarian vektor cepat, lebih "mentah"</li>
+            <li><strong style="color:var(--text)">Layanan terkelola / ekstensi database:</strong> untuk skala produksi</li>
+          </ul>
+        </div>
+      </div>
+      <p>Kita memakai <strong>ChromaDB</strong> karena instalasinya sederhana dan tidak butuh server terpisah. Konsep yang dipelajari (koleksi, add, query, metadata) berlaku serupa di vector database lain.</p>
+    </div>
+
+    <!-- PRAKTIK -->
+    <div class="content-block" id="praktik">
+      <h2>6. Praktik: Membangun Indeks dengan ChromaDB</h2>
+
+      <h3>Langkah 1 — Instalasi</h3>
+      <div class="code-block">
+        <div class="code-head"><span>TERMINAL</span></div>
+<pre>pip install chromadb sentence-transformers pypdf langchain-text-splitters</pre>
+      </div>
+      <div class="callout warn">
+        <span class="callout-icon">💾</span>
+        <div class="callout-body">
+          <p><strong>Unduhan cukup besar.</strong> <code>sentence-transformers</code> membawa PyTorch, dan model embedding diunduh saat pertama dipakai (ratusan MB). Jika laptop terbatas, jalankan di Google Colab. Versi pustaka ini cepat berubah; bila ada error API, cek dokumentasi resmi tiap pustaka.</p>
+        </div>
+      </div>
+
+      <h3 style="margin-top:var(--s6);">Langkah 2 — Baca PDF dan potong menjadi chunk</h3>
+      <div class="code-block">
+        <div class="code-head"><span>indeks.py (bagian 1: load &amp; split)</span></div>
+<pre><span class="k">from</span> pathlib <span class="k">import</span> Path
+<span class="k">from</span> pypdf <span class="k">import</span> PdfReader
+
+<span class="k">def</span> baca_pdf(path):
+    reader = PdfReader(path)
+    <span class="k">return</span> <span class="s">"\n"</span>.join((p.extract_text() <span class="k">or</span> <span class="s">""</span>) <span class="k">for</span> p <span class="k">in</span> reader.pages)
+
+<span class="k">def</span> potong(teks, ukuran=800, tumpang=100):
+    <span class="s">"""Pemotongan ukuran tetap dengan overlap (versi paling sederhana)."""</span>
+    hasil, mulai = [], 0
+    <span class="k">while</span> mulai &lt; len(teks):
+        hasil.append(teks[mulai:mulai + ukuran])
+        mulai += ukuran - tumpang
+    <span class="k">return</span> [h <span class="k">for</span> h <span class="k">in</span> hasil <span class="k">if</span> h.strip()]</pre>
+      </div>
+
+      <p>Alternatif yang menjaga batas paragraf dan kalimat adalah pemotong rekursif dari LangChain (pustaka kerangka kerja yang juga menyediakan loader dan pembungkus vector store):</p>
+      <div class="code-block">
+        <div class="code-head"><span>ALTERNATIF · LangChain text splitter</span></div>
+<pre><span class="k">from</span> langchain_text_splitters <span class="k">import</span> RecursiveCharacterTextSplitter
+
+splitter = RecursiveCharacterTextSplitter(chunk_size=800, chunk_overlap=100)
+chunks = splitter.split_text(teks)</pre>
+      </div>
+
+      <h3 style="margin-top:var(--s6);">Langkah 3 — Embed dan simpan ke ChromaDB</h3>
+      <div class="code-block">
+        <div class="code-head"><span>indeks.py (bagian 2: embed &amp; store)</span></div>
+<pre><span class="k">import</span> chromadb
+<span class="k">from</span> chromadb.utils <span class="k">import</span> embedding_functions
+
+<span class="c"># model embedding multilingual (jalan lokal, tanpa API key)</span>
+emb = embedding_functions.SentenceTransformerEmbeddingFunction(
+    model_name=<span class="s">"paraphrase-multilingual-MiniLM-L12-v2"</span>)
+
+client = chromadb.PersistentClient(path=<span class="s">"./chroma_db"</span>)   <span class="c"># tersimpan di folder</span>
+koleksi = client.get_or_create_collection(
+    name=<span class="s">"pedoman"</span>, embedding_function=emb,
+    metadata={<span class="s">"hnsw:space"</span>: <span class="s">"cosine"</span>})                    <span class="c"># ukuran jarak: cosine</span>
+
+<span class="k">for</span> pdf <span class="k">in</span> Path(<span class="s">"dokumen"</span>).glob(<span class="s">"*.pdf"</span>):
+    chunks = potong(baca_pdf(pdf))
+    koleksi.upsert(                                           <span class="c"># upsert: aman dijalankan ulang</span>
+        ids=[f<span class="s">"{pdf.stem}-{i}"</span> <span class="k">for</span> i <span class="k">in</span> range(len(chunks))],
+        documents=chunks,
+        metadatas=[{<span class="s">"sumber"</span>: pdf.name, <span class="s">"chunk"</span>: i} <span class="k">for</span> i <span class="k">in</span> range(len(chunks))],
+    )
+    print(pdf.name, <span class="s">"→"</span>, len(chunks), <span class="s">"chunk"</span>)</pre>
+      </div>
+      <div class="callout info">
+        <span class="callout-icon">ℹ️</span>
+        <div class="callout-body">
+          <p><strong>Catatan versi:</strong> cara mengatur metrik jarak (<code>metadata</code> di atas) berbeda antar versi ChromaDB. Jika muncul peringatan atau error, ikuti dokumentasi versi yang Anda pasang. Tanpa pengaturan ini, ChromaDB memakai jarak default yang berbeda dari cosine.</p>
+        </div>
+      </div>
+
+      <h3 style="margin-top:var(--s6);">Langkah 4 — Query</h3>
+      <div class="code-block">
+        <div class="code-head"><span>cari.py</span></div>
+<pre>hasil = koleksi.query(query_texts=[<span class="s">"Apa syarat cuti akademik?"</span>], n_results=3)
+
+<span class="k">for</span> doc, meta, jarak <span class="k">in</span> zip(hasil[<span class="s">"documents"</span>][0], hasil[<span class="s">"metadatas"</span>][0], hasil[<span class="s">"distances"</span>][0]):
+    print(f<span class="s">"[{meta['sumber']} · chunk {meta['chunk']}]  jarak={jarak:.3f}"</span>)
+    print(doc[:200], <span class="s">"...\n"</span>)</pre>
+      </div>
+      <p style="font-size:13px;color:var(--text-2);">Ingat: pada <code>distances</code>, <strong>nilai lebih kecil berarti lebih mirip</strong>. Metadata (<code>sumber</code>, <code>chunk</code>) inilah yang nanti dipakai di P-11 untuk menampilkan sumber jawaban.</p>
+    </div>
+
+    <!-- EVALUASI -->
+    <div class="content-block" id="evaluasi">
+      <h2>7. Mengevaluasi Retrieval Sebelum Menambah LLM</h2>
+      <p>Kesalahan RAG paling sering berasal dari retrieval, bukan dari LLM: jika chunk yang benar tidak ikut terambil, LLM sebaik apa pun tidak bisa menjawab dengan benar. Karena itu retrieval dievaluasi <em>terpisah</em> dan terukur, dengan semangat yang sama dengan uji prompt di P-09 dan evaluasi model di Blok 1.</p>
+
+      <div class="table-scroll">
+      <table class="kisi-table">
+        <thead><tr><th>METRIK</th><th>DEFINISI</th><th>MEMBACA HASILNYA</th></tr></thead>
+        <tbody>
+          <tr><td><strong style="color:var(--text)">Hit@k</strong></td><td>Proporsi pertanyaan uji yang chunk jawaban benarnya muncul di antara k hasil teratas</td><td>Hit@3 = 0,80 berarti 8 dari 10 pertanyaan terjawab "terambil" dalam 3 hasil teratas</td></tr>
+          <tr><td><strong style="color:var(--text)">MRR</strong> (Mean Reciprocal Rank)</td><td>Rata-rata dari 1/peringkat chunk benar pertama</td><td>Lebih tinggi bila chunk benar ada di peringkat atas, bukan sekadar masuk top-k</td></tr>
+        </tbody>
+      </table>
+      </div>
+
+      <div class="code-block">
+        <div class="code-head"><span>evaluasi_retrieval.py</span></div>
+<pre><span class="c"># (pertanyaan, kata/frasa yang HARUS ada di chunk jawaban yang benar)</span>
+UJI = [
+    (<span class="s">"Apa syarat cuti akademik?"</span>,          <span class="s">"cuti akademik"</span>),
+    (<span class="s">"Berapa batas kehadiran untuk ujian?"</span>, <span class="s">"75 persen"</span>),
+    <span class="c"># ... buat 15–20 pasangan dari dokumen Anda sendiri</span>
+]
+
+<span class="k">def</span> hit_at_k(uji, k=3):
+    benar = 0
+    <span class="k">for</span> pertanyaan, kunci <span class="k">in</span> uji:
+        docs = koleksi.query(query_texts=[pertanyaan], n_results=k)[<span class="s">"documents"</span>][0]
+        <span class="k">if</span> any(kunci.lower() <span class="k">in</span> d.lower() <span class="k">for</span> d <span class="k">in</span> docs):
+            benar += 1
+    <span class="k">return</span> benar / len(uji)
+
+<span class="k">for</span> k <span class="k">in</span> (1, 3, 5):
+    print(f<span class="s">"Hit@{k} = {hit_at_k(UJI, k):.2f}"</span>)</pre>
+      </div>
+
+      <div class="callout tip">
+        <span class="callout-icon">💡</span>
+        <div class="callout-body">
+          <p><strong>Ini cara evaluasi yang praktis, bukan sempurna.</strong> Mencocokkan kata kunci di chunk adalah pendekatan kasar: chunk bisa memuat kata kunci tetapi tidak benar-benar menjawab. Untuk laporan proyek, jelaskan keterbatasan ini dan, bila perlu, periksa sebagian hasil secara manual.</p>
+        </div>
+      </div>
+
+      <h3 style="margin-top:var(--s6);">Kesalahan umum yang perlu diwaspadai</h3>
+      <div class="table-scroll">
+      <table class="kisi-table">
+        <thead><tr><th>MASALAH</th><th>GEJALA</th><th>PERBAIKAN</th></tr></thead>
+        <tbody>
+          <tr><td><strong style="color:var(--red)">PDF hasil scan</strong></td><td><code>extract_text()</code> mengembalikan teks kosong</td><td>Gunakan PDF berbasis teks, atau OCR terlebih dahulu</td></tr>
+          <tr><td><strong style="color:var(--red)">Model embedding tidak cocok bahasa</strong></td><td>Hasil pencarian aneh pada teks Indonesia</td><td>Pakai model multilingual; bandingkan dengan beberapa pertanyaan uji</td></tr>
+          <tr><td><strong style="color:var(--red)">Chunk memotong tabel/daftar</strong></td><td>Angka terpisah dari judul kolomnya</td><td>Pemotong rekursif atau berbasis struktur; perbesar chunk</td></tr>
+          <tr><td><strong style="color:var(--red)">k terlalu besar</strong></td><td>Banyak chunk tak relevan ikut masuk</td><td>Mulai dari k = 3–5, ukur dengan Hit@k, sesuaikan</td></tr>
+          <tr><td><strong style="color:var(--red)">Model embedding berbeda antara indexing dan query</strong></td><td>Hasil acak atau error dimensi</td><td>Gunakan satu <code>embedding_function</code> yang sama untuk koleksi tersebut</td></tr>
+          <tr><td><strong style="color:var(--red)">Tanpa metadata</strong></td><td>Tidak bisa menyebut sumber jawaban</td><td>Simpan nama file, halaman, dan bagian sejak awal</td></tr>
+        </tbody>
+      </table>
+      </div>
+    </div>
+
+    <!-- LAB -->
+    <div class="content-block" id="lab">
+      <h2>8. Lab Terbimbing</h2>
+
+      <div class="task-box">
+        <div class="task-box-title">🧪 Lab 1 — Eksperimen chunking (15 menit)</div>
+        <ol style="font-size:14px;color:var(--text);line-height:2.1;">
+          <li>Baca satu PDF dengan <code>baca_pdf()</code> dan cetak 500 karakter pertama untuk memastikan teksnya terbaca baik.</li>
+          <li>Potong dengan <code>potong()</code> memakai tiga ukuran (mis. 500, 1000, 1500) dan overlap 10–20%. Catat jumlah chunk tiap pengaturan.</li>
+          <li>Lihat 3 chunk acak untuk tiap ukuran: adakah yang terpotong di tengah kalimat atau tabel?</li>
+        </ol>
+      </div>
+
+      <div class="task-box">
+        <div class="task-box-title">🧪 Lab 2 — Bangun indeks &amp; cari (25 menit)</div>
+        <ol style="font-size:14px;color:var(--text);line-height:2.1;">
+          <li>Letakkan 2–3 PDF di folder <code>dokumen/</code>, jalankan skrip indeks, pastikan tiap file melaporkan jumlah chunk.</li>
+          <li>Ajukan 5 pertanyaan dengan <code>query()</code>. Untuk tiap pertanyaan, periksa apakah chunk teratas benar-benar relevan.</li>
+          <li>Ajukan 2 pertanyaan dengan kata berbeda dari teks dokumen (parafrase). Apakah pencarian semantik tetap menemukannya?</li>
+        </ol>
+      </div>
+
+      <div class="task-box">
+        <div class="task-box-title">🧪 Lab 3 — Ukur Hit@k (25 menit)</div>
+        <ol style="font-size:14px;color:var(--text);line-height:2.1;">
+          <li>Buat 15 pertanyaan uji beserta kata kunci jawaban dari dokumen Anda.</li>
+          <li>Jalankan <code>hit_at_k</code> untuk k = 1, 3, 5 pada <strong>dua koleksi dengan ukuran chunk berbeda</strong>.</li>
+          <li>Tulis kesimpulan 3–4 kalimat: ukuran mana yang lebih baik, pada pertanyaan apa gagal, dan dugaan penyebabnya.</li>
+        </ol>
+      </div>
+    </div>
+
+    <!-- PROYEK -->
+    <div class="content-block" id="proyek">
+      <h2>9. Kaitan dengan Proyek Akhir</h2>
+      <p>Materi hari ini adalah fondasi langsung <strong>Proyek 4 (Chatbot Akademik berbasis RAG)</strong>, termasuk evaluasi ukuran chunk 500, 1.000, dan 1.500 karakter. Bagi kelompok lain, konsep embedding dan pencarian semantik tetap berguna, misalnya untuk sistem rekomendasi berbasis konten (Proyek 2).</p>
+
+      <div class="proyek-cta">
+        <div class="proyek-cta-text">
+          <div class="proyek-cta-label">Proyek UAS · Bobot 35%</div>
+          <div class="proyek-cta-title">Panduan Proyek Akhir Kecerdasan Buatan</div>
+          <div class="proyek-cta-desc">Lihat deskripsi Proyek 4, format laporan, rubrik, dan timeline pengerjaan.</div>
+        </div>
+        <a href="proyek-akhir.html#proyek-4" class="proyek-cta-btn">Lihat Proyek 4 <span>→</span></a>
+      </div>
+    </div>
+
+    <!-- LATIHAN -->
+    <div class="content-block" id="latihan">
+      <h2>10. Latihan Pemahaman</h2>
+      <p>Klik opsi untuk memeriksa jawaban; penjelasan muncul setelah Anda memilih.</p>
+
+      <div class="quiz-box">
+        <div class="quiz-header"><span class="quiz-num">No. 1</span><span class="quiz-q">Perusahaan ingin chatbot menjawab dari SOP internal yang direvisi tiap bulan. Mengapa RAG lebih cocok daripada fine-tuning?</span></div>
+        <div class="quiz-options" data-correct="B">
+          <div class="quiz-opt" data-val="A"><span class="opt-letter">A</span>Karena RAG membuat model tidak pernah salah</div>
+          <div class="quiz-opt" data-val="B"><span class="opt-letter">B</span>Karena pembaruan cukup dengan mengganti/menambah dokumen di indeks, tanpa melatih ulang model, dan jawaban bisa merujuk sumber</div>
+          <div class="quiz-opt" data-val="C"><span class="opt-letter">C</span>Karena RAG tidak membutuhkan dokumen sama sekali</div>
+          <div class="quiz-opt" data-val="D"><span class="opt-letter">D</span>Karena fine-tuning tidak bisa dilakukan pada model bahasa</div>
+        </div>
+        <div class="quiz-explanation"><strong>Jawaban: B.</strong> Fakta yang sering berubah lebih mudah dikelola lewat dokumen yang diindeks ulang. RAG membantu mengurangi halusinasi, tetapi tidak menghilangkannya sepenuhnya.</div>
+      </div>
+
+      <div class="quiz-box">
+        <div class="quiz-header"><span class="quiz-num">No. 2</span><span class="quiz-q">Urutan yang tepat untuk alur indexing RAG adalah...</span></div>
+        <div class="quiz-options" data-correct="C">
+          <div class="quiz-opt" data-val="A"><span class="opt-letter">A</span>Embed → Load → Store → Split</div>
+          <div class="quiz-opt" data-val="B"><span class="opt-letter">B</span>Store → Split → Load → Embed</div>
+          <div class="quiz-opt" data-val="C"><span class="opt-letter">C</span>Load → Split → Embed → Store</div>
+          <div class="quiz-opt" data-val="D"><span class="opt-letter">D</span>Split → Store → Embed → Load</div>
+        </div>
+        <div class="quiz-explanation"><strong>Jawaban: C.</strong> Dokumen dibaca (load), dipotong (split), tiap potongan diubah menjadi vektor (embed), lalu disimpan bersama teks dan metadata (store).</div>
+      </div>
+
+      <div class="quiz-box">
+        <div class="quiz-header"><span class="quiz-num">No. 3</span><span class="quiz-q">Nilai cosine similarity antara vektor query dan sebuah chunk mendekati 1. Artinya...</span></div>
+        <div class="quiz-options" data-correct="A">
+          <div class="quiz-opt" data-val="A"><span class="opt-letter">A</span>Arah kedua vektor hampir sama, sehingga maknanya sangat mirip</div>
+          <div class="quiz-opt" data-val="B"><span class="opt-letter">B</span>Kedua teks tidak berhubungan sama sekali</div>
+          <div class="quiz-opt" data-val="C"><span class="opt-letter">C</span>Chunk tersebut pasti memuat jawaban yang benar</div>
+          <div class="quiz-opt" data-val="D"><span class="opt-letter">D</span>Panjang kedua teks persis sama</div>
+        </div>
+        <div class="quiz-explanation"><strong>Jawaban: A.</strong> Cosine mengukur kesamaan arah, bukan panjang. Skor tinggi berarti mirip secara makna menurut model embedding, tetapi tidak menjamin chunk itu memuat jawaban yang tepat.</div>
+      </div>
+
+      <div class="quiz-box">
+        <div class="quiz-header"><span class="quiz-num">No. 4</span><span class="quiz-q">Chunk berukuran sangat kecil (mis. 100 karakter) pada dokumen peraturan paling mungkin menyebabkan...</span></div>
+        <div class="quiz-options" data-correct="D">
+          <div class="quiz-opt" data-val="A"><span class="opt-letter">A</span>Indeks menjadi terlalu kecil untuk disimpan</div>
+          <div class="quiz-opt" data-val="B"><span class="opt-letter">B</span>Embedding tidak bisa dihitung</div>
+          <div class="quiz-opt" data-val="C"><span class="opt-letter">C</span>Biaya prompt turun tanpa efek samping</div>
+          <div class="quiz-opt" data-val="D"><span class="opt-letter">D</span>Konteks terpotong: bagian jawaban terpisah dari penjelasannya sehingga chunk yang terambil tidak cukup untuk menjawab</div>
+        </div>
+        <div class="quiz-explanation"><strong>Jawaban: D.</strong> Chunk terlalu kecil kehilangan konteks. Sebaliknya, chunk terlalu besar mengaburkan relevansi dan memboroskan token. Karena itu ukuran harus diuji, misalnya dengan Hit@k.</div>
+      </div>
+
+      <div class="quiz-box">
+        <div class="quiz-header"><span class="quiz-num">No. 5</span><span class="quiz-q">Pengguna bertanya "boleh berhenti kuliah sementara?" sedangkan dokumen memakai istilah "cuti akademik". Pencarian kata kunci gagal, sedangkan pencarian dengan embedding semantik cenderung berhasil karena...</span></div>
+        <div class="quiz-options" data-correct="B">
+          <div class="quiz-opt" data-val="A"><span class="opt-letter">A</span>Embedding menyalin kata persis dari pertanyaan ke dokumen</div>
+          <div class="quiz-opt" data-val="B"><span class="opt-letter">B</span>Model embedding dilatih agar teks bermakna mirip memiliki vektor berdekatan, meski kata-katanya berbeda</div>
+          <div class="quiz-opt" data-val="C"><span class="opt-letter">C</span>Vector database selalu menjamin hasil yang benar</div>
+          <div class="quiz-opt" data-val="D"><span class="opt-letter">D</span>Embedding menghapus semua kata yang tidak cocok</div>
+        </div>
+        <div class="quiz-explanation"><strong>Jawaban: B.</strong> Itulah keunggulan pencarian semantik. Namun hasilnya tidak dijamin sempurna, sehingga retrieval tetap perlu dievaluasi dengan pertanyaan uji.</div>
+      </div>
+
+      <div class="quiz-box">
+        <div class="quiz-header"><span class="quiz-num">No. 6</span><span class="quiz-q">Chatbot RAG Anda sering menjawab salah. Langkah diagnosis pertama yang paling tepat adalah...</span></div>
+        <div class="quiz-options" data-correct="C">
+          <div class="quiz-opt" data-val="A"><span class="opt-letter">A</span>Langsung mengganti LLM dengan model yang lebih besar</div>
+          <div class="quiz-opt" data-val="B"><span class="opt-letter">B</span>Menaikkan temperature agar jawaban lebih bervariasi</div>
+          <div class="quiz-opt" data-val="C"><span class="opt-letter">C</span>Memeriksa retrieval terpisah (mis. Hit@k): apakah chunk yang benar memang terambil sebelum sampai ke LLM?</div>
+          <div class="quiz-opt" data-val="D"><span class="opt-letter">D</span>Menghapus metadata dari indeks</div>
+        </div>
+        <div class="quiz-explanation"><strong>Jawaban: C.</strong> Jika chunk yang benar tidak terambil, LLM tidak punya bahan untuk menjawab dengan benar. Memisahkan evaluasi retrieval dan generasi membuat sumber masalah mudah ditemukan.</div>
+      </div>
+    </div>
+
+    <!-- PERSIAPAN -->
+    <div class="content-block" id="persiapan">
+      <h2>Persiapan Sesi Berikutnya</h2>
+      <div class="reading-box">
+        <div class="reading-box-title">📖 Menuju P-11: RAG Part 2 &amp; AI untuk Prediksi/Rekomendasi Bisnis</div>
+        <div class="reading-item">
+          <span class="reading-icon">🔧</span>
+          <div class="reading-label">
+            <strong>Melengkapi chatbot dokumen</strong>
+            Menyusun prompt dengan konteks hasil retrieval, instruksi "jawab hanya dari konteks", menampilkan sumber, dan menguji kualitas jawaban. Persiapan: simpan indeks <code>chroma_db</code> dari lab hari ini, dan pastikan Anda memiliki akses ke LLM untuk langkah generasi (API key atau opsi yang disediakan dosen).
+          </div>
+        </div>
+        <div class="reading-item">
+          <span class="reading-icon">📈</span>
+          <div class="reading-label">
+            <strong>Pengantar AI untuk bisnis</strong>
+            Demand forecasting, recommendation system, dan customer segmentation. Bacaan awal: ingat kembali konsep clustering dan evaluasi regresi dari Blok 1.
+          </div>
+        </div>
+        <div class="reading-item">
+          <span class="reading-icon">📝</span>
+          <div class="reading-label">
+            <strong>Dokumentasi resmi</strong>
+            Baca halaman "getting started" ChromaDB dan dokumentasi text splitter yang Anda pakai; API pustaka ini cepat berubah.
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ── ASIDE ── -->
+  <aside class="content-aside">
+    <div class="toc">
+      <div class="toc-title">Isi Halaman</div>
+      <ul class="toc-list">
+        <li><a href="#tujuan" class="active">Tujuan Pembelajaran</a></li>
+        <li><a href="#mengapa">1. Mengapa RAG?</a></li>
+        <li><a href="#pipeline">2. Dua Alur RAG</a></li>
+        <li><a href="#embedding">3. Embedding &amp; Pencarian</a></li>
+        <li><a href="#chunking">4. Chunking</a></li>
+        <li><a href="#vectordb">5. Vector Database</a></li>
+        <li><a href="#praktik">6. Praktik ChromaDB</a></li>
+        <li><a href="#evaluasi">7. Evaluasi Retrieval</a></li>
+        <li><a href="#lab">8. Lab Terbimbing</a></li>
+        <li><a href="#proyek">9. Kaitan Proyek Akhir</a></li>
+        <li><a href="#latihan">10. Latihan Pemahaman</a></li>
+        <li><a href="#persiapan">Persiapan P-11</a></li>
+      </ul>
+    </div>
+
+    <div class="sesi-nav-aside">
+      <div class="sesi-nav-title">Navigasi Sesi</div>
+      <a href="sesi-09.html" class="sesi-nav-btn">
+        <span>←</span>
+        <span>P-09: Prompt Engineering &amp; API</span>
+      </a>
+      <a href="sesi-11.html" class="sesi-nav-btn" style="margin-top:var(--s2);">
+        <span>→</span>
+        <span>P-11: RAG Part 2 &amp; AI Bisnis</span>
+      </a>
+      <a href="../index.html" class="sesi-nav-btn" style="margin-top:var(--s2);">
+        <span>🏠</span>
+        <span>Kembali ke Beranda</span>
+      </a>
+      <a href="proyek-akhir.html" class="sesi-nav-btn" style="margin-top:var(--s2);border-color:rgba(155,124,244,0.35);color:var(--purple);">
+        <span>🚀</span>
+        <span>Panduan Proyek Akhir</span>
+      </a>
+    </div>
+
+    <div style="background:var(--bg-2);border:1px solid var(--border);border-radius:var(--r3);padding:var(--s5);margin-top:var(--s4);">
+      <div style="font-family:var(--mono);font-size:10px;color:var(--text-3);letter-spacing:2px;text-transform:uppercase;margin-bottom:var(--s4);">Skor Latihan Anda</div>
+      <div style="text-align:center;margin-bottom:var(--s3);">
+        <span id="score-display" style="font-family:var(--mono);font-size:36px;font-weight:700;color:var(--teal);">0</span>
+        <span style="font-family:var(--mono);font-size:18px;color:var(--text-3);"> / <span id="score-total">6</span></span>
+      </div>
+      <div style="font-size:12px;color:var(--text-3);text-align:center;margin-bottom:var(--s3);">soal dijawab benar</div>
+      <div style="background:var(--bg-3);border-radius:4px;height:6px;overflow:hidden;">
+        <div id="score-bar" style="height:100%;background:var(--teal);width:0%;transition:width 0.4s var(--ease);border-radius:4px;"></div>
+      </div>
+      <div id="score-msg" style="font-size:12px;color:var(--text-2);text-align:center;margin-top:var(--s3);">Mulai kerjakan soal latihan!</div>
+    </div>
+
+    <div style="background:var(--bg-2);border:1px solid var(--border);border-radius:var(--r3);padding:var(--s5);margin-top:var(--s4);">
+      <div style="font-family:var(--mono);font-size:10px;color:var(--text-3);letter-spacing:2px;text-transform:uppercase;margin-bottom:var(--s3);">Info Pertemuan</div>
+      <div style="display:flex;flex-direction:column;gap:var(--s3);">
+        <div><div style="font-size:11px;color:var(--text-3);">Tipe</div><div style="font-size:13px;color:var(--text);">Praktik</div></div>
+        <div><div style="font-size:11px;color:var(--text-3);">Durasi</div><div style="font-size:13px;color:var(--text);">100 menit</div></div>
+        <div><div style="font-size:11px;color:var(--text-3);">CPMK</div><div style="font-size:13px;color:var(--text);">C3, C4</div></div>
+        <div><div style="font-size:11px;color:var(--text-3);">Topik</div><div style="font-size:13px;color:var(--text);">Embedding, vector database (ChromaDB), chunking, evaluasi retrieval</div></div>
+        <div><div style="font-size:11px;color:var(--text-3);">Prasyarat</div><div style="font-size:13px;color:var(--text);">Python 3.9+, 2–3 PDF berbasis teks</div></div>
+        <div><div style="font-size:11px;color:var(--text-3);">API key LLM</div><div style="font-size:13px;color:var(--text);">Tidak dibutuhkan (baru di P-11)</div></div>
+      </div>
+    </div>
+  </aside>
+
+</div>
+
+<!-- ══ FOOTER ══ -->
+<footer class="footer">
+  <div>AI·UKWMS <span style="color:var(--text-3);">· P-10 RAG Part 1: Embedding &amp; Vector Database</span></div>
+  <div><a href="../index.html" style="color:var(--text-3);">← Kembali ke Beranda</a></div>
+</footer>
+
+<script>
+  function esc(s) { return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+
+  /* ══ Mini search engine (TF-IDF + cosine) ══ */
+  (function () {
+    const PASSAGES = [
+      'Mahasiswa dapat mengajukan cuti akademik paling lama dua semester berturut-turut dengan persetujuan dekan.',
+      'Batas maksimal masa studi program sarjana adalah tujuh tahun sejak mahasiswa pertama kali terdaftar.',
+      'Mahasiswa wajib mengikuti minimal 75 persen pertemuan perkuliahan untuk berhak mengikuti ujian akhir semester.',
+      'Pengajuan perubahan kartu rencana studi dilakukan pada minggu pertama perkuliahan melalui sistem informasi akademik.',
+      'Nilai D pada mata kuliah wajib dapat diperbaiki dengan mengulang pada semester berikutnya.',
+      'Pembayaran biaya kuliah dilakukan paling lambat dua minggu sebelum perkuliahan dimulai di bagian keuangan.',
+      'Skripsi dapat diajukan setelah mahasiswa menyelesaikan minimal 110 SKS dengan IPK sekurang-kurangnya 2,00.',
+      'Mahasiswa yang melanggar tata tertib ujian dapat dikenai sanksi pembatalan nilai mata kuliah tersebut.'
+    ];
+    const STOP = new Set(['yang','dan','di','ke','dari','untuk','adalah','dengan','pada','atau','dalam','itu','ini','akan','dapat','oleh','setelah','sebelum','sejak','paling','lama','lambat','boleh','apa','agar','berhak']);
+    const tok = s => s.toLowerCase().replace(/[^a-z0-9\s]/g, ' ').split(/\s+/).filter(w => w && !STOP.has(w));
+    const docsTok = PASSAGES.map(tok);
+    const N = docsTok.length;
+    const df = {};
+    docsTok.forEach(ts => new Set(ts).forEach(w => df[w] = (df[w] || 0) + 1));
+    const idf = w => Math.log((N + 1) / ((df[w] || 0) + 1)) + 1;
+    function vec(ts) {
+      const tf = {}; ts.forEach(w => tf[w] = (tf[w] || 0) + 1);
+      const v = {}; Object.keys(tf).forEach(w => v[w] = tf[w] * idf(w));
+      return v;
+    }
+    const norm = v => Math.sqrt(Object.values(v).reduce((a, b) => a + b * b, 0));
+    function cos(a, b) {
+      let dot = 0; Object.keys(a).forEach(w => { if (b[w]) dot += a[w] * b[w]; });
+      const d = norm(a) * norm(b);
+      return d ? dot / d : 0;
+    }
+    const docVecs = docsTok.map(vec);
+    const input = document.getElementById('q-input');
+    const out = document.getElementById('q-results');
+    function run() {
+      const q = input.value.trim();
+      if (!q) { out.innerHTML = '<div class="chunk-summary">Ketik pertanyaan atau klik salah satu contoh di atas.</div>'; return; }
+      const qt = tok(q), qv = vec(qt);
+      const scored = docVecs.map((dv, i) => ({ i, s: cos(qv, dv), m: qt.filter(w => docsTok[i].includes(w)) }))
+                            .sort((a, b) => b.s - a.s).slice(0, 3);
+      if (scored[0].s === 0) { out.innerHTML = '<div class="chunk-summary">Tidak ada kata yang cocok sama sekali dengan potongan mana pun, inilah batas pencarian berbasis kata.</div>'; return; }
+      out.innerHTML = scored.map((r, k) =>
+        '<div class="res-card"><div class="res-top"><span class="res-rank">#' + (k + 1) + '</span>' +
+        '<div class="res-track"><div class="res-fill" style="width:' + Math.round(r.s * 100) + '%"></div></div>' +
+        '<span class="res-score">' + r.s.toFixed(2) + '</span></div>' +
+        '<div class="res-text">' + esc(PASSAGES[r.i]) + '</div>' +
+        '<div class="res-match">kata yang cocok: ' + (r.m.length ? esc(Array.from(new Set(r.m)).join(', ')) : '—') + '</div></div>'
+      ).join('');
+    }
+    input.addEventListener('input', run);
+    document.querySelectorAll('.preset-row [data-q]').forEach(b => b.addEventListener('click', () => { input.value = b.dataset.q; run(); }));
+    run();
+  })();
+
+  /* ══ Chunking demo ══ */
+  (function () {
+    const SAMPLE = 'Mahasiswa dapat mengajukan cuti akademik paling lama dua semester berturut-turut dengan persetujuan dekan. Permohonan cuti diajukan sebelum masa registrasi semester berjalan dimulai. Selama cuti, mahasiswa tidak diperkenankan mengikuti kegiatan perkuliahan dan ujian. Masa cuti tidak dihitung sebagai bagian dari batas masa studi. Mahasiswa yang tidak melakukan registrasi tanpa izin cuti dinyatakan mengundurkan diri setelah dua semester berturut-turut.';
+    const cs = document.getElementById('cs'), co = document.getElementById('co');
+    const csv = document.getElementById('cs-val'), cov = document.getElementById('co-val');
+    const list = document.getElementById('chunk-list'), sum = document.getElementById('chunk-summary');
+    function render() {
+      const size = +cs.value;
+      const ov = Math.min(+co.value, size - 10);
+      csv.textContent = size; cov.textContent = ov;
+      let start = 0, i = 0, html = '', n = 0, midSentence = 0;
+      while (start < SAMPLE.length) {
+        const end = Math.min(start + size, SAMPLE.length);
+        const seg = SAMPLE.slice(start, end);
+        const k = i > 0 ? Math.min(ov, seg.length) : 0;
+        const body = k ? '<mark>' + esc(seg.slice(0, k)) + '</mark>' + esc(seg.slice(k)) : esc(seg);
+        n++;
+        if (!/[.]\s*$/.test(seg)) midSentence++;
+        html += '<div class="chunk-card"><div class="chunk-meta">CHUNK ' + (i + 1) + ' · karakter ' + start + '–' + end + ' · ' + seg.length + ' karakter</div><div class="chunk-text">' + body + '</div></div>';
+        if (end >= SAMPLE.length) break;
+        start = end - ov; i++;
+      }
+      list.innerHTML = html;
+      sum.textContent = 'Total teks ' + SAMPLE.length + ' karakter → ' + n + ' chunk. ' + midSentence + ' dari ' + n + ' chunk tidak berakhir di akhir kalimat.';
+    }
+    cs.addEventListener('input', render); co.addEventListener('input', render);
+    render();
+  })();
+
+  /* ══ Quiz ══ */
+  let correctCount = 0;
+  const TOTAL = document.querySelectorAll('.quiz-box').length;
+  document.getElementById('score-total').textContent = TOTAL;
+  document.querySelectorAll('.quiz-box').forEach(box => {
+    const correct = box.querySelector('.quiz-options').dataset.correct;
+    const opts = box.querySelectorAll('.quiz-opt');
+    const explanation = box.querySelector('.quiz-explanation');
+    let answered = false;
+    opts.forEach(opt => {
+      opt.addEventListener('click', () => {
+        if (answered) return;
+        answered = true;
+        opts.forEach(o => {
+          if (o.dataset.val === correct) o.classList.add('correct');
+          else if (o === opt) o.classList.add('wrong');
+          o.style.cursor = 'default';
+        });
+        if (opt.dataset.val === correct) correctCount++;
+        explanation.classList.add('show');
+        updateScore();
+      });
+    });
+  });
+  function updateScore() {
+    const pct = Math.round((correctCount / TOTAL) * 100);
+    document.getElementById('score-display').textContent = correctCount;
+    const bar = document.getElementById('score-bar');
+    bar.style.width = pct + '%';
+    if (pct >= 90) bar.style.background = 'var(--teal)';
+    else if (pct >= 70) bar.style.background = 'var(--blue)';
+    else if (pct >= 50) bar.style.background = 'var(--amber)';
+    else bar.style.background = 'var(--red)';
+    let msg;
+    if (correctCount === TOTAL) msg = '🎯 Sempurna! Fondasi RAG sudah kuat.';
+    else if (correctCount >= TOTAL - 1) msg = 'Hampir sempurna! Baca penjelasan soal yang salah.';
+    else if (correctCount >= TOTAL / 2) msg = 'Lumayan! Review lagi bagian yang kurang.';
+    else msg = 'Terus semangat — baca ulang materinya.';
+    document.getElementById('score-msg').textContent = msg;
+  }
+
+  /* ══ TOC active tracking ══ */
+  const headings = document.querySelectorAll('.content-main .content-block[id]');
+  const tocLinks = document.querySelectorAll('.toc-list a');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(a => {
+          a.classList.remove('active');
+          if (a.getAttribute('href') === '#' + entry.target.id) a.classList.add('active');
+        });
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px' });
+  headings.forEach(h => observer.observe(h));
+
+  const navLinks = document.querySelectorAll('.nav-links a[href^="#"]');
+  window.addEventListener('scroll', () => {
+    let current = '';
+    headings.forEach(h => { if (window.scrollY >= h.offsetTop - 100) current = h.id; });
+    navLinks.forEach(a => {
+      a.classList.remove('active');
+      if (a.getAttribute('href') === '#' + current) a.classList.add('active');
+    });
+  });
+</script>
+</body>
+</html>
