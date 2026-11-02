@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>P-10: AI untuk Quality Control & Predictive Maintenance — Teknik Industri UKWMS</title>
+<link rel="stylesheet" href="../../css/style.css">
+<style>
+  /* ── Table wrapper ── */
+  .table-wrap { overflow-x: auto; margin: var(--s4) 0; }
+  .table-wrap .industry-table { margin: 0; min-width: 560px; }
+
+  /* ── Flow steps ── */
+  .flow-steps {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: var(--s3);
+    margin: var(--s5) 0;
+  }
+  .flow-step {
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: var(--r2);
+    padding: var(--s4);
+    position: relative;
+  }
+  .flow-step:not(:last-child)::after {
+    content: '→';
+    position: absolute;
+    right: -11px; top: 50%;
+    transform: translateY(-50%);
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--text-3);
+    background: var(--bg);
+    z-index: 1;
+    line-height: 1;
+  }
+  .flow-num { font-family: var(--mono); font-size: 11px; color: var(--teal); margin-bottom: var(--s2); }
+  .flow-title { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+  .flow-desc { font-size: 12px; color: var(--text-2); line-height: 1.6; }
+
+  /* ── Confusion matrix ── */
+  .cm-box {
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: var(--r3);
+    padding: var(--s5);
+    margin: var(--s5) 0;
+  }
+  .cm-label {
+    font-family: var(--mono); font-size: 10px; color: var(--text-3);
+    letter-spacing: 2px; text-transform: uppercase; margin-bottom: var(--s4);
+  }
+  .cm-grid {
+    display: grid;
+    grid-template-columns: 110px 1fr 1fr;
+    gap: 6px;
+    max-width: 560px;
+    font-size: 12px;
+  }
+  .cm-head {
+    font-family: var(--mono); font-size: 10px; color: var(--text-3);
+    letter-spacing: 1px; text-transform: uppercase;
+    display: flex; align-items: center; justify-content: center; text-align: center; padding: 4px;
+  }
+  .cm-cell { border-radius: var(--r2); padding: var(--s4); text-align: center; border: 1px solid var(--border); }
+  .cm-cell .cm-num { font-family: var(--mono); font-size: 22px; font-weight: 600; line-height: 1.2; }
+  .cm-cell .cm-name { font-size: 11px; color: var(--text-2); margin-top: 2px; line-height: 1.5; }
+  .cm-tp { background: var(--teal-glow); border-color: rgba(0,201,177,0.3); }
+  .cm-tp .cm-num { color: var(--teal); }
+  .cm-tn { background: var(--bg-3); }
+  .cm-tn .cm-num { color: var(--text-2); }
+  .cm-fn { background: rgba(240,96,96,0.08); border-color: rgba(240,96,96,0.3); }
+  .cm-fn .cm-num { color: var(--red); }
+  .cm-fp { background: var(--amber-dim); border-color: rgba(255,180,50,0.3); }
+  .cm-fp .cm-num { color: var(--amber); }
+  .cm-note { font-size: 12px; color: var(--text-3); margin-top: var(--s4); line-height: 1.8; }
+  .cm-note strong { color: var(--text); }
+
+  /* ── Chart sensor ── */
+  .chart-box {
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: var(--r3);
+    padding: var(--s5);
+    margin: var(--s5) 0;
+  }
+  .chart-box svg { width: 100%; height: auto; display: block; }
+  .chart-caption { font-size: 12px; color: var(--text-3); margin-top: var(--s3); line-height: 1.7; }
+
+  /* ── Data tables ── */
+  .data-table { width: 100%; border-collapse: collapse; font-size: 12px; margin: var(--s3) 0; }
+  .data-table th {
+    background: var(--bg-3); border: 1px solid var(--border);
+    padding: var(--s2) var(--s3); text-align: center;
+    font-family: var(--mono); font-size: 11px; color: var(--text-3);
+  }
+  .data-table td {
+    border: 1px solid var(--border); padding: var(--s2) var(--s3);
+    color: var(--text-2); font-family: var(--mono); text-align: center;
+  }
+  .data-table td.row-h { text-align: left; color: var(--text-3); background: var(--bg-2); }
+
+  /* ── Prompt / lab box ── */
+  .prompt-box { background: var(--bg-2); border: 1px solid var(--border); border-radius: var(--r2); margin: var(--s4) 0; overflow: hidden; }
+  .prompt-head {
+    display: flex; justify-content: space-between; align-items: center; gap: var(--s3);
+    padding: var(--s3) var(--s4); background: var(--bg-3); border-bottom: 1px solid var(--border);
+    font-family: var(--mono); font-size: 11px; color: var(--text-3); letter-spacing: 1px;
+  }
+  .prompt-head .tag-mini { color: var(--teal); }
+  .prompt-body { padding: var(--s4) var(--s5); font-size: 13px; color: var(--text-2); line-height: 1.8; white-space: pre-wrap; }
+  .prompt-body strong { color: var(--text); }
+  .prompt-check {
+    padding: var(--s3) var(--s5); border-top: 1px solid var(--border);
+    background: var(--amber-dim); font-size: 12px; color: var(--text-2); line-height: 1.7;
+  }
+  .prompt-check strong { color: var(--amber); }
+
+  /* ── Lab steps ── */
+  .lab-steps { margin: var(--s4) 0; padding-left: 0; list-style: none; counter-reset: lab; }
+  .lab-steps li {
+    counter-increment: lab;
+    position: relative;
+    padding: var(--s3) 0 var(--s3) 40px;
+    font-size: 14px; color: var(--text-2); line-height: 1.8;
+    border-bottom: 1px solid var(--border);
+  }
+  .lab-steps li:last-child { border-bottom: none; }
+  .lab-steps li::before {
+    content: counter(lab);
+    position: absolute; left: 0; top: var(--s3);
+    width: 26px; height: 26px; border-radius: 50%;
+    background: var(--teal-dim); color: var(--teal);
+    font-family: var(--mono); font-size: 12px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .lab-steps li strong { color: var(--text); }
+
+  /* ── Case cards ── */
+  .case-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: var(--s4); margin: var(--s5) 0; }
+  .case-card { background: var(--bg-2); border: 1px solid var(--border); border-top: 3px solid var(--blue); border-radius: var(--r3); padding: var(--s5); }
+  .case-card.pm { border-top-color: var(--teal); }
+  .case-tag { font-family: var(--mono); font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--text-3); margin-bottom: var(--s2); }
+  .case-card h4 { font-size: 15px; font-weight: 600; color: var(--text); margin-bottom: var(--s3); }
+  .case-card p { font-size: 13px !important; color: var(--text-2); line-height: 1.7 !important; margin-bottom: var(--s3) !important; }
+  .case-src { font-size: 11px; color: var(--text-3); padding-top: var(--s3); border-top: 1px solid var(--border); line-height: 1.6; }
+
+  @media (max-width: 900px) {
+    .flow-step:not(:last-child)::after { display: none; }
+    .cm-grid { grid-template-columns: 80px 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ══ NAV ══ -->
+<nav class="nav">
+  <div class="nav-logo">AI<span>·</span>UKWMS</div>
+  <ul class="nav-links">
+    <li><a href="../index.html">← Beranda</a></li>
+    <li><a href="#tujuan" class="active">Tujuan</a></li>
+    <li><a href="#qc">QC</a></li>
+    <li><a href="#metrik">Metrik</a></li>
+    <li><a href="#pdm">Maintenance</a></li>
+    <li><a href="#lab-a">Praktik</a></li>
+    <li><a href="#kasus">Studi Kasus</a></li>
+    <li><a href="#tugas">Tugas</a></li>
+  </ul>
+</nav>
+
+<!-- ══ HERO ══ -->
+<header class="sesi-hero">
+  <div style="max-width:1100px;margin:0 auto;">
+    <div class="sesi-breadcrumb">
+      <a href="../index.html">Kecerdasan Buatan · Teknik Industri</a>
+      <span>›</span>
+      <span>Pertemuan 10</span>
+    </div>
+    <div class="sesi-num" style="color:var(--teal);">PERTEMUAN 10 · PRAKTIK</div>
+    <h1 class="sesi-title">AI untuk Quality Control<br><em style="color:var(--teal);">& Predictive Maintenance</em></h1>
+    <p style="font-size:15px;color:var(--text-2);max-width:720px;line-height:1.8;">Computer vision untuk inspeksi visual dan data sensor untuk memprediksi kerusakan mesin. Fokusnya pada cara menilai kinerja, menghitung nilai ekonominya, dan membaca klaim vendor secara kritis, bukan membangun model dari nol.</p>
+    <div class="sesi-meta-row">
+      <span class="badge badge-blue">S1 Teknik Industri</span>
+      <span class="badge badge-teal">Praktik</span>
+      <span class="badge badge-amber">Blok 2</span>
+      <span class="badge" style="color:var(--teal);border-color:rgba(0,201,177,0.3);background:var(--teal-dim);">100 menit</span>
+    </div>
+  </div>
+</header>
+
+<!-- ══ CONTENT LAYOUT ══ -->
+<div class="content-layout">
+  <main class="content-main">
+
+    <!-- TUJUAN -->
+    <div class="content-block" id="tujuan">
+      <h2>Tujuan Pembelajaran</h2>
+      <p>Setelah dua sesi tentang bahasa (P-08 dan P-09), kita kembali ke data yang paling dekat dengan lantai produksi: <em>gambar produk</em> dan <em>sinyal mesin</em>. Setelah sesi ini, mahasiswa diharapkan mampu:</p>
+      <ol>
+        <li>Menjelaskan empat jenis tugas computer vision untuk inspeksi (klasifikasi, deteksi objek, segmentasi, deteksi anomali) dan syarat implementasinya di lini produksi</li>
+        <li>Menghitung dan menafsirkan precision, recall, dan accuracy dari confusion matrix, serta mengaitkannya dengan biaya salah-deteksi</li>
+        <li>Membedakan strategi pemeliharaan reaktif, preventif, berbasis kondisi, dan prediktif beserta data yang dibutuhkan masing-masing</li>
+        <li>Menganalisis data sensor sederhana di spreadsheet untuk menentukan ambang peringatan dini dan menghitung nilai ekonominya</li>
+        <li>Mengevaluasi studi kasus implementasi secara kritis, termasuk memisahkan klaim yang terukur dari klaim pemasaran</li>
+      </ol>
+
+      <div class="callout tip" style="margin-top:var(--s5);">
+        <span class="callout-icon">💡</span>
+        <div class="callout-body">
+          <p><strong>Cara pandang Teknik Industri:</strong> model yang "akurat" belum tentu menguntungkan. Pertanyaan yang menentukan adalah: berapa biaya kalau model meleset ke arah yang satu, dan berapa kalau ke arah yang lain? Sesi ini melatih Anda menerjemahkan metrik teknis menjadi rupiah.</p>
+        </div>
+      </div>
+
+      <div class="callout warn">
+        <span class="callout-icon">🧪</span>
+        <div class="callout-body">
+          <p><strong>Siapkan untuk praktik:</strong> laptop dengan webcam (atau ponsel), akses internet, dan Excel atau Google Sheets. Praktik A memakai alat klasifikasi gambar berbasis browser seperti Google Teachable Machine (atau alat sejenis). Semua objek dan data sensor yang dipakai bersifat contoh, bukan data perusahaan.</p>
+        </div>
+      </div>
+
+      <h3 style="margin-top:var(--s6);">Alur Sesi (100 menit)</h3>
+      <div class="timeline" style="margin-top:var(--s4);">
+        <div class="tl-item">
+          <div class="tl-year">0–10 menit</div>
+          <div class="tl-event">Pembuka: Bagaimana Inspeksi dan Perawatan Dilakukan Hari Ini?</div>
+          <div class="tl-desc">Diskusi singkat: siapa yang memeriksa produk, kapan mesin dirawat, dan apa yang terjadi bila terlambat.</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-year">10–35 menit</div>
+          <div class="tl-event">AI untuk QC dan Cara Mengukurnya</div>
+          <div class="tl-desc">Jenis tugas vision, syarat lini, confusion matrix, dan biaya salah-deteksi.</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-year">35–50 menit</div>
+          <div class="tl-event">Predictive Maintenance</div>
+          <div class="tl-desc">Tangga strategi pemeliharaan, sensor, alur data, dan jenis model.</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-year">50–85 menit</div>
+          <div class="tl-event">Praktik A dan B</div>
+          <div class="tl-desc">A: klasifikasi gambar sederhana dan hitung metriknya. B: analisis data getaran di spreadsheet dan hitung nilai peringatan dini.</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-year">85–95 menit</div>
+          <div class="tl-event">Studi Kasus dan Membaca Klaim Vendor</div>
+          <div class="tl-desc">Dua kasus implementasi dan daftar pertanyaan kritis.</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-year">95–100 menit</div>
+          <div class="tl-event">Penugasan</div>
+          <div class="tl-desc">Pengantar mini-proposal P-10.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 1. QC -->
+    <div class="content-block" id="qc">
+      <h2>1. AI untuk Quality Control: Computer Vision</h2>
+      <p>Inspeksi visual manual bergantung pada perhatian manusia yang menurun pada pekerjaan berulang. Computer vision mengambil gambar produk dari kamera di lini dan memutuskan: lolos, cacat, atau perlu dicek manusia.</p>
+
+      <h3>Empat Jenis Tugas</h3>
+      <div class="table-wrap">
+        <table class="industry-table">
+          <thead>
+            <tr><th>Jenis tugas</th><th>Pertanyaan yang dijawab</th><th>Contoh di industri</th><th>Kebutuhan data</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="sector-name">Klasifikasi gambar</td>
+              <td>Gambar ini kelas apa? (OK / cacat / jenis cacat)</td>
+              <td>Tutup botol utuh vs penyok; kain bebas cacat vs bernoda</td>
+              <td>Banyak gambar berlabel per kelas</td>
+            </tr>
+            <tr>
+              <td class="sector-name">Deteksi objek</td>
+              <td>Ada apa dan di mana? (kotak pembatas)</td>
+              <td>Komponen hilang pada rakitan; label miring di botol</td>
+              <td>Gambar dengan kotak berlabel (lebih mahal)</td>
+            </tr>
+            <tr>
+              <td class="sector-name">Segmentasi</td>
+              <td>Piksel mana yang cacat? (bentuk dan luas)</td>
+              <td>Luas goresan pada cat bodi; area las yang tidak rata</td>
+              <td>Gambar dengan area cacat ditandai piksel demi piksel</td>
+            </tr>
+            <tr>
+              <td class="sector-name">Deteksi anomali</td>
+              <td>Apakah gambar ini <em>berbeda</em> dari yang normal?</td>
+              <td>Cacat yang jarang dan beragam sehingga sulit dikumpulkan contohnya</td>
+              <td>Terutama gambar produk normal; contoh cacat sedikit atau tidak ada</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 style="margin-top:var(--s6);">Syarat Agar Berhasil di Lantai Produksi</h3>
+      <div class="concept-grid">
+        <div class="concept-card">
+          <div class="concept-card-label" style="color:var(--amber);">Lingkungan</div>
+          <div class="concept-card-title">Pencahayaan dan posisi kamera tetap</div>
+          <div class="concept-card-body">Perubahan cahaya, bayangan, debu, atau posisi produk adalah penyebab umum kegagalan. Rancang dudukan kamera dan pencahayaan terkontrol sebelum memikirkan model.</div>
+        </div>
+        <div class="concept-card">
+          <div class="concept-card-label" style="color:var(--blue);">Data</div>
+          <div class="concept-card-title">Variasi dan kualitas label</div>
+          <div class="concept-card-body">Contoh harus mencakup variasi nyata (shift, bahan, pemasok). Label yang tidak konsisten antar inspektur akan "diajarkan" ke model. Cacat yang langka membuat data tidak seimbang.</div>
+        </div>
+        <div class="concept-card">
+          <div class="concept-card-label" style="color:var(--teal);">Proses</div>
+          <div class="concept-card-title">Peran manusia tetap ada</div>
+          <div class="concept-card-body">Rancang jalur untuk kasus ragu-ragu (diteruskan ke inspektur), dan libatkan inspektur dalam pelabelan dan evaluasi. Mereka tahu mana cacat sungguhan dan mana sekadar debu.</div>
+        </div>
+        <div class="concept-card">
+          <div class="concept-card-label" style="color:var(--red);">Perubahan</div>
+          <div class="concept-card-title">Model bisa usang (drift)</div>
+          <div class="concept-card-body">Varian produk baru, pemasok bahan berbeda, atau kamera yang bergeser membuat kinerja menurun diam-diam. Perlu pemantauan berkala dan rencana pelatihan ulang.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. METRIK -->
+    <div class="content-block" id="metrik">
+      <h2>2. Mengukur Model QC: Confusion Matrix dan Biaya</h2>
+      <p>Bayangkan 1.000 produk diperiksa, dan sebenarnya ada 50 yang cacat. Model mengambil keputusan untuk setiap produk. Hasilnya dapat dirangkum dalam empat angka (data ilustrasi):</p>
+
+      <div class="cm-box">
+        <div class="cm-label">Ilustrasi · 1.000 produk, 50 cacat sebenarnya</div>
+        <div class="cm-grid">
+          <div></div>
+          <div class="cm-head">Model bilang CACAT</div>
+          <div class="cm-head">Model bilang OK</div>
+          <div class="cm-head">Sebenarnya cacat</div>
+          <div class="cm-cell cm-tp"><div class="cm-num">40</div><div class="cm-name">True Positive<br>cacat terdeteksi</div></div>
+          <div class="cm-cell cm-fn"><div class="cm-num">10</div><div class="cm-name">False Negative<br>cacat lolos</div></div>
+          <div class="cm-head">Sebenarnya OK</div>
+          <div class="cm-cell cm-fp"><div class="cm-num">30</div><div class="cm-name">False Positive<br>produk bagus ditolak</div></div>
+          <div class="cm-cell cm-tn"><div class="cm-num">920</div><div class="cm-name">True Negative<br>OK dikenali OK</div></div>
+        </div>
+        <div class="cm-note">
+          <strong>Precision</strong> = 40 ÷ (40 + 30) = <strong>57,1%</strong> (dari yang ditandai cacat, berapa yang benar-benar cacat)<br>
+          <strong>Recall</strong> = 40 ÷ (40 + 10) = <strong>80%</strong> (dari semua cacat, berapa yang tertangkap)<br>
+          <strong>Accuracy</strong> = (40 + 920) ÷ 1.000 = <strong>96%</strong> (dari semua keputusan, berapa yang benar)
+        </div>
+      </div>
+
+      <div class="callout warn">
+        <span class="callout-icon">⚠️</span>
+        <div class="callout-body">
+          <p><strong>Jebakan accuracy:</strong> sistem yang selalu menjawab "OK" untuk semua produk juga akan memiliki accuracy 950 ÷ 1.000 = <strong>95%</strong>, tetapi recall-nya 0%. Pada cacat yang langka, accuracy menyesatkan. Lihat recall dan precision.</p>
+        </div>
+      </div>
+
+      <h3>Terjemahkan ke Rupiah</h3>
+      <p>Dua jenis kesalahan punya biaya berbeda. Misalkan (angka fiktif): satu cacat yang lolos ke pelanggan memicu klaim dan penarikan sebesar <strong style="color:var(--text)">Rp500.000</strong>, sedangkan satu produk bagus yang salah dibuang atau dicek ulang berbiaya <strong style="color:var(--text)">Rp20.000</strong>.</p>
+      <div class="table-wrap">
+        <table class="industry-table">
+          <thead><tr><th>Jenis kesalahan</th><th>Jumlah</th><th>Biaya per kasus</th><th>Total biaya</th></tr></thead>
+          <tbody>
+            <tr><td class="sector-name">False Negative (cacat lolos)</td><td>10</td><td>Rp500.000</td><td>Rp5.000.000</td></tr>
+            <tr><td class="sector-name">False Positive (bagus ditolak)</td><td>30</td><td>Rp20.000</td><td>Rp600.000</td></tr>
+            <tr><td class="sector-name" style="color:var(--teal);">Total</td><td></td><td></td><td style="color:var(--teal);font-family:var(--mono);">Rp5.600.000</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout info">
+        <span class="callout-icon">📌</span>
+        <div class="callout-body">
+          <p><strong>Implikasi desain:</strong> karena cacat lolos jauh lebih mahal, perusahaan ini rela menaikkan false positive demi menaikkan recall, misalnya dengan menurunkan ambang keputusan dan meneruskan kasus ragu-ragu ke inspektur. Untuk produk yang risikonya rendah, kebalikannya bisa lebih masuk akal. <em>Ambang keputusan adalah keputusan bisnis, bukan sekadar pengaturan teknis.</em></p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. PDM -->
+    <div class="content-block" id="pdm">
+      <h2>3. Predictive Maintenance</h2>
+      <p>Tujuannya sederhana: mendeteksi tanda awal kerusakan sehingga perbaikan bisa dijadwalkan <em>sebelum</em> mesin berhenti mendadak. Ini bukan serba-AI. Banyak keberhasilan berasal dari sensor dan ambang yang dipikirkan baik, baru kemudian model yang lebih canggih.</p>
+
+      <h3>Tangga Strategi Pemeliharaan</h3>
+      <div class="table-wrap">
+        <table class="industry-table">
+          <thead>
+            <tr><th>Strategi</th><th>Pemicu tindakan</th><th>Kelebihan</th><th>Kelemahan</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="sector-name">Reaktif</td>
+              <td>Setelah rusak</td>
+              <td>Tanpa investasi awal</td>
+              <td>Downtime mendadak, kerusakan ikutan, biaya darurat</td>
+            </tr>
+            <tr>
+              <td class="sector-name">Preventif (terjadwal)</td>
+              <td>Interval waktu atau jam operasi</td>
+              <td>Terencana, mudah dikelola</td>
+              <td>Bisa mengganti komponen yang masih bagus, atau tetap kecolongan antar jadwal</td>
+            </tr>
+            <tr>
+              <td class="sector-name">Berbasis kondisi</td>
+              <td>Ukuran melewati ambang (suhu, getaran)</td>
+              <td>Tindakan sesuai kondisi nyata</td>
+              <td>Butuh sensor dan penetapan ambang yang baik</td>
+            </tr>
+            <tr>
+              <td class="sector-name">Prediktif</td>
+              <td>Model memperkirakan kapan kondisi akan memburuk</td>
+              <td>Jadwal perbaikan optimal, peringatan lebih dini</td>
+              <td>Butuh data historis kegagalan, keahlian, dan perawatan model</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 style="margin-top:var(--s6);">Dari Sensor ke Keputusan</h3>
+      <div class="flow-steps">
+        <div class="flow-step">
+          <div class="flow-num">01</div>
+          <div class="flow-title">Sensor</div>
+          <div class="flow-desc">Getaran, suhu, arus motor, tekanan, suara/ultrasonik, kondisi oli.</div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">02</div>
+          <div class="flow-title">Pengumpulan data</div>
+          <div class="flow-desc">Gateway, PLC/SCADA, atau IoT mengirim data ke penyimpanan terpusat.</div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">03</div>
+          <div class="flow-title">Analitik</div>
+          <div class="flow-desc">Ambang, deteksi anomali, atau model prediksi sisa umur pakai.</div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">04</div>
+          <div class="flow-title">Peringatan</div>
+          <div class="flow-desc">Notifikasi ke teknisi dengan tingkat urgensi dan bukti pendukung.</div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">05</div>
+          <div class="flow-title">Tindakan</div>
+          <div class="flow-desc">Work order di sistem perawatan, pemesanan suku cadang, penjadwalan henti.</div>
+        </div>
+      </div>
+
+      <h3>Tiga Jenis Model yang Umum</h3>
+      <div class="concept-grid">
+        <div class="concept-card">
+          <div class="concept-card-label" style="color:var(--blue);">Deteksi anomali</div>
+          <div class="concept-card-title">"Ini tidak seperti biasanya"</div>
+          <div class="concept-card-body">Belajar kondisi normal, lalu menandai penyimpangan. Cocok bila data kegagalan sedikit. Konsepnya sama dengan deteksi anomali pada gambar.</div>
+        </div>
+        <div class="concept-card">
+          <div class="concept-card-label" style="color:var(--teal);">Klasifikasi kondisi</div>
+          <div class="concept-card-title">"Mesin ini sehat / waspada / kritis"</div>
+          <div class="concept-card-body">Butuh data historis yang diberi label kondisi atau jenis kerusakan, misalnya ketidakseimbangan, bearing aus, atau misalignment.</div>
+        </div>
+        <div class="concept-card">
+          <div class="concept-card-label" style="color:var(--amber);">Prediksi sisa umur</div>
+          <div class="concept-card-title">"Sekitar berapa lama lagi?"</div>
+          <div class="concept-card-body">Regresi atau time series untuk memperkirakan sisa umur pakai (RUL). Paling menuntut data, dan paling bernilai bila biaya salah jadwal tinggi.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4. PRAKTIK A -->
+    <div class="content-block" id="lab-a">
+      <h2>4. Praktik A: Klasifikasi Gambar Sederhana</h2>
+      <p>Tujuan praktik ini bukan membuat sistem yang siap produksi, melainkan merasakan sendiri mengapa data, pencahayaan, dan metrik begitu menentukan.</p>
+
+      <ol class="lab-steps">
+        <li><strong>Tentukan dua kelas</strong> dari benda di sekitar Anda yang mudah dibedakan secara visual, misalnya "tutup botol utuh" vs "tutup botol penyok", atau "kertas bersih" vs "kertas bernoda".</li>
+        <li><strong>Kumpulkan data latih:</strong> ambil minimal 40 gambar per kelas lewat webcam dengan variasi posisi dan sudut. Catat kondisi cahaya saat mengambil gambar.</li>
+        <li><strong>Latih model</strong> memakai alat klasifikasi gambar berbasis browser, lalu uji.</li>
+        <li><strong>Siapkan data uji terpisah:</strong> 20 objek (10 per kelas) yang <em>tidak</em> dipakai saat melatih. Catat hasil tebakan model untuk tiap objek.</li>
+        <li><strong>Isi confusion matrix</strong> dan hitung precision, recall, dan accuracy untuk kelas "cacat".</li>
+        <li><strong>Uji ketahanan:</strong> ubah pencahayaan (matikan satu lampu atau gunakan senter dari samping) dan ulangi pengujian. Catat penurunan kinerjanya.</li>
+        <li><strong>Hitung biaya</strong> dengan angka biaya fiktif yang Anda tentukan sendiri untuk false negative dan false positive, lalu putuskan: model ini layak dipakai atau tidak?</li>
+      </ol>
+
+      <div class="callout tip">
+        <span class="callout-icon">🧠</span>
+        <div class="callout-body">
+          <p><strong>Pertanyaan diskusi:</strong> (1) Apa yang berubah ketika pencahayaan berubah, dan apa artinya bagi pemasangan kamera di lini? (2) Jika data latih Anda hanya diambil dari satu orang dan satu meja, apa risikonya saat dipakai di tempat lain? (3) Apakah accuracy atau recall yang lebih penting bagi kasus Anda?</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5. PRAKTIK B -->
+    <div class="content-block" id="lab-b">
+      <h2>5. Praktik B: Peringatan Dini dari Data Getaran</h2>
+      <p>Data berikut adalah <strong style="color:var(--text)">data fiktif</strong> getaran (RMS, mm/s) pada sebuah pompa selama 12 hari. Ambang fiktif: <strong style="color:var(--amber)">peringatan 4,5 mm/s</strong> dan <strong style="color:var(--red)">bahaya (henti) 7,0 mm/s</strong>.</p>
+
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr><th>Hari</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>7</th><th>8</th><th>9</th><th>10</th><th>11</th><th>12</th></tr>
+          </thead>
+          <tbody>
+            <tr><td class="row-h">mm/s</td><td>2,1</td><td>2,2</td><td>2,1</td><td>2,3</td><td>2,4</td><td>2,6</td><td>2,9</td><td>3,3</td><td>3,8</td><td>4,5</td><td>5,4</td><td>6,6</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="chart-box">
+        <svg viewBox="0 0 660 260" role="img" aria-label="Grafik getaran pompa 12 hari, naik dari 2,1 menjadi 6,6 mm/s dengan garis ambang peringatan 4,5 dan bahaya 7,0">
+          <!-- grid -->
+          <g stroke="var(--border)" stroke-width="1">
+            <line x1="50" y1="20"  x2="620" y2="20"/>
+            <line x1="50" y1="70"  x2="620" y2="70"/>
+            <line x1="50" y1="120" x2="620" y2="120"/>
+            <line x1="50" y1="170" x2="620" y2="170"/>
+            <line x1="50" y1="220" x2="620" y2="220"/>
+          </g>
+          <g fill="var(--text-3)" font-family="monospace" font-size="11" text-anchor="end">
+            <text x="42" y="224">0</text>
+            <text x="42" y="174">2</text>
+            <text x="42" y="124">4</text>
+            <text x="42" y="74">6</text>
+            <text x="42" y="24">8</text>
+          </g>
+          <!-- thresholds -->
+          <line x1="50" y1="107.5" x2="620" y2="107.5" stroke="var(--amber)" stroke-width="1.5" stroke-dasharray="6 4"/>
+          <text x="624" y="111" fill="var(--amber)" font-family="monospace" font-size="10">4,5</text>
+          <line x1="50" y1="45" x2="620" y2="45" stroke="var(--red)" stroke-width="1.5" stroke-dasharray="6 4"/>
+          <text x="624" y="49" fill="var(--red)" font-family="monospace" font-size="10">7,0</text>
+          <!-- data -->
+          <polyline fill="none" stroke="var(--teal)" stroke-width="2.5" stroke-linejoin="round"
+            points="50,167.5 101.8,165 153.6,167.5 205.5,162.5 257.3,160 309.1,155 360.9,147.5 412.7,137.5 464.5,125 516.4,107.5 568.2,85 620,55"/>
+          <g fill="var(--teal)">
+            <circle cx="50" cy="167.5" r="3.5"/><circle cx="101.8" cy="165" r="3.5"/><circle cx="153.6" cy="167.5" r="3.5"/>
+            <circle cx="205.5" cy="162.5" r="3.5"/><circle cx="257.3" cy="160" r="3.5"/><circle cx="309.1" cy="155" r="3.5"/>
+            <circle cx="360.9" cy="147.5" r="3.5"/><circle cx="412.7" cy="137.5" r="3.5"/><circle cx="464.5" cy="125" r="3.5"/>
+            <circle cx="516.4" cy="107.5" r="3.5"/><circle cx="568.2" cy="85" r="3.5"/><circle cx="620" cy="55" r="3.5"/>
+          </g>
+          <!-- x labels -->
+          <g fill="var(--text-3)" font-family="monospace" font-size="11" text-anchor="middle">
+            <text x="50" y="240">1</text><text x="101.8" y="240">2</text><text x="153.6" y="240">3</text>
+            <text x="205.5" y="240">4</text><text x="257.3" y="240">5</text><text x="309.1" y="240">6</text>
+            <text x="360.9" y="240">7</text><text x="412.7" y="240">8</text><text x="464.5" y="240">9</text>
+            <text x="516.4" y="240">10</text><text x="568.2" y="240">11</text><text x="620" y="240">12</text>
+          </g>
+          <text x="335" y="256" fill="var(--text-3)" font-family="monospace" font-size="10" text-anchor="middle">hari</text>
+        </svg>
+        <div class="chart-caption">Getaran naik pelan di awal, lalu semakin cepat. Garis putus-putus oranye adalah ambang peringatan, garis merah adalah ambang bahaya.</div>
+      </div>
+
+      <h3>Kerjakan di Spreadsheet</h3>
+      <ol class="lab-steps">
+        <li><strong>Baseline:</strong> hitung rata-rata hari 1–5 sebagai kondisi normal.</li>
+        <li><strong>Rasio terhadap baseline</strong> untuk setiap hari (nilai ÷ baseline).</li>
+        <li><strong>Rata-rata bergerak 3 hari</strong> untuk meredam fluktuasi.</li>
+        <li><strong>Laju kenaikan harian</strong> (% perubahan dibanding hari sebelumnya).</li>
+        <li><strong>Bandingkan dua aturan peringatan:</strong> ambang tetap 4,5 mm/s vs ambang dinamis "melebihi 1,5 × baseline". Pada hari ke berapa masing-masing berbunyi?</li>
+        <li><strong>Perkirakan</strong> getaran hari ke-13 bila laju kenaikan terakhir berlanjut, dan apakah akan melewati 7,0.</li>
+      </ol>
+
+      <div class="prompt-box">
+        <div class="prompt-head"><span>CEK JAWABAN</span><span class="tag-mini">Hitung sendiri dulu</span></div>
+        <div class="prompt-body">Baseline (hari 1–5) = (2,1 + 2,2 + 2,1 + 2,3 + 2,4) ÷ 5 = <strong>2,22 mm/s</strong>
+Rasio hari 12 = 6,6 ÷ 2,22 ≈ <strong>3,0 ×</strong> baseline
+Rata-rata bergerak 3 hari pada hari 12 = (4,5 + 5,4 + 6,6) ÷ 3 = <strong>5,5 mm/s</strong>
+Laju kenaikan: hari 10 = +18,4%, hari 11 = +20,0%, hari 12 = +22,2% (makin cepat)
+Ambang dinamis 1,5 × 2,22 = 3,33 → pertama kali terlampaui <strong>hari 9</strong> (3,8)
+Ambang tetap 4,5 → pertama kali tercapai <strong>hari 10</strong> (4,5)
+Perkiraan hari 13 bila +22% berlanjut: 6,6 × 1,222 ≈ <strong>8,1 mm/s</strong> (melampaui 7,0)</div>
+        <div class="prompt-check"><strong>Diskusi:</strong> ambang dinamis memberi peringatan satu hari lebih awal. Apakah satu hari cukup untuk memesan suku cadang dan menjadwalkan henti? Apa risikonya bila ambang dinamis terlalu sensitif (banyak alarm palsu)?</div>
+      </div>
+
+      <h3 style="margin-top:var(--s6);">Hitung Nilai Peringatan Dini</h3>
+      <p>Misalkan (angka fiktif) bearing pompa diganti pada jendela henti terencana atau dibiarkan hingga rusak mendadak:</p>
+      <div class="table-wrap">
+        <table class="industry-table">
+          <thead><tr><th>Komponen biaya</th><th>Perbaikan terencana</th><th>Rusak mendadak</th></tr></thead>
+          <tbody>
+            <tr><td class="sector-name">Suku cadang dan tenaga kerja</td><td>Rp15.000.000</td><td>Rp60.000.000 (kerusakan ikutan pada poros)</td></tr>
+            <tr><td class="sector-name">Lama henti</td><td>4 jam (dijadwalkan di luar jam sibuk)</td><td>16 jam (tidak terencana)</td></tr>
+            <tr><td class="sector-name">Kerugian produksi per jam</td><td>Rp2.000.000</td><td>Rp8.000.000</td></tr>
+            <tr><td class="sector-name">Total</td><td style="font-family:var(--mono);">Rp23.000.000</td><td style="font-family:var(--mono);">Rp188.000.000</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p style="font-size:14px;">Selisih <strong style="color:var(--teal)">Rp165.000.000</strong> per kejadian adalah nilai satu peringatan dini yang tepat. Pertanyaan lanjutan: berapa banyak peringatan palsu yang masih layak dibayar untuk satu peringatan yang benar?</p>
+
+      <div class="callout info">
+        <span class="callout-icon">🤖</span>
+        <div class="callout-body">
+          <p><strong>Peran LLM di sini (sambungan P-08 dan P-09):</strong> LLM boleh membantu menuliskan rumus spreadsheet atau menjelaskan hasil, tetapi hitungan sebaiknya dijalankan di spreadsheet dan dibandingkan dengan kunci di atas. Jangan menyerahkan perhitungan ke jawaban teks model.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 6. STUDI KASUS -->
+    <div class="content-block" id="kasus">
+      <h2>6. Studi Kasus dan Cara Membacanya</h2>
+      <p>Dua kasus berikut dipilih karena dokumentasinya terbuka. Keduanya bersumber dari publikasi media industri dan vendor, jadi bacalah dengan kacamata kritis.</p>
+
+      <div class="case-grid">
+        <div class="case-card">
+          <div class="case-tag">Quality Control · Otomotif</div>
+          <h4>BMW Group Plant Steyr: Inspeksi Visual Otonom</h4>
+          <p>Pabrik BMW di Steyr, Austria, memakai sistem machine vision otonom (INSPEKTO S70) untuk inspeksi kualitas komponen. Setelah fase percontohan, pabrik membeli empat unit. Laporan menyebut perbaikan kualitas dan berkurangnya deteksi palsu, sehingga putaran pengecekan manual ulang bisa dihindari.</p>
+          <p>Pelajaran: nilai utama datang dari <em>menurunkan false positive</em> (pseudo-defect), bukan sekadar menangkap cacat. Sistem juga dibawa dekat ke operator lini.</p>
+          <div class="case-src">Sumber: artikel Manufacturing Digital, "BMW: Quality Control Through Artificial Intelligence". Angka kinerja rinci tidak dipublikasikan di artikel tersebut.</div>
+        </div>
+        <div class="case-card pm">
+          <div class="case-tag">Predictive Maintenance · Pergudangan</div>
+          <h4>Sensor Getaran pada Konveyor Cross-Belt</h4>
+          <p>Sebuah studi kasus dari vendor ifm memasang sensor getaran pada motor dan gearbox konveyor cross-belt di gudang untuk memantau tanda dini kerusakan. Disebutkan satu potensi kegagalan berhasil dicegah dengan penghematan sekitar US$30.000, dan proyeksi penghematan tahunan di atas US$250.000 per lokasi.</p>
+          <p>Pelajaran: angka tahunan adalah <em>proyeksi</em>, sedangkan angka yang sudah terjadi hanya satu kejadian. Bandingkan dengan logika perhitungan di Praktik B.</p>
+          <div class="case-src">Sumber: halaman "Predictive maintenance real-world use cases" di situs ifm (moneo). Klaim berasal dari vendor.</div>
+        </div>
+      </div>
+
+      <h3>Daftar Pertanyaan Kritis untuk Klaim Vendor</h3>
+      <div class="table-wrap">
+        <table class="industry-table">
+          <thead><tr><th>Pertanyaan</th><th>Mengapa penting</th></tr></thead>
+          <tbody>
+            <tr>
+              <td class="sector-name">Siapa yang melaporkan, dan apa kepentingannya?</td>
+              <td>Studi kasus vendor cenderung memilih hasil terbaik dan jarang memuat proyek yang gagal.</td>
+            </tr>
+            <tr>
+              <td class="sector-name">Pembandingnya apa?</td>
+              <td>"Turun 30%" dari kondisi apa? Reaktif murni, atau preventif yang sudah baik? Rentang klaim penurunan downtime di berbagai sumber industri sangat lebar, dari sekitar sepertiga hingga lebih dari tujuh puluh persen.</td>
+            </tr>
+            <tr>
+              <td class="sector-name">Terukur atau proyeksi?</td>
+              <td>Hasil yang sudah terjadi dan estimasi masa depan perlu dibedakan.</td>
+            </tr>
+            <tr>
+              <td class="sector-name">Berapa metrik teknisnya?</td>
+              <td>Precision, recall, dan jumlah alarm palsu jarang dilaporkan, padahal inilah penentu beban kerja dan biaya nyata.</td>
+            </tr>
+            <tr>
+              <td class="sector-name">Apa kondisi pendukungnya?</td>
+              <td>Kualitas data, jumlah mesin, keahlian tim, dan biaya total (sensor, integrasi, perawatan model) menentukan apakah hasilnya bisa ditiru di tempat lain.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 7. TUGAS -->
+    <div class="content-block" id="tugas">
+      <h2>7. Tugas: Mini-Proposal QC atau Predictive Maintenance</h2>
+
+      <div class="task-box" id="penugasan">
+        <div class="task-box-title">📋 Tugas P-10: Mini-Proposal Solusi AI untuk Satu Mesin atau Satu Titik Inspeksi</div>
+        <p style="font-size:13px;color:var(--text-2);margin-bottom:var(--s4);">Dikerjakan individu, maksimal 2 halaman. Kumpulkan melalui Google Classroom atau LMS UKWMS sebelum pertemuan P-11.</p>
+        <ol style="font-size:14px;color:var(--text);line-height:2.1;">
+          <li><strong>Pilih satu kasus:</strong> satu titik inspeksi visual (QC) <em>atau</em> satu mesin kritis (predictive maintenance) di industri pilihan Anda.</li>
+          <li><strong>Jelaskan masalah dan kondisi saat ini:</strong> bagaimana inspeksi atau perawatan dilakukan sekarang, dan biaya kesalahan yang terjadi (perkirakan dengan angka masuk akal dan sebutkan asumsinya).</li>
+          <li><strong>Rancang solusinya:</strong> jenis tugas atau model (lihat tabel di sesi ini), data/sensor yang dibutuhkan, dan di mana manusia tetap mengambil keputusan.</li>
+          <li><strong>Tetapkan ukuran keberhasilan:</strong> metrik teknis (precision/recall atau waktu peringatan dini) dan biaya salah-deteksi (false negative vs false positive), lalu tentukan arah ambang yang Anda pilih beserta alasannya.</li>
+          <li><strong>Hitung nilai ekonomi kasar</strong> memakai struktur perhitungan seperti Rp165.000.000 pada Praktik B atau tabel biaya di bagian metrik.</li>
+          <li><strong>Susun rencana pilot 90 hari dan tiga risiko utama</strong> (misalnya perubahan pencahayaan, data tidak seimbang, alarm palsu) beserta pengendaliannya.</li>
+        </ol>
+      </div>
+
+      <div class="reading-box">
+        <div class="reading-box-title">📖 Pratinjau Pertemuan Berikutnya</div>
+        <div class="reading-item">
+          <span class="reading-icon">📈</span>
+          <div class="reading-label">
+            <strong>P-11: AI untuk Prediksi & Rekomendasi Bisnis</strong>
+            Demand forecasting, segmentasi pelanggan, dan rekomendasi produk dengan dataset industri lokal. Metrik dan cara berpikir biaya salah-prediksi dari sesi ini akan dipakai lagi.
+          </div>
+        </div>
+        <div class="reading-item">
+          <span class="reading-icon">📚</span>
+          <div class="reading-label">
+            <strong>Bacaan: satu studi kasus implementasi AI di manufaktur</strong>
+            Pilih satu studi kasus dari sumber terbuka dan nilai dengan lima pertanyaan kritis di bagian 6. Bawa catatan Anda ke kelas.
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ── ASIDE ── -->
+  <aside class="content-aside">
+
+    <div class="toc">
+      <div class="toc-title">Isi Halaman</div>
+      <ul class="toc-list">
+        <li><a href="#tujuan" class="active">Tujuan Pembelajaran</a></li>
+        <li><a href="#qc">1. AI untuk QC</a></li>
+        <li><a href="#metrik">2. Metrik & Biaya</a></li>
+        <li><a href="#pdm">3. Predictive Maintenance</a></li>
+        <li><a href="#lab-a">4. Praktik A: Gambar</a></li>
+        <li><a href="#lab-b">5. Praktik B: Sensor</a></li>
+        <li><a href="#kasus">6. Studi Kasus</a></li>
+        <li><a href="#tugas">7. Tugas Mini-Proposal</a></li>
+      </ul>
+    </div>
+
+    <div class="sesi-nav-aside">
+      <div class="sesi-nav-title">Navigasi Sesi</div>
+      <a href="sesi-09.html" class="sesi-nav-btn">
+        <span>←</span>
+        <span>P-09: Prompt Engineering</span>
+      </a>
+      <a href="sesi-11.html" class="sesi-nav-btn">
+        <span>→</span>
+        <span>P-11: Prediksi & Rekomendasi Bisnis</span>
+      </a>
+      <a href="../index.html" class="sesi-nav-btn">
+        <span>🏠</span>
+        <span>Kembali ke Beranda TI</span>
+      </a>
+    </div>
+
+    <div style="background:var(--bg-2);border:1px solid var(--border);border-radius:var(--r3);padding:var(--s5);margin-top:var(--s4);">
+      <div style="font-family:var(--mono);font-size:10px;color:var(--text-3);letter-spacing:2px;text-transform:uppercase;margin-bottom:var(--s3);">Info Pertemuan</div>
+      <div style="display:flex;flex-direction:column;gap:var(--s3);">
+        <div>
+          <div style="font-size:11px;color:var(--text-3);">Program Studi</div>
+          <div style="font-size:13px;color:var(--text);">S1 Teknik Industri</div>
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--text-3);">Tipe</div>
+          <div style="font-size:13px;color:var(--text);">Praktik + studi kasus</div>
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--text-3);">Durasi</div>
+          <div style="font-size:13px;color:var(--text);">100 menit</div>
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--text-3);">CPMK</div>
+          <div style="font-size:13px;color:var(--text);">C3, C4, C5</div>
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--text-3);">Tools</div>
+          <div style="font-size:13px;color:var(--text);">Teachable Machine (atau sejenis) · Excel / Google Sheets</div>
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--text-3);">Keluaran</div>
+          <div style="font-size:13px;color:var(--text);">Mini-proposal 2 halaman</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+</div>
+
+<!-- ══ FOOTER ══ -->
+<footer class="footer">
+  <div>AI·UKWMS <span style="color:var(--text-3);">· P-10 QC & Predictive Maintenance · S1 Teknik Industri</span></div>
+  <div><a href="../index.html" style="color:var(--text-3);">← Kembali ke Beranda</a></div>
+</footer>
+
+<script>
+  /* ── TOC active tracking ── */
+  const headings = document.querySelectorAll('.content-main [id]');
+  const tocLinks = document.querySelectorAll('.toc-list a');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(a => {
+          a.classList.remove('active');
+          if (a.getAttribute('href') === '#' + entry.target.id) a.classList.add('active');
+        });
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px' });
+  headings.forEach(h => observer.observe(h));
+
+  /* ── Nav scroll active ── */
+  const navLinks = document.querySelectorAll('.nav-links a[href^="#"]');
+  window.addEventListener('scroll', () => {
+    let current = '';
+    headings.forEach(h => { if (window.scrollY >= h.offsetTop - 100) current = h.id; });
+    navLinks.forEach(a => {
+      a.classList.remove('active');
+      if (a.getAttribute('href') === '#' + current) a.classList.add('active');
+    });
+  });
+</script>
+</body>
+</html>
