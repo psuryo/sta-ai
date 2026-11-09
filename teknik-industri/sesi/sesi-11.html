@@ -70,8 +70,9 @@
   .file-chip {
     display: inline-block; font-family: var(--mono); font-size: 12px;
     background: var(--bg-3); border: 1px solid var(--border); border-radius: var(--r2);
-    padding: 2px var(--s3); color: var(--teal);
+    padding: 2px var(--s3); color: var(--teal); text-decoration: none;
   }
+  a.file-chip:hover { border-color: var(--teal); background: var(--teal-dim); }
 
   /* ── Gate status ── */
   .gate-ok   { color: var(--teal);  font-family: var(--mono); font-size: 11px; }
@@ -105,7 +106,7 @@
     </div>
     <div class="sesi-num" style="color:var(--teal);">PERTEMUAN 11 · PRAKTIK + KLINIK PROYEK</div>
     <h1 class="sesi-title">AI untuk Prediksi &<br><em style="color:var(--teal);">Rekomendasi Bisnis</em></h1>
-    <p style="font-size:15px;color:var(--text-2);max-width:720px;line-height:1.8;">Dari angka prediksi menjadi keputusan: forecast demand dan stok pengaman, segmentasi pelanggan, dan rekomendasi produk dengan data distributor lokal. Separuh akhir sesi dipakai untuk klinik proyek akhir dan Checkpoint 1.</p>
+    <p style="font-size:15px;color:var(--text-2);max-width:720px;line-height:1.8;">Dari angka prediksi menjadi keputusan: forecast demand dan stok pengaman, segmentasi pelanggan, dan rekomendasi produk dengan data distributor lokal. Bagian akhir sesi dipakai untuk klinik proyek akhir dan Checkpoint 1.</p>
     <div class="sesi-meta-row">
       <span class="badge badge-blue">S1 Teknik Industri</span>
       <span class="badge badge-teal">Praktik</span>
@@ -141,46 +142,7 @@
       <div class="callout warn">
         <span class="callout-icon">🧪</span>
         <div class="callout-body">
-          <p><strong>Data latihan sesi ini</strong> (fiktif, dibagikan dosen): <span class="file-chip">data_demand_distributor.csv</span> dan <span class="file-chip">data_pelanggan_rfm.csv</span>. Dataset ini <strong>tidak boleh dipakai sebagai dataset proyek akhir</strong>, sama seperti dataset latihan P-03 dan P-04 di ketentuan originalitas. Siapkan Google Sheets atau Excel, dan Google Colab untuk bagian opsional.</p>
-        </div>
-      </div>
-
-      <h3 style="margin-top:var(--s6);">Alur Sesi (100 menit)</h3>
-      <div class="timeline" style="margin-top:var(--s4);">
-        <div class="tl-item">
-          <div class="tl-year">0–10 menit</div>
-          <div class="tl-event">Cek Kelayakan Dataset Proyek</div>
-          <div class="tl-desc">Tiap kelompok memeriksa dataset dengan tabel gate di bagian 5. Kelompok yang belum lolos ditandai untuk pendampingan.</div>
-        </div>
-        <div class="tl-item">
-          <div class="tl-year">10–25 menit</div>
-          <div class="tl-event">Peta Masalah: Forecast, Segmentasi, Rekomendasi</div>
-          <div class="tl-desc">Tiga jenis masalah, jenis ML, metrik, dan keputusan bisnis yang didukungnya.</div>
-        </div>
-        <div class="tl-item">
-          <div class="tl-year">25–50 menit</div>
-          <div class="tl-event">Praktik A: Forecast dan Stok Pengaman</div>
-          <div class="tl-desc">Bandingkan tiga metode, periksa bias, hitung stok pengaman.</div>
-        </div>
-        <div class="tl-item">
-          <div class="tl-year">50–65 menit</div>
-          <div class="tl-event">Praktik B: Segmentasi Pelanggan</div>
-          <div class="tl-desc">Skoring RFM di spreadsheet; K-Means opsional di Colab.</div>
-        </div>
-        <div class="tl-item">
-          <div class="tl-year">65–75 menit</div>
-          <div class="tl-event">Praktik C: Rekomendasi Produk</div>
-          <div class="tl-desc">Hitung support, confidence, dan lift dari 10 transaksi.</div>
-        </div>
-        <div class="tl-item">
-          <div class="tl-year">75–95 menit</div>
-          <div class="tl-event">Klinik Proyek Akhir</div>
-          <div class="tl-desc">Kelompok bekerja pada dataset sendiri; dosen berkeliling per topik (A, B, C, D).</div>
-        </div>
-        <div class="tl-item">
-          <div class="tl-year">95–100 menit</div>
-          <div class="tl-event">Penutup dan Penugasan Checkpoint 1</div>
-          <div class="tl-desc">Target tiap kelompok untuk dikumpulkan sebelum P-12.</div>
+          <p><strong>Data latihan sesi ini</strong> (fiktif, dibagikan dosen): <a class="file-chip" href="data_demand_distributor.csv" download>data_demand_distributor.csv</a> dan <a class="file-chip" href="data_pelanggan_rfm.csv" download>data_pelanggan_rfm.csv</a>. Dataset ini <strong>tidak boleh dipakai sebagai dataset proyek akhir</strong>, sama seperti dataset latihan P-03 dan P-04 di ketentuan originalitas. Siapkan Google Sheets atau Excel, dan Google Colab untuk bagian opsional.</p>
         </div>
       </div>
     </div>
@@ -230,7 +192,7 @@
     <!-- 2. PRAKTIK A -->
     <div class="content-block" id="lab-a">
       <h2>2. Praktik A: Forecast Demand dan Stok Pengaman</h2>
-      <p>Data: penjualan bulanan satu SKU (air mineral 600 ml, satuan dus) pada distributor minuman fiktif di Jawa Timur, Januari 2024 sampai Desember 2025. File lengkap ada di <span class="file-chip">data_demand_distributor.csv</span> (dua SKU, 48 baris). Praktik ini memakai SKU A.</p>
+      <p>Data: penjualan bulanan satu SKU (air mineral 600 ml, satuan dus) pada distributor minuman fiktif di Jawa Timur, Januari 2024 sampai Desember 2025. File lengkap ada di <a class="file-chip" href="data_demand_distributor.csv" download>data_demand_distributor.csv</a> (dua SKU, 48 baris). Praktik ini memakai SKU A.</p>
 
       <div class="table-wrap">
         <table class="data-table">
@@ -313,7 +275,7 @@ Stok pengaman (z = 1,65): 1,65 × 62,6 ≈ <strong>103 dus</strong></div>
     <!-- 3. PRAKTIK B -->
     <div class="content-block" id="lab-b">
       <h2>3. Praktik B: Segmentasi Pelanggan dengan RFM</h2>
-      <p>Data: <span class="file-chip">data_pelanggan_rfm.csv</span>, 60 toko pelanggan fiktif distributor yang sama. Kolom: <code>id_pelanggan</code>, <code>wilayah</code>, <code>recency_hari</code> (hari sejak order terakhir), <code>frekuensi_order_12bln</code>, <code>nilai_pembelian_juta_12bln</code> (Rp juta), dan <code>tipe_toko</code>.</p>
+      <p>Data: <a class="file-chip" href="data_pelanggan_rfm.csv" download>data_pelanggan_rfm.csv</a>, 60 toko pelanggan fiktif distributor yang sama. Kolom: <code>id_pelanggan</code>, <code>wilayah</code>, <code>recency_hari</code> (hari sejak order terakhir), <code>frekuensi_order_12bln</code>, <code>nilai_pembelian_juta_12bln</code> (Rp juta), dan <code>tipe_toko</code>.</p>
 
       <h3>Skoring RFM dengan Aturan Tetap</h3>
       <div class="table-wrap">
@@ -440,9 +402,9 @@ print(df["klaster"].value_counts())</div>
     <!-- 5. KLINIK -->
     <div class="content-block" id="klinik">
       <h2>5. Klinik Proyek Akhir</h2>
-      <p>Kita berada pada Minggu 2 timeline proyek: data dikumpulkan dan dibersihkan, EDA mulai dikerjakan, dan Bab 3–4 ditulis. Gunakan 20 menit klinik untuk kemajuan nyata pada dataset Anda sendiri.</p>
+      <p>Kita berada pada Minggu 2 timeline proyek: data dikumpulkan dan dibersihkan, EDA mulai dikerjakan, dan Bab 3–4 ditulis. Gunakan waktu klinik untuk kemajuan nyata pada dataset Anda sendiri.</p>
 
-      <h3>Gate: Cek Kelayakan Dataset (10 menit pertama)</h3>
+      <h3>Gate: Cek Kelayakan Dataset</h3>
       <div class="table-wrap">
         <table class="industry-table">
           <thead><tr><th>Cek</th><th>Lolos jika</th><th>Bila belum lolos</th></tr></thead>
@@ -615,7 +577,7 @@ print(df["klaster"].value_counts())</div>
         </div>
         <div>
           <div style="font-size:11px;color:var(--text-3);">Berkas Latihan</div>
-          <div style="font-size:13px;color:var(--text);">data_demand_distributor.csv<br>data_pelanggan_rfm.csv</div>
+          <div style="font-size:13px;display:flex;flex-direction:column;gap:6px;margin-top:4px;"><a class="file-chip" href="data_demand_distributor.csv" download>data_demand_distributor.csv</a><a class="file-chip" href="data_pelanggan_rfm.csv" download>data_pelanggan_rfm.csv</a></div>
         </div>
         <div>
           <div style="font-size:11px;color:var(--text-3);">Keluaran</div>
