@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>P-11: AI untuk Prediksi & Rekomendasi Bisnis — Teknik Industri UKWMS</title>
+<link rel="stylesheet" href="../../css/style.css">
+<style>
+  /* ── Table wrapper ── */
+  .table-wrap { overflow-x: auto; margin: var(--s4) 0; }
+  .table-wrap .industry-table { margin: 0; min-width: 560px; }
+
+  /* ── Data tables ── */
+  .data-table { width: 100%; border-collapse: collapse; font-size: 12px; margin: var(--s3) 0; min-width: 640px; }
+  .data-table th {
+    background: var(--bg-3); border: 1px solid var(--border);
+    padding: var(--s2) var(--s3); text-align: center;
+    font-family: var(--mono); font-size: 11px; color: var(--text-3);
+  }
+  .data-table td {
+    border: 1px solid var(--border); padding: var(--s2) var(--s3);
+    color: var(--text-2); font-family: var(--mono); text-align: center;
+  }
+  .data-table td.row-h { text-align: left; color: var(--text-3); background: var(--bg-2); white-space: nowrap; }
+  .data-table td.hl { color: var(--teal); }
+
+  /* ── Chart ── */
+  .chart-box { background: var(--bg-2); border: 1px solid var(--border); border-radius: var(--r3); padding: var(--s5); margin: var(--s5) 0; }
+  .chart-box svg { width: 100%; height: auto; display: block; }
+  .chart-caption { font-size: 12px; color: var(--text-3); margin-top: var(--s3); line-height: 1.7; }
+  .legend { display: flex; gap: var(--s5); flex-wrap: wrap; font-size: 12px; color: var(--text-2); margin-bottom: var(--s3); }
+  .legend i { display: inline-block; width: 18px; height: 3px; border-radius: 2px; vertical-align: middle; margin-right: 6px; }
+
+  /* ── Prompt / answer box ── */
+  .prompt-box { background: var(--bg-2); border: 1px solid var(--border); border-radius: var(--r2); margin: var(--s4) 0; overflow: hidden; }
+  .prompt-head {
+    display: flex; justify-content: space-between; align-items: center; gap: var(--s3);
+    padding: var(--s3) var(--s4); background: var(--bg-3); border-bottom: 1px solid var(--border);
+    font-family: var(--mono); font-size: 11px; color: var(--text-3); letter-spacing: 1px;
+  }
+  .prompt-head .tag-mini { color: var(--teal); }
+  .prompt-body { padding: var(--s4) var(--s5); font-size: 13px; color: var(--text-2); line-height: 1.8; white-space: pre-wrap; }
+  .prompt-body strong { color: var(--text); }
+  .prompt-body.code { font-family: var(--mono); font-size: 12px; line-height: 1.7; overflow-x: auto; white-space: pre; }
+  .prompt-check {
+    padding: var(--s3) var(--s5); border-top: 1px solid var(--border);
+    background: var(--amber-dim); font-size: 12px; color: var(--text-2); line-height: 1.7;
+  }
+  .prompt-check strong { color: var(--amber); }
+
+  /* ── Lab steps ── */
+  .lab-steps { margin: var(--s4) 0; padding-left: 0; list-style: none; counter-reset: lab; }
+  .lab-steps li {
+    counter-increment: lab; position: relative;
+    padding: var(--s3) 0 var(--s3) 40px;
+    font-size: 14px; color: var(--text-2); line-height: 1.8;
+    border-bottom: 1px solid var(--border);
+  }
+  .lab-steps li:last-child { border-bottom: none; }
+  .lab-steps li::before {
+    content: counter(lab); position: absolute; left: 0; top: var(--s3);
+    width: 26px; height: 26px; border-radius: 50%;
+    background: var(--teal-dim); color: var(--teal);
+    font-family: var(--mono); font-size: 12px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .lab-steps li strong { color: var(--text); }
+
+  /* ── File chips ── */
+  .file-chip {
+    display: inline-block; font-family: var(--mono); font-size: 12px;
+    background: var(--bg-3); border: 1px solid var(--border); border-radius: var(--r2);
+    padding: 2px var(--s3); color: var(--teal);
+  }
+
+  /* ── Gate status ── */
+  .gate-ok   { color: var(--teal);  font-family: var(--mono); font-size: 11px; }
+  .gate-fail { color: var(--red);   font-family: var(--mono); font-size: 11px; }
+</style>
+</head>
+<body>
+
+<!-- ══ NAV ══ -->
+<nav class="nav">
+  <div class="nav-logo">AI<span>·</span>UKWMS</div>
+  <ul class="nav-links">
+    <li><a href="../index.html">← Beranda</a></li>
+    <li><a href="#tujuan" class="active">Tujuan</a></li>
+    <li><a href="#peta">Peta</a></li>
+    <li><a href="#lab-a">Forecast</a></li>
+    <li><a href="#lab-b">Segmentasi</a></li>
+    <li><a href="#lab-c">Rekomendasi</a></li>
+    <li><a href="#klinik">Klinik Proyek</a></li>
+    <li><a href="#tugas">Checkpoint</a></li>
+  </ul>
+</nav>
+
+<!-- ══ HERO ══ -->
+<header class="sesi-hero">
+  <div style="max-width:1100px;margin:0 auto;">
+    <div class="sesi-breadcrumb">
+      <a href="../index.html">Kecerdasan Buatan · Teknik Industri</a>
+      <span>›</span>
+      <span>Pertemuan 11</span>
+    </div>
+    <div class="sesi-num" style="color:var(--teal);">PERTEMUAN 11 · PRAKTIK + KLINIK PROYEK</div>
+    <h1 class="sesi-title">AI untuk Prediksi &<br><em style="color:var(--teal);">Rekomendasi Bisnis</em></h1>
+    <p style="font-size:15px;color:var(--text-2);max-width:720px;line-height:1.8;">Dari angka prediksi menjadi keputusan: forecast demand dan stok pengaman, segmentasi pelanggan, dan rekomendasi produk dengan data distributor lokal. Separuh akhir sesi dipakai untuk klinik proyek akhir dan Checkpoint 1.</p>
+    <div class="sesi-meta-row">
+      <span class="badge badge-blue">S1 Teknik Industri</span>
+      <span class="badge badge-teal">Praktik</span>
+      <span class="badge badge-amber">Blok 2 · Checkpoint 1 Proyek</span>
+      <span class="badge" style="color:var(--teal);border-color:rgba(0,201,177,0.3);background:var(--teal-dim);">100 menit</span>
+    </div>
+  </div>
+</header>
+
+<!-- ══ CONTENT LAYOUT ══ -->
+<div class="content-layout">
+  <main class="content-main">
+
+    <!-- TUJUAN -->
+    <div class="content-block" id="tujuan">
+      <h2>Tujuan Pembelajaran</h2>
+      <p>P-06 mengajarkan cara membuat dan mengukur forecast. P-10 mengajarkan cara menghitung biaya salah-keputusan. Sesi ini menyatukan keduanya, lalu memperluas ke dua pertanyaan bisnis lain: <em>siapa pelanggan kita</em> dan <em>apa yang sebaiknya ditawarkan</em>. Setelah sesi ini, mahasiswa diharapkan mampu:</p>
+      <ol>
+        <li>Membandingkan beberapa metode forecast sederhana (naive, moving average, seasonal naive) dengan MAE, RMSE, dan MAPE, serta memeriksa bias</li>
+        <li>Menerjemahkan error forecast menjadi keputusan stok pengaman dan memilih target service level berdasarkan biaya</li>
+        <li>Mensegmentasi pelanggan dengan RFM dan K-Means, lalu memberi nama dan tindakan untuk tiap segmen</li>
+        <li>Menghitung support, confidence, dan lift untuk aturan rekomendasi produk, serta menilai keandalannya</li>
+        <li>Mengerjakan Checkpoint 1 proyek akhir: dataset layak, cleaning terdokumentasi, EDA awal, dan rencana model</li>
+      </ol>
+
+      <div class="callout tip" style="margin-top:var(--s5);">
+        <span class="callout-icon">💡</span>
+        <div class="callout-body">
+          <p><strong>Kebiasaan yang dilatih:</strong> selalu mulai dari baseline sederhana. Model yang lebih rumit baru layak dipakai bila mengalahkan baseline dengan selisih yang berarti bagi keputusan bisnis. Kebiasaan ini yang akan membuat Bab 6 proyek Anda kuat.</p>
+        </div>
+      </div>
+
+      <div class="callout warn">
+        <span class="callout-icon">🧪</span>
+        <div class="callout-body">
+          <p><strong>Data latihan sesi ini</strong> (fiktif, dibagikan dosen): <span class="file-chip">data_demand_distributor.csv</span> dan <span class="file-chip">data_pelanggan_rfm.csv</span>. Dataset ini <strong>tidak boleh dipakai sebagai dataset proyek akhir</strong>, sama seperti dataset latihan P-03 dan P-04 di ketentuan originalitas. Siapkan Google Sheets atau Excel, dan Google Colab untuk bagian opsional.</p>
+        </div>
+      </div>
+
+      <h3 style="margin-top:var(--s6);">Alur Sesi (100 menit)</h3>
+      <div class="timeline" style="margin-top:var(--s4);">
+        <div class="tl-item">
+          <div class="tl-year">0–10 menit</div>
+          <div class="tl-event">Cek Kelayakan Dataset Proyek</div>
+          <div class="tl-desc">Tiap kelompok memeriksa dataset dengan tabel gate di bagian 5. Kelompok yang belum lolos ditandai untuk pendampingan.</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-year">10–25 menit</div>
+          <div class="tl-event">Peta Masalah: Forecast, Segmentasi, Rekomendasi</div>
+          <div class="tl-desc">Tiga jenis masalah, jenis ML, metrik, dan keputusan bisnis yang didukungnya.</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-year">25–50 menit</div>
+          <div class="tl-event">Praktik A: Forecast dan Stok Pengaman</div>
+          <div class="tl-desc">Bandingkan tiga metode, periksa bias, hitung stok pengaman.</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-year">50–65 menit</div>
+          <div class="tl-event">Praktik B: Segmentasi Pelanggan</div>
+          <div class="tl-desc">Skoring RFM di spreadsheet; K-Means opsional di Colab.</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-year">65–75 menit</div>
+          <div class="tl-event">Praktik C: Rekomendasi Produk</div>
+          <div class="tl-desc">Hitung support, confidence, dan lift dari 10 transaksi.</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-year">75–95 menit</div>
+          <div class="tl-event">Klinik Proyek Akhir</div>
+          <div class="tl-desc">Kelompok bekerja pada dataset sendiri; dosen berkeliling per topik (A, B, C, D).</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-year">95–100 menit</div>
+          <div class="tl-event">Penutup dan Penugasan Checkpoint 1</div>
+          <div class="tl-desc">Target tiap kelompok untuk dikumpulkan sebelum P-12.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 1. PETA -->
+    <div class="content-block" id="peta">
+      <h2>1. Peta Masalah: Tiga Cara AI Mendukung Keputusan Komersial</h2>
+      <div class="table-wrap">
+        <table class="industry-table">
+          <thead>
+            <tr><th>Masalah</th><th>Pertanyaan bisnis</th><th>Jenis ML</th><th>Metrik</th><th>Keputusan yang didukung</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="sector-name">Forecast demand</td>
+              <td>Berapa yang akan terjual bulan depan?</td>
+              <td>Time series / regresi (supervised)</td>
+              <td>MAE, RMSE, MAPE, bias</td>
+              <td>Jumlah pesanan, stok pengaman, jadwal produksi</td>
+            </tr>
+            <tr>
+              <td class="sector-name">Segmentasi pelanggan</td>
+              <td>Kelompok pelanggan apa yang kita punya?</td>
+              <td>Klasterisasi (unsupervised)</td>
+              <td>Kemudahan tafsir, ukuran dan nilai tiap segmen; inertia/silhouette untuk memilih k</td>
+              <td>Prioritas layanan, promo, penagihan, retensi</td>
+            </tr>
+            <tr>
+              <td class="sector-name">Rekomendasi produk</td>
+              <td>Apa yang sering dibeli bersamaan atau disukai pelanggan serupa?</td>
+              <td>Aturan asosiasi, collaborative filtering</td>
+              <td>Support, confidence, lift</td>
+              <td>Bundling, penataan rak, tawaran silang (cross-sell)</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout info">
+        <span class="callout-icon">📌</span>
+        <div class="callout-body">
+          <p><strong>Hubungan dengan topik proyek:</strong> Topik B memakai forecasting secara langsung. Topik C bisa memakai klasterisasi untuk segmentasi supplier atau rute. Topik A dan D memakai klasifikasi dan regresi, tetapi cara berpikir "baseline dulu, lalu ubah error menjadi biaya" berlaku sama untuk semuanya.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. PRAKTIK A -->
+    <div class="content-block" id="lab-a">
+      <h2>2. Praktik A: Forecast Demand dan Stok Pengaman</h2>
+      <p>Data: penjualan bulanan satu SKU (air mineral 600 ml, satuan dus) pada distributor minuman fiktif di Jawa Timur, Januari 2024 sampai Desember 2025. File lengkap ada di <span class="file-chip">data_demand_distributor.csv</span> (dua SKU, 48 baris). Praktik ini memakai SKU A.</p>
+
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr><th>Bulan</th><th>Jan</th><th>Feb</th><th>Mar</th><th>Apr</th><th>Mei</th><th>Jun</th><th>Jul</th><th>Agu</th><th>Sep</th><th>Okt</th><th>Nov</th><th>Des</th></tr>
+          </thead>
+          <tbody>
+            <tr><td class="row-h">2024</td><td>737</td><td>765</td><td>920</td><td>946</td><td>814</td><td>772</td><td>829</td><td>857</td><td>856</td><td>791</td><td>960</td><td>1.035</td></tr>
+            <tr><td class="row-h">2025</td><td>824</td><td>786</td><td>940</td><td>1.070</td><td>926</td><td>850</td><td>875</td><td>958</td><td>870</td><td>870</td><td>994</td><td>1.095</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="chart-box">
+        <div class="legend">
+          <span><i style="background:var(--teal);"></i>Penjualan aktual (dus)</span>
+          <span><i style="background:var(--amber);"></i>Prediksi seasonal naive (bulan uji)</span>
+        </div>
+        <svg viewBox="0 0 660 260" role="img" aria-label="Grafik penjualan bulanan 24 bulan dengan pola musiman, puncak di Maret-April dan Desember, serta prediksi seasonal naive pada enam bulan uji yang berada di bawah nilai aktual">
+          <g stroke="var(--border)" stroke-width="1">
+            <line x1="50" y1="20" x2="620" y2="20"/><line x1="50" y1="70" x2="620" y2="70"/>
+            <line x1="50" y1="120" x2="620" y2="120"/><line x1="50" y1="170" x2="620" y2="170"/>
+            <line x1="50" y1="220" x2="620" y2="220"/>
+          </g>
+          <g fill="var(--text-3)" font-family="monospace" font-size="11" text-anchor="end">
+            <text x="42" y="224">700</text><text x="42" y="174">800</text><text x="42" y="124">900</text>
+            <text x="42" y="74">1.000</text><text x="42" y="24">1.100</text>
+          </g>
+          <!-- test zone -->
+          <rect x="483.7" y="20" width="148" height="200" fill="var(--amber-dim)" opacity="0.5"/>
+          <text x="557" y="34" fill="var(--amber)" font-family="monospace" font-size="10" text-anchor="middle">DATA UJI</text>
+          <polyline fill="none" stroke="var(--teal)" stroke-width="2.5" stroke-linejoin="round"
+            points="50.0,201.5 74.8,187.5 99.6,110.0 124.3,97.0 149.1,163.0 173.9,184.0 198.7,155.5 223.5,141.5 248.3,142.0 273.0,174.5 297.8,90.0 322.6,52.5 347.4,158.0 372.2,177.0 397.0,100.0 421.7,35.0 446.5,107.0 471.3,145.0 496.1,132.5 520.9,91.0 545.7,135.0 570.4,135.0 595.2,73.0 620.0,22.5"/>
+          <polyline fill="none" stroke="var(--amber)" stroke-width="2" stroke-dasharray="6 4" stroke-linejoin="round"
+            points="496.1,155.5 520.9,141.5 545.7,142.0 570.4,174.5 595.2,90.0 620.0,52.5"/>
+          <g fill="var(--text-3)" font-family="monospace" font-size="10" text-anchor="middle">
+            <text x="50" y="240">Jan 24</text><text x="198.7" y="240">Jul 24</text>
+            <text x="347.4" y="240">Jan 25</text><text x="496.1" y="240">Jul 25</text><text x="620" y="240">Des 25</text>
+          </g>
+        </svg>
+        <div class="chart-caption">Ada pola musiman (puncak Maret–April dan Desember) dan tren naik dari tahun ke tahun. Area oranye adalah enam bulan yang disisihkan sebagai data uji.</div>
+      </div>
+
+      <h3>Langkah Kerja</h3>
+      <ol class="lab-steps">
+        <li><strong>Pisahkan data secara kronologis:</strong> Januari 2024 sampai Juni 2025 sebagai data latih (18 bulan), Juli sampai Desember 2025 sebagai data uji (6 bulan). Jangan diacak.</li>
+        <li><strong>Buat tiga prediksi</strong> untuk tiap bulan uji: <em>Naive</em> (nilai bulan sebelumnya), <em>Moving Average 3 bulan</em> (rata-rata tiga bulan sebelumnya), dan <em>Seasonal Naive</em> (nilai bulan yang sama tahun lalu).</li>
+        <li><strong>Hitung error</strong> (aktual − prediksi) per bulan, lalu MAE, RMSE, dan MAPE untuk ketiganya.</li>
+        <li><strong>Periksa bias:</strong> apakah error cenderung selalu positif atau selalu negatif? Apa artinya bagi stok?</li>
+        <li><strong>Hitung stok pengaman</strong> untuk metode terbaik: z × RMSE, dengan z = 1,65 (service level 95%) dan lead time satu bulan.</li>
+        <li><strong>Diskusi biaya:</strong> bila biaya kehabisan stok Rp12.000/dus (margin hilang) dan biaya menyimpan Rp1.500/dus/bulan, apakah 95% target yang tepat?</li>
+      </ol>
+
+      <div class="prompt-box">
+        <div class="prompt-head"><span>KUNCI JAWABAN</span><span class="tag-mini">Hitung sendiri dulu</span></div>
+        <div class="prompt-body">Data uji aktual (Jul–Des 2025): 875, 958, 870, 870, 994, 1.095
+
+<strong>Seasonal naive</strong>  prediksi: 829, 857, 856, 791, 960, 1.035  → error: +46, +101, +14, +79, +34, +60
+<strong>Naive</strong>           prediksi: 850, 875, 958, 870, 870, 994
+<strong>MA-3</strong>            prediksi: 948,7; 883,7; 894,3; 901,0; 899,3; 911,3
+
+Metode           MAE     RMSE    MAPE
+Naive            70,2    82,5    7,22%
+MA-3             80,3    95,9    8,14%
+Seasonal naive   55,7    62,6    5,90%   ← terbaik
+
+Bias seasonal naive: keenam error positif (rata-rata +55,7 dus). Prediksi selalu di bawah aktual karena tren naik tidak tertangkap.
+Stok pengaman (z = 1,65): 1,65 × 62,6 ≈ <strong>103 dus</strong></div>
+        <div class="prompt-check"><strong>Perluasan:</strong> kalikan seasonal naive dengan faktor pertumbuhan tahunan dari data latih (Jan–Jun 2025 ÷ Jan–Jun 2024 = 5.396 ÷ 4.954 ≈ 1,089). Hasilnya MAE 34,5; RMSE 38,9; MAPE 3,67%, dan stok pengaman turun menjadi 1,65 × 38,9 ≈ <strong>64 dus</strong>. Perbaikan sederhana ini memangkas stok pengaman sekitar 38%.</div>
+      </div>
+
+      <div class="callout info">
+        <span class="callout-icon">⚖️</span>
+        <div class="callout-body">
+          <p><strong>Service level dari rasio biaya:</strong> rasio kritis = Cu ÷ (Cu + Co) = 12.000 ÷ (12.000 + 1.500) ≈ 0,889, yang setara z ≈ 1,22 (service level sekitar 89%). Dengan RMSE 62,6, stok pengaman menjadi sekitar 76 dus, bukan 103. Angka 95% adalah kebiasaan, bukan hukum. Biaya kehabisan stok yang tinggi akan mendorong service level lebih tinggi lagi. <em>Ini pola yang sama dengan biaya false negative vs false positive di P-10.</em></p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. PRAKTIK B -->
+    <div class="content-block" id="lab-b">
+      <h2>3. Praktik B: Segmentasi Pelanggan dengan RFM</h2>
+      <p>Data: <span class="file-chip">data_pelanggan_rfm.csv</span>, 60 toko pelanggan fiktif distributor yang sama. Kolom: <code>id_pelanggan</code>, <code>wilayah</code>, <code>recency_hari</code> (hari sejak order terakhir), <code>frekuensi_order_12bln</code>, <code>nilai_pembelian_juta_12bln</code> (Rp juta), dan <code>tipe_toko</code>.</p>
+
+      <h3>Skoring RFM dengan Aturan Tetap</h3>
+      <div class="table-wrap">
+        <table class="industry-table">
+          <thead><tr><th>Skor</th><th>Recency (R)</th><th>Frekuensi (F)</th><th>Nilai pembelian (M)</th></tr></thead>
+          <tbody>
+            <tr><td class="sector-name">3</td><td>≤ 30 hari</td><td>≥ 12 order</td><td>≥ Rp60 juta</td></tr>
+            <tr><td class="sector-name">2</td><td>31–90 hari</td><td>6–11 order</td><td>Rp20–59 juta</td></tr>
+            <tr><td class="sector-name">1</td><td>&gt; 90 hari</td><td>&lt; 6 order</td><td>&lt; Rp20 juta</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p style="font-size:14px;">Total skor = R + F + M. Segmen: <strong style="color:var(--text)">8–9 Utama</strong>, <strong style="color:var(--text)">6–7 Berkembang</strong>, <strong style="color:var(--text)">4–5 Berisiko</strong>, <strong style="color:var(--text)">3 Tidur</strong>.</p>
+
+      <ol class="lab-steps">
+        <li><strong>Hitung skor R, F, M</strong> dan total skor tiap pelanggan dengan rumus IF bertingkat di spreadsheet.</li>
+        <li><strong>Tentukan segmen</strong> dari total skor, lalu buat tabel ringkasan: jumlah pelanggan, total nilai pembelian, dan rata-rata recency per segmen (pivot table).</li>
+        <li><strong>Tulis tindakan</strong> untuk tiap segmen: apa yang dilakukan tim penjualan, dan apa yang <em>tidak</em> perlu dilakukan.</li>
+      </ol>
+
+      <div class="prompt-box">
+        <div class="prompt-head"><span>KUNCI JAWABAN</span><span class="tag-mini">Aturan tetap · 60 pelanggan</span></div>
+        <div class="prompt-body">Segmen       Pelanggan   Nilai (Rp juta)   Porsi nilai   Rata-rata recency
+Utama        19          1.855,4           62,4%         15,1 hari
+Berkembang   16          696,8             23,5%         46,4 hari
+Berisiko     10          279,3             9,4%          116,7 hari
+Tidur        15          139,6             4,7%          167,6 hari
+Total        60          2.971,1           100%
+
+Temuan: 19 pelanggan (31,7%) menyumbang <strong>62,4%</strong> nilai pembelian. 15 pelanggan "Tidur" hanya menyumbang 4,7%.</div>
+        <div class="prompt-check"><strong>Diskusi:</strong> apakah layak mengejar segmen Tidur dengan diskon besar? Bandingkan potensi nilai (Rp139,6 juta per 12 bulan untuk 15 toko) dengan biaya promo. Mana yang lebih menguntungkan: menjaga segmen Utama tetap puas, atau memulihkan segmen Berisiko?</div>
+      </div>
+
+      <h3 style="margin-top:var(--s6);">Opsional: K-Means di Google Colab</h3>
+      <p>Aturan RFM di atas dibuat manusia. K-Means membiarkan data membentuk kelompoknya sendiri. Kerangka berikut adalah <strong style="color:var(--text)">template struktur untuk latihan</strong>. Untuk proyek akhir, preprocessing, pemilihan fitur, dan interpretasi harus diadaptasi ke dataset dan konteks Anda.</p>
+      <div class="prompt-box">
+        <div class="prompt-head"><span>PYTHON</span><span class="tag-mini">Template latihan</span></div>
+        <div class="prompt-body code">import pandas as pd
+from sklearn.preprocessing import StandardScaler
+from sklearn.cluster import KMeans
+
+df = pd.read_csv("data_pelanggan_rfm.csv")
+fitur = ["recency_hari", "frekuensi_order_12bln", "nilai_pembelian_juta_12bln"]
+X_std = StandardScaler().fit_transform(df[fitur])
+
+for k in range(2, 7):
+    km = KMeans(n_clusters=k, n_init=10, random_state=42).fit(X_std)
+    print(k, round(km.inertia_, 1))
+
+df["klaster"] = KMeans(n_clusters=4, n_init=10, random_state=42).fit_predict(X_std)
+print(df.groupby("klaster")[fitur].mean().round(1))
+print(df["klaster"].value_counts())</div>
+        <div class="prompt-check"><strong>Tugas interpretasi:</strong> (1) pilih k dengan melihat penurunan inertia dan kemasukakalan bisnis, (2) beri nama tiap klaster dari rata-rata R, F, M, (3) bandingkan dengan segmen aturan RFM: apa yang sama dan apa yang berbeda? Hasil klaster bisa bergeser bila Anda mengubah k atau tidak melakukan standardisasi.</div>
+      </div>
+    </div>
+
+    <!-- 4. PRAKTIK C -->
+    <div class="content-block" id="lab-c">
+      <h2>4. Praktik C: Rekomendasi Produk (Aturan Asosiasi)</h2>
+      <p>Sepuluh transaksi fiktif di sebuah toko grosir. Tiap baris adalah satu keranjang belanja.</p>
+
+      <div class="table-wrap">
+        <table class="data-table" style="min-width:480px;">
+          <thead><tr><th>Transaksi</th><th>Isi keranjang</th></tr></thead>
+          <tbody>
+            <tr><td class="row-h">T1</td><td style="text-align:left;">Mie, Telur</td></tr>
+            <tr><td class="row-h">T2</td><td style="text-align:left;">Mie, Telur, Minyak</td></tr>
+            <tr><td class="row-h">T3</td><td style="text-align:left;">Gula, Kopi</td></tr>
+            <tr><td class="row-h">T4</td><td style="text-align:left;">Mie, Minyak</td></tr>
+            <tr><td class="row-h">T5</td><td style="text-align:left;">Telur, Minyak</td></tr>
+            <tr><td class="row-h">T6</td><td style="text-align:left;">Mie, Telur</td></tr>
+            <tr><td class="row-h">T7</td><td style="text-align:left;">Gula, Kopi, Minyak</td></tr>
+            <tr><td class="row-h">T8</td><td style="text-align:left;">Mie, Telur, Kopi</td></tr>
+            <tr><td class="row-h">T9</td><td style="text-align:left;">Telur, Minyak</td></tr>
+            <tr><td class="row-h">T10</td><td style="text-align:left;">Mie, Telur</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="concept-grid">
+        <div class="concept-card">
+          <div class="concept-card-label" style="color:var(--blue);">Support</div>
+          <div class="concept-card-title">Seberapa sering muncul bersama</div>
+          <div class="concept-card-body">Jumlah transaksi yang memuat kedua produk ÷ seluruh transaksi.</div>
+        </div>
+        <div class="concept-card">
+          <div class="concept-card-label" style="color:var(--teal);">Confidence</div>
+          <div class="concept-card-title">Peluang B bila A dibeli</div>
+          <div class="concept-card-body">Transaksi dengan A dan B ÷ transaksi dengan A.</div>
+        </div>
+        <div class="concept-card">
+          <div class="concept-card-label" style="color:var(--amber);">Lift</div>
+          <div class="concept-card-title">Lebih sering dari kebetulan?</div>
+          <div class="concept-card-body">Confidence ÷ proporsi transaksi yang memuat B. Lift di atas 1 berarti B lebih mungkin dibeli bila A dibeli.</div>
+        </div>
+      </div>
+
+      <ol class="lab-steps">
+        <li><strong>Hitung</strong> support, confidence, dan lift untuk aturan <em>Mie → Telur</em> dan <em>Gula → Kopi</em>.</li>
+        <li><strong>Bandingkan keduanya:</strong> aturan mana yang tampak lebih kuat, dan aturan mana yang lebih bisa dipercaya? Mengapa?</li>
+        <li><strong>Usulkan satu tindakan bisnis</strong> (bundling, penataan rak, atau tawaran silang) berdasarkan aturan yang Anda anggap andal.</li>
+      </ol>
+
+      <div class="prompt-box">
+        <div class="prompt-head"><span>KUNCI JAWABAN</span><span class="tag-mini">10 transaksi</span></div>
+        <div class="prompt-body">Mie: 6 transaksi · Telur: 7 · Mie dan Telur: 5 · Gula: 2 · Kopi: 3 · Gula dan Kopi: 2
+
+<strong>Mie → Telur</strong>
+  support = 5 ÷ 10 = 0,50 · confidence = 5 ÷ 6 = 83,3% · lift = 0,833 ÷ 0,70 = <strong>1,19</strong>
+
+<strong>Gula → Kopi</strong>
+  support = 2 ÷ 10 = 0,20 · confidence = 2 ÷ 2 = 100% · lift = 1,00 ÷ 0,30 = <strong>3,33</strong></div>
+        <div class="prompt-check"><strong>Pelajaran:</strong> Gula → Kopi tampak sempurna (confidence 100%, lift 3,33), tetapi hanya berdasar <strong>2 transaksi</strong>. Satu transaksi berbeda saja akan mengubah angkanya drastis. Mie → Telur memiliki lift lebih rendah (1,19) tetapi didukung 5 transaksi, sehingga lebih layak dijadikan dasar bundling. Selalu baca support bersama lift.</div>
+      </div>
+
+      <div class="callout warn">
+        <span class="callout-icon">⚠️</span>
+        <div class="callout-body">
+          <p><strong>Batas aturan asosiasi:</strong> ia menunjukkan keterkaitan, bukan sebab-akibat. Pola bisa muncul karena promo, musim, atau satu pelanggan besar yang berbelanja berulang. Uji tawaran di sebagian toko (pilot) sebelum diluncurkan penuh.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5. KLINIK -->
+    <div class="content-block" id="klinik">
+      <h2>5. Klinik Proyek Akhir</h2>
+      <p>Kita berada pada Minggu 2 timeline proyek: data dikumpulkan dan dibersihkan, EDA mulai dikerjakan, dan Bab 3–4 ditulis. Gunakan 20 menit klinik untuk kemajuan nyata pada dataset Anda sendiri.</p>
+
+      <h3>Gate: Cek Kelayakan Dataset (10 menit pertama)</h3>
+      <div class="table-wrap">
+        <table class="industry-table">
+          <thead><tr><th>Cek</th><th>Lolos jika</th><th>Bila belum lolos</th></tr></thead>
+          <tbody>
+            <tr>
+              <td class="sector-name">Ukuran data</td>
+              <td>Minimal 100 baris dan 5 kolom; tersedia sebagai CSV atau Excel</td>
+              <td>Perpanjang periode, gabungkan sumber yang sah, atau ganti dataset</td>
+            </tr>
+            <tr>
+              <td class="sector-name">Bukan dataset terlarang</td>
+              <td>Bukan AI4I, Telco Churn, data produksi P-04, Store Sales, Superstore (termasuk varian), dan bukan data latihan P-11</td>
+              <td>Ganti dataset dan konsultasikan ke dosen hari ini</td>
+            </tr>
+            <tr>
+              <td class="sector-name">Bukan skenario terlarang</td>
+              <td>Bukan lima perusahaan fiktif P-02 dan bukan Toyota, Unilever, Amazon sebagai subjek utama</td>
+              <td>Rancang perusahaan atau skenario baru dari awal</td>
+            </tr>
+            <tr>
+              <td class="sector-name">Sesuai topik undian</td>
+              <td>Ada variabel yang dibutuhkan topik (lihat kartu A–D di bawah)</td>
+              <td>Cari variabel tambahan atau ubah sudut masalah</td>
+            </tr>
+            <tr>
+              <td class="sector-name">Rumusan masalah</td>
+              <td>2–3 pertanyaan spesifik yang bisa dijawab dengan data tersebut</td>
+              <td>Tajamkan pertanyaan: ukur apa, untuk keputusan siapa</td>
+            </tr>
+            <tr>
+              <td class="sector-name">Asal data jelas</td>
+              <td>Dinyatakan nyata, publik, atau fiktif; sumber dan periode tercatat</td>
+              <td>Lengkapi di Bab 4.1 sebelum menulis bab lain</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 style="margin-top:var(--s6);">Fokus per Topik Undian</h3>
+      <div class="concept-grid">
+        <div class="concept-card">
+          <div class="concept-card-label" style="color:var(--red);">Topik A · Predictive Maintenance & QC</div>
+          <div class="concept-card-title">Klasifikasi</div>
+          <div class="concept-card-body">Cek proporsi kelas (kejadian gagal biasanya langka). Pastikan fitur tidak "membocorkan" target. Baseline: tebak kelas mayoritas. Evaluasi dengan recall dan precision serta biaya salah-deteksi seperti di P-10.</div>
+        </div>
+        <div class="concept-card">
+          <div class="concept-card-label" style="color:var(--blue);">Topik B · Demand Forecasting & Inventori</div>
+          <div class="concept-card-title">Time series</div>
+          <div class="concept-card-body">Urutkan menurut waktu dan bagi latih/uji secara kronologis. Baseline: naive atau seasonal naive. Laporkan MAE, RMSE, MAPE, dan bias, lalu hubungkan ke stok pengaman seperti Praktik A.</div>
+        </div>
+        <div class="concept-card">
+          <div class="concept-card-label" style="color:var(--teal);">Topik C · Optimasi Rantai Pasok</div>
+          <div class="concept-card-title">Klasterisasi dan EDA</div>
+          <div class="concept-card-body">Standardisasi fitur sebelum K-Means. Pilih k dari inertia dan kemasukakalan bisnis. Beri nama dan tindakan tiap klaster. Untuk keterlambatan, cari pola per pemasok, rute, atau periode.</div>
+        </div>
+        <div class="concept-card">
+          <div class="concept-card-label" style="color:var(--amber);">Topik D · Optimasi Proses Produksi</div>
+          <div class="concept-card-title">Regresi dan visualisasi</div>
+          <div class="concept-card-body">Definisikan OEE dengan benar (Availability × Performance × Quality). Baseline: rata-rata atau nilai historis. Gunakan analisis Pareto downtime seperti di P-10 untuk menunjukkan prioritas.</div>
+        </div>
+      </div>
+
+      <div class="callout warn">
+        <span class="callout-icon">🚫</span>
+        <div class="callout-body">
+          <p><strong>Pengingat penting:</strong> notebook latihan boleh menjadi kerangka urutan langkah, tetapi kode yang identik atau hampir identik tidak mendapat nilai pada L4. Jika Anda memakai alat AI generatif untuk membantu menulis atau menjelaskan kode, catat prompt dan pastikan semua analisis benar-benar Anda jalankan dan pahami sendiri. Persiapan pernyataan penggunaan AI akan dibahas di P-12.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 6. TUGAS -->
+    <div class="content-block" id="tugas">
+      <h2>6. Penugasan: Checkpoint 1 Proyek Akhir</h2>
+
+      <div class="task-box" id="penugasan">
+        <div class="task-box-title">📋 Checkpoint 1: Data, Cleaning, dan EDA Awal</div>
+        <p style="font-size:13px;color:var(--text-2);margin-bottom:var(--s4);">Dikerjakan per kelompok. Kumpulkan melalui Google Classroom atau LMS UKWMS sebelum pertemuan P-12 (satu berkas PDF dan satu berkas dataset).</p>
+        <ol style="font-size:14px;color:var(--text);line-height:2.1;">
+          <li><strong>Draf Bab 2 yang direvisi</strong> berdasarkan umpan balik presentasi P-10 (latar belakang, profil, rumusan masalah 2–3 pertanyaan, tujuan terukur).</li>
+          <li><strong>Draf Bab 3 dan Bab 4:</strong> tinjauan pustaka (minimal 2 referensi studi kasus), sumber data, tabel ringkasan dataset (baris, kolom, tipe), dan diagram alir metodologi.</li>
+          <li><strong>Tabel "sebelum vs sesudah cleaning"</strong> untuk minimal satu masalah data (missing value, outlier, atau format tidak konsisten), beserta penjelasan keputusan penanganannya.</li>
+          <li><strong>Minimal tiga visualisasi bermakna</strong>, masing-masing dengan interpretasi 2–3 kalimat yang menyebut konteks industri Anda (bukan sekadar "grafik menunjukkan...").</li>
+          <li><strong>Satu halaman rencana model:</strong> baseline yang akan dipakai, satu pendekatan pembanding, metrik evaluasi yang dipilih, dan alasan metrik itu penting bagi keputusan manajemen.</li>
+          <li><strong>Berkas dataset</strong> (CSV atau Excel) dan link draf Colab atau Power BI/Looker Studio.</li>
+        </ol>
+      </div>
+
+      <div class="callout info">
+        <span class="callout-icon">🎯</span>
+        <div class="callout-body">
+          <p><strong>Yang diperiksa dosen di P-12:</strong> apakah masalahnya spesifik (L1), apakah proses cleaning terdokumentasi sebelum-sesudah (L2), dan apakah EDA sudah mengarah ke solusi (awal L3). Kelompok yang masih bermasalah pada dataset akan dipanggil untuk konsultasi di awal P-12.</p>
+        </div>
+      </div>
+
+      <div class="reading-box">
+        <div class="reading-box-title">📖 Pratinjau Pertemuan Berikutnya</div>
+        <div class="reading-item">
+          <span class="reading-icon">⚖️</span>
+          <div class="reading-label">
+            <strong>P-12: AI Ethics</strong>
+            Bias, privasi, dan tanggung jawab dalam penerapan AI di industri. Hasilnya langsung dipakai pada Bab 7.3 (Risiko & Keterbatasan) dan pernyataan penggunaan AI generatif di laporan proyek. Pada P-12 Anda juga mulai menjalankan model dan membandingkan pendekatan.
+          </div>
+        </div>
+        <div class="reading-item">
+          <span class="reading-icon">📚</span>
+          <div class="reading-label">
+            <strong>Persiapan</strong>
+            Tulis tiga risiko yang menurut Anda paling mungkin muncul pada proyek Anda sendiri (misalnya kualitas data, bias sampel, atau kerahasiaan data perusahaan). Bawa daftar ini ke kelas.
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ── ASIDE ── -->
+  <aside class="content-aside">
+
+    <div class="toc">
+      <div class="toc-title">Isi Halaman</div>
+      <ul class="toc-list">
+        <li><a href="#tujuan" class="active">Tujuan Pembelajaran</a></li>
+        <li><a href="#peta">1. Peta Masalah</a></li>
+        <li><a href="#lab-a">2. Praktik A: Forecast</a></li>
+        <li><a href="#lab-b">3. Praktik B: Segmentasi</a></li>
+        <li><a href="#lab-c">4. Praktik C: Rekomendasi</a></li>
+        <li><a href="#klinik">5. Klinik Proyek Akhir</a></li>
+        <li><a href="#tugas">6. Checkpoint 1</a></li>
+      </ul>
+    </div>
+
+    <div class="sesi-nav-aside">
+      <div class="sesi-nav-title">Navigasi Sesi</div>
+      <a href="sesi-10.html" class="sesi-nav-btn">
+        <span>←</span>
+        <span>P-10: QC & Predictive Maintenance</span>
+      </a>
+      <a href="sesi-12.html" class="sesi-nav-btn">
+        <span>→</span>
+        <span>P-12: AI Ethics</span>
+      </a>
+      <a href="../index.html" class="sesi-nav-btn">
+        <span>🏠</span>
+        <span>Kembali ke Beranda TI</span>
+      </a>
+    </div>
+
+    <div style="background:var(--bg-2);border:1px solid var(--border);border-radius:var(--r3);padding:var(--s5);margin-top:var(--s4);">
+      <div style="font-family:var(--mono);font-size:10px;color:var(--text-3);letter-spacing:2px;text-transform:uppercase;margin-bottom:var(--s3);">Info Pertemuan</div>
+      <div style="display:flex;flex-direction:column;gap:var(--s3);">
+        <div>
+          <div style="font-size:11px;color:var(--text-3);">Program Studi</div>
+          <div style="font-size:13px;color:var(--text);">S1 Teknik Industri</div>
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--text-3);">Tipe</div>
+          <div style="font-size:13px;color:var(--text);">Praktik + klinik proyek</div>
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--text-3);">Durasi</div>
+          <div style="font-size:13px;color:var(--text);">100 menit</div>
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--text-3);">CPMK</div>
+          <div style="font-size:13px;color:var(--text);">C3, C4, C5</div>
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--text-3);">Tools</div>
+          <div style="font-size:13px;color:var(--text);">Excel / Google Sheets · Google Colab (opsional)</div>
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--text-3);">Berkas Latihan</div>
+          <div style="font-size:13px;color:var(--text);">data_demand_distributor.csv<br>data_pelanggan_rfm.csv</div>
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--text-3);">Keluaran</div>
+          <div style="font-size:13px;color:var(--text);">Checkpoint 1 proyek akhir</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+</div>
+
+<!-- ══ FOOTER ══ -->
+<footer class="footer">
+  <div>AI·UKWMS <span style="color:var(--text-3);">· P-11 Prediksi & Rekomendasi Bisnis · S1 Teknik Industri</span></div>
+  <div><a href="../index.html" style="color:var(--text-3);">← Kembali ke Beranda</a></div>
+</footer>
+
+<script>
+  /* ── TOC active tracking ── */
+  const headings = document.querySelectorAll('.content-main [id]');
+  const tocLinks = document.querySelectorAll('.toc-list a');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(a => {
+          a.classList.remove('active');
+          if (a.getAttribute('href') === '#' + entry.target.id) a.classList.add('active');
+        });
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px' });
+  headings.forEach(h => observer.observe(h));
+
+  /* ── Nav scroll active ── */
+  const navLinks = document.querySelectorAll('.nav-links a[href^="#"]');
+  window.addEventListener('scroll', () => {
+    let current = '';
+    headings.forEach(h => { if (window.scrollY >= h.offsetTop - 100) current = h.id; });
+    navLinks.forEach(a => {
+      a.classList.remove('active');
+      if (a.getAttribute('href') === '#' + current) a.classList.add('active');
+    });
+  });
+</script>
+</body>
+</html>
