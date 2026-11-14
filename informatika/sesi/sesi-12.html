@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>P-12: Sintesis Etika AI, Regulasi Indonesia & Computer Vision — Kecerdasan Buatan UKWMS</title>
+<link rel="stylesheet" href="../../css/style.css">
+<style>
+  /* ── Cards ── */
+  .review-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:var(--s4); margin:var(--s5) 0; }
+  .review-card { background:var(--bg-2); border:1px solid var(--border); border-radius:var(--r3); padding:var(--s5); position:relative; overflow:hidden; }
+  .review-card::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; }
+  .review-card.teal::before   { background:var(--teal); }
+  .review-card.blue::before   { background:var(--blue); }
+  .review-card.amber::before  { background:var(--amber); }
+  .review-card.purple::before { background:var(--purple); }
+  .review-card.red::before    { background:var(--red); }
+  .review-card-label { font-family:var(--mono); font-size:10px; letter-spacing:2px; text-transform:uppercase; margin-bottom:var(--s3); }
+  .review-card.teal .review-card-label   { color:var(--teal); }
+  .review-card.blue .review-card-label   { color:var(--blue); }
+  .review-card.amber .review-card-label  { color:var(--amber); }
+  .review-card.purple .review-card-label { color:var(--purple); }
+  .review-card.red .review-card-label    { color:var(--red); }
+  .review-card h4 { font-size:14px; font-weight:600; color:var(--text); margin-bottom:var(--s3); }
+  .review-card ul { padding-left:var(--s5); font-size:13px; color:var(--text-2); line-height:1.9; }
+  .review-card p  { font-size:13px; color:var(--text-2); line-height:1.8; margin-bottom:0; }
+
+  /* ── Tabel ── */
+  .kisi-table { width:100%; border-collapse:collapse; font-size:13px; margin:var(--s4) 0; }
+  .kisi-table th { background:var(--bg-2); border:1px solid var(--border); padding:var(--s3) var(--s4); text-align:left; font-family:var(--mono); font-size:11px; color:var(--text-3); letter-spacing:1px; }
+  .kisi-table td { border:1px solid var(--border); padding:var(--s3) var(--s4); color:var(--text-2); vertical-align:top; line-height:1.6; }
+  .kisi-table tr:hover td { background:var(--bg-2); }
+  .table-scroll { overflow-x:auto; }
+  .content-block code { font-family:var(--mono); font-size:12px; background:var(--bg-3); color:var(--teal); padding:1px 6px; border-radius:var(--r1); }
+
+  /* ── Pembagi bagian ── */
+  .part-banner { display:flex; align-items:center; gap:var(--s4); padding:var(--s4) var(--s5); border-radius:var(--r3); margin:0 0 var(--s5); border:1px solid; }
+  .part-banner.a { background:rgba(155,124,244,0.07); border-color:rgba(155,124,244,0.25); }
+  .part-banner.b { background:rgba(79,142,247,0.07); border-color:rgba(79,142,247,0.25); }
+  .part-tag { font-family:var(--mono); font-size:11px; letter-spacing:2px; text-transform:uppercase; flex-shrink:0; }
+  .part-banner.a .part-tag { color:var(--purple); }
+  .part-banner.b .part-tag { color:var(--blue); }
+  .part-text { font-size:13px; color:var(--text-2); line-height:1.7; }
+  .part-text strong { color:var(--text); }
+
+  /* ── Lapisan regulasi ── */
+  .layer { display:grid; grid-template-columns:150px 1fr; gap:var(--s4); background:var(--bg-2); border:1px solid var(--border); border-left:3px solid var(--purple); border-radius:var(--r2); padding:var(--s3) var(--s4); margin-bottom:var(--s2); }
+  .layer.l2 { border-left-color:var(--blue); }
+  .layer.l3 { border-left-color:var(--amber); }
+  .layer.l4 { border-left-color:var(--text-3); }
+  .layer-k { font-family:var(--mono); font-size:11px; letter-spacing:1px; text-transform:uppercase; color:var(--text); padding-top:2px; }
+  .layer-v { font-size:13px; color:var(--text-2); line-height:1.7; }
+  .status-pill { display:inline-block; font-family:var(--mono); font-size:10px; letter-spacing:1px; padding:1px 8px; border-radius:var(--r1); border:1px solid; margin-right:var(--s2); }
+  .status-pill.ok { color:var(--teal); border-color:rgba(0,201,177,0.35); background:var(--teal-dim); }
+  .status-pill.wait { color:var(--amber); border-color:rgba(245,166,35,0.35); background:rgba(245,166,35,0.08); }
+  @media (max-width:600px) { .layer { grid-template-columns:1fr; gap:var(--s1); } }
+
+  /* ── Widget umum ── */
+  .builder { background:var(--bg-2); border:1px solid var(--border); border-radius:var(--r3); padding:var(--s5); margin:var(--s5) 0; }
+  .ctl-row { display:flex; align-items:center; gap:var(--s4); margin-bottom:var(--s3); flex-wrap:wrap; }
+  .ctl-row label { font-family:var(--mono); font-size:12px; color:var(--text-2); width:150px; flex-shrink:0; }
+  .ctl-row input[type=range] { flex:1; min-width:140px; accent-color:var(--blue); }
+  .ctl-val { font-family:var(--mono); font-size:14px; color:var(--amber); width:48px; text-align:right; }
+  .btn-mini { font-family:var(--mono); font-size:11px; padding:4px 10px; border:1px solid var(--border-2); border-radius:var(--r1); background:var(--bg-2); color:var(--text-2); cursor:pointer; transition:border-color .2s,color .2s; }
+  .btn-mini:hover { border-color:var(--teal); color:var(--teal); }
+
+  /* ── Widget biaya kesalahan CV ── */
+  .cm-wrap { display:grid; grid-template-columns:auto 1fr; gap:var(--s5); margin-top:var(--s4); align-items:start; }
+  .cm { display:grid; grid-template-columns:auto 90px 90px; gap:3px; font-family:var(--mono); font-size:11px; }
+  .cm div { padding:var(--s2) var(--s3); text-align:center; border-radius:var(--r1); }
+  .cm .h { color:var(--text-3); background:transparent; font-size:10px; letter-spacing:1px; }
+  .cm .rowh { color:var(--text-3); text-align:right; align-self:center; background:transparent; font-size:10px; }
+  .cm .tp, .cm .tn { background:var(--teal-dim); color:var(--teal); border:1px solid rgba(0,201,177,0.25); }
+  .cm .fp, .cm .fn { background:rgba(240,96,96,0.07); color:var(--red); border:1px solid rgba(240,96,96,0.3); }
+  .cm .num { font-size:18px; font-weight:700; display:block; }
+  .met-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:var(--s3); }
+  .met { background:var(--bg); border:1px solid var(--border); border-radius:var(--r2); padding:var(--s3) var(--s4); }
+  .met-n { font-size:11px; color:var(--text-3); margin-bottom:2px; }
+  .met-v { font-family:var(--mono); font-size:19px; font-weight:700; color:var(--text); }
+  .met.cost .met-v { color:var(--amber); }
+  .met.opt .met-v { color:var(--teal); }
+  .cost-note { font-size:12px; color:var(--text-2); line-height:1.7; margin-top:var(--s4); }
+  @media (max-width:700px) { .cm-wrap { grid-template-columns:1fr; } }
+
+  /* ── Checklist etika/PDP ── */
+  .ck-item { display:flex; gap:var(--s3); align-items:flex-start; padding:var(--s3) var(--s4); border:1px solid var(--border); border-radius:var(--r2); background:var(--bg); margin-bottom:var(--s2); cursor:pointer; font-size:13px; color:var(--text-2); line-height:1.6; }
+  .ck-item:hover { border-color:var(--blue); }
+  .ck-item input { margin-top:3px; accent-color:var(--blue); flex-shrink:0; }
+  .ck-item.crit .ck-tag { color:var(--red); }
+  .ck-tag { font-family:var(--mono); font-size:9px; letter-spacing:1px; text-transform:uppercase; color:var(--text-3); display:block; margin-bottom:2px; }
+  .ck-result { margin-top:var(--s4); }
+  .ck-score { display:flex; align-items:baseline; gap:var(--s3); margin-bottom:var(--s3); }
+  .ck-score-num { font-family:var(--mono); font-size:30px; font-weight:700; color:var(--blue); }
+  .ck-flag { padding:var(--s3) var(--s4); border-radius:var(--r2); margin-bottom:var(--s2); font-size:12.5px; color:var(--text-2); line-height:1.7; border:1px solid var(--border); background:var(--bg); }
+  .ck-flag.crit { border-color:rgba(240,96,96,0.4); background:rgba(240,96,96,0.06); }
+  .ck-flag strong { color:var(--text); }
+  .code-block { background:var(--bg-2); border:1px solid var(--border); border-radius:var(--r2); margin:var(--s4) 0; overflow:hidden; }
+  .code-head { display:flex; justify-content:space-between; align-items:center; padding:var(--s2) var(--s4); border-bottom:1px solid var(--border); background:var(--bg-3); font-family:var(--mono); font-size:11px; color:var(--text-3); letter-spacing:1px; }
+  .code-block pre { margin:0; padding:var(--s4) var(--s5); overflow-x:auto; font-family:var(--mono); font-size:12.5px; line-height:1.75; color:var(--text); white-space:pre-wrap; }
+
+  /* ── Kasus ── */
+  .case { background:var(--bg-2); border:1px solid var(--border); border-radius:var(--r3); padding:var(--s5); margin-bottom:var(--s4); }
+  .case-tag { font-family:var(--mono); font-size:10px; letter-spacing:2px; text-transform:uppercase; color:var(--purple); margin-bottom:var(--s2); }
+  .case h4 { font-size:15px; color:var(--text); margin-bottom:var(--s2); }
+  .case p { font-size:13px; color:var(--text-2); line-height:1.8; margin-bottom:var(--s3); }
+  .case ol { font-size:13px; color:var(--text-2); line-height:1.9; padding-left:var(--s5); margin:0; }
+
+  /* ── Quiz ── */
+  .quiz-box { background:var(--bg-2); border:1px solid var(--border); border-radius:var(--r3); margin:var(--s5) 0; overflow:hidden; }
+  .quiz-header { padding:var(--s4) var(--s5); border-bottom:1px solid var(--border); display:flex; align-items:center; gap:var(--s3); }
+  .quiz-num { font-family:var(--mono); font-size:11px; background:var(--teal-dim); color:var(--teal); border:1px solid rgba(0,201,177,0.25); border-radius:var(--r1); padding:2px 8px; flex-shrink:0; }
+  .quiz-q { font-size:14px; color:var(--text); font-weight:500; }
+  .quiz-options { padding:var(--s4) var(--s5); display:flex; flex-direction:column; gap:var(--s2); }
+  .quiz-opt { display:flex; align-items:flex-start; gap:var(--s3); padding:var(--s3) var(--s4); border:1px solid var(--border); border-radius:var(--r2); font-size:13px; color:var(--text-2); cursor:pointer; transition:border-color .2s, background .2s; user-select:none; }
+  .quiz-opt:hover { border-color:var(--teal); background:var(--teal-glow); }
+  .quiz-opt.correct { border-color:var(--teal); background:var(--teal-glow); color:var(--teal); }
+  .quiz-opt.wrong { border-color:var(--red); background:rgba(240,96,96,0.07); color:var(--red); }
+  .quiz-opt .opt-letter { font-family:var(--mono); font-size:11px; flex-shrink:0; color:var(--text-3); width:18px; padding-top:1px; }
+  .quiz-opt.correct .opt-letter { color:var(--teal); }
+  .quiz-opt.wrong .opt-letter { color:var(--red); }
+  .quiz-explanation { margin:0; padding:var(--s3) var(--s5) var(--s4); font-size:12px; color:var(--text-2); line-height:1.7; border-top:1px solid var(--border); display:none; background:var(--bg); }
+  .quiz-explanation.show { display:block; }
+  .quiz-explanation strong { color:var(--teal); }
+
+  /* ── CTA proyek akhir ── */
+  .proyek-cta { display:flex; align-items:center; gap:var(--s5); background:rgba(155,124,244,0.07); border:1px solid rgba(155,124,244,0.25); border-radius:var(--r3); padding:var(--s5) var(--s6); margin:var(--s5) 0; flex-wrap:wrap; }
+  .proyek-cta-text { flex:1 1 320px; }
+  .proyek-cta-label { font-family:var(--mono); font-size:10px; color:var(--purple); letter-spacing:2px; text-transform:uppercase; margin-bottom:var(--s2); }
+  .proyek-cta-title { font-family:var(--serif); font-size:18px; font-weight:600; color:var(--text); margin-bottom:var(--s2); }
+  .proyek-cta-desc { font-size:13px; color:var(--text-2); line-height:1.7; }
+  .proyek-cta-btn { display:inline-flex; align-items:center; gap:var(--s2); padding:var(--s3) var(--s5); background:var(--purple); color:#fff; font-weight:600; font-size:14px; border-radius:var(--r2); transition:transform .2s var(--ease), opacity .2s; white-space:nowrap; }
+  .proyek-cta-btn:hover { transform:translateY(-1px); opacity:.9; text-decoration:none; color:#fff; }
+</style>
+</head>
+<body>
+
+<!-- ══ NAV ══ -->
+<nav class="nav">
+  <div class="nav-logo">AI<span>·</span>UKWMS</div>
+  <ul class="nav-links">
+    <li><a href="../index.html">← Beranda</a></li>
+    <li><a href="#tujuan" class="active">Tujuan</a></li>
+    <li><a href="#etika">Etika AI</a></li>
+    <li><a href="#regulasi">Regulasi</a></li>
+    <li><a href="#pdp">UU PDP</a></li>
+    <li><a href="#cv">Computer Vision</a></li>
+    <li><a href="#kasus">Studi Kasus</a></li>
+    <li><a href="#audit">Audit Proyek</a></li>
+    <li><a href="#latihan">Latihan</a></li>
+  </ul>
+</nav>
+
+<!-- ══ HERO ══ -->
+<header class="sesi-hero">
+  <div style="max-width:1100px;margin:0 auto;">
+    <div class="sesi-breadcrumb">
+      <a href="../index.html">Kecerdasan Buatan</a>
+      <span>›</span>
+      <span>Pertemuan 12</span>
+    </div>
+    <div class="sesi-num">PERTEMUAN 12 · TEORI</div>
+    <h1 class="sesi-title">Etika AI, Regulasi<br><em style="color:var(--purple);">Indonesia &amp; Computer Vision</em></h1>
+    <p style="font-size:15px;color:var(--text-2);max-width:700px;line-height:1.8;">Rekap prinsip etika AI, peta regulasi di Indonesia (UU PDP dan peraturan pelaksananya, serta status regulasi AI), dan Computer Vision sebagai studi kasus: dari biaya kesalahan prediksi hingga risiko data biometrik.</p>
+    <div class="sesi-meta-row">
+      <span class="badge badge-teal">Teori</span>
+      <span class="badge badge-blue">100 menit</span>
+      <span class="badge badge-amber">CPMK: C4, C5</span>
+      <span class="badge" style="background:rgba(155,124,244,0.1);color:var(--purple);border:1px solid rgba(155,124,244,0.2);">Audit Etika Proyek Akhir</span>
+    </div>
+  </div>
+</header>
+
+<!-- ══ CONTENT LAYOUT ══ -->
+<div class="content-layout">
+  <main class="content-main">
+
+    <!-- TUJUAN -->
+    <div class="content-block" id="tujuan">
+      <h2>Tujuan Pembelajaran</h2>
+      <p>Setelah membangun beragam aplikasi AI di sesi-sesi sebelumnya, kini saatnya bertanya: <em>apakah sistem ini adil, aman, dan boleh dibuat dengan cara ini?</em> Setelah sesi ini, mahasiswa diharapkan mampu:</p>
+      <ol>
+        <li>Menjelaskan prinsip etika AI dan sumber bias dalam siklus pengembangan model</li>
+        <li>Memetakan lapisan regulasi yang relevan bagi AI di Indonesia, termasuk status terbarunya</li>
+        <li>Menjelaskan konsep kunci UU PDP (data spesifik, dasar pemrosesan, hak subjek data, keputusan otomatis, kewajiban pengendali) dan kaitannya dengan proyek AI</li>
+        <li>Menganalisis aplikasi Computer Vision sebagai studi kasus bisnis, termasuk biaya kesalahan dan risiko biometrik</li>
+        <li>Menilai proyek akhir kelompok dengan checklist etika dan pelindungan data, lalu menuliskannya di laporan</li>
+      </ol>
+
+      <div class="callout warn" style="margin-top:var(--s5);">
+        <span class="callout-icon">⚖️</span>
+        <div class="callout-body">
+          <p><strong>Penting:</strong> materi ini bersifat pendidikan, bukan nasihat hukum. Regulasi AI dan pelindungan data di Indonesia sedang berkembang cepat, dan status yang tertulis di sini adalah <strong>kondisi berdasarkan pemberitaan hingga Oktober 2026</strong>. Selalu periksa teks peraturan di sumber resmi (misalnya JDIH Komdigi atau JDIH Nasional) sebelum menjadikannya acuan.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════ BAGIAN A ═══════════ -->
+    <div class="content-block" id="etika">
+      <div class="part-banner a">
+        <span class="part-tag">Bagian A</span>
+        <span class="part-text"><strong>Etika &amp; Regulasi:</strong> apa yang harus dijaga, dan apa yang diwajibkan hukum.</span>
+      </div>
+
+      <h2>1. Rekap Etika AI</h2>
+      <p>Pedoman etika AI dari berbagai lembaga (UNESCO, OECD, ASEAN, dan lainnya) memakai istilah berbeda tetapi menunjuk ke prinsip yang mirip. Untuk keperluan kuliah, enam prinsip berikut cukup sebagai kerangka kerja.</p>
+
+      <div class="table-scroll">
+      <table class="kisi-table">
+        <thead><tr><th>PRINSIP</th><th>PERTANYAAN KUNCI</th><th>PRAKTIK NYATA DALAM PROYEK</th></tr></thead>
+        <tbody>
+          <tr><td><strong style="color:var(--text)">Keadilan (fairness)</strong></td><td>Apakah sistem memperlakukan kelompok berbeda secara setara?</td><td>Ukur performa per subkelompok, bukan hanya rata-rata keseluruhan</td></tr>
+          <tr><td><strong style="color:var(--text)">Transparansi &amp; keterjelasan</strong></td><td>Dapatkah pengguna dan pengembang memahami mengapa sistem memberi keluaran tertentu?</td><td>SHAP / feature importance (Proyek 1, 5, 8), sitasi sumber di RAG (Proyek 4), dokumentasi model</td></tr>
+          <tr><td><strong style="color:var(--text)">Akuntabilitas</strong></td><td>Siapa yang bertanggung jawab bila sistem keliru?</td><td>Peran jelas, log keputusan, jalur banding</td></tr>
+          <tr><td><strong style="color:var(--text)">Privasi</strong></td><td>Apakah data pribadi dikumpulkan dan dipakai secukupnya dan sah?</td><td>Minimisasi data, anonimisasi, kebijakan data penyedia API</td></tr>
+          <tr><td><strong style="color:var(--text)">Keamanan &amp; ketahanan</strong></td><td>Apakah sistem tahan terhadap salah pakai, serangan, dan kondisi di luar data latih?</td><td>Uji kasus ekstrem, perlindungan dari prompt injection (P-09)</td></tr>
+          <tr><td><strong style="color:var(--text)">Pengawasan manusia</strong></td><td>Apakah manusia dapat meninjau dan membatalkan keputusan yang berdampak?</td><td>Human-in-the-loop untuk keputusan berisiko; jangan jadikan keluaran AI sebagai satu-satunya dasar</td></tr>
+        </tbody>
+      </table>
+      </div>
+
+      <h3 style="margin-top:var(--s6);">Dari mana bias berasal?</h3>
+      <div class="review-grid">
+        <div class="review-card red">
+          <div class="review-card-label">Data</div>
+          <h4>Sampling &amp; representasi</h4>
+          <p>Data latih tidak mewakili populasi sasaran. Contoh: dataset wajah yang didominasi satu kelompok membuat akurasi turun pada kelompok lain.</p>
+        </div>
+        <div class="review-card amber">
+          <div class="review-card-label">Label</div>
+          <h4>Anotasi yang subjektif</h4>
+          <p>Label buatan manusia membawa pandangan penganotasi. Contoh: label ekspresi wajah pada FER2013 dikenal berisik dan ambigu.</p>
+        </div>
+        <div class="review-card blue">
+          <div class="review-card-label">Model &amp; metrik</div>
+          <h4>Optimasi rata-rata</h4>
+          <p>Akurasi keseluruhan tinggi bisa menyembunyikan kinerja buruk pada kelompok kecil, apalagi bila kelas tidak seimbang.</p>
+        </div>
+        <div class="review-card purple">
+          <div class="review-card-label">Penerapan</div>
+          <h4>Umpan balik &amp; konteks</h4>
+          <p>Sistem dipakai pada konteks berbeda dari saat dilatih, atau keluarannya memengaruhi data masa depan (mis. rekomendasi yang memperkuat preferensi lama).</p>
+        </div>
+      </div>
+
+      <h3>Contoh hitung cepat: rasio tingkat seleksi</h3>
+      <p>Sebuah model menyaring 100 pelamar tiap kelompok. Kelompok A diloloskan 60 orang, kelompok B diloloskan 36 orang. Tingkat seleksi A = 60%, B = 36%, sehingga rasio B terhadap A = 36 / 60 = <strong>0,6</strong>. Rasio yang jauh di bawah 1 adalah sinyal untuk menyelidiki lebih lanjut, misalnya dengan membandingkan juga tingkat true positive per kelompok. Ambang yang sering dipakai sebagai patokan awal (mis. 0,8) berasal dari praktik di luar negeri dan hanya <em>heuristik</em>, bukan aturan hukum Indonesia, dan angka tunggal tidak pernah cukup untuk menyimpulkan adil atau tidak.</p>
+    </div>
+
+    <div class="content-block" id="regulasi">
+      <h2>2. Peta Regulasi untuk AI di Indonesia</h2>
+      <p>Indonesia belum memiliki satu undang-undang khusus yang mengatur AI secara menyeluruh seperti pendekatan Uni Eropa. Pemerintah menyebut kerangka yang berlaku saat ini tersusun dari beberapa instrumen yang saling melengkapi. Pahami sebagai <em>lapisan</em>:</p>
+
+      <div class="layer">
+        <div class="layer-k">Lapisan 1<br>Pelindungan data</div>
+        <div class="layer-v"><span class="status-pill ok">BERLAKU</span><strong style="color:var(--text)">UU No. 27 Tahun 2022 tentang Pelindungan Data Pribadi (UU PDP)</strong> beserta peraturan pelaksananya, <strong style="color:var(--text)">PP No. 33 Tahun 2026</strong> (ditetapkan 16 Juli 2026). Ini lapisan yang paling mengikat bagi proyek AI yang memproses data pribadi. Dibahas rinci di bagian 3.</div>
+      </div>
+      <div class="layer l2">
+        <div class="layer-k">Lapisan 2<br>Etika &amp; strategi AI</div>
+        <div class="layer-v"><span class="status-pill ok">ADA</span>Strategi Nasional Kecerdasan Artifisial 2020–2045 dan Surat Edaran Menteri Kominfo No. 9 Tahun 2023 tentang etika AI. Keduanya berupa pedoman arah dan etika, bukan undang-undang dengan sanksi spesifik AI.</div>
+      </div>
+      <div class="layer l3">
+        <div class="layer-k">Lapisan 3<br>Perpres AI</div>
+        <div class="layer-v"><span class="status-pill wait">PROSES</span>Dua Peraturan Presiden sedang disiapkan: <strong style="color:var(--text)">Peta Jalan AI (2026–2029)</strong> dan <strong style="color:var(--text)">Etika AI</strong>. Pembahasan lintas kementerian disebut selesai sejak Mei 2026, dan per pemberitaan awal-pertengahan September 2026 keduanya masih menunggu penandatanganan Presiden. <em>Periksa apakah sudah terbit</em> sebelum mengutipnya sebagai aturan berlaku.</div>
+      </div>
+      <div class="layer l4">
+        <div class="layer-k">Lapisan 4<br>Sektoral &amp; lainnya</div>
+        <div class="layer-v">Aturan sektor (mis. regulator jasa keuangan, kesehatan, pendidikan) serta ketentuan umum seperti UU ITE dan regulasi keamanan siber. Pemerintah menyatakan pengaturan AI ke depan akan disesuaikan dengan bidangnya, bukan satu pola untuk semua penggunaan, dan undang-undang AI khusus belum menjadi prioritas saat ini.</div>
+      </div>
+
+      <div class="callout info" style="margin-top:var(--s5);">
+        <span class="callout-icon">🌍</span>
+        <div class="callout-body">
+          <p><strong>Pembanding internasional (bukan hukum Indonesia):</strong> Uni Eropa memakai pendekatan <em>berbasis tingkat risiko</em>: praktik tertentu dilarang, sistem berisiko tinggi dikenai kewajiban ketat (dokumentasi, pengawasan manusia, pengujian), sedangkan risiko rendah diatur ringan. Pola pikir ini berguna untuk menilai proyek Anda sendiri: <em>makin besar dampaknya terhadap hak dan kehidupan orang, makin ketat kehati-hatiannya</em>. Di kerangka Uni Eropa, pengenalan emosi dari wajah di tempat kerja dan lembaga pendidikan termasuk yang sangat dibatasi, yang relevan untuk dipikirkan oleh kelompok Proyek 11.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="content-block" id="pdp">
+      <h2>3. UU PDP: Konsep Kunci untuk Pengembang AI</h2>
+      <p>UU PDP berlaku penuh dan, menurut pemberitaan, PP 33/2026 yang diterbitkan Juli 2026 memerinci cara pelaksanaannya, termasuk keberatan atas pemrosesan otomatis, penilaian dampak pelindungan data, penunjukan pejabat/petugas pelindungan data, transfer data lintas negara, dan sanksi administratif. Tabel berikut merangkum konsep yang paling sering bersinggungan dengan proyek AI.</p>
+
+      <div class="table-scroll">
+      <table class="kisi-table">
+        <thead><tr><th>KONSEP</th><th>INTI</th><th>RELEVANSI UNTUK PROYEK AI</th></tr></thead>
+        <tbody>
+          <tr><td><strong style="color:var(--text)">Peran</strong></td><td>Subjek data (orang pemilik data), pengendali data (menentukan tujuan dan cara pemrosesan), prosesor data (memproses atas nama pengendali)</td><td>Pengembang/penyelenggara aplikasi umumnya berperan sebagai pengendali; penyedia API/cloud dapat berperan sebagai prosesor atau pihak lain, tergantung perjanjian</td></tr>
+          <tr><td><strong style="color:var(--text)">Data pribadi spesifik</strong></td><td>Kategori berisiko lebih tinggi, antara lain data kesehatan, <strong style="color:var(--text)">biometrik</strong>, genetika, catatan kejahatan, data anak, dan data keuangan pribadi</td><td>Foto wajah untuk identifikasi (Proyek 11 dan sejenisnya) termasuk biometrik; kehati-hatian dan dasar pemrosesan harus lebih kuat</td></tr>
+          <tr><td><strong style="color:var(--text)">Dasar pemrosesan</strong></td><td>Pemrosesan harus punya dasar sah, misalnya persetujuan, perjanjian, kewajiban hukum, atau kepentingan yang sah</td><td>"Datanya ada di internet" bukan otomatis dasar sah; periksa lisensi dan syarat dataset</td></tr>
+          <tr><td><strong style="color:var(--text)">Hak subjek data</strong></td><td>Antara lain mengakses, memperbaiki, menghapus, menarik persetujuan, dan menyatakan keberatan atas keputusan yang semata-mata berdasarkan pemrosesan otomatis</td><td>Segmentasi atau skoring otomatis yang berdampak pada seseorang perlu jalur tinjauan dan penjelasan</td></tr>
+          <tr><td><strong style="color:var(--text)">Penilaian dampak (DPIA)</strong></td><td>Penilaian risiko untuk pemrosesan berisiko tinggi, mis. profiling, data spesifik, atau skala besar</td><td>Format ringkasnya dapat Anda tiru di bagian "Audit Proyek" di bawah</td></tr>
+          <tr><td><strong style="color:var(--text)">Kegagalan pelindungan</strong></td><td>Insiden kebocoran wajib diberitahukan kepada pihak terdampak dan otoritas paling lambat 3 × 24 jam</td><td>Rancang log dan prosedur insiden sejak awal, termasuk bila data bocor lewat layanan pihak ketiga</td></tr>
+          <tr><td><strong style="color:var(--text)">Sanksi</strong></td><td>Sanksi administratif, termasuk denda administratif hingga 2% dari pendapatan tahunan menurut PP 33/2026, serta sanksi pidana untuk pelanggaran tertentu</td><td>Menunjukkan bahwa pelindungan data adalah risiko bisnis nyata, bukan sekadar etika</td></tr>
+        </tbody>
+      </table>
+      </div>
+
+      <div class="callout warn">
+        <span class="callout-icon">🏛️</span>
+        <div class="callout-body">
+          <p><strong>Lembaga pengawas PDP belum terbentuk.</strong> UU PDP mengamanatkan lembaga pelindungan data pribadi, tetapi per pemberitaan akhir Oktober 2026, proses harmonisasi pembentukannya telah selesai dan menunggu penetapan Presiden. Sementara itu fungsi pelindungan dijalankan oleh Kementerian Komunikasi dan Digital. Sejumlah pengamat menilai penegakan baru efektif setelah lembaga ada, namun kewajiban dalam UU tetap berlaku sehingga organisasi tidak seharusnya menunggu untuk berbenah.</p>
+        </div>
+      </div>
+
+      <div class="callout tip">
+        <span class="callout-icon">🧭</span>
+        <div class="callout-body">
+          <p><strong>Prinsip kerja sederhana untuk proyek kampus:</strong> (1) pakai data yang memang boleh dipakai, (2) kumpulkan dan simpan seminimal mungkin, (3) jangan kirim data pribadi ke layanan eksternal tanpa anonimisasi, (4) jangan jadikan keluaran AI satu-satunya dasar keputusan yang berdampak pada orang, (5) tuliskan keterbatasan dengan jujur.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════ BAGIAN B ═══════════ -->
+    <div class="content-block" id="cv">
+      <div class="part-banner b">
+        <span class="part-tag">Bagian B</span>
+        <span class="part-text"><strong>Computer Vision sebagai studi kasus:</strong> teknik yang sama, konsekuensi bisnis dan etika yang sangat berbeda tergantung konteks.</span>
+      </div>
+
+      <h2>4. Computer Vision untuk Bisnis</h2>
+      <p>Ingat kembali dari Blok 1: CNN dan transfer learning mengubah gambar menjadi prediksi kelas. Di dunia bisnis, pertanyaan pentingnya bukan hanya "berapa akurasinya?", tetapi <em>apa harga setiap jenis kesalahan?</em> dan <em>apa risiko memotret orang?</em></p>
+
+      <div class="table-scroll">
+      <table class="kisi-table">
+        <thead><tr><th>APLIKASI</th><th>NILAI BISNIS</th><th>KESALAHAN YANG PALING MAHAL</th><th>RISIKO ETIKA / PDP</th></tr></thead>
+        <tbody>
+          <tr><td><strong style="color:var(--text)">Inspeksi kualitas produk di pabrik</strong></td><td>Kurangi cacat lolos, hemat tenaga inspeksi</td><td>False negative: produk cacat lolos ke pelanggan</td><td>Rendah bila tidak memotret pekerja; periksa bila kamera menangkap orang</td></tr>
+          <tr><td><strong style="color:var(--text)">Deteksi penyakit tanaman (Proyek 3)</strong></td><td>Penanganan dini, kurangi gagal panen</td><td>False negative: penyakit tak terdeteksi; false positive: penggunaan pestisida berlebih</td><td>Rendah; perhatikan keterbatasan kondisi foto lapangan</td></tr>
+          <tr><td><strong style="color:var(--text)">Klasifikasi sampah (Proyek 7)</strong></td><td>Otomasi pemilahan, edukasi</td><td>Kelas keliru mencemari aliran daur ulang</td><td>Rendah; bias pada jenis sampah lokal yang tidak ada di data latih</td></tr>
+          <tr><td><strong style="color:var(--text)">Presensi / verifikasi wajah</strong></td><td>Hemat waktu, cegah titip absen</td><td>False reject (orang sah ditolak) dan false accept (orang tak sah diterima)</td><td><strong style="color:var(--red)">Tinggi:</strong> biometrik = data spesifik, perlu dasar pemrosesan dan pengamanan kuat, risiko bias antar kelompok</td></tr>
+          <tr><td><strong style="color:var(--text)">Pengenalan ekspresi/emosi (Proyek 11)</strong></td><td>Analisis pengalaman pelanggan</td><td>Salah menafsirkan emosi sebagai fakta tentang seseorang</td><td><strong style="color:var(--red)">Tinggi:</strong> validitas ilmiah diperdebatkan, label data berisik, dibatasi ketat di sejumlah yurisdiksi</td></tr>
+        </tbody>
+      </table>
+      </div>
+
+      <h3 style="margin-top:var(--s6);">Coba sendiri: ambang keputusan dan biaya kesalahan</h3>
+      <p>Model inspeksi memberi skor "cacat" 0–1 pada tiap produk. Anda memilih <strong>ambang</strong>: produk dengan skor di atasnya ditandai cacat. Data di bawah adalah simulasi sintetis (1.000 produk). Ubah biaya kesalahan dan lihat ambang mana yang paling murah secara total, bukan yang paling "akurat".</p>
+
+      <div class="builder">
+        <div class="ctl-row"><label for="c-prev">Proporsi produk cacat</label><input type="range" id="c-prev" min="2" max="40" step="1" value="10"><span class="ctl-val" id="c-prev-v">10%</span></div>
+        <div class="ctl-row"><label for="c-fp">Biaya false positive</label><input type="range" id="c-fp" min="1" max="50" step="1" value="1"><span class="ctl-val" id="c-fp-v">1</span></div>
+        <div class="ctl-row"><label for="c-fn">Biaya false negative</label><input type="range" id="c-fn" min="1" max="100" step="1" value="50"><span class="ctl-val" id="c-fn-v">50</span></div>
+        <div class="ctl-row"><label for="c-t">Ambang keputusan</label><input type="range" id="c-t" min="0.05" max="0.95" step="0.01" value="0.50"><span class="ctl-val" id="c-t-v">0.50</span></div>
+
+        <div class="cm-wrap">
+          <div class="cm">
+            <div class="h"></div><div class="h">PRED. CACAT</div><div class="h">PRED. BAIK</div>
+            <div class="rowh">AKTUAL CACAT</div><div class="tp"><span class="num" id="m-tp">0</span>TP</div><div class="fn"><span class="num" id="m-fn">0</span>FN</div>
+            <div class="rowh">AKTUAL BAIK</div><div class="fp"><span class="num" id="m-fp">0</span>FP</div><div class="tn"><span class="num" id="m-tn">0</span>TN</div>
+          </div>
+          <div class="met-grid">
+            <div class="met"><div class="met-n">Precision</div><div class="met-v" id="m-prec">0</div></div>
+            <div class="met"><div class="met-n">Recall</div><div class="met-v" id="m-rec">0</div></div>
+            <div class="met cost"><div class="met-n">Total biaya (ambang ini)</div><div class="met-v" id="m-cost">0</div></div>
+            <div class="met opt"><div class="met-n">Biaya minimum (ambang optimal)</div><div class="met-v" id="m-opt">0</div></div>
+          </div>
+        </div>
+        <div class="cost-note" id="m-note"></div>
+        <div style="margin-top:var(--s3);"><button class="btn-mini" type="button" id="c-best">Pindahkan ke ambang optimal</button></div>
+      </div>
+
+      <div class="callout tip">
+        <span class="callout-icon">💡</span>
+        <div class="callout-body">
+          <p><strong>Pelajarannya:</strong> ambang 0,5 bukan hukum alam. Ketika false negative jauh lebih mahal daripada false positive, ambang optimal bergeser turun (recall naik, precision turun). Sebaliknya bila kesalahan menandai "cacat" itu mahal, ambang naik. Karena itu metrik teknis (accuracy, F1) harus selalu dipasangkan dengan <em>biaya kesalahan nyata</em> dari pemilik bisnis, dan angka biaya itu perlu didiskusikan, bukan diasumsikan.</p>
+        </div>
+      </div>
+
+      <h3 style="margin-top:var(--s6);">Dari model ke produk: catatan penerapan CV</h3>
+      <div class="review-grid">
+        <div class="review-card teal">
+          <div class="review-card-label">Lingkungan</div>
+          <h4>Kondisi lapangan ≠ dataset</h4>
+          <ul>
+            <li>Pencahayaan, sudut kamera, dan latar berbeda dari data latih</li>
+            <li>Uji dengan foto yang diambil sendiri (seperti 200 foto lokal di Proyek 7)</li>
+          </ul>
+        </div>
+        <div class="review-card blue">
+          <div class="review-card-label">Infrastruktur</div>
+          <h4>Cloud atau perangkat tepi</h4>
+          <ul>
+            <li>Model ringan (MobileNet, EfficientNet-B0) cocok untuk ponsel/perangkat terbatas</li>
+            <li>Mengirim gambar ke cloud menambah latensi dan risiko privasi</li>
+          </ul>
+        </div>
+        <div class="review-card amber">
+          <div class="review-card-label">Pemeliharaan</div>
+          <h4>Drift data</h4>
+          <ul>
+            <li>Produk, kemasan, atau musim berubah sehingga performa menurun diam-diam</li>
+            <li>Pantau performa dan kumpulkan kasus gagal untuk pelatihan ulang</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="content-block" id="kasus">
+      <h2>5. Diskusi Studi Kasus</h2>
+      <p>Bahaslah dalam kelompok kecil (±8 menit per kasus), lalu presentasikan jawaban singkat. Gunakan kerangka dari bagian 1–4.</p>
+
+      <div class="case">
+        <div class="case-tag">Kasus 1 · Computer Vision</div>
+        <h4>Presensi wajah di kampus</h4>
+        <p>Sebuah fakultas ingin mengganti tanda tangan absensi dengan kamera pengenal wajah di pintu kelas agar tidak ada titip absen.</p>
+        <ol>
+          <li>Data apa yang diproses dan termasuk kategori apa menurut UU PDP?</li>
+          <li>Apa dasar pemrosesannya, dan apakah mahasiswa benar-benar bebas menolak?</li>
+          <li>Apa dampak false reject pada mahasiswa? Siapa yang menanggung biayanya?</li>
+          <li>Adakah cara yang kurang invasif untuk tujuan yang sama?</li>
+        </ol>
+      </div>
+
+      <div class="case">
+        <div class="case-tag">Kasus 2 · Tabular ML / Segmentasi</div>
+        <h4>Skor otomatis penolakan layanan</h4>
+        <p>Sebuah toko cicilan memakai model untuk menolak otomatis pelanggan yang diprediksi berisiko, tanpa tinjauan manusia, berdasarkan data transaksi dan lokasi.</p>
+        <ol>
+          <li>Bagaimana bias dapat masuk (fitur lokasi sebagai proksi kelompok tertentu)?</li>
+          <li>Hak apa yang dimiliki pelanggan terhadap keputusan yang semata-mata otomatis?</li>
+          <li>Apa jalur tinjauan manusia dan penjelasan yang layak disediakan?</li>
+        </ol>
+      </div>
+
+      <div class="case">
+        <div class="case-tag">Kasus 3 · Generative AI</div>
+        <h4>Chatbot HR yang menampung curhat karyawan</h4>
+        <p>Perusahaan meluncurkan chatbot HR berbasis LLM via API pihak ketiga. Karyawan mulai menceritakan masalah pribadi, termasuk kondisi kesehatan, dan percakapan disimpan untuk "meningkatkan layanan".</p>
+        <ol>
+          <li>Data apa yang kini dikumpulkan, dan apakah itu data pribadi spesifik?</li>
+          <li>Ke mana data mengalir, dan apa yang harus dicek pada penyedia API?</li>
+          <li>Apa yang harus dikatakan kepada pengguna tentang keterbatasan bot dan penyimpanan percakapan?</li>
+          <li>Bagaimana prosedur bila terjadi kebocoran?</li>
+        </ol>
+      </div>
+    </div>
+
+    <!-- AUDIT PROYEK -->
+    <div class="content-block" id="audit">
+      <h2>6. Audit Etika &amp; Pelindungan Data untuk Proyek Akhir</h2>
+      <p>Tandai pernyataan yang <strong>sudah benar</strong> untuk proyek kelompok Anda. Sisanya muncul sebagai daftar tindak lanjut, beserta draf catatan yang bisa ditempel di laporan (misalnya Bab 1.4 Batasan, Bab 4.6 Keterbatasan, atau Lampiran C).</p>
+
+      <div class="builder">
+        <div id="ck-list"></div>
+        <div class="ck-result">
+          <div class="ck-score"><span class="ck-score-num" id="ck-num">0/10</span><span style="font-size:13px;color:var(--text-2);" id="ck-msg">Tandai pernyataan yang sudah terpenuhi.</span></div>
+          <div id="ck-flags"></div>
+          <div class="code-block" style="margin-top:var(--s4);">
+            <div class="code-head"><span>DRAF CATATAN UNTUK LAPORAN</span><button class="btn-mini" type="button" id="ck-copy">Salin</button></div>
+<pre id="ck-out"></pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="callout info">
+        <span class="callout-icon">📝</span>
+        <div class="callout-body">
+          <p><strong>Ini alat bantu refleksi, bukan sertifikasi kepatuhan.</strong> Menandai semua kotak tidak berarti proyek Anda otomatis sesuai hukum, dan beberapa item (misalnya dasar pemrosesan) perlu dikonsultasikan dengan dosen atau pihak berwenang. Tujuannya membiasakan Anda menulis keterbatasan dan risiko dengan jujur.</p>
+        </div>
+      </div>
+
+      <div class="proyek-cta">
+        <div class="proyek-cta-text">
+          <div class="proyek-cta-label">Proyek UAS · Bobot 35%</div>
+          <div class="proyek-cta-title">Panduan Proyek Akhir Kecerdasan Buatan</div>
+          <div class="proyek-cta-desc">Hasil audit ini mendukung bagian Batasan (Bab 1.4), Keterbatasan (Bab 4.6), dan Lampiran C pada laporan. Buka kembali panduan lengkapnya sebelum Workshop P-13.</div>
+        </div>
+        <a href="proyek-akhir.html" class="proyek-cta-btn">Buka Panduan Proyek Akhir <span>→</span></a>
+      </div>
+    </div>
+
+    <!-- LATIHAN -->
+    <div class="content-block" id="latihan">
+      <h2>7. Latihan Pemahaman</h2>
+      <p>Klik opsi untuk memeriksa jawaban; penjelasan muncul setelah Anda memilih.</p>
+
+      <div class="quiz-box">
+        <div class="quiz-header"><span class="quiz-num">No. 1</span><span class="quiz-q">Sebuah aplikasi presensi memakai foto wajah mahasiswa untuk mengenali identitas. Menurut kategori dalam UU PDP, data tersebut paling tepat digolongkan sebagai...</span></div>
+        <div class="quiz-options" data-correct="C">
+          <div class="quiz-opt" data-val="A"><span class="opt-letter">A</span>Data umum yang bebas diproses tanpa dasar apa pun</div>
+          <div class="quiz-opt" data-val="B"><span class="opt-letter">B</span>Data anonim yang tidak lagi tergolong data pribadi</div>
+          <div class="quiz-opt" data-val="C"><span class="opt-letter">C</span>Data pribadi spesifik (biometrik), yang menuntut dasar pemrosesan dan pengamanan lebih kuat</div>
+          <div class="quiz-opt" data-val="D"><span class="opt-letter">D</span>Data yang hanya diatur oleh aturan kampus, bukan UU PDP</div>
+        </div>
+        <div class="quiz-explanation"><strong>Jawaban: C.</strong> Data biometrik termasuk kategori data pribadi spesifik karena risikonya lebih tinggi bila disalahgunakan. Wajah yang dipakai untuk mengidentifikasi seseorang adalah contoh biometrik.</div>
+      </div>
+
+      <div class="quiz-box">
+        <div class="quiz-header"><span class="quiz-num">No. 2</span><span class="quiz-q">Berdasarkan informasi yang dirujuk di materi ini (pemberitaan hingga pertengahan September 2026), pernyataan yang paling tepat tentang regulasi AI di Indonesia adalah...</span></div>
+        <div class="quiz-options" data-correct="B">
+          <div class="quiz-opt" data-val="A"><span class="opt-letter">A</span>Indonesia sudah memiliki undang-undang khusus AI yang komprehensif seperti Uni Eropa</div>
+          <div class="quiz-opt" data-val="B"><span class="opt-letter">B</span>Belum ada undang-undang AI yang menyeluruh; kerangka saat ini terdiri dari strategi nasional, surat edaran etika, dan UU PDP, sementara dua Perpres (peta jalan dan etika AI) menunggu penetapan</div>
+          <div class="quiz-opt" data-val="C"><span class="opt-letter">C</span>AI sama sekali tidak diatur oleh peraturan apa pun</div>
+          <div class="quiz-opt" data-val="D"><span class="opt-letter">D</span>Seluruh pengaturan AI diserahkan sepenuhnya kepada perusahaan teknologi</div>
+        </div>
+        <div class="quiz-explanation"><strong>Jawaban: B.</strong> AI tidak bebas aturan, karena UU PDP dan ketentuan lain tetap berlaku, tetapi belum ada undang-undang khusus AI. Status Perpres dapat berubah, jadi selalu periksa sumber resmi terbaru.</div>
+      </div>
+
+      <div class="quiz-box">
+        <div class="quiz-header"><span class="quiz-num">No. 3</span><span class="quiz-q">Model penyaring pelamar meloloskan 50% pelamar kelompok P dan 30% pelamar kelompok Q. Berapa rasio tingkat seleksi Q terhadap P, dan apa artinya?</span></div>
+        <div class="quiz-options" data-correct="A">
+          <div class="quiz-opt" data-val="A"><span class="opt-letter">A</span>0,6; kesenjangan cukup besar sehingga perlu diselidiki lebih lanjut (mis. performa per kelompok, fitur proksi)</div>
+          <div class="quiz-opt" data-val="B"><span class="opt-letter">B</span>1,67; model pasti adil karena rasio di atas 1</div>
+          <div class="quiz-opt" data-val="C"><span class="opt-letter">C</span>0,2; selisih mutlaknya otomatis membuktikan diskriminasi</div>
+          <div class="quiz-opt" data-val="D"><span class="opt-letter">D</span>Tidak bisa dihitung tanpa akurasi model</div>
+        </div>
+        <div class="quiz-explanation"><strong>Jawaban: A.</strong> 30% / 50% = 0,6. Angka ini adalah sinyal awal, bukan vonis: perlu diperiksa juga kualitas label, true positive rate per kelompok, dan konteks penggunaan.</div>
+      </div>
+
+      <div class="quiz-box">
+        <div class="quiz-header"><span class="quiz-num">No. 4</span><span class="quiz-q">Pada sistem inspeksi pabrik, produk cacat yang lolos jauh lebih merugikan daripada produk baik yang keliru ditandai. Penyesuaian ambang keputusan yang masuk akal adalah...</span></div>
+        <div class="quiz-options" data-correct="D">
+          <div class="quiz-opt" data-val="A"><span class="opt-letter">A</span>Menaikkan ambang agar precision setinggi mungkin</div>
+          <div class="quiz-opt" data-val="B"><span class="opt-letter">B</span>Tetap 0,5 karena itu ambang standar</div>
+          <div class="quiz-opt" data-val="C"><span class="opt-letter">C</span>Menghapus ambang dan menandai semua produk baik</div>
+          <div class="quiz-opt" data-val="D"><span class="opt-letter">D</span>Menurunkan ambang sehingga recall naik, dengan konsekuensi lebih banyak false positive yang harus ditinjau</div>
+        </div>
+        <div class="quiz-explanation"><strong>Jawaban: D.</strong> Bila false negative mahal, kita rela menerima lebih banyak false positive untuk menangkap lebih banyak cacat. Besarnya pergeseran ditentukan oleh perbandingan biaya kedua jenis kesalahan.</div>
+      </div>
+
+      <div class="quiz-box">
+        <div class="quiz-header"><span class="quiz-num">No. 5</span><span class="quiz-q">Menurut ketentuan pelindungan data yang dibahas, batas waktu pemberitahuan terjadinya kegagalan pelindungan data pribadi (kebocoran) kepada pihak terdampak dan otoritas adalah paling lambat...</span></div>
+        <div class="quiz-options" data-correct="B">
+          <div class="quiz-opt" data-val="A"><span class="opt-letter">A</span>7 hari kerja</div>
+          <div class="quiz-opt" data-val="B"><span class="opt-letter">B</span>3 × 24 jam</div>
+          <div class="quiz-opt" data-val="C"><span class="opt-letter">C</span>30 hari</div>
+          <div class="quiz-opt" data-val="D"><span class="opt-letter">D</span>Tidak ada kewajiban memberitahukan</div>
+        </div>
+        <div class="quiz-explanation"><strong>Jawaban: B.</strong> Notifikasi insiden dalam 3 × 24 jam menuntut organisasi punya prosedur dan log yang siap sebelum insiden terjadi, termasuk untuk data yang mengalir ke penyedia pihak ketiga.</div>
+      </div>
+
+      <div class="quiz-box">
+        <div class="quiz-header"><span class="quiz-num">No. 6</span><span class="quiz-q">Sebuah sistem segmentasi otomatis menentukan siapa yang ditolak layanannya tanpa tinjauan manusia. Dari sisi etika dan UU PDP, langkah yang paling tepat adalah...</span></div>
+        <div class="quiz-options" data-correct="C">
+          <div class="quiz-opt" data-val="A"><span class="opt-letter">A</span>Merahasiakan cara kerja sistem agar tidak ada yang mengajukan keberatan</div>
+          <div class="quiz-opt" data-val="B"><span class="opt-letter">B</span>Menaikkan akurasi lalu menganggap isu etika selesai</div>
+          <div class="quiz-opt" data-val="C"><span class="opt-letter">C</span>Menyediakan jalur tinjauan manusia, penjelasan keputusan, dan mekanisme keberatan atas pemrosesan otomatis, serta menguji bias antar kelompok</div>
+          <div class="quiz-opt" data-val="D"><span class="opt-letter">D</span>Menghapus semua data pelanggan setiap hari</div>
+        </div>
+        <div class="quiz-explanation"><strong>Jawaban: C.</strong> Keputusan yang berdampak pada orang sebaiknya tidak semata-mata otomatis. Hak keberatan atas pemrosesan otomatis, pengawasan manusia, dan pengujian bias adalah satu paket praktik yang saling menguatkan.</div>
+      </div>
+    </div>
+
+    <!-- PERSIAPAN -->
+    <div class="content-block" id="persiapan">
+      <h2>Persiapan Sesi Berikutnya</h2>
+      <div class="reading-box">
+        <div class="reading-box-title">📖 Menuju P-13: Workshop Proyek UAS — Sesi 1</div>
+        <div class="reading-item">
+          <span class="reading-icon">👥</span>
+          <div class="reading-label">
+            <strong>Pembentukan kelompok &amp; penetapan topik</strong>
+            Datang dengan kelompok 4 orang, pembagian peran (Data Engineer, ML Engineer, App Developer, Research Writer), dan minimal 3 topik pilihan dari panduan proyek akhir.
+          </div>
+        </div>
+        <div class="reading-item">
+          <span class="reading-icon">📄</span>
+          <div class="reading-label">
+            <strong>Proposal 1 halaman</strong>
+            Siapkan presentasi proposal 5 menit, termasuk hasil audit etika dan pelindungan data dari bagian 6 sebagai bagian dari analisis risiko.
+          </div>
+        </div>
+        <div class="reading-item">
+          <span class="reading-icon">⚖️</span>
+          <div class="reading-label">
+            <strong>Sumber resmi regulasi</strong>
+            Bacalah ringkasan UU PDP dan PP 33/2026 di JDIH resmi. Periksa juga apakah Perpres Peta Jalan AI dan Perpres Etika AI sudah terbit.
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ── ASIDE ── -->
+  <aside class="content-aside">
+    <div class="toc">
+      <div class="toc-title">Isi Halaman</div>
+      <ul class="toc-list">
+        <li><a href="#tujuan" class="active">Tujuan Pembelajaran</a></li>
+        <li><a href="#etika">1. Rekap Etika AI</a></li>
+        <li><a href="#regulasi">2. Peta Regulasi AI</a></li>
+        <li><a href="#pdp">3. UU PDP untuk Pengembang</a></li>
+        <li><a href="#cv">4. Computer Vision &amp; Bisnis</a></li>
+        <li><a href="#kasus">5. Diskusi Studi Kasus</a></li>
+        <li><a href="#audit">6. Audit Proyek Akhir</a></li>
+        <li><a href="#latihan">7. Latihan Pemahaman</a></li>
+        <li><a href="#persiapan">Persiapan P-13</a></li>
+      </ul>
+    </div>
+
+    <div class="sesi-nav-aside">
+      <div class="sesi-nav-title">Navigasi Sesi</div>
+      <a href="sesi-11.html" class="sesi-nav-btn">
+        <span>←</span>
+        <span>P-11: RAG Part 2 &amp; AI Bisnis</span>
+      </a>
+      <a href="proyek-akhir.html" class="sesi-nav-btn" style="margin-top:var(--s2);border-color:rgba(155,124,244,0.35);color:var(--purple);">
+        <span>→</span>
+        <span>P-13: Workshop Proyek UAS</span>
+      </a>
+      <a href="../index.html" class="sesi-nav-btn" style="margin-top:var(--s2);">
+        <span>🏠</span>
+        <span>Kembali ke Beranda</span>
+      </a>
+    </div>
+
+    <div style="background:var(--bg-2);border:1px solid var(--border);border-radius:var(--r3);padding:var(--s5);margin-top:var(--s4);">
+      <div style="font-family:var(--mono);font-size:10px;color:var(--text-3);letter-spacing:2px;text-transform:uppercase;margin-bottom:var(--s4);">Skor Latihan Anda</div>
+      <div style="text-align:center;margin-bottom:var(--s3);">
+        <span id="score-display" style="font-family:var(--mono);font-size:36px;font-weight:700;color:var(--teal);">0</span>
+        <span style="font-family:var(--mono);font-size:18px;color:var(--text-3);"> / <span id="score-total">6</span></span>
+      </div>
+      <div style="font-size:12px;color:var(--text-3);text-align:center;margin-bottom:var(--s3);">soal dijawab benar</div>
+      <div style="background:var(--bg-3);border-radius:4px;height:6px;overflow:hidden;">
+        <div id="score-bar" style="height:100%;background:var(--teal);width:0%;transition:width 0.4s var(--ease);border-radius:4px;"></div>
+      </div>
+      <div id="score-msg" style="font-size:12px;color:var(--text-2);text-align:center;margin-top:var(--s3);">Mulai kerjakan soal latihan!</div>
+    </div>
+
+    <div style="background:var(--bg-2);border:1px solid var(--border);border-radius:var(--r3);padding:var(--s5);margin-top:var(--s4);">
+      <div style="font-family:var(--mono);font-size:10px;color:var(--text-3);letter-spacing:2px;text-transform:uppercase;margin-bottom:var(--s3);">Info Pertemuan</div>
+      <div style="display:flex;flex-direction:column;gap:var(--s3);">
+        <div><div style="font-size:11px;color:var(--text-3);">Tipe</div><div style="font-size:13px;color:var(--text);">Teori + diskusi kasus</div></div>
+        <div><div style="font-size:11px;color:var(--text-3);">Durasi</div><div style="font-size:13px;color:var(--text);">100 menit</div></div>
+        <div><div style="font-size:11px;color:var(--text-3);">CPMK</div><div style="font-size:13px;color:var(--text);">C4, C5</div></div>
+        <div><div style="font-size:11px;color:var(--text-3);">Topik</div><div style="font-size:13px;color:var(--text);">Etika AI, regulasi Indonesia (UU PDP, PP 33/2026), studi kasus Computer Vision</div></div>
+        <div><div style="font-size:11px;color:var(--text-3);">Status regulasi</div><div style="font-size:13px;color:var(--text);">Berdasarkan pemberitaan hingga Okt 2026; periksa sumber resmi</div></div>
+      </div>
+    </div>
+  </aside>
+
+</div>
+
+<!-- ══ FOOTER ══ -->
+<footer class="footer">
+  <div>AI·UKWMS <span style="color:var(--text-3);">· P-12 Etika AI, Regulasi Indonesia &amp; Computer Vision</span></div>
+  <div><a href="../index.html" style="color:var(--text-3);">← Kembali ke Beranda</a></div>
+</footer>
+
+<script>
+  function esc(s) { return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+
+  /* ══ Widget ambang & biaya kesalahan ══ */
+  (function () {
+    const N = 1000, MU_P = 0.70, MU_N = 0.35, SD = 0.15;
+    function erf(x) { const s = x < 0 ? -1 : 1; x = Math.abs(x); const t = 1 / (1 + 0.3275911 * x);
+      const y = 1 - (((((1.061405429 * t - 1.453152027) * t) + 1.421413741) * t - 0.284496736) * t + 0.254829592) * t * Math.exp(-x * x); return s * y; }
+    const Phi = z => 0.5 * (1 + erf(z / Math.SQRT2));
+    const el = id => document.getElementById(id);
+    const prev = el('c-prev'), fp = el('c-fp'), fn = el('c-fn'), th = el('c-t');
+    function stats(t, pv, cFP, cFN) {
+      const P = N * pv, Ng = N - P;
+      const tpr = 1 - Phi((t - MU_P) / SD), fpr = 1 - Phi((t - MU_N) / SD);
+      const TP = P * tpr, FN = P - TP, FP = Ng * fpr, TN = Ng - FP;
+      return { TP, FN, FP, TN, prec: (TP + FP) ? TP / (TP + FP) : 0, rec: tpr, cost: cFP * FP + cFN * FN };
+    }
+    function best(pv, cFP, cFN) {
+      let bt = 0.05, bc = Infinity;
+      for (let t = 0.01; t <= 0.99; t += 0.01) { const c = stats(t, pv, cFP, cFN).cost; if (c < bc) { bc = c; bt = t; } }
+      return { t: +bt.toFixed(2), cost: bc };
+    }
+    function render() {
+      const pv = +prev.value / 100, cFP = +fp.value, cFN = +fn.value, t = +th.value;
+      el('c-prev-v').textContent = prev.value + '%'; el('c-fp-v').textContent = cFP; el('c-fn-v').textContent = cFN; el('c-t-v').textContent = t.toFixed(2);
+      const s = stats(t, pv, cFP, cFN), b = best(pv, cFP, cFN);
+      el('m-tp').textContent = Math.round(s.TP); el('m-fn').textContent = Math.round(s.FN);
+      el('m-fp').textContent = Math.round(s.FP); el('m-tn').textContent = Math.round(s.TN);
+      el('m-prec').textContent = s.prec.toFixed(2); el('m-rec').textContent = s.rec.toFixed(2);
+      el('m-cost').textContent = Math.round(s.cost).toLocaleString('id-ID');
+      el('m-opt').textContent = Math.round(b.cost).toLocaleString('id-ID') + ' @ ' + b.t.toFixed(2);
+      const gap = s.cost - b.cost;
+      el('m-note').textContent = gap < 1
+        ? 'Ambang Anda berada di titik biaya terendah untuk pengaturan biaya ini.'
+        : 'Ambang ini ' + Math.round(gap).toLocaleString('id-ID') + ' satuan biaya lebih mahal daripada ambang optimal (' + b.t.toFixed(2) + '). ' + (b.t < t ? 'Menurunkan ambang akan menangkap lebih banyak cacat.' : 'Menaikkan ambang akan mengurangi salah tandai.');
+      th.dataset.best = b.t;
+    }
+    [prev, fp, fn, th].forEach(x => x.addEventListener('input', render));
+    el('c-best').addEventListener('click', () => { th.value = th.dataset.best; render(); });
+    render();
+  })();
+
+  /* ══ Checklist audit etika & PDP ══ */
+  (function () {
+    const ITEMS = [
+      { crit: true,  t: 'Saya sudah mengidentifikasi apakah dataset memuat data pribadi (nama, kontak, foto wajah, NIK, dsb.).',
+        a: 'Telusuri tiap kolom/file dataset dan catat mana yang memuat data pribadi.', r: 'Telah dilakukan identifikasi data pribadi pada dataset.' },
+      { crit: true,  t: 'Dataset punya lisensi atau izin yang memperbolehkan penggunaan akademik, dan sumbernya saya catat.',
+        a: 'Cek halaman sumber dataset, catat lisensi dan tautan, lalu cantumkan di laporan.', r: 'Sumber dan lisensi dataset dicantumkan.' },
+      { crit: true,  t: 'Bila ada data spesifik (wajah/biometrik, kesehatan, anak, keuangan pribadi), saya sudah memutuskan tidak memakainya atau memastikan dasar pemrosesan dan pengamanan tambahan.',
+        a: 'Konsultasikan dengan dosen. Pertimbangkan dataset pengganti yang tidak memuat data spesifik.', r: 'Penggunaan data spesifik ditinjau (dihindari atau dilindungi).' },
+      { crit: false, t: 'Data pribadi yang tidak diperlukan dihapus atau dianonimkan sebelum dipakai (minimisasi data).',
+        a: 'Hapus kolom identitas langsung; pertimbangkan pseudonimisasi.', r: 'Prinsip minimisasi data diterapkan.' },
+      { crit: true,  t: 'Data tidak dikirim ke layanan pihak ketiga (API LLM, cloud) tanpa anonimisasi dan tanpa memeriksa kebijakan datanya.',
+        a: 'Periksa kebijakan penyimpanan dan pelatihan data penyedia; anonimkan sebelum mengirim.', r: 'Aliran data ke pihak ketiga ditinjau dan dibatasi.' },
+      { crit: false, t: 'Saya sudah menguji performa model per subkelompok (per kelas, kondisi, kategori), bukan hanya rata-rata keseluruhan.',
+        a: 'Hitung metrik per kelas/subkelompok dan laporkan kesenjangannya.', r: 'Performa dievaluasi per subkelompok.' },
+      { crit: false, t: 'Keluaran sistem tidak dipakai sebagai satu-satunya dasar keputusan yang berdampak pada orang; ada tinjauan manusia.',
+        a: 'Tambahkan langkah verifikasi manusia atau batasi cakupan penggunaan sistem.', r: 'Ada tinjauan manusia atas keputusan berdampak.' },
+      { crit: false, t: 'Pengguna diberi tahu bahwa mereka berinteraksi dengan AI, beserta keterbatasannya (pernyataan batas, sumber jawaban).',
+        a: 'Tambahkan disclaimer dan, untuk RAG, tampilkan sumber di antarmuka.', r: 'Pengguna diberi tahu tentang penggunaan AI dan keterbatasannya.' },
+      { crit: false, t: 'Keterbatasan, risiko salah prediksi, dan cakupan penggunaan sudah ditulis di laporan (Bab 1.4 dan 4.6).',
+        a: 'Tulis keterbatasan dengan jujur dan spesifik di Bab 1.4 dan 4.6.', r: 'Keterbatasan dan risiko dituliskan di laporan.' },
+      { crit: false, t: 'Penggunaan tools AI (ChatGPT, Claude, Copilot, dsb.) dicantumkan di Lampiran C beserta bagian yang dibantu.',
+        a: 'Catat tools dan bagian pekerjaan yang dibantu, lalu masukkan ke Lampiran C.', r: 'Penggunaan tools AI didokumentasikan di Lampiran C.' }
+    ];
+    const list = document.getElementById('ck-list');
+    ITEMS.forEach((it, i) => {
+      const lab = document.createElement('label');
+      lab.className = 'ck-item' + (it.crit ? ' crit' : '');
+      lab.innerHTML = '<input type="checkbox" data-i="' + i + '"><span><span class="ck-tag">' + (it.crit ? 'Prioritas tinggi' : 'Praktik baik') + '</span>' + esc(it.t) + '</span>';
+      list.appendChild(lab);
+    });
+    function refresh() {
+      const checks = Array.from(list.querySelectorAll('input'));
+      const done = checks.filter(c => c.checked).length;
+      document.getElementById('ck-num').textContent = done + '/' + ITEMS.length;
+      document.getElementById('ck-msg').textContent = done === ITEMS.length ? 'Semua pernyataan terpenuhi. Tetap konsultasikan dengan dosen untuk hal yang meragukan.' : (ITEMS.length - done) + ' butir perlu ditindaklanjuti.';
+      const todo = ITEMS.map((it, i) => ({ it, i })).filter(x => !checks[x.i].checked).sort((a, b) => (b.it.crit ? 1 : 0) - (a.it.crit ? 1 : 0));
+      document.getElementById('ck-flags').innerHTML = todo.map(x =>
+        '<div class="ck-flag' + (x.it.crit ? ' crit' : '') + '"><strong>' + (x.it.crit ? 'Prioritas · ' : '') + 'Tindak lanjut:</strong> ' + esc(x.it.a) + '</div>').join('');
+      const ok = ITEMS.filter((it, i) => checks[i].checked).map(it => '- ' + it.r);
+      const open = todo.map(x => '- ' + x.it.a);
+      const L = ['CATATAN ETIKA DAN PELINDUNGAN DATA PROYEK', '', 'Telah dilakukan:'];
+      L.push(ok.length ? ok.join('\n') : '- (belum ada)');
+      L.push('', 'Akan ditindaklanjuti / keterbatasan saat ini:');
+      L.push(open.length ? open.join('\n') : '- (tidak ada)');
+      document.getElementById('ck-out').textContent = L.join('\n');
+    }
+    list.addEventListener('change', refresh);
+    document.getElementById('ck-copy').addEventListener('click', e => {
+      const btn = e.currentTarget, text = document.getElementById('ck-out').textContent;
+      const done = () => { const t = btn.textContent; btn.textContent = 'Tersalin ✓'; setTimeout(() => btn.textContent = t, 1500); };
+      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(done, done);
+      else { const ta = document.createElement('textarea'); ta.value = text; document.body.appendChild(ta); ta.select(); try { document.execCommand('copy'); } catch (x) {} document.body.removeChild(ta); done(); }
+    });
+    refresh();
+  })();
+
+  /* ══ Quiz ══ */
+  let correctCount = 0;
+  const TOTAL = document.querySelectorAll('.quiz-box').length;
+  document.getElementById('score-total').textContent = TOTAL;
+  document.querySelectorAll('.quiz-box').forEach(box => {
+    const correct = box.querySelector('.quiz-options').dataset.correct;
+    const opts = box.querySelectorAll('.quiz-opt');
+    const explanation = box.querySelector('.quiz-explanation');
+    let answered = false;
+    opts.forEach(opt => {
+      opt.addEventListener('click', () => {
+        if (answered) return;
+        answered = true;
+        opts.forEach(o => {
+          if (o.dataset.val === correct) o.classList.add('correct');
+          else if (o === opt) o.classList.add('wrong');
+          o.style.cursor = 'default';
+        });
+        if (opt.dataset.val === correct) correctCount++;
+        explanation.classList.add('show');
+        updateScore();
+      });
+    });
+  });
+  function updateScore() {
+    const pct = Math.round((correctCount / TOTAL) * 100);
+    document.getElementById('score-display').textContent = correctCount;
+    const bar = document.getElementById('score-bar');
+    bar.style.width = pct + '%';
+    if (pct >= 90) bar.style.background = 'var(--teal)';
+    else if (pct >= 70) bar.style.background = 'var(--blue)';
+    else if (pct >= 50) bar.style.background = 'var(--amber)';
+    else bar.style.background = 'var(--red)';
+    let msg;
+    if (correctCount === TOTAL) msg = '🎯 Sempurna! Pemahaman etika dan regulasi sudah kuat.';
+    else if (correctCount >= TOTAL - 1) msg = 'Hampir sempurna! Baca penjelasan soal yang salah.';
+    else if (correctCount >= TOTAL / 2) msg = 'Lumayan! Review lagi bagian yang kurang.';
+    else msg = 'Terus semangat — baca ulang materinya.';
+    document.getElementById('score-msg').textContent = msg;
+  }
+
+  /* ══ TOC active tracking ══ */
+  const headings = document.querySelectorAll('.content-main .content-block[id]');
+  const tocLinks = document.querySelectorAll('.toc-list a');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(a => {
+          a.classList.remove('active');
+          if (a.getAttribute('href') === '#' + entry.target.id) a.classList.add('active');
+        });
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px' });
+  headings.forEach(h => observer.observe(h));
+
+  const navLinks = document.querySelectorAll('.nav-links a[href^="#"]');
+  window.addEventListener('scroll', () => {
+    let current = '';
+    headings.forEach(h => { if (window.scrollY >= h.offsetTop - 100) current = h.id; });
+    navLinks.forEach(a => {
+      a.classList.remove('active');
+      if (a.getAttribute('href') === '#' + current) a.classList.add('active');
+    });
+  });
+</script>
+</body>
+</html>
