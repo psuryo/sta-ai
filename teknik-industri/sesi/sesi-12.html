@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>P-12: AI Ethics, Regulasi & Kepatuhan Industri — Teknik Industri UKWMS</title>
+<link rel="stylesheet" href="../../css/style.css">
+<style>
+  /* ── Table wrapper ── */
+  .table-wrap { overflow-x: auto; margin: var(--s4) 0; }
+  .table-wrap .industry-table { margin: 0; min-width: 600px; }
+
+  /* ── Risk / isu cards ── */
+  .risk-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: var(--s4);
+    margin: var(--s5) 0;
+  }
+  .risk-card {
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-top: 3px solid var(--blue);
+    border-radius: var(--r3);
+    padding: var(--s5);
+  }
+  .risk-card.c2 { border-top-color: var(--teal); }
+  .risk-card.c3 { border-top-color: var(--amber); }
+  .risk-card.c4 { border-top-color: var(--red); }
+  .risk-card.c5 { border-top-color: var(--purple); }
+  .risk-card h4 { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: var(--s2); }
+  .risk-card p { font-size: 13px !important; color: var(--text-2); line-height: 1.7 !important; margin-bottom: var(--s3) !important; }
+  .risk-mit { font-size: 12px; color: var(--text-2); line-height: 1.7; padding-top: var(--s3); border-top: 1px solid var(--border); }
+  .risk-mit strong { color: var(--teal); font-family: var(--mono); font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; display: block; margin-bottom: 2px; }
+
+  /* ── Bar comparison ── */
+  .bar-box { background: var(--bg-2); border: 1px solid var(--border); border-radius: var(--r3); padding: var(--s5); margin: var(--s5) 0; }
+  .bar-label { font-family: var(--mono); font-size: 10px; color: var(--text-3); letter-spacing: 2px; text-transform: uppercase; margin-bottom: var(--s3); }
+  .bar-row { display: grid; grid-template-columns: 140px 1fr 56px; gap: var(--s3); align-items: center; margin-bottom: var(--s2); font-size: 13px; }
+  .bar-name { font-family: var(--mono); color: var(--text); font-size: 12px; }
+  .bar-track { height: 10px; background: var(--bg-3); border-radius: 5px; overflow: hidden; }
+  .bar-fill { height: 100%; border-radius: 5px; background: var(--blue); }
+  .bar-fill.good { background: var(--teal); }
+  .bar-fill.warn { background: var(--amber); }
+  .bar-fill.bad  { background: var(--red); }
+  .bar-val { font-family: var(--mono); font-size: 12px; color: var(--text-2); text-align: right; }
+  .bar-note { font-size: 12px; color: var(--text-3); margin-top: var(--s3); line-height: 1.7; }
+
+  /* ── Prompt / answer box ── */
+  .prompt-box { background: var(--bg-2); border: 1px solid var(--border); border-radius: var(--r2); margin: var(--s4) 0; overflow: hidden; }
+  .prompt-head {
+    display: flex; justify-content: space-between; align-items: center; gap: var(--s3);
+    padding: var(--s3) var(--s4); background: var(--bg-3); border-bottom: 1px solid var(--border);
+    font-family: var(--mono); font-size: 11px; color: var(--text-3); letter-spacing: 1px;
+  }
+  .prompt-head .tag-mini { color: var(--teal); }
+  .prompt-body { padding: var(--s4) var(--s5); font-size: 13px; color: var(--text-2); line-height: 1.8; white-space: pre-wrap; }
+  .prompt-body strong { color: var(--text); }
+  .prompt-check {
+    padding: var(--s3) var(--s5); border-top: 1px solid var(--border);
+    background: var(--amber-dim); font-size: 12px; color: var(--text-2); line-height: 1.7;
+  }
+  .prompt-check strong { color: var(--amber); }
+
+  /* ── Lab steps ── */
+  .lab-steps { margin: var(--s4) 0; padding-left: 0; list-style: none; counter-reset: lab; }
+  .lab-steps li {
+    counter-increment: lab; position: relative;
+    padding: var(--s3) 0 var(--s3) 40px;
+    font-size: 14px; color: var(--text-2); line-height: 1.8;
+    border-bottom: 1px solid var(--border);
+  }
+  .lab-steps li:last-child { border-bottom: none; }
+  .lab-steps li::before {
+    content: counter(lab); position: absolute; left: 0; top: var(--s3);
+    width: 26px; height: 26px; border-radius: 50%;
+    background: var(--teal-dim); color: var(--teal);
+    font-family: var(--mono); font-size: 12px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .lab-steps li strong { color: var(--text); }
+
+  .status-tag { font-family: var(--mono); font-size: 10px; letter-spacing: 1px; color: var(--amber); display: block; margin-top: 2px; }
+
+  @media (max-width: 900px) { .bar-row { grid-template-columns: 100px 1fr 48px; } }
+</style>
+</head>
+<body>
+
+<!-- ══ NAV ══ -->
+<nav class="nav">
+  <div class="nav-logo">AI<span>·</span>UKWMS</div>
+  <ul class="nav-links">
+    <li><a href="../index.html">← Beranda</a></li>
+    <li><a href="#tujuan" class="active">Tujuan</a></li>
+    <li><a href="#isu">Isu Inti</a></li>
+    <li><a href="#bias">Bias</a></li>
+    <li><a href="#privasi">Privasi</a></li>
+    <li><a href="#regulasi">Regulasi</a></li>
+    <li><a href="#k3">K3 & Audit</a></li>
+    <li><a href="#klinik">Klinik Proyek</a></li>
+    <li><a href="#tugas">Checkpoint 2</a></li>
+  </ul>
+</nav>
+
+<!-- ══ HERO ══ -->
+<header class="sesi-hero">
+  <div style="max-width:1100px;margin:0 auto;">
+    <div class="sesi-breadcrumb">
+      <a href="../index.html">Kecerdasan Buatan · Teknik Industri</a>
+      <span>›</span>
+      <span>Pertemuan 12</span>
+    </div>
+    <div class="sesi-num" style="color:var(--blue);">PERTEMUAN 12 · TEORI + KLINIK PROYEK</div>
+    <h1 class="sesi-title">AI Ethics, Regulasi &<br><em style="color:var(--teal);">Kepatuhan Industri</em></h1>
+    <p style="font-size:15px;color:var(--text-2);max-width:720px;line-height:1.8;">Bias algoritma, perlindungan data pribadi, regulasi dan standar yang berlaku, serta implikasi K3 dan audit kepatuhan. Hasilnya langsung dipakai pada Bab 7.3 (Risiko &amp; Keterbatasan) dan pernyataan penggunaan AI generatif di laporan proyek akhir.</p>
+    <div class="sesi-meta-row">
+      <span class="badge badge-blue">S1 Teknik Industri</span>
+      <span class="badge badge-blue">Teori</span>
+      <span class="badge badge-amber">Checkpoint 2 Proyek</span>
+      <span class="badge" style="color:var(--teal);border-color:rgba(0,201,177,0.3);background:var(--teal-dim);">100 menit</span>
+    </div>
+  </div>
+</header>
+
+<!-- ══ CONTENT LAYOUT ══ -->
+<div class="content-layout">
+  <main class="content-main">
+
+    <!-- TUJUAN -->
+    <div class="content-block" id="tujuan">
+      <h2>Tujuan Pembelajaran</h2>
+      <p>P-08 sampai P-11 menunjukkan apa yang bisa dilakukan AI untuk industri. Sesi ini menjawab pertanyaan yang sama pentingnya: <em>apa yang bisa salah, siapa yang dirugikan, dan siapa yang bertanggung jawab?</em> Setelah sesi ini, mahasiswa diharapkan mampu:</p>
+      <ol>
+        <li>Mengidentifikasi sumber bias pada sistem AI industri dan memeriksanya dengan ukuran sederhana (selection rate, rasio dampak berbeda, kinerja per subkelompok)</li>
+        <li>Menentukan apakah data dalam proyek memuat data pribadi dan menerapkan prinsip minimisasi, anonimisasi, dan pembatasan akses</li>
+        <li>Menjelaskan lanskap regulasi dan standar yang relevan: UU PDP, pedoman etika AI nasional, GDPR, EU AI Act, ISO/IEC 42001 dan 23894</li>
+        <li>Menganalisis implikasi K3 dan audit: tingkat pengawasan manusia, akuntabilitas, dan jejak audit</li>
+        <li>Menyusun Bab 7.3 Risiko &amp; Keterbatasan serta Pernyataan Penggunaan AI Generatif untuk laporan proyek (Checkpoint 2)</li>
+      </ol>
+
+      <div class="callout tip" style="margin-top:var(--s5);">
+        <span class="callout-icon">💡</span>
+        <div class="callout-body">
+          <p><strong>Etika bukan bab pelengkap.</strong> Di industri, risiko yang diabaikan berubah menjadi biaya: denda, penarikan produk, kecelakaan kerja, atau hilangnya kepercayaan pelanggan. Bab 7.3 yang kuat menunjukkan bahwa Anda menghitung risiko itu sejak awal, sebagaimana Anda menghitung biaya salah-prediksi di P-10 dan P-11.</p>
+        </div>
+      </div>
+
+      <div class="callout warn">
+        <span class="callout-icon">⚖️</span>
+        <div class="callout-body">
+          <p><strong>Catatan penting:</strong> materi ini bukan nasihat hukum. Regulasi AI dan data berubah cepat, dan status yang tercantum di halaman ini adalah keadaan awal November 2026. Verifikasi ke sumber resmi (misalnya JDIH Komdigi untuk regulasi Indonesia dan EUR-Lex untuk regulasi Uni Eropa) sebelum mengutipnya di laporan.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 1. ISU INTI -->
+    <div class="content-block" id="isu">
+      <h2>1. Enam Isu Inti AI yang Bertanggung Jawab di Industri</h2>
+      <p>Isu etika AI sering terdengar abstrak. Di lantai produksi, gudang, dan kantor, isu itu muncul dalam bentuk konkret:</p>
+
+      <div class="risk-grid">
+        <div class="risk-card">
+          <h4>Bias dan keadilan</h4>
+          <p>Model bekerja baik untuk sebagian kelompok dan buruk untuk lainnya: penyaring pelamar, penilaian kinerja, deteksi cacat yang akurat di satu varian produk namun meleset di varian lain.</p>
+          <div class="risk-mit"><strong>Pertanyaan kunci</strong>Apakah kinerja sama untuk semua kelompok yang terdampak?</div>
+        </div>
+        <div class="risk-card c2">
+          <h4>Privasi dan data pribadi</h4>
+          <p>Data pelanggan, absensi dan kinerja karyawan, biometrik, serta rekaman kamera yang menangkap wajah pekerja termasuk data yang diatur undang-undang.</p>
+          <div class="risk-mit"><strong>Pertanyaan kunci</strong>Apakah data ini memuat orang yang bisa diidentifikasi, dan apakah kita boleh memakainya untuk tujuan ini?</div>
+        </div>
+        <div class="risk-card c3">
+          <h4>Transparansi dan keterjelasan</h4>
+          <p>Manajer dan pekerja perlu memahami mengapa sistem mengambil suatu keputusan, misalnya mengapa suatu batch ditolak atau mesin ditandai berisiko.</p>
+          <div class="risk-mit"><strong>Pertanyaan kunci</strong>Bisakah keputusan dijelaskan kepada orang yang terdampak?</div>
+        </div>
+        <div class="risk-card c4">
+          <h4>Keselamatan dan keandalan</h4>
+          <p>Salah prediksi pada sistem yang menyentuh keselamatan (prediksi kerusakan, deteksi bahaya) dapat berujung pada cedera atau kerusakan aset.</p>
+          <div class="risk-mit"><strong>Pertanyaan kunci</strong>Apa yang terjadi bila model salah, dan apakah ada pengaman lain?</div>
+        </div>
+        <div class="risk-card c5">
+          <h4>Akuntabilitas</h4>
+          <p>AI tidak bisa dimintai tanggung jawab. Manusia dan organisasi yang menerapkannya yang harus menjawab saat terjadi kerugian.</p>
+          <div class="risk-mit"><strong>Pertanyaan kunci</strong>Siapa pemilik keputusan dan siapa yang meninjau hasil model?</div>
+        </div>
+        <div class="risk-card c2">
+          <h4>Keamanan data dan kerahasiaan</h4>
+          <p>Data produksi, resep, harga pemasok, dan gambar teknik adalah rahasia dagang. Mengunggahnya ke layanan AI publik dapat membocorkannya (lihat P-08).</p>
+          <div class="risk-mit"><strong>Pertanyaan kunci</strong>Apakah data ini boleh keluar dari perusahaan?</div>
+        </div>
+      </div>
+
+      <div class="callout info">
+        <span class="callout-icon">📌</span>
+        <div class="callout-body">
+          <p><strong>Rahasia dagang tidak sama dengan data pribadi.</strong> Harga kontrak pemasok bukan data pribadi, tetapi tetap rahasia bisnis. Nama dan nomor telepon karyawan adalah data pribadi. Keduanya perlu dilindungi, dengan dasar dan aturan yang berbeda.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. BIAS -->
+    <div class="content-block" id="bias">
+      <h2>2. Bias Algoritma dan Fairness</h2>
+      <p>Bias bukan berarti model "jahat". Bias muncul ketika data, label, atau cara penerapan membuat hasil berbeda secara tidak adil untuk kelompok tertentu.</p>
+
+      <h3>Empat Sumber Bias</h3>
+      <div class="concept-grid">
+        <div class="concept-card">
+          <div class="concept-card-label" style="color:var(--blue);">Data</div>
+          <div class="concept-card-title">Data tidak mewakili</div>
+          <div class="concept-card-body">Data latih didominasi satu kelompok: shift siang, mesin baru, atau satu varian produk. Kelompok yang jarang muncul diperlakukan buruk oleh model.</div>
+        </div>
+        <div class="concept-card">
+          <div class="concept-card-label" style="color:var(--teal);">Label</div>
+          <div class="concept-card-title">Label mewarisi penilaian lama</div>
+          <div class="concept-card-body">Bila "karyawan berkinerja baik" dilabeli oleh atasan yang bias di masa lalu, model akan menyalin bias itu dan terlihat objektif.</div>
+        </div>
+        <div class="concept-card">
+          <div class="concept-card-label" style="color:var(--amber);">Proksi</div>
+          <div class="concept-card-title">Variabel yang menggantikan atribut sensitif</div>
+          <div class="concept-card-body">Menghapus kolom sensitif belum cukup bila kolom lain (alamat, sekolah asal, jam kerja) berkorelasi kuat dengannya.</div>
+        </div>
+        <div class="concept-card">
+          <div class="concept-card-label" style="color:var(--red);">Penerapan</div>
+          <div class="concept-card-title">Dipakai di luar konteks latih</div>
+          <div class="concept-card-body">Model yang dilatih di satu pabrik atau satu periode dipakai di tempat atau kondisi lain tanpa diuji ulang (drift, lihat P-10).</div>
+        </div>
+      </div>
+
+      <h3 style="margin-top:var(--s6);">Latihan 1: Dua Cara Memeriksa Bias</h3>
+      <p><strong style="color:var(--text)">Kasus A (data fiktif).</strong> Sebuah perusahaan memakai AI untuk menyaring pelamar operator produksi. Hasil penyaringan:</p>
+      <div class="table-wrap">
+        <table class="industry-table" style="min-width:480px;">
+          <thead><tr><th>Kelompok pelamar</th><th>Jumlah pelamar</th><th>Lolos penyaringan</th></tr></thead>
+          <tbody>
+            <tr><td class="sector-name">Kelompok A</td><td>80</td><td>40</td></tr>
+            <tr><td class="sector-name">Kelompok B</td><td>40</td><td>12</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p style="font-size:14px;"><strong style="color:var(--text)">Kasus B (data fiktif).</strong> Model deteksi cacat diuji pada dua varian produk. Varian P memiliki 100 cacat sebenarnya, 90 terdeteksi. Varian Q memiliki 50 cacat sebenarnya, 30 terdeteksi.</p>
+
+      <ol class="lab-steps">
+        <li><strong>Kasus A:</strong> hitung selection rate tiap kelompok (lolos ÷ pelamar), lalu rasio dampak berbeda = selection rate kelompok terendah ÷ tertinggi.</li>
+        <li><strong>Kasus A:</strong> bandingkan hasil dengan patokan "aturan 80%". Apa artinya, dan apa yang <em>tidak</em> bisa disimpulkan dari angka ini?</li>
+        <li><strong>Kasus B:</strong> hitung recall untuk tiap varian, lalu recall keseluruhan.</li>
+        <li><strong>Kasus B:</strong> mengapa recall keseluruhan menyesatkan? Apa konsekuensinya bagi pelanggan yang membeli varian Q?</li>
+      </ol>
+
+      <div class="bar-box">
+        <div class="bar-label">Kunci jawaban · hitung sendiri dulu sebelum melihat</div>
+        <div class="bar-row"><span class="bar-name">Selection A</span><div class="bar-track"><div class="bar-fill good" style="width:50%;"></div></div><span class="bar-val">50%</span></div>
+        <div class="bar-row"><span class="bar-name">Selection B</span><div class="bar-track"><div class="bar-fill warn" style="width:30%;"></div></div><span class="bar-val">30%</span></div>
+        <div class="bar-row"><span class="bar-name">Recall varian P</span><div class="bar-track"><div class="bar-fill good" style="width:90%;"></div></div><span class="bar-val">90%</span></div>
+        <div class="bar-row"><span class="bar-name">Recall varian Q</span><div class="bar-track"><div class="bar-fill bad" style="width:60%;"></div></div><span class="bar-val">60%</span></div>
+        <div class="bar-row"><span class="bar-name">Recall total</span><div class="bar-track"><div class="bar-fill" style="width:80%;"></div></div><span class="bar-val">80%</span></div>
+        <div class="bar-note">
+          <strong style="color:var(--text)">Kasus A:</strong> selection rate A = 40 ÷ 80 = 50%, B = 12 ÷ 40 = 30%. Rasio dampak berbeda = 30 ÷ 50 = <strong style="color:var(--text)">0,60</strong>, di bawah patokan 0,80. Ini <em>sinyal untuk diselidiki</em> (apa fitur yang dipakai, apakah ada proksi), bukan bukti diskriminasi, dan bukan vonis hukum.<br>
+          <strong style="color:var(--text)">Kasus B:</strong> recall P = 90 ÷ 100 = 90%, Q = 30 ÷ 50 = 60%, total = (90 + 30) ÷ 150 = <strong style="color:var(--text)">80%</strong>. Angka total menyembunyikan bahwa 40% cacat varian Q lolos ke pelanggan. Selalu evaluasi per subkelompok (shift, varian, mesin, pemasok).
+        </div>
+      </div>
+
+      <div class="callout tip">
+        <span class="callout-icon">🧠</span>
+        <div class="callout-body">
+          <p><strong>Pengurangan bias yang realistis:</strong> audit kinerja per subkelompok sebelum dan sesudah peluncuran, tambah data kelompok yang kurang terwakili, periksa variabel proksi, minta tinjauan manusia pada keputusan yang berdampak besar, dan pantau terus setelah model dipakai.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. PRIVASI -->
+    <div class="content-block" id="privasi">
+      <h2>3. Privasi dan Perlindungan Data Pribadi</h2>
+      <p>Indonesia memiliki UU No. 27 Tahun 2022 tentang Pelindungan Data Pribadi (UU PDP). Undang-undang ini mulai berlaku efektif pada 18 Oktober 2024 setelah masa transisi dua tahun. Prinsipnya mirip GDPR di Uni Eropa.</p>
+
+      <h3>Data di Lingkungan Industri: Mana yang Perlu Hati-hati?</h3>
+      <div class="table-wrap">
+        <table class="industry-table">
+          <thead><tr><th>Jenis data</th><th>Data pribadi?</th><th>Risiko utama</th><th>Penanganan umum</th></tr></thead>
+          <tbody>
+            <tr>
+              <td class="sector-name">Data pelanggan (nama, alamat, telepon)</td>
+              <td>Ya</td>
+              <td>Penyalahgunaan, kebocoran, pemakaian di luar tujuan</td>
+              <td>Minimisasi, pseudonim (ganti nama dengan kode), akses terbatas</td>
+            </tr>
+            <tr>
+              <td class="sector-name">Data karyawan (absensi, kinerja, biometrik)</td>
+              <td>Ya, sebagian sensitif</td>
+              <td>Pemantauan berlebihan, keputusan SDM otomatis yang tidak adil</td>
+              <td>Dasar pemrosesan jelas, transparansi kepada karyawan, tinjauan manusia</td>
+            </tr>
+            <tr>
+              <td class="sector-name">Rekaman kamera di lini produksi</td>
+              <td>Ya bila wajah pekerja terlihat</td>
+              <td>Pengawasan yang tidak proporsional</td>
+              <td>Arahkan kamera ke produk, bukan orang; buram atau potong area wajah; batasi penyimpanan</td>
+            </tr>
+            <tr>
+              <td class="sector-name">Data sensor mesin dan produksi</td>
+              <td>Umumnya tidak</td>
+              <td>Rahasia dagang; bisa menjadi data pribadi bila terkait operator tertentu</td>
+              <td>Klasifikasi kerahasiaan; hindari mencantumkan ID operator bila tidak perlu</td>
+            </tr>
+            <tr>
+              <td class="sector-name">Harga dan kontrak pemasok</td>
+              <td>Tidak (kecuali pemasok perorangan)</td>
+              <td>Kebocoran informasi bisnis</td>
+              <td>Perjanjian kerahasiaan, jangan diunggah ke layanan AI publik</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 style="margin-top:var(--s6);">Ketentuan Pokok UU PDP yang Perlu Anda Kenal</h3>
+      <div class="concept-grid">
+        <div class="concept-card">
+          <div class="concept-card-label" style="color:var(--blue);">Dasar pemrosesan</div>
+          <div class="concept-card-title">Persetujuan dan dasar sah lain</div>
+          <div class="concept-card-body">Data pribadi diproses berdasarkan dasar yang sah, misalnya persetujuan yang eksplisit atau kewajiban kontrak. Tujuannya harus jelas dan dibatasi.</div>
+        </div>
+        <div class="concept-card">
+          <div class="concept-card-label" style="color:var(--teal);">Hak subjek data</div>
+          <div class="concept-card-title">Akses, koreksi, penghapusan</div>
+          <div class="concept-card-body">Pemilik data berhak mengetahui, memperbaiki, dan dalam kondisi tertentu meminta penghapusan atau menolak keputusan yang sepenuhnya otomatis.</div>
+        </div>
+        <div class="concept-card">
+          <div class="concept-card-label" style="color:var(--amber);">Kewajiban pengendali</div>
+          <div class="concept-card-title">Keamanan dan notifikasi kebocoran</div>
+          <div class="concept-card-body">Pengendali wajib melindungi data dan memberitahukan kegagalan pelindungan data dalam batas waktu yang ditentukan (diatur 3 × 24 jam).</div>
+        </div>
+        <div class="concept-card">
+          <div class="concept-card-label" style="color:var(--red);">Sanksi</div>
+          <div class="concept-card-title">Administratif dan pidana</div>
+          <div class="concept-card-body">Sanksi administratif mencakup denda hingga 2% dari pendapatan tahunan. Ketentuan pelaksananya diatur dalam PP No. 33 Tahun 2026. Ada juga ketentuan pidana untuk pelanggaran tertentu.</div>
+        </div>
+      </div>
+
+      <h3 style="margin-top:var(--s6);">GDPR dan UU PDP: Perbandingan Singkat</h3>
+      <div class="table-wrap">
+        <table class="industry-table">
+          <thead><tr><th>Aspek</th><th>UU PDP (Indonesia)</th><th>GDPR (Uni Eropa)</th></tr></thead>
+          <tbody>
+            <tr><td class="sector-name">Berlaku sejak</td><td>Efektif 18 Oktober 2024</td><td>25 Mei 2018</td></tr>
+            <tr><td class="sector-name">Jangkauan</td><td>Pemrosesan di Indonesia atau berdampak pada subjek data di Indonesia</td><td>Juga mencakup organisasi di luar UE yang memproses data penduduk UE</td></tr>
+            <tr><td class="sector-name">Denda administratif tertinggi</td><td>Hingga 2% pendapatan tahunan</td><td>Hingga 20 juta euro atau 4% omzet global tahunan, mana yang lebih tinggi</td></tr>
+            <tr><td class="sector-name">Otoritas pengawas</td><td>Lembaga PDP diamanatkan undang-undang; pembentukannya dilaporkan masih berproses</td><td>Otoritas perlindungan data di tiap negara anggota</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout warn">
+        <span class="callout-icon">🔒</span>
+        <div class="callout-body">
+          <p><strong>Untuk proyek Anda:</strong> bila dataset memuat nama, alamat, nomor telepon, NIK, atau ID karyawan yang bisa dilacak, lakukan pseudonimisasi atau hapus kolom itu sebelum analisis. Jangan menempelkan data semacam itu ke layanan AI generatif. Dataset fiktif atau publik yang sudah dianonimkan adalah pilihan yang lebih aman.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4. REGULASI -->
+    <div class="content-block" id="regulasi">
+      <h2>4. Lanskap Regulasi dan Standar</h2>
+      <p>Tabel berikut merangkum instrumen yang paling mungkin Anda temui. Perhatikan kolom status: regulasi AI di Indonesia masih bergerak.</p>
+
+      <div class="table-wrap">
+        <table class="industry-table">
+          <thead><tr><th>Instrumen</th><th>Status (awal November 2026)</th><th>Inti</th><th>Relevansi industri</th></tr></thead>
+          <tbody>
+            <tr>
+              <td class="sector-name">UU No. 27/2022 (UU PDP) dan PP No. 33/2026</td>
+              <td>Berlaku<span class="status-tag">Lembaga PDP masih berproses</span></td>
+              <td>Pelindungan data pribadi, hak subjek data, kewajiban pengendali, sanksi</td>
+              <td>Data pelanggan dan karyawan; kamera di pabrik; HR analytics</td>
+            </tr>
+            <tr>
+              <td class="sector-name">SE Menkominfo No. 9 Tahun 2023 tentang Etika Kecerdasan Artifisial</td>
+              <td>Berlaku sebagai pedoman</td>
+              <td>Nilai etika AI (antara lain inklusivitas, keamanan, transparansi, akuntabilitas, pelindungan data pribadi)</td>
+              <td>Acuan kebijakan internal perusahaan dan Bab 7.3 laporan</td>
+            </tr>
+            <tr>
+              <td class="sector-name">Rancangan Perpres Etika AI dan Peta Jalan AI 2026–2029</td>
+              <td>Rancangan, menunggu penetapan<span class="status-tag">Cek ulang sebelum dikutip</span></td>
+              <td>Kerangka tata kelola nasional; aturan turunan sektoral diharapkan menyusul</td>
+              <td>Arah regulasi; jangan dikutip sebagai aturan yang sudah berlaku</td>
+            </tr>
+            <tr>
+              <td class="sector-name">GDPR (UE)</td>
+              <td>Berlaku</td>
+              <td>Perlindungan data pribadi penduduk UE</td>
+              <td>Perusahaan yang melayani pelanggan di UE atau memproses datanya</td>
+            </tr>
+            <tr>
+              <td class="sector-name">EU AI Act (Regulation (EU) 2024/1689)</td>
+              <td>Berlaku bertahap<span class="status-tag">Kewajiban sistem berisiko tinggi ditunda ke Des 2027 dan Agu 2028</span></td>
+              <td>Pendekatan berbasis risiko: dilarang, berisiko tinggi, kewajiban transparansi, risiko minimal</td>
+              <td>Ekspor ke UE; AI untuk manajemen pekerja dan komponen keselamatan produk dapat masuk kategori berisiko tinggi</td>
+            </tr>
+            <tr>
+              <td class="sector-name">ISO/IEC 42001:2023</td>
+              <td>Standar internasional (sukarela)</td>
+              <td>Sistem manajemen AI di organisasi: kebijakan, peran, kontrol, perbaikan berkelanjutan</td>
+              <td>Dasar tata kelola AI dan bahan audit, mirip posisi ISO 9001 untuk mutu</td>
+            </tr>
+            <tr>
+              <td class="sector-name">ISO/IEC 23894:2023</td>
+              <td>Standar panduan (sukarela)</td>
+              <td>Panduan manajemen risiko untuk AI</td>
+              <td>Struktur untuk menyusun daftar risiko di Bab 7.3</td>
+            </tr>
+            <tr>
+              <td class="sector-name">UU No. 1/1970 dan PP No. 50/2012 (SMK3)</td>
+              <td>Berlaku</td>
+              <td>Keselamatan kerja dan sistem manajemen K3</td>
+              <td>AI yang memengaruhi keselamatan harus masuk manajemen risiko K3 dan audit SMK3</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout info">
+        <span class="callout-icon">📌</span>
+        <div class="callout-body">
+          <p><strong>Cara memakai tabel ini di laporan:</strong> sebut hanya regulasi yang benar-benar relevan dengan kasus Anda (misalnya UU PDP bila ada data pelanggan atau karyawan), nyatakan statusnya dengan jujur ("rancangan" bukan "berlaku"), dan jelaskan apa artinya bagi rancangan solusi. Daftar panjang tanpa kaitan ke kasus tidak menambah nilai.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5. K3 & AUDIT -->
+    <div class="content-block" id="k3">
+      <h2>5. Implikasi K3, Akuntabilitas, dan Audit Kepatuhan</h2>
+      <p>Semakin besar dampak keputusan terhadap keselamatan atau hak orang, semakin kuat pengawasan manusia yang diperlukan. Gunakan tabel ini sebagai titik awal.</p>
+
+      <div class="table-wrap">
+        <table class="industry-table">
+          <thead><tr><th>Keputusan yang dipengaruhi AI</th><th>Contoh</th><th>Pengawasan manusia minimal</th><th>Kontrol audit</th></tr></thead>
+          <tbody>
+            <tr>
+              <td class="sector-name">Rekomendasi bisnis berdampak rendah</td>
+              <td>Saran bundling produk, prioritas kunjungan sales</td>
+              <td>Manusia meninjau hasil secara berkala</td>
+              <td>Catat versi model dan periode pemakaian</td>
+            </tr>
+            <tr>
+              <td class="sector-name">Keputusan mutu</td>
+              <td>Penolakan otomatis produk di lini QC</td>
+              <td>Sampel acak ditinjau inspektur; jalur "ragu-ragu" ke manusia</td>
+              <td>Log keputusan, rasio false negative dan false positive, audit kinerja per varian</td>
+            </tr>
+            <tr>
+              <td class="sector-name">Keputusan perawatan</td>
+              <td>Alarm prediksi kerusakan dan jadwal henti mesin</td>
+              <td>Teknisi memverifikasi sebelum henti atau perbaikan besar</td>
+              <td>Rekam alarm, verifikasi, dan hasil (alarm benar atau palsu)</td>
+            </tr>
+            <tr>
+              <td class="sector-name">Keputusan terkait manusia</td>
+              <td>Penyaringan pelamar, penilaian kinerja, penjadwalan lembur</td>
+              <td>Keputusan akhir oleh manusia, dengan penjelasan yang dapat disampaikan ke yang bersangkutan</td>
+              <td>Audit bias berkala, mekanisme keberatan</td>
+            </tr>
+            <tr>
+              <td class="sector-name">Fungsi keselamatan kritis</td>
+              <td>Interlock mesin, penghentian darurat, deteksi bahaya</td>
+              <td>Umumnya memakai sistem keselamatan yang tervalidasi dan tersertifikasi; AI sebagai pendukung, bukan satu-satunya pengaman</td>
+              <td>Validasi, pengujian berkala, pengelolaan perubahan (management of change)</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="concept-grid">
+        <div class="concept-card">
+          <div class="concept-card-label" style="color:var(--blue);">Jejak audit</div>
+          <div class="concept-card-title">Apa yang dicatat</div>
+          <div class="concept-card-body">Versi model, data masukan (atau ringkasannya), keluaran, siapa yang meninjau, dan keputusan akhir. Tanpa catatan ini auditor tidak bisa menilai.</div>
+        </div>
+        <div class="concept-card">
+          <div class="concept-card-label" style="color:var(--teal);">Perubahan model</div>
+          <div class="concept-card-title">Perlakukan seperti perubahan proses</div>
+          <div class="concept-card-body">Model yang dilatih ulang atau diganti perlu diuji dan disetujui sebelum dipakai, serupa prosedur management of change pada mesin atau SOP.</div>
+        </div>
+        <div class="concept-card">
+          <div class="concept-card-label" style="color:var(--amber);">Pemilik</div>
+          <div class="concept-card-title">Setiap sistem punya penanggung jawab</div>
+          <div class="concept-card-body">Tetapkan satu pemilik proses yang bertanggung jawab atas hasil, kualitas data, dan tindakan saat model salah.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 6. KLINIK -->
+    <div class="content-block" id="klinik">
+      <h2>6. Klinik Proyek: Bab 7.3 dan Pernyataan Penggunaan AI Generatif</h2>
+      <p>Gunakan waktu klinik untuk dua dokumen yang paling mudah diabaikan namun dinilai: tabel risiko dan pernyataan penggunaan AI.</p>
+
+      <h3>Template Bab 7.3: Risiko dan Keterbatasan</h3>
+      <p style="font-size:14px;">Tulis minimal tiga risiko yang <strong style="color:var(--text)">spesifik</strong> pada proyek Anda. Contoh pengisian (fiktif, Topik B, forecasting):</p>
+      <div class="table-wrap">
+        <table class="industry-table">
+          <thead><tr><th>Risiko</th><th>Sumber</th><th>Dampak</th><th>Kemungkinan</th><th>Kontrol</th><th>Pemilik</th></tr></thead>
+          <tbody>
+            <tr>
+              <td class="sector-name">Forecast selalu di bawah aktual saat tren naik</td>
+              <td>Model tidak menangkap tren</td>
+              <td>Kehabisan stok, kehilangan penjualan</td>
+              <td>Tinggi</td>
+              <td>Periksa bias tiap bulan; tambahkan faktor pertumbuhan; tinjau saat bias melewati batas</td>
+              <td>Perencana permintaan</td>
+            </tr>
+            <tr>
+              <td class="sector-name">Data penjualan belum mencakup periode promo besar</td>
+              <td>Data hanya 24 bulan</td>
+              <td>Error tinggi saat promo</td>
+              <td>Sedang</td>
+              <td>Tandai bulan promo; evaluasi terpisah; kumpulkan data tambahan</td>
+              <td>Tim penjualan dan analis</td>
+            </tr>
+            <tr>
+              <td class="sector-name">Data pelanggan memuat nama dan alamat toko</td>
+              <td>Dataset mentah dari sistem order</td>
+              <td>Pelanggaran privasi bila bocor</td>
+              <td>Sedang</td>
+              <td>Ganti dengan kode pelanggan; akses terbatas; tidak diunggah ke layanan AI publik</td>
+              <td>Pemilik data</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p style="font-size:14px;">Setiap kelompok perlu memasukkan <strong style="color:var(--text)">satu risiko data atau privasi</strong> dan, bila relevan, <strong style="color:var(--text)">satu risiko kinerja pada subkelompok</strong> (shift, varian, wilayah, pemasok).</p>
+
+      <h3 style="margin-top:var(--s6);">Template Pernyataan Penggunaan AI Generatif</h3>
+      <p style="font-size:14px;">Dokumen proyek mewajibkan laporan yang memakai AI generatif mencantumkan pernyataan penggunaan dan memastikan seluruh analisis data benar-benar dikerjakan sendiri. Template berikut dapat diadaptasi:</p>
+      <div class="prompt-box">
+        <div class="prompt-head"><span>TEMPLATE</span><span class="tag-mini">Lampirkan di laporan</span></div>
+        <div class="prompt-body"><strong>Pernyataan Penggunaan AI Generatif — Kelompok [nomor], [judul proyek]</strong>
+
+1. <strong>Alat yang dipakai:</strong> [nama alat dan versi atau tanggal akses, atau "tidak menggunakan"]
+2. <strong>Tujuan penggunaan:</strong> [contoh: memeriksa tata bahasa, menjelaskan istilah, membantu memahami pesan error]
+3. <strong>Bagian laporan yang terpengaruh:</strong> [Bab/bagian; bila tidak ada, tulis "tidak ada"]
+4. <strong>Yang kami kerjakan dan verifikasi sendiri:</strong> seluruh pembersihan data, EDA, pemodelan, perhitungan metrik, dan interpretasi. Setiap angka dan klaim yang dihasilkan AI telah kami periksa terhadap data atau sumber asli.
+5. <strong>Data yang tidak kami masukkan ke alat AI:</strong> data pribadi, data rahasia perusahaan, dan dataset mentah proyek.
+6. <strong>Lampiran:</strong> log prompt dan keluaran yang dipakai (Lampiran [huruf]).
+
+Kami menyatakan bahwa informasi di atas benar.
+[Nama dan NIM seluruh anggota]</div>
+        <div class="prompt-check"><strong>Catatan:</strong> pernyataan hanya bernilai bila benar. Penilai dapat meminta Anda menjelaskan bagian analisis dan kode. Jika Anda tidak memahami hasilnya, jangan pakai. Kebiasaan "periksa dulu" dari P-08 dan P-09 berlaku sepenuhnya di sini.</div>
+      </div>
+    </div>
+
+    <!-- 7. TUGAS -->
+    <div class="content-block" id="tugas">
+      <h2>7. Penugasan: Checkpoint 2 Proyek Akhir</h2>
+
+      <div class="task-box" id="penugasan">
+        <div class="task-box-title">📋 Checkpoint 2: Model, Perbandingan, dan Risiko</div>
+        <p style="font-size:13px;color:var(--text-2);margin-bottom:var(--s4);">Dikerjakan per kelompok. Kumpulkan melalui Google Classroom atau LMS UKWMS sebelum pertemuan P-13 (satu berkas PDF dan tautan notebook atau dashboard yang dapat dibuka dosen).</p>
+        <ol style="font-size:14px;color:var(--text);line-height:2.1;">
+          <li><strong>Draf Bab 5 (EDA)</strong> yang sudah lengkap: minimal tiga visualisasi dengan interpretasi kontekstual yang mengarah ke rumusan solusi.</li>
+          <li><strong>Draf Bab 6 (Implementasi Model):</strong> baseline dan minimal satu pendekatan pembanding, dijalankan di Google Colab atau Power BI/Looker Studio, dengan keluaran (screenshot atau tautan).</li>
+          <li><strong>Tabel perbandingan metrik</strong> dua pendekatan atau lebih, beserta alasan pendekatan terpilih dan metrik yang relevan bagi keputusan manajemen.</li>
+          <li><strong>Evaluasi per subkelompok</strong> (shift, varian, wilayah, pemasok, atau lainnya) minimal satu pemotongan, bila data memungkinkan.</li>
+          <li><strong>Draf Bab 7.3:</strong> tabel risiko minimal tiga baris, termasuk satu risiko data atau privasi, dengan kontrol dan pemilik.</li>
+          <li><strong>Pernyataan Penggunaan AI Generatif</strong> beserta log prompt (atau pernyataan "tidak menggunakan").</li>
+        </ol>
+      </div>
+
+      <div class="callout info">
+        <span class="callout-icon">🎯</span>
+        <div class="callout-body">
+          <p><strong>Yang diperiksa dosen di P-13:</strong> apakah model benar-benar dijalankan dan hasilnya diinterpretasi (L3, L4), apakah perbandingan pendekatan adil dan metriknya sesuai masalah, serta apakah risiko yang ditulis spesifik pada proyek Anda, bukan daftar umum yang bisa ditempel di proyek mana pun.</p>
+        </div>
+      </div>
+
+      <div class="reading-box">
+        <div class="reading-box-title">📖 Pratinjau Pertemuan Berikutnya</div>
+        <div class="reading-item">
+          <span class="reading-icon">🛠️</span>
+          <div class="reading-label">
+            <strong>P-13: Workshop Proyek UAS (Sesi 1)</strong>
+            Bimbingan kerangka proposal solusi AI. Pada sesi ini Anda menerjemahkan hasil model menjadi dampak bisnis (Bab 7), tabel AI vs konvensional, rekomendasi, dan roadmap, lalu saling menilai draf dengan rubrik.
+          </div>
+        </div>
+        <div class="reading-item">
+          <span class="reading-icon">📚</span>
+          <div class="reading-label">
+            <strong>Persiapan</strong>
+            Bawa draf Bab 2–6 dalam keadaan terbuka di laptop, dan hitung perkiraan biaya salah-prediksi untuk proyek Anda (seperti di P-10 dan P-11) sebagai bahan Bab 7.
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ── ASIDE ── -->
+  <aside class="content-aside">
+
+    <div class="toc">
+      <div class="toc-title">Isi Halaman</div>
+      <ul class="toc-list">
+        <li><a href="#tujuan" class="active">Tujuan Pembelajaran</a></li>
+        <li><a href="#isu">1. Enam Isu Inti</a></li>
+        <li><a href="#bias">2. Bias & Fairness</a></li>
+        <li><a href="#privasi">3. Privasi & Data Pribadi</a></li>
+        <li><a href="#regulasi">4. Regulasi & Standar</a></li>
+        <li><a href="#k3">5. K3 & Audit</a></li>
+        <li><a href="#klinik">6. Klinik Proyek</a></li>
+        <li><a href="#tugas">7. Checkpoint 2</a></li>
+      </ul>
+    </div>
+
+    <div class="sesi-nav-aside">
+      <div class="sesi-nav-title">Navigasi Sesi</div>
+      <a href="sesi-11.html" class="sesi-nav-btn">
+        <span>←</span>
+        <span>P-11: Prediksi & Rekomendasi Bisnis</span>
+      </a>
+      <a href="sesi-13.html" class="sesi-nav-btn">
+        <span>→</span>
+        <span>P-13: Workshop Proyek UAS 1</span>
+      </a>
+      <a href="../index.html" class="sesi-nav-btn">
+        <span>🏠</span>
+        <span>Kembali ke Beranda TI</span>
+      </a>
+    </div>
+
+    <div style="background:var(--bg-2);border:1px solid var(--border);border-radius:var(--r3);padding:var(--s5);margin-top:var(--s4);">
+      <div style="font-family:var(--mono);font-size:10px;color:var(--text-3);letter-spacing:2px;text-transform:uppercase;margin-bottom:var(--s3);">Info Pertemuan</div>
+      <div style="display:flex;flex-direction:column;gap:var(--s3);">
+        <div>
+          <div style="font-size:11px;color:var(--text-3);">Program Studi</div>
+          <div style="font-size:13px;color:var(--text);">S1 Teknik Industri</div>
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--text-3);">Tipe</div>
+          <div style="font-size:13px;color:var(--text);">Teori + klinik proyek</div>
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--text-3);">Durasi</div>
+          <div style="font-size:13px;color:var(--text);">100 menit</div>
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--text-3);">CPMK</div>
+          <div style="font-size:13px;color:var(--text);">C4, C5, C6</div>
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--text-3);">Rujukan</div>
+          <div style="font-size:13px;color:var(--text);">JDIH Komdigi · EUR-Lex · ISO/IEC 42001 dan 23894</div>
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--text-3);">Keluaran</div>
+          <div style="font-size:13px;color:var(--text);">Checkpoint 2 proyek akhir</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+</div>
+
+<!-- ══ FOOTER ══ -->
+<footer class="footer">
+  <div>AI·UKWMS <span style="color:var(--text-3);">· P-12 AI Ethics, Regulasi & Kepatuhan · S1 Teknik Industri</span></div>
+  <div><a href="../index.html" style="color:var(--text-3);">← Kembali ke Beranda</a></div>
+</footer>
+
+<script>
+  /* ── TOC active tracking ── */
+  const headings = document.querySelectorAll('.content-main [id]');
+  const tocLinks = document.querySelectorAll('.toc-list a');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(a => {
+          a.classList.remove('active');
+          if (a.getAttribute('href') === '#' + entry.target.id) a.classList.add('active');
+        });
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px' });
+  headings.forEach(h => observer.observe(h));
+
+  /* ── Nav scroll active ── */
+  const navLinks = document.querySelectorAll('.nav-links a[href^="#"]');
+  window.addEventListener('scroll', () => {
+    let current = '';
+    headings.forEach(h => { if (window.scrollY >= h.offsetTop - 100) current = h.id; });
+    navLinks.forEach(a => {
+      a.classList.remove('active');
+      if (a.getAttribute('href') === '#' + current) a.classList.add('active');
+    });
+  });
+</script>
+</body>
+</html>
