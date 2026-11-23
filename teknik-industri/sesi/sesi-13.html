@@ -1,0 +1,947 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>P-13: Workshop Proyek UAS — Sesi 1 — Teknik Industri UKWMS</title>
+<link rel="stylesheet" href="../../css/style.css">
+<style>
+  /* ── Table wrapper ── */
+  .table-wrap { overflow-x: auto; margin: var(--s4) 0; }
+  .table-wrap .industry-table { margin: 0; min-width: 600px; }
+
+  /* ── Flow steps ── */
+  .flow-steps {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: var(--s3);
+    margin: var(--s5) 0;
+  }
+  .flow-step { background: var(--bg-2); border: 1px solid var(--border); border-radius: var(--r2); padding: var(--s4); position: relative; }
+  .flow-step:not(:last-child)::after {
+    content: '→'; position: absolute; right: -11px; top: 50%; transform: translateY(-50%);
+    font-family: var(--mono); font-size: 13px; color: var(--text-3); background: var(--bg); z-index: 1; line-height: 1;
+  }
+  .flow-num { font-family: var(--mono); font-size: 11px; color: var(--teal); margin-bottom: var(--s2); }
+  .flow-title { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+  .flow-desc { font-size: 12px; color: var(--text-2); line-height: 1.6; }
+
+  /* ── Prompt / template box ── */
+  .prompt-box { background: var(--bg-2); border: 1px solid var(--border); border-radius: var(--r2); margin: var(--s4) 0; overflow: hidden; }
+  .prompt-head {
+    display: flex; justify-content: space-between; align-items: center; gap: var(--s3);
+    padding: var(--s3) var(--s4); background: var(--bg-3); border-bottom: 1px solid var(--border);
+    font-family: var(--mono); font-size: 11px; color: var(--text-3); letter-spacing: 1px;
+  }
+  .prompt-head .tag-mini { color: var(--teal); }
+  .prompt-body { padding: var(--s4) var(--s5); font-size: 13px; color: var(--text-2); line-height: 1.9; white-space: pre-wrap; }
+  .prompt-body strong { color: var(--text); }
+  .prompt-check { padding: var(--s3) var(--s5); border-top: 1px solid var(--border); background: var(--amber-dim); font-size: 12px; color: var(--text-2); line-height: 1.7; }
+  .prompt-check strong { color: var(--amber); }
+
+  /* ── Lab steps ── */
+  .lab-steps { margin: var(--s4) 0; padding-left: 0; list-style: none; counter-reset: lab; }
+  .lab-steps li {
+    counter-increment: lab; position: relative; padding: var(--s3) 0 var(--s3) 40px;
+    font-size: 14px; color: var(--text-2); line-height: 1.8; border-bottom: 1px solid var(--border);
+  }
+  .lab-steps li:last-child { border-bottom: none; }
+  .lab-steps li::before {
+    content: counter(lab); position: absolute; left: 0; top: var(--s3);
+    width: 26px; height: 26px; border-radius: 50%; background: var(--teal-dim); color: var(--teal);
+    font-family: var(--mono); font-size: 12px; display: flex; align-items: center; justify-content: center;
+  }
+  .lab-steps li strong { color: var(--text); }
+
+  /* ── Lemah vs kuat ── */
+  .lk td.weak   { background: rgba(240,96,96,0.06); }
+  .lk td.strong { background: var(--teal-glow); }
+  .lk td.weak::before   { content: 'LEMAH';  display: block; font-family: var(--mono); font-size: 9px; letter-spacing: 2px; color: var(--red);  margin-bottom: 4px; }
+  .lk td.strong::before { content: 'KUAT';   display: block; font-family: var(--mono); font-size: 9px; letter-spacing: 2px; color: var(--teal); margin-bottom: 4px; }
+
+  /* ── Rubrik ── */
+  .rubric-table { width: 100%; border-collapse: collapse; font-size: 13px; margin: var(--s4) 0; min-width: 620px; }
+  .rubric-table th { background: var(--bg-2); border: 1px solid var(--border); padding: var(--s3) var(--s4); text-align: left; font-family: var(--mono); font-size: 11px; color: var(--text-3); letter-spacing: 1px; }
+  .rubric-table td { border: 1px solid var(--border); padding: var(--s3) var(--s4); color: var(--text-2); vertical-align: top; line-height: 1.6; }
+  .rubric-table tr:hover td { background: var(--bg-2); }
+  .rubric-table td.pts { font-family: var(--mono); color: var(--blue); white-space: nowrap; }
+  .rubric-table tr.sub td { background: var(--bg-3); color: var(--text-3); font-family: var(--mono); font-size: 11px; letter-spacing: 1px; }
+
+  /* ── Kartu kasus ── */
+  .cards { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s5); margin: var(--s5) 0; }
+  .kartu { border: 2px dashed var(--border); border-radius: var(--r3); padding: var(--s5); background: var(--bg-2); break-inside: avoid; page-break-inside: avoid; }
+  .k-head { display: flex; justify-content: space-between; align-items: baseline; gap: var(--s3); margin-bottom: var(--s3); }
+  .k-no { font-family: var(--mono); font-size: 12px; color: var(--teal); letter-spacing: 2px; white-space: nowrap; }
+  .k-title { font-size: 15px; font-weight: 600; color: var(--text); }
+  .k-label { font-family: var(--mono); font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--text-3); margin: var(--s3) 0 4px; }
+  .k-text { font-size: 12.5px; color: var(--text-2); line-height: 1.7; }
+  .k-data { font-family: var(--mono); font-size: 12px; color: var(--text); line-height: 1.7; background: var(--bg-3); border-radius: var(--r2); padding: var(--s3) var(--s4); white-space: pre-wrap; overflow-x: auto; }
+  .k-ask { font-size: 12.5px; color: var(--text); line-height: 1.7; border-left: 3px solid var(--amber); padding-left: var(--s3); }
+
+  .sub-h { font-family: var(--mono); font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--amber); margin: var(--s7) 0 var(--s2); }
+
+  @media (max-width: 900px) {
+    .flow-step:not(:last-child)::after { display: none; }
+    .cards { grid-template-columns: 1fr; }
+  }
+  @media print { .kartu { border-style: solid; } }
+</style>
+</head>
+<body>
+
+<!-- ══ NAV ══ -->
+<nav class="nav">
+  <div class="nav-logo">AI<span>·</span>UKWMS</div>
+  <ul class="nav-links">
+    <li><a href="../index.html">← Beranda</a></li>
+    <li><a href="#tujuan" class="active">Tujuan</a></li>
+    <li><a href="#rantai">Kerangka</a></li>
+    <li><a href="#kanvas">Kanvas</a></li>
+    <li><a href="#uji">Uji</a></li>
+    <li><a href="#topik">Topik A–D</a></li>
+    <li><a href="#individu">Tugas Individu</a></li>
+    <li><a href="#kartu">Kartu</a></li>
+  </ul>
+</nav>
+
+<!-- ══ HERO ══ -->
+<header class="sesi-hero">
+  <div style="max-width:1100px;margin:0 auto;">
+    <div class="sesi-breadcrumb">
+      <a href="../index.html">Kecerdasan Buatan · Teknik Industri</a>
+      <span>›</span>
+      <span>Pertemuan 13</span>
+    </div>
+    <div class="sesi-num" style="color:var(--amber);">PERTEMUAN 13 · PROYEK</div>
+    <h1 class="sesi-title">Workshop Proyek UAS<br><em style="color:var(--teal);">— Sesi 1</em></h1>
+    <p style="font-size:15px;color:var(--text-2);max-width:720px;line-height:1.8;">Bimbingan kerangka proposal solusi AI: menyusun rantai logika dari masalah sampai rekomendasi, menguji konsistensinya, dan menemukan celah sebelum laporan dikumpulkan. Di bagian akhir terdapat tugas individu dengan kartu kasus.</p>
+    <div class="sesi-meta-row">
+      <span class="badge badge-blue">S1 Teknik Industri</span>
+      <span class="badge badge-amber">Proyek Akhir</span>
+      <span class="badge badge-teal">Bimbingan Kelompok</span>
+      <span class="badge badge-blue">Tugas Individu</span>
+      <span class="badge" style="color:var(--teal);border-color:rgba(0,201,177,0.3);background:var(--teal-dim);">100 menit</span>
+    </div>
+  </div>
+</header>
+
+<!-- ══ CONTENT LAYOUT ══ -->
+<div class="content-layout">
+  <main class="content-main">
+
+    <!-- TUJUAN -->
+    <div class="content-block" id="tujuan">
+      <h2>Tujuan Pembelajaran</h2>
+      <p>Kelompok dan topik undian sudah ditetapkan, dan sebagian besar bahan proyek sudah ada: dataset, cleaning, EDA, dan model awal. Sesi ini bukan tentang menambah pekerjaan, melainkan memeriksa apakah semuanya <em>nyambung</em> sebagai satu proposal solusi AI yang bisa dipertanggungjawabkan kepada manajemen. Setelah sesi ini, mahasiswa diharapkan mampu:</p>
+      <ol>
+        <li>Menyusun kanvas proposal solusi AI satu halaman yang konsisten dari masalah, data, pendekatan, bukti, dampak, sampai rekomendasi</li>
+        <li>Memetakan setiap bagian kanvas ke bab laporan dan ke rubrik L1–L5</li>
+        <li>Menguji logika proposal dengan lima uji konsistensi dan memastikan ketentuan originalitas terpenuhi</li>
+        <li>Menyusun daftar celah beserta penanggung jawab dan tenggat sebelum P-14</li>
+        <li>Mengerjakan tugas individu: keputusan layak-tidaknya LLM dan perbaikan prompt pada kartu kasus (materi P-08 dan P-09)</li>
+      </ol>
+
+      <div class="callout tip" style="margin-top:var(--s5);">
+        <span class="callout-icon">💡</span>
+        <div class="callout-body">
+          <p><strong>Ingat esensi proyek:</strong> yang dinilai bukan model yang paling canggih, melainkan cara Anda berpikir sebagai insinyur industri yang memahami AI: apa masalahnya, data apa yang dibutuhkan, pendekatan mana yang tepat, dan apa dampaknya bagi perusahaan. Kelompok dengan nilai tinggi biasanya yang paling jelas menjelaskan <em>mengapa</em> memilih pendekatan tertentu dan bagaimana hasilnya berguna bagi manajer di lapangan.</p>
+        </div>
+      </div>
+
+      <div class="callout warn">
+        <span class="callout-icon">🧪</span>
+        <div class="callout-body">
+          <p><strong>Bawa:</strong> laptop dengan draf laporan (Bab 2–7 sejauh yang ada), dataset, link Colab atau dashboard, dan kanvas yang sudah diisi sebisanya. Untuk tugas individu, bawa juga akun layanan LLM yang bisa dipakai, kalkulator atau spreadsheet, dan catatan P-08 serta P-09.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 1. RANTAI -->
+    <div class="content-block" id="rantai">
+      <h2>1. Rantai Logika Proposal Solusi AI</h2>
+      <p>Proposal yang kuat adalah satu rantai: setiap mata rantai menjawab pertanyaan dari mata rantai sebelumnya. Bila satu mata rantai lemah atau terputus, penilai langsung melihatnya.</p>
+
+      <div class="flow-steps">
+        <div class="flow-step">
+          <div class="flow-num">01 · MASALAH</div>
+          <div class="flow-title">Apa yang bermasalah?</div>
+          <div class="flow-desc">Masalah operasional yang spesifik, berangka, dan punya pemilik keputusan.</div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">02 · DATA</div>
+          <div class="flow-title">Data apa yang menjawabnya?</div>
+          <div class="flow-desc">Sumber, periode, ukuran, variabel kunci, dan masalah data yang sudah dibersihkan.</div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">03 · PENDEKATAN</div>
+          <div class="flow-title">Metode apa dan mengapa?</div>
+          <div class="flow-desc">Paradigma ML, baseline, minimal satu pembanding, dan metrik yang sesuai masalah.</div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">04 · BUKTI</div>
+          <div class="flow-title">Apa yang ditemukan?</div>
+          <div class="flow-desc">Pola dari EDA dan hasil model yang diinterpretasi dalam konteks industri.</div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">05 · DAMPAK</div>
+          <div class="flow-title">Apa nilainya?</div>
+          <div class="flow-desc">Estimasi dalam rupiah, jam, atau persen, dengan asumsi eksplisit, plus risiko dan alternatif.</div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">06 · REKOMENDASI</div>
+          <div class="flow-title">Apa yang dilakukan manajer?</div>
+          <div class="flow-desc">Langkah konkret, roadmap 3–6 bulan, dan KPI keberhasilan.</div>
+        </div>
+      </div>
+
+      <h3>Peta ke Laporan dan Rubrik</h3>
+      <div class="table-wrap">
+        <table class="industry-table">
+          <thead><tr><th>Bagian proposal</th><th>Pertanyaan penuntun</th><th>Bab laporan</th><th>Rubrik</th></tr></thead>
+          <tbody>
+            <tr>
+              <td class="sector-name">Masalah dan rumusan</td>
+              <td>Siapa yang terdampak, seberapa besar (angka, periode), dan apa 2–3 pertanyaan yang bisa dijawab dengan data Anda?</td>
+              <td>Bab 2 (2.1–2.4)</td>
+              <td>L1 · 15 poin</td>
+            </tr>
+            <tr>
+              <td class="sector-name">Data dan cleaning</td>
+              <td>Dari mana data berasal, berapa baris dan kolom, masalah apa yang ditemukan, dan apa buktinya sebelum dan sesudah dibersihkan?</td>
+              <td>Bab 4</td>
+              <td>L2 · 15 poin</td>
+            </tr>
+            <tr>
+              <td class="sector-name">Bukti awal (EDA)</td>
+              <td>Pola apa yang terlihat, dan bagaimana pola itu mengarahkan pilihan solusi?</td>
+              <td>Bab 5</td>
+              <td>L3 · 15 poin</td>
+            </tr>
+            <tr>
+              <td class="sector-name">Pendekatan dan hasil</td>
+              <td>Mengapa paradigma ini, apa baseline dan pembandingnya, metrik apa, dan apa artinya hasil bagi bisnis?</td>
+              <td>Bab 3 (3.1), Bab 6</td>
+              <td>L4 · 15 poin</td>
+            </tr>
+            <tr>
+              <td class="sector-name">Dampak, risiko, alternatif</td>
+              <td>Berapa nilainya dan apa asumsinya? Apa risiko dan keterbatasannya? Bagaimana dibandingkan solusi konvensional?</td>
+              <td>Bab 7 (7.1–7.4)</td>
+              <td rowspan="2" style="vertical-align:middle;">L5 · 15 poin (bersama)</td>
+            </tr>
+            <tr>
+              <td class="sector-name">Rekomendasi dan roadmap</td>
+              <td>Apa 3–5 langkah konkret, bagaimana timeline 3–6 bulan, dan KPI apa yang mengukur keberhasilan?</td>
+              <td>Bab 8, Bab 9</td>
+            </tr>
+            <tr>
+              <td class="sector-name">Presentasi</td>
+              <td>Bisakah manajer non-teknis memahami masalah, solusi, dan dampaknya? Apakah setiap anggota bisa menjawab?</td>
+              <td>Slide dan demo</td>
+              <td>P1–P3 · 25 poin</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 2. KANVAS -->
+    <div class="content-block" id="kanvas">
+      <h2>2. Kanvas Proposal Solusi AI (Satu Halaman)</h2>
+      <p>Kanvas adalah ringkasan proposal pada satu halaman. Isi sebisanya, lalu gunakan kotak yang masih kosong atau lemah sebagai bahan bimbingan. Kanvas bukan bagian yang dikumpulkan di laporan akhir, tetapi menjadi tulang punggung Ringkasan Eksekutif (Bab 1) dan slide presentasi.</p>
+
+      <div class="prompt-box">
+        <div class="prompt-head"><span>KANVAS</span><span class="tag-mini">Salin dan isi</span></div>
+        <div class="prompt-body"><strong>Kelompok / anggota:</strong>
+<strong>Topik undian:</strong> A / B / C / D          <strong>Konteks:</strong> nyata / data publik / fiktif
+
+<strong>1. MASALAH</strong> (satu kalimat dengan angka dan periode):
+Pemilik keputusan (siapa yang akan memakai hasil ini):
+
+<strong>2. RUMUSAN MASALAH</strong> (2–3 pertanyaan terukur):
+a.
+b.
+
+<strong>3. DATA</strong>
+Sumber dan periode:                    Ukuran (baris × kolom):
+Variabel kunci / target:
+Masalah data yang ditangani (sebelum → sesudah):
+
+<strong>4. PENDEKATAN</strong>
+Paradigma ML dan alasan:
+Baseline:                               Pendekatan pembanding:
+Metrik utama dan mengapa penting bagi manajer:
+
+<strong>5. BUKTI</strong>
+Temuan EDA yang paling berpengaruh:
+Hasil model (angka metrik) dan artinya:
+
+<strong>6. DAMPAK</strong>
+Estimasi (Rp / jam / %) dan rumusnya:
+Asumsi paling lemah:
+Risiko utama dan kontrol (termasuk data/privasi dan kinerja per subkelompok bila relevan):
+AI vs solusi konvensional (biaya / waktu / akurasi / risiko):
+
+<strong>7. REKOMENDASI</strong>
+3–5 tindakan konkret:
+Roadmap 3–6 bulan (persiapan data → pilot → evaluasi → rollout):
+KPI keberhasilan dan targetnya:</div>
+        <div class="prompt-check"><strong>Cara memakai:</strong> setiap kotak harus bisa dijawab dengan angka atau bukti dari laporan Anda. Kotak yang jawabannya hanya "akan dilakukan" atau "kami rasa" menandakan celah.</div>
+      </div>
+    </div>
+
+    <!-- 3. CONTOH -->
+    <div class="content-block" id="contoh">
+      <h2>3. Contoh Lemah dan Kuat</h2>
+      <p>Perbedaan nilai tinggi dan rendah sering terletak pada tingkat kekhususan kalimat. Contoh berikut memakai skenario fiktif (pabrik pengolahan kayu) hanya untuk menunjukkan tingkat kekhususan. <strong style="color:var(--text)">Jangan dipakai sebagai skenario proyek Anda.</strong></p>
+
+      <div class="table-wrap">
+        <table class="industry-table lk">
+          <thead><tr><th>Bagian</th><th>Versi lemah</th><th>Versi kuat</th></tr></thead>
+          <tbody>
+            <tr>
+              <td class="sector-name">Rumusan masalah</td>
+              <td class="weak">"Bagaimana AI dapat meningkatkan efisiensi pabrik?"</td>
+              <td class="strong">"Pada Lini Pengamplasan, faktor apa yang paling terkait dengan henti mendadak, dan berapa jam henti per bulan yang dapat dihindari bila peringatan diberikan 24 jam sebelumnya?"</td>
+            </tr>
+            <tr>
+              <td class="sector-name">Pemilihan pendekatan</td>
+              <td class="weak">"Kami memakai Random Forest karena akurat."</td>
+              <td class="strong">"Kami membandingkan baseline (menebak kelas mayoritas), regresi logistik, dan random forest. Random forest dipilih karena recall kelas 'gagal' paling tinggi pada data uji. Recall diutamakan karena kegagalan yang lolos lebih mahal daripada alarm palsu."</td>
+            </tr>
+            <tr>
+              <td class="sector-name">Interpretasi grafik</td>
+              <td class="weak">"Grafik menunjukkan downtime tinggi."</td>
+              <td class="strong">"Downtime mesin 3 pada shift malam sekitar dua kali rata-rata shift lain. Pola ini mengarahkan kami memasukkan variabel shift dan umur komponen ke dalam model."</td>
+            </tr>
+            <tr>
+              <td class="sector-name">Dampak bisnis</td>
+              <td class="weak">"Biaya produksi akan turun."</td>
+              <td class="strong">"12 henti mendadak per tahun × 60% terdeteksi dini × selisih biaya Rp60 juta = Rp432 juta per tahun. Dikurangi biaya sensor dan integrasi Rp150 juta (asumsi), manfaat bersih sekitar Rp282 juta pada tahun pertama."</td>
+            </tr>
+            <tr>
+              <td class="sector-name">Rekomendasi</td>
+              <td class="weak">"Perusahaan sebaiknya menerapkan AI."</td>
+              <td class="strong">"Jalankan pilot 3 bulan pada dua mesin dengan henti terbanyak. Lanjutkan ke seluruh lini bila recall ≥ 80% dan alarm palsu ≤ 2 per minggu."</td>
+            </tr>
+            <tr>
+              <td class="sector-name">KPI</td>
+              <td class="weak">"Efisiensi meningkat."</td>
+              <td class="strong">"Henti tak terencana turun dari 14 jam menjadi ≤ 9 jam per bulan dalam 6 bulan."</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 4. UJI -->
+    <div class="content-block" id="uji">
+      <h2>4. Lima Uji Konsistensi dan Pengecekan Originalitas</h2>
+      <p>Jalankan kelima uji ini pada kanvas Anda. Satu jawaban "tidak" berarti ada celah yang perlu masuk daftar tindak lanjut.</p>
+
+      <div class="concept-grid">
+        <div class="concept-card">
+          <div class="concept-card-label" style="color:var(--blue);">Uji 1</div>
+          <div class="concept-card-title">Uji Jawaban</div>
+          <div class="concept-card-body">Apakah setiap pertanyaan di rumusan masalah (Bab 2.3) dijawab oleh hasil di Bab 6–7 dan diringkas di Bab 9? Pertanyaan yang tidak terjawab harus diubah atau dihapus.</div>
+        </div>
+        <div class="concept-card">
+          <div class="concept-card-label" style="color:var(--teal);">Uji 2</div>
+          <div class="concept-card-title">Uji Data</div>
+          <div class="concept-card-body">Apakah data Anda benar-benar mampu menjawab pertanyaan itu: ukuran cukup (minimal 100 baris dan 5 kolom), variabel kunci ada, periode memadai untuk dibagi latih dan uji?</div>
+        </div>
+        <div class="concept-card">
+          <div class="concept-card-label" style="color:var(--amber);">Uji 3</div>
+          <div class="concept-card-title">Uji Pembanding</div>
+          <div class="concept-card-body">Ada baseline dan minimal satu pendekatan lain? Metrik sesuai masalah dan dikaitkan dengan biaya salah-keputusan seperti di P-10 dan P-11?</div>
+        </div>
+        <div class="concept-card">
+          <div class="concept-card-label" style="color:var(--purple);">Uji 4</div>
+          <div class="concept-card-title">Uji Rupiah</div>
+          <div class="concept-card-body">Bisakah dampak dihitung dengan rumus, asumsi yang disebutkan, dan asumsi terlemah yang diakui? Angka tanpa asumsi sama lemahnya dengan tanpa angka.</div>
+        </div>
+        <div class="concept-card">
+          <div class="concept-card-label" style="color:var(--red);">Uji 5</div>
+          <div class="concept-card-title">Uji Manajer</div>
+          <div class="concept-card-body">Apakah manajer non-teknis bisa memahami rekomendasi tanpa kamus istilah ML, tahu apa yang dikerjakan pertama kali, dan tahu KPI yang dipantau?</div>
+        </div>
+        <div class="concept-card">
+          <div class="concept-card-label" style="color:var(--teal);">Uji tambahan</div>
+          <div class="concept-card-title">Uji Risiko dan Etika</div>
+          <div class="concept-card-body">Bab 7.3 memuat minimal tiga risiko spesifik (termasuk satu risiko data atau privasi)? Ada pernyataan penggunaan AI generatif beserta log prompt, atau pernyataan tidak menggunakan (P-12)?</div>
+        </div>
+      </div>
+
+      <h3 style="margin-top:var(--s6);">Pengingat Originalitas</h3>
+      <div class="callout warn">
+        <span class="callout-icon">🚫</span>
+        <div class="callout-body">
+          <p><strong>Pelanggaran diperlakukan setara plagiarisme (nilai 0).</strong> Periksa sekali lagi bahwa proyek Anda tidak memakai: dataset latihan kelas (AI4I 2020, Telco Customer Churn, data produksi mentah P-04, Store Sales, Superstore, beserta variannya, dan dua dataset latihan P-11); lima perusahaan fiktif dari P-02 (PT Sejahtera Tekstil, Koperasi Maju Bersama, CV Roti Kita, PT Gas Nusantara, RS Husada Prima); atau Toyota, Unilever, dan Amazon sebagai subjek utama analisis. Kode dari notebook kelas atau Kaggle wajib diadaptasi dan diatribusikan. Jika ragu, tanyakan ke dosen hari ini.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5. TOPIK -->
+    <div class="content-block" id="topik">
+      <h2>5. Titik Perhatian per Topik Undian</h2>
+      <p>Setiap topik punya titik lemah yang berbeda. Periksa bagian topik Anda secara khusus.</p>
+
+      <div class="concept-grid">
+        <div class="concept-card">
+          <div class="concept-card-label" style="color:var(--red);">Topik A · Predictive Maintenance & QC</div>
+          <div class="concept-card-title">Klasifikasi</div>
+          <div class="concept-card-body"><strong style="color:var(--text)">Cek:</strong> proporsi kelas (kejadian gagal biasanya langka), kebocoran target pada fitur, baseline "tebak kelas mayoritas". <strong style="color:var(--text)">Metrik:</strong> recall, precision, confusion matrix, bukan accuracy semata. <strong style="color:var(--text)">Dampak:</strong> biaya false negative vs false positive, selisih biaya henti terencana vs mendadak.</div>
+        </div>
+        <div class="concept-card">
+          <div class="concept-card-label" style="color:var(--blue);">Topik B · Demand Forecasting & Inventori</div>
+          <div class="concept-card-title">Time series</div>
+          <div class="concept-card-body"><strong style="color:var(--text)">Cek:</strong> pembagian latih/uji kronologis, baseline naive atau seasonal naive, periode data cukup untuk pola musiman. <strong style="color:var(--text)">Metrik:</strong> MAE, RMSE, MAPE, dan bias. <strong style="color:var(--text)">Dampak:</strong> stok pengaman, biaya kehabisan stok vs biaya simpan.</div>
+        </div>
+        <div class="concept-card">
+          <div class="concept-card-label" style="color:var(--teal);">Topik C · Optimasi Rantai Pasok</div>
+          <div class="concept-card-title">Klasterisasi dan EDA</div>
+          <div class="concept-card-body"><strong style="color:var(--text)">Cek:</strong> standardisasi fitur, alasan memilih jumlah klaster, nama dan tindakan tiap klaster. <strong style="color:var(--text)">Metrik:</strong> kemudahan tafsir, ukuran dan nilai segmen, bukan hanya angka inertia. <strong style="color:var(--text)">Dampak:</strong> biaya keterlambatan, risiko ketergantungan pada pemasok tertentu.</div>
+        </div>
+        <div class="concept-card">
+          <div class="concept-card-label" style="color:var(--amber);">Topik D · Optimasi Proses Produksi</div>
+          <div class="concept-card-title">Regresi dan visualisasi</div>
+          <div class="concept-card-body"><strong style="color:var(--text)">Cek:</strong> definisi OEE yang benar (Availability × Performance × Quality), baseline rata-rata atau nilai historis, analisis Pareto untuk menunjukkan prioritas. <strong style="color:var(--text)">Metrik:</strong> MAE/RMSE bila memprediksi cycle time. <strong style="color:var(--text)">Dampak:</strong> jam produktif yang kembali, kenaikan output per shift.</div>
+        </div>
+      </div>
+
+      <div class="callout info">
+        <span class="callout-icon">📌</span>
+        <div class="callout-body">
+          <p><strong>Bila data tidak mendukung pemodelan:</strong> laporan boleh memakai analisis kuantitatif mendalam (simulasi stok, analisis sensitivitas, dan sejenisnya) sebagai pengganti Bab 6. Itu lebih baik daripada memaksakan model dari data yang tidak memadai. Bahas dengan dosen saat bimbingan.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 6. BIMBINGAN -->
+    <div class="content-block" id="bimbingan">
+      <h2>6. Bimbingan: Pertanyaan Dosen dan Daftar Celah</h2>
+
+      <h3>Pertanyaan yang Akan Diajukan</h3>
+      <p style="font-size:14px;">Siapkan jawaban singkat untuk pertanyaan berikut. Jawaban yang terbata-bata menunjukkan bagian yang perlu diperkuat.</p>
+      <ol class="lab-steps">
+        <li>Apa masalah Anda dalam satu kalimat yang memuat angka dan periode?</li>
+        <li>Mengapa data ini bisa menjawab rumusan masalah Anda?</li>
+        <li>Apa baseline Anda, dan apa yang Anda bandingkan dengannya?</li>
+        <li>Metrik mana yang paling penting bagi manajer, dan mengapa?</li>
+        <li>Berapa dampaknya dalam rupiah, jam, atau persen, dan asumsi mana yang paling lemah?</li>
+        <li>Apa risiko terbesar proyek Anda, dan siapa pemilik kontrolnya?</li>
+        <li>Apa yang pertama kali dilakukan manajer setelah membaca rekomendasi Anda?</li>
+        <li>Bagian mana yang paling belum selesai, dan apa rencana Anda sebelum P-14?</li>
+      </ol>
+
+      <h3 style="margin-top:var(--s6);">Daftar Celah dan Rencana Tindak</h3>
+      <p style="font-size:14px;">Di akhir bimbingan, tiap kelompok menyerahkan tabel ini (foto atau berkas). Tulis hanya celah nyata yang ditemukan, dan jangan lebih dari tujuh baris agar bisa diselesaikan.</p>
+      <div class="table-wrap">
+        <table class="industry-table" style="min-width:560px;">
+          <thead><tr><th>Celah</th><th>Bab</th><th>Rubrik</th><th>PIC</th><th>Tenggat</th></tr></thead>
+          <tbody>
+            <tr><td>&nbsp;</td><td></td><td></td><td></td><td></td></tr>
+            <tr><td>&nbsp;</td><td></td><td></td><td></td><td></td></tr>
+            <tr><td>&nbsp;</td><td></td><td></td><td></td><td></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout tip">
+        <span class="callout-icon">🎯</span>
+        <div class="callout-body">
+          <p><strong>Target setelah sesi ini:</strong> kanvas terisi lengkap, daftar celah disepakati, dan pekerjaan untuk Bab 7–8 sudah dimulai. Di P-14 Anda akan memfinalisasi analisis dan berlatih presentasi, jadi celah besar sebaiknya sudah tertangani sebelum itu.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 7. TUGAS INDIVIDU -->
+    <div class="content-block" id="individu">
+      <h2>7. Tugas Individu: LLM & Prompt Engineering</h2>
+      <p>Bagian ini menilai pemahaman individu atas P-08 (LLM & Generative AI) dan P-09 (Prompt Engineering). Dosen mengundi kartu kasus untuk tiap mahasiswa. Anda punya 30 menit untuk menyiapkan, lalu tampil di depan kelas. Yang dinilai adalah keputusan Anda, kualitas prompt Anda, dan ketelitian Anda memeriksa hasilnya, bukan hasil AI yang tampak bagus.</p>
+
+      <div class="stat-row">
+        <div class="stat-item">
+          <div class="stat-num" style="color:var(--amber);">30</div>
+          <div class="stat-desc">menit persiapan setelah menerima kartu</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num" style="color:var(--teal);">2–4</div>
+          <div class="stat-desc">menit tampil, ditambah tanya jawab singkat (durasi pasti diumumkan dosen)</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num" style="color:var(--blue);">1</div>
+          <div class="stat-desc">kartu kasus per mahasiswa, diundi oleh dosen</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num" style="color:var(--purple);">5</div>
+          <div class="stat-desc">komponen prompt: peran, tugas, konteks, format, batasan</div>
+        </div>
+      </div>
+
+      <div class="sub-h">Langkah pelaksanaan</div>
+      <ol class="lab-steps">
+        <li><strong>Undian kartu.</strong> Dosen mengundi siapa mendapat kartu nomor berapa. Kartu tidak bisa ditukar. Anda hanya mengerjakan kartu yang Anda terima (lihat bagian 9).</li>
+        <li><strong>Persiapan 30 menit.</strong> Kerjakan Bagian A, B, dan C secara mandiri dan isi lembar kerja.</li>
+        <li><strong>Tampil satu per satu.</strong> Anda dipanggil maju, menampilkan layar (riwayat chat asli dan perhitungan Anda), dan menyajikan hasil mengikuti format di bawah.</li>
+        <li><strong>Tanya jawab.</strong> Dosen mengajukan satu atau dua pertanyaan untuk menguji pemahaman Anda atas langkah yang baru ditunjukkan.</li>
+        <li><strong>Kumpulkan lembar kerja</strong> (foto atau berkas) setelah tampil.</li>
+      </ol>
+
+      <div class="sub-h">Bagian A · Keputusan dan risiko (materi P-08)</div>
+      <div class="table-wrap">
+        <table class="industry-table">
+          <thead><tr><th>Pertanyaan</th><th>Pilihan atau isi jawaban</th></tr></thead>
+          <tbody>
+            <tr>
+              <td class="sector-name">A1. Seberapa layak LLM untuk tugas pada kartu?</td>
+              <td>Pilih satu dan beri alasan 2–3 kalimat berdasarkan kerangka "LLM, ML klasik, atau rumus biasa?" di P-08:<br>
+                (a) <strong style="color:var(--text)">Layak</strong>: LLM menyusun draf, manusia meninjau.<br>
+                (b) <strong style="color:var(--text)">Sebagian</strong>: LLM membantu, tetapi perhitungan atau validasi dijalankan alat lain (spreadsheet, aturan, manusia).<br>
+                (c) <strong style="color:var(--text)">Tidak layak sebagai pengambil keputusan</strong>: LLM hanya boleh membantu pada bagian tertentu, atau tidak dipakai sama sekali.</td>
+            </tr>
+            <tr>
+              <td class="sector-name">A2. Apa risiko utamanya, dan apa kontrolnya?</td>
+              <td>Pilih satu risiko paling relevan (halusinasi, kerahasiaan data, hasil tidak konsisten, bias atau bahasa lokal, ketergantungan berlebihan) dan tulis <strong style="color:var(--text)">satu kontrol konkret</strong>: siapa memeriksa apa, atau data apa yang dibatasi.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="sub-h">Bagian B · Prompt, pemeriksaan, dan perbaikan (materi P-09)</div>
+      <ol class="lab-steps">
+        <li><strong>Prompt v1.</strong> Susun prompt dengan lima komponen berdasarkan permintaan atasan di kartu. Tempel data kartu di antara pemisah (tanda kutip tiga). Jalankan di LLM.</li>
+        <li><strong>Daftar cek sebelum membaca hasil.</strong> Tulis 3–5 hal yang akan Anda periksa (angka yang harus cocok, informasi yang seharusnya "tidak tersedia", format yang diminta). Menulisnya <em>sebelum</em> melihat hasil mencegah Anda menerima jawaban yang tampak meyakinkan.</li>
+        <li><strong>Periksa hasil.</strong> Hitung ulang angka dengan kalkulator atau spreadsheet. Catat <strong>minimal satu temuan</strong>: kesalahan, klaim tanpa dasar, atau informasi yang dikarang. Jika tidak ada masalah, tunjukkan bukti bahwa tiap butir daftar cek lolos.</li>
+        <li><strong>Prompt v2.</strong> Ubah prompt dengan satu atau dua perubahan spesifik yang Anda kaitkan dengan gejala yang ditemukan (lihat tabel gejala dan perbaikan di P-09). Jalankan lagi.</li>
+        <li><strong>Bandingkan v1 dan v2.</strong> Apa yang membaik, apa yang tidak berubah, dan apa yang masih harus diperiksa manusia?</li>
+      </ol>
+
+      <div class="sub-h">Bagian C · Kesimpulan satu kalimat</div>
+      <p>Lengkapi: <em>"Hasil ini boleh dipakai oleh [siapa] untuk [tujuan] bila [kondisi verifikasi yang harus dipenuhi]."</em></p>
+
+      <div class="callout info">
+        <span class="callout-icon">📌</span>
+        <div class="callout-body">
+          <p><strong>Tidak semua kartu "bisa dikerjakan" oleh LLM.</strong> Sebagian kartu sengaja berisi tugas yang salah bila diserahkan sepenuhnya ke LLM. Mengenali hal itu dan menjelaskannya dengan baik adalah jawaban yang benar.</p>
+        </div>
+      </div>
+
+      <div class="sub-h">Lembar kerja</div>
+      <p style="font-size:14px;">Salin ke kertas, catatan, atau Google Doc, lalu isi selama 30 menit persiapan. Maksimal satu halaman.</p>
+      <div class="prompt-box">
+        <div class="prompt-head"><span>LEMBAR KERJA</span><span class="tag-mini">Tugas Individu P-13</span></div>
+        <div class="prompt-body"><strong>Nama / NIM:</strong>                 <strong>Kartu nomor:</strong>
+
+<strong>A1. Keputusan:</strong> ( ) Layak   ( ) Sebagian   ( ) Tidak layak sebagai pengambil keputusan
+Alasan (2–3 kalimat):
+
+<strong>A2. Risiko utama:</strong>
+Kontrol konkret:
+
+<strong>B1. Prompt v1</strong> (peran / tugas / konteks / format / batasan):
+
+<strong>B2. Daftar cek</strong> (ditulis sebelum membaca hasil):
+1.
+2.
+3.
+
+<strong>B3. Hasil pemeriksaan</strong> (perhitungan sendiri + temuan):
+
+<strong>B4. Perubahan pada prompt v2</strong> dan gejala yang diperbaiki:
+
+<strong>B5. Perbandingan v1 dan v2:</strong>
+
+<strong>C. Kesimpulan:</strong> Hasil ini boleh dipakai oleh ... untuk ... bila ...</div>
+        <div class="prompt-check"><strong>Tip:</strong> perhitungan boleh ditulis kasar. Yang penting terlihat dari mana angka Anda berasal, karena penilai akan menanyakannya.</div>
+      </div>
+
+      <div class="sub-h">Format penyajian di depan kelas</div>
+      <p style="font-size:14px;">Tidak perlu membuat slide. Tampilkan layar laptop atau ponsel Anda: riwayat chat asli, perhitungan, dan lembar kerja.</p>
+      <div class="table-wrap">
+        <table class="industry-table">
+          <thead><tr><th>Segmen</th><th>Isi</th><th>Proporsi waktu</th></tr></thead>
+          <tbody>
+            <tr><td class="sector-name">1. Kartu dan keputusan</td><td>Sebutkan kasus Anda dan keputusan A1 beserta alasan singkat</td><td style="font-family:var(--mono);">± 20%</td></tr>
+            <tr><td class="sector-name">2. Prompt v1</td><td>Tampilkan prompt dengan lima komponennya dan ringkasan hasilnya</td><td style="font-family:var(--mono);">± 25%</td></tr>
+            <tr><td class="sector-name">3. Pemeriksaan</td><td>Sebutkan daftar cek, tunjukkan perhitungan, dan sampaikan temuan</td><td style="font-family:var(--mono);">± 25%</td></tr>
+            <tr><td class="sector-name">4. Prompt v2</td><td>Jelaskan perubahan yang dibuat dan dampaknya pada hasil</td><td style="font-family:var(--mono);">± 20%</td></tr>
+            <tr><td class="sector-name">5. Risiko dan kesimpulan</td><td>Bacakan risiko, kontrol, dan kesimpulan satu kalimat (Bagian C)</td><td style="font-family:var(--mono);">± 10%</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout warn">
+        <span class="callout-icon">⏱️</span>
+        <div class="callout-body">
+          <p><strong>Waktu sangat terbatas.</strong> Bila tidak sempat menyelesaikan semua bagian, utamakan tiga hal: keputusan A1 beserta alasannya, hasil pemeriksaan Anda, dan perbedaan v1 dengan v2. Bagian yang tidak sempat dikerjakan lebih baik dinyatakan terus terang daripada dikarang.</p>
+        </div>
+      </div>
+
+      <div class="sub-h">Aturan pelaksanaan</div>
+      <div class="concept-grid">
+        <div class="concept-card">
+          <div class="concept-card-label" style="color:var(--teal);">Diperbolehkan</div>
+          <div class="concept-card-title">Alat bantu Anda sendiri</div>
+          <div class="concept-card-body">Catatan P-08 dan P-09, satu layanan LLM pilihan Anda, kalkulator atau spreadsheet. Anda boleh menjalankan prompt berulang kali, tetapi sajikan hasil yang benar-benar dipakai.</div>
+        </div>
+        <div class="concept-card">
+          <div class="concept-card-label" style="color:var(--red);">Tidak diperbolehkan</div>
+          <div class="concept-card-title">Bantuan orang lain dan data lain</div>
+          <div class="concept-card-body">Berdiskusi dengan teman selama persiapan, bertukar kartu, atau menambahkan data di luar kartu. Jangan memasukkan data pribadi nyata ke layanan LLM.</div>
+        </div>
+        <div class="concept-card">
+          <div class="concept-card-label" style="color:var(--amber);">Bukti</div>
+          <div class="concept-card-title">Tampilkan riwayat chat asli</div>
+          <div class="concept-card-body">Layar harus menunjukkan prompt dan hasil asli, bukan hasil yang diketik ulang. Bila hasil berubah saat dijalankan ulang, laporkan perubahan itu, karena itu juga temuan.</div>
+        </div>
+        <div class="concept-card">
+          <div class="concept-card-label" style="color:var(--blue);">Data dalam kartu</div>
+          <div class="concept-card-title">Semuanya fiktif</div>
+          <div class="concept-card-body">Bila kartu memuat nama orang, lakukan latihan P-08: ganti dengan sebutan netral (misalnya "Operator 1") sebelum memasukkan teks ke LLM publik.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 8. RUBRIK -->
+    <div class="content-block" id="rubrik">
+      <h2>8. Rubrik Tugas Individu</h2>
+
+      <div class="table-wrap">
+        <table class="rubric-table">
+          <thead><tr><th>Aspek</th><th>Skor penuh jika</th><th>Bobot</th></tr></thead>
+          <tbody>
+            <tr class="sub"><td colspan="3">MATERI P-08 · 30 POIN</td></tr>
+            <tr>
+              <td><strong style="color:var(--text)">Keputusan layak atau tidaknya LLM (A1)</strong></td>
+              <td>Pilihan tepat untuk kasus pada kartu, alasan merujuk pada jenis keluaran (bahasa vs hasil tepat dan dapat diaudit) dan konsekuensi bila salah</td>
+              <td class="pts">15</td>
+            </tr>
+            <tr>
+              <td><strong style="color:var(--text)">Risiko dan kontrol (A2)</strong></td>
+              <td>Risiko relevan dengan kasus, kontrol konkret (siapa memeriksa apa, atau data apa yang dibatasi), bukan pernyataan umum</td>
+              <td class="pts">15</td>
+            </tr>
+            <tr class="sub"><td colspan="3">MATERI P-09 · 50 POIN</td></tr>
+            <tr>
+              <td><strong style="color:var(--text)">Kualitas prompt v1 (B1)</strong></td>
+              <td>Lima komponen lengkap, data dipisahkan dari instruksi, ada batasan sumber dan aturan "jika tidak tahu"</td>
+              <td class="pts">15</td>
+            </tr>
+            <tr>
+              <td><strong style="color:var(--text)">Verifikasi hasil (B2, B3)</strong></td>
+              <td>Daftar cek dibuat sebelum membaca hasil, perhitungan sendiri benar dan ditunjukkan, temuan atau bukti lolos jelas</td>
+              <td class="pts">20</td>
+            </tr>
+            <tr>
+              <td><strong style="color:var(--text)">Perbaikan v2 dan perbandingan (B4, B5)</strong></td>
+              <td>Perubahan spesifik, terkait gejala yang ditemukan, dampaknya dinilai jujur (termasuk bila tidak membaik)</td>
+              <td class="pts">15</td>
+            </tr>
+            <tr class="sub"><td colspan="3">PENYAJIAN · 20 POIN</td></tr>
+            <tr>
+              <td><strong style="color:var(--text)">Penyajian dan tanya jawab</strong></td>
+              <td>Urutan jelas, sesuai waktu, bukti chat asli ditampilkan, mampu menjelaskan dan menjawab pertanyaan tentang langkahnya sendiri</td>
+              <td class="pts">20</td>
+            </tr>
+            <tr>
+              <td><strong style="color:var(--text)">Total</strong></td>
+              <td></td>
+              <td class="pts" style="color:var(--teal);">100</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p style="font-size:14px;"><strong style="color:var(--text)">Skala per aspek:</strong> 100% bila lengkap dan benar, 70% bila ada kekurangan kecil, 40% bila hanya sebagian, 0% bila tidak ada.</p>
+    </div>
+
+    <!-- 9. KARTU -->
+    <div class="content-block" id="kartu">
+      <h2>9. Kartu Kasus</h2>
+      <p>Dosen mengundi siapa mendapat kartu nomor berapa. Kerjakan hanya kartu yang Anda terima. Semua data pada kartu bersifat fiktif.</p>
+
+<div class="cards">
+
+    <!-- K1 -->
+    <div class="kartu">
+      <div class="k-head"><span class="k-title">Laporan Shift Lini Pengemasan</span><span class="k-no">KARTU 01</span></div>
+      <div class="k-label">Konteks</div>
+      <div class="k-text">Anda staf produksi di pabrik makanan kemasan. Supervisor meminta draf laporan shift untuk manajer pabrik.</div>
+      <div class="k-label">Data</div>
+      <div class="k-data">Lini Pengemasan 1 · Shift 1 · 5 Nov 2026
+Target: 3.600 unit | Aktual: 3.342 unit
+Reject: 67 unit (label miring 40, seal bocor 19, lainnya 8)
+Downtime: 55 menit (changeover 30, feeder macet 25)
+Catatan supervisor: "Feeder macet tiga kali setelah ganti roll film."</div>
+      <div class="k-label">Permintaan atasan</div>
+      <div class="k-ask">Laporan maksimal 120 kata untuk manajer pabrik, memuat pencapaian (%), defect rate (%), penyebab downtime, dan satu usulan tindak lanjut.</div>
+    </div>
+
+    <!-- K2 -->
+    <div class="kartu">
+      <div class="k-head"><span class="k-title">Ringkasan SOP Penyimpanan Bahan Kimia</span><span class="k-no">KARTU 02</span></div>
+      <div class="k-label">Konteks</div>
+      <div class="k-text">Seorang petugas gudang baru ingin memahami aturan penyimpanan bahan kimia di Gudang B.</div>
+      <div class="k-label">Kutipan SOP (fiktif)</div>
+      <div class="k-data">5.1 Bahan kimia disimpan di area khusus berventilasi baik, suhu 15–25 °C.
+5.2 Jarak minimum bahan kimia ke sumber api atau panas: 3 meter.
+5.3 Tumpukan palet maksimal 2 palet dan tidak melebihi 1,5 meter.
+5.4 Setiap kemasan berlabel nama bahan dan tanggal penerimaan; berlaku FIFO.
+5.5 Kebocoran kemasan diperiksa tiap hari kerja oleh petugas gudang dan dicatat di formulir F-07.
+5.6 Kemasan bocor segera dipisahkan dan dilaporkan kepada supervisor gudang.</div>
+      <div class="k-label">Permintaan atasan</div>
+      <div class="k-ask">Buat ringkasan 5 poin untuk petugas baru. Lalu jawab dua pertanyaan petugas itu: "APD apa yang wajib dipakai?" dan "Berapa lama bahan boleh disimpan?"</div>
+    </div>
+
+    <!-- K3 -->
+    <div class="kartu">
+      <div class="k-head"><span class="k-title">Pengelompokan Keluhan Pelanggan</span><span class="k-no">KARTU 03</span></div>
+      <div class="k-label">Konteks</div>
+      <div class="k-text">Bagian layanan pelanggan sebuah distributor minuman mengumpulkan 12 keluhan minggu ini.</div>
+      <div class="k-label">Data</div>
+      <div class="k-data">1. Tutup botol sering bocor sejak pembelian bulan lalu.
+2. Pesanan datang 3 hari lebih lambat dari janji.
+3. Dus luar penyok dan basah saat diterima.
+4. Rasa produk berbeda dari biasanya, agak pahit.
+5. Kurir tidak menghubungi sebelum mengantar.
+6. Admin lama membalas pesan, 2 hari tanpa jawaban.
+7. Satu dus isinya kurang 2 botol.
+8. Barang dikirim ke alamat lama padahal sudah saya ubah.
+9. Label terkelupas, tanggal kedaluwarsa tidak terbaca.
+10. Produk sudah mendekati kedaluwarsa saat sampai.
+11. Pengiriman sering terlambat tiap minggu.
+12. Mohon dibuatkan ukuran kemasan yang lebih kecil.</div>
+      <div class="k-label">Permintaan atasan</div>
+      <div class="k-ask">Kelompokkan ke kategori: Kualitas Produk, Pengiriman, Kemasan, Layanan, Lainnya, dalam bentuk tabel. Lalu sebutkan tiga tema keluhan terbanyak beserta jumlahnya.</div>
+    </div>
+
+    <!-- K4 -->
+    <div class="kartu">
+      <div class="k-head"><span class="k-title">Notulen Rapat Perawatan</span><span class="k-no">KARTU 04</span></div>
+      <div class="k-label">Konteks</div>
+      <div class="k-text">Anda notulis rapat tim perawatan pabrik. Atasan meminta notulen ringkas dengan daftar tindak lanjut.</div>
+      <div class="k-label">Transkrip (fiktif)</div>
+      <div class="k-data">Rina: Pompa 2 bergetar lagi, sudah dua kali minggu ini.
+Agus: Usul kita periksa bearing hari Kamis.
+Rina: Bisa, tapi kita perlu izin henti dari produksi.
+Yudi: Saya tanyakan ke kepala produksi hari ini.
+Agus: Soal suku cadang, saya cek stok gudang dulu.
+Rina: Keputusan ganti vendor oli kita tunda dulu.</div>
+      <div class="k-label">Permintaan atasan</div>
+      <div class="k-ask">Buat: (1) ringkasan maksimal 3 kalimat, (2) daftar keputusan, (3) tabel tindak lanjut dengan kolom Tindakan | PIC | Tenggat.</div>
+    </div>
+
+    <!-- K5 -->
+    <div class="kartu">
+      <div class="k-head"><span class="k-title">Ekstraksi Data Invoice</span><span class="k-no">KARTU 05</span></div>
+      <div class="k-label">Konteks</div>
+      <div class="k-text">Bagian pembelian menerima invoice pemasok sebagai teks hasil scan dan ingin memasukkannya ke spreadsheet.</div>
+      <div class="k-label">Teks invoice (fiktif)</div>
+      <div class="k-data">INVOICE No. INV-2026-1189 · 6 Nov 2026 · Pemasok D
+1. Bearing 6205 — 10 pcs × Rp45.000 = Rp450.000
+2. Oli hidrolik 20 L — 2 drum × Rp1.250.000 = Rp2.500.000
+3. Sabuk V tipe B-52 — 6 pcs × Rp82.000 = Rp512.000
+4. Sealant tahan panas — 4 tube × Rp37.500 = Rp150.000
+TOTAL TAGIHAN: Rp3.612.000</div>
+      <div class="k-label">Permintaan atasan</div>
+      <div class="k-ask">Ubah menjadi tabel (No, Barang, Qty, Harga satuan, Jumlah). Pastikan total sudah benar dan laporkan bila ada ketidaksesuaian.</div>
+    </div>
+
+    <!-- K6 -->
+    <div class="kartu">
+      <div class="k-head"><span class="k-title">Draf Email Keterlambatan Pemasok</span><span class="k-no">KARTU 06</span></div>
+      <div class="k-label">Konteks</div>
+      <div class="k-text">Anda staf pengadaan. Kepala bagian meminta draf email kepada pemasok yang terlambat mengirim bahan baku.</div>
+      <div class="k-label">Data (fiktif)</div>
+      <div class="k-data">Nomor PO: PO-2026-0417
+Pemasok: Pemasok C
+Janji kirim: 12 Nov 2026 | Tiba: 19 Nov 2026
+Dampak: Lini 2 berhenti 6 jam pada 16 Nov 2026 karena bahan habis
+Klausul denda keterlambatan dalam kontrak: tidak diketahui</div>
+      <div class="k-label">Permintaan atasan</div>
+      <div class="k-ask">Draf email maksimal 130 kata, sopan namun tegas. Minta penjelasan penyebab dan komitmen tanggal kirim untuk pesanan berikutnya.</div>
+    </div>
+
+    <!-- K7 -->
+    <div class="kartu">
+      <div class="k-head"><span class="k-title">Analisis Pareto Downtime Mesin</span><span class="k-no">KARTU 07</span></div>
+      <div class="k-label">Konteks</div>
+      <div class="k-text">Supervisor ingin tahu mesin mana yang perlu diprioritaskan perbaikannya berdasarkan downtime sebulan terakhir.</div>
+      <div class="k-label">Data (menit downtime)</div>
+      <div class="k-data">Press 1: 180
+Filler: 140
+Conveyor: 120
+Press 2: 95
+Labeler: 60
+Capper: 45</div>
+      <div class="k-label">Permintaan atasan</div>
+      <div class="k-ask">Buat tabel Pareto (urut terbesar, persentase, persentase kumulatif), lalu sebutkan mesin-mesin yang bersama-sama menyumbang sekitar 80% downtime.</div>
+    </div>
+
+    <!-- K8 -->
+    <div class="kartu">
+      <div class="k-head"><span class="k-title">Prediksi Penjualan Bulan Depan</span><span class="k-no">KARTU 08</span></div>
+      <div class="k-label">Konteks</div>
+      <div class="k-text">Manajer penjualan berkata: "Tanya AI saja berapa penjualan Januari tahun depan, lalu pesan stok sesuai itu."</div>
+      <div class="k-label">Data (dus per bulan, Jan–Des)</div>
+      <div class="k-data">520, 540, 610, 640, 560, 530, 545, 570, 560, 540, 620, 700</div>
+      <div class="k-label">Permintaan atasan</div>
+      <div class="k-ask">Dapatkan angka prediksi Januari dan jelaskan kepada manajer bagaimana angka itu diperoleh serta seberapa bisa dipercaya.</div>
+    </div>
+
+    <!-- K9 -->
+    <div class="kartu">
+      <div class="k-head"><span class="k-title">Pemeriksaan Izin Kerja Panas</span><span class="k-no">KARTU 09</span></div>
+      <div class="k-label">Konteks</div>
+      <div class="k-text">Seorang supervisor usul: "Biar AI saja yang menyetujui izin kerja panas, supaya cepat."</div>
+      <div class="k-label">Data (fiktif)</div>
+      <div class="k-data">FORM IZIN KERJA PANAS
+Lokasi: Gudang Material B | Pekerjaan: pengelasan pipa
+Waktu: 08.00–11.00
+Area bebas bahan mudah terbakar: Ya
+Jarak ke tangki solar: 2 m
+APAR tersedia: Ya
+Petugas pengawas api: belum ditunjuk
+
+KETENTUAN SOP (fiktif):
+- Jarak minimum 5 m dari bahan mudah terbakar, atau lindungi dengan penutup tahan api.
+- Wajib ada pengawas api selama pekerjaan dan 30 menit setelahnya.</div>
+      <div class="k-label">Permintaan atasan</div>
+      <div class="k-ask">Minta AI menilai form tersebut terhadap ketentuan SOP, lalu sampaikan apakah izin boleh disetujui oleh AI.</div>
+    </div>
+
+    <!-- K10 -->
+    <div class="kartu">
+      <div class="k-head"><span class="k-title">Ringkasan Laporan Near-Miss</span><span class="k-no">KARTU 10</span></div>
+      <div class="k-label">Konteks</div>
+      <div class="k-text">Tim K3 ingin mengubah laporan insiden berikut menjadi ringkasan terstruktur.</div>
+      <div class="k-label">Teks laporan (fiktif)</div>
+      <div class="k-data">Pada 4 November 2026 pukul 14.20 di Lini 2, operator Budi Santoso hampir tertimpa karung bahan baku saat forklift mundur. Forklift dikemudikan oleh Andi Pratama. Tidak ada korban. Area saat itu ramai karena pergantian shift. Setelah kejadian, supervisor memasang rambu dan memberi arahan lisan kepada operator forklift.</div>
+      <div class="k-label">Permintaan atasan</div>
+      <div class="k-ask">Ekstrak: waktu, lokasi, kejadian, tindakan korektif, dan penyebab akar. Susun menjadi ringkasan 5 baris.</div>
+    </div>
+
+  </div>
+
+      <div class="reading-box">
+        <div class="reading-box-title">📖 Pratinjau Pertemuan Berikutnya</div>
+        <div class="reading-item">
+          <span class="reading-icon">🛠️</span>
+          <div class="reading-label">
+            <strong>P-14: Workshop Proyek UAS (Sesi 2)</strong>
+            Finalisasi analisis, persiapan presentasi proposal, dan simulasi presentasi. Pastikan celah dari daftar tindak lanjut hari ini sudah tertangani dan draf laporan lengkap siap dibawa.
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ── ASIDE ── -->
+  <aside class="content-aside">
+
+    <div class="toc">
+      <div class="toc-title">Isi Halaman</div>
+      <ul class="toc-list">
+        <li><a href="#tujuan" class="active">Tujuan Pembelajaran</a></li>
+        <li><a href="#rantai">1. Rantai Logika Proposal</a></li>
+        <li><a href="#kanvas">2. Kanvas Proposal</a></li>
+        <li><a href="#contoh">3. Contoh Lemah dan Kuat</a></li>
+        <li><a href="#uji">4. Lima Uji Konsistensi</a></li>
+        <li><a href="#topik">5. Titik Perhatian Topik A–D</a></li>
+        <li><a href="#bimbingan">6. Pertanyaan & Daftar Celah</a></li>
+        <li><a href="#individu">7. Tugas Individu</a></li>
+        <li><a href="#rubrik">8. Rubrik Tugas Individu</a></li>
+        <li><a href="#kartu">9. Kartu Kasus</a></li>
+      </ul>
+    </div>
+
+    <div class="sesi-nav-aside">
+      <div class="sesi-nav-title">Navigasi Sesi</div>
+      <a href="sesi-12.html" class="sesi-nav-btn">
+        <span>←</span>
+        <span>P-12: AI Ethics & Kepatuhan</span>
+      </a>
+      <a href="sesi-14.html" class="sesi-nav-btn">
+        <span>→</span>
+        <span>P-14: Workshop Proyek UAS 2</span>
+      </a>
+      <a href="../index.html" class="sesi-nav-btn">
+        <span>🏠</span>
+        <span>Kembali ke Beranda TI</span>
+      </a>
+    </div>
+
+    <div style="background:var(--bg-2);border:1px solid var(--border);border-radius:var(--r3);padding:var(--s5);margin-top:var(--s4);">
+      <div style="font-family:var(--mono);font-size:10px;color:var(--text-3);letter-spacing:2px;text-transform:uppercase;margin-bottom:var(--s3);">Info Pertemuan</div>
+      <div style="display:flex;flex-direction:column;gap:var(--s3);">
+        <div>
+          <div style="font-size:11px;color:var(--text-3);">Program Studi</div>
+          <div style="font-size:13px;color:var(--text);">S1 Teknik Industri</div>
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--text-3);">Tipe</div>
+          <div style="font-size:13px;color:var(--text);">Workshop proyek + tugas individu</div>
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--text-3);">Durasi</div>
+          <div style="font-size:13px;color:var(--text);">100 menit</div>
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--text-3);">CPMK</div>
+          <div style="font-size:13px;color:var(--text);">C3, C4, C5, C6</div>
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--text-3);">Acuan</div>
+          <div style="font-size:13px;color:var(--text);">Halaman Proyek Akhir (struktur laporan, rubrik L1–L5 dan P1–P3) · P-08 dan P-09 untuk tugas individu</div>
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--text-3);">Bawa</div>
+          <div style="font-size:13px;color:var(--text);">Laptop + draf laporan, dataset, link Colab/dashboard · akun LLM · kalkulator atau spreadsheet</div>
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--text-3);">Keluaran</div>
+          <div style="font-size:13px;color:var(--text);">Kanvas proposal, daftar celah, lembar kerja tugas individu</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+</div>
+
+<!-- ══ FOOTER ══ -->
+<footer class="footer">
+  <div>AI·UKWMS <span style="color:var(--text-3);">· P-13 Workshop Proyek UAS — Sesi 1 · S1 Teknik Industri</span></div>
+  <div><a href="../index.html" style="color:var(--text-3);">← Kembali ke Beranda</a></div>
+</footer>
+
+<script>
+  /* ── TOC active tracking ── */
+  const headings = document.querySelectorAll('.content-main [id]');
+  const tocLinks = document.querySelectorAll('.toc-list a');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(a => {
+          a.classList.remove('active');
+          if (a.getAttribute('href') === '#' + entry.target.id) a.classList.add('active');
+        });
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px' });
+  headings.forEach(h => observer.observe(h));
+
+  /* ── Nav scroll active ── */
+  const navLinks = document.querySelectorAll('.nav-links a[href^="#"]');
+  window.addEventListener('scroll', () => {
+    let current = '';
+    headings.forEach(h => { if (window.scrollY >= h.offsetTop - 100) current = h.id; });
+    navLinks.forEach(a => {
+      a.classList.remove('active');
+      if (a.getAttribute('href') === '#' + current) a.classList.add('active');
+    });
+  });
+</script>
+</body>
+</html>
